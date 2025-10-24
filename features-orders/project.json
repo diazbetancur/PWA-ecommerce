@@ -1,0 +1,21 @@
+{
+  "name": "features-orders",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "features-orders/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:features type:lib"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "features-orders/jest.config.ts",
+        "tsConfig": "features-orders/tsconfig.spec.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

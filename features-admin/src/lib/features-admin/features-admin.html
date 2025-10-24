@@ -1,0 +1,12 @@
+<div class="admin-actions">
+  @if (pushEnabled()) {
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="sendTestPush()"
+    i18n="@@admin.sendTestPush"
+  >
+    Enviar notificación de prueba
+  </button>
+  }
+</div>

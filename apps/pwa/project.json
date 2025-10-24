@@ -1,5 +1,5 @@
 {
-  "name": "pwa",
+  "name": "ecommerce",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "app",
@@ -10,9 +10,9 @@
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/pwa",
+        "outputPath": "dist/apps/ecommerce",
         "browser": "apps/pwa/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": ["zone.js", "@angular/localize/init"],
         "tsConfig": "apps/pwa/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
         "assets": [
@@ -22,13 +22,12 @@
           }
         ],
         "styles": ["apps/pwa/src/styles.scss"],
-        "server": "apps/pwa/src/main.server.ts",
-        "ssr": {
-          "entry": "apps/pwa/src/server.ts"
-        },
-        "outputMode": "server"
+        "outputMode": "static"
       },
       "configurations": {
+        "development": {
+          "sourceMap": true
+        },
         "production": {
           "budgets": [
             {
@@ -42,12 +41,47 @@
               "maximumError": "8kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "serviceWorker": "apps/pwa/ngsw-config.json",
+          "fileReplacements": [
+            {
+              "replace": "apps/pwa/src/environments/environment.ts",
+              "with": "apps/pwa/src/environments/environment.prod.ts"
+            }
+          ],
+          "server": "apps/pwa/src/main.server.ts",
+          "ssr": {
+            "entry": "apps/pwa/src/server.ts"
+          },
+          "outputMode": "server",
+          "prerender": {
+            "discoverRoutes": false
+          },
+          "optimization": true
         },
-        "development": {
-          "optimization": false,
-          "extractLicenses": false,
-          "sourceMap": true
+        "production-browser": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all",
+          "serviceWorker": "apps/pwa/ngsw-config.json",
+          "fileReplacements": [
+            {
+              "replace": "apps/pwa/src/environments/environment.ts",
+              "with": "apps/pwa/src/environments/environment.prod.ts"
+            }
+          ],
+          "outputMode": "static",
+          "optimization": true
         }
       },
       "defaultConfiguration": "production"
@@ -57,10 +91,10 @@
       "executor": "@angular/build:dev-server",
       "configurations": {
         "production": {
-          "buildTarget": "pwa:build:production"
+          "buildTarget": "ecommerce:build:production"
         },
         "development": {
-          "buildTarget": "pwa:build:development"
+          "buildTarget": "ecommerce:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -68,7 +102,7 @@
     "extract-i18n": {
       "executor": "@angular/build:extract-i18n",
       "options": {
-        "buildTarget": "pwa:build"
+        "buildTarget": "ecommerce:build"
       }
     },
     "lint": {
@@ -86,9 +120,9 @@
       "continuous": true,
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "pwa:build",
+        "buildTarget": "ecommerce:build",
         "port": 4200,
-        "staticFilePath": "dist/apps/pwa/browser",
+        "staticFilePath": "dist/apps/ecommerce/browser",
         "spa": true
       }
     }

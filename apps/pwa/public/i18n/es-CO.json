@@ -1,0 +1,27 @@
+{
+  "app": { "title": "eCommerce" },
+  "navbar": {
+    "brand": "eCommerce",
+    "catalog": "Catálogo",
+    "cart": "Carrito",
+    "checkout": "Checkout",
+    "account": "Cuenta",
+    "orders": "Pedidos",
+    "admin": "Admin",
+    "superadmin": "Superadmin"
+  },
+  "layout": { "skipToContent": "Saltar al contenido" },
+  "footer": { "text": "© 2025 Mi Tienda" },
+  "auth": { "login": "Iniciar sesión", "logout": "Cerrar sesión" },
+  "cart": { "empty": "Tu carrito está vacío" },
+  "checkout": { "title": "Pagar" },
+  "admin": {
+    "title": "Administración",
+    "sendTestPush": "Enviar notificación de prueba"
+  },
+  "superadmin": { "title": "Superadmin" },
+  "notifications": {
+    "enabled": "Notificaciones habilitadas",
+    "denied": "Permiso de notificaciones denegado"
+  }
+}

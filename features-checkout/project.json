@@ -1,0 +1,21 @@
+{
+  "name": "features-checkout",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "features-checkout/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:features type:lib"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "features-checkout/jest.config.ts",
+        "tsConfig": "features-checkout/tsconfig.spec.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

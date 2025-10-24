@@ -1,0 +1,27 @@
+{
+  "app": { "title": "eCommerce" },
+  "navbar": {
+    "brand": "eCommerce",
+    "catalog": "Catalog",
+    "cart": "Cart",
+    "checkout": "Checkout",
+    "account": "Account",
+    "orders": "Orders",
+    "admin": "Admin",
+    "superadmin": "Superadmin"
+  },
+  "layout": { "skipToContent": "Skip to content" },
+  "footer": { "text": "© 2025 My Shop" },
+  "auth": { "login": "Sign in", "logout": "Sign out" },
+  "cart": { "empty": "Your cart is empty" },
+  "checkout": { "title": "Checkout" },
+  "admin": {
+    "title": "Administration",
+    "sendTestPush": "Send test notification"
+  },
+  "superadmin": { "title": "Superadmin" },
+  "notifications": {
+    "enabled": "Notifications enabled",
+    "denied": "Notifications permission denied"
+  }
+}

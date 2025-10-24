@@ -1,0 +1,24 @@
+{
+  "tenant": {
+    "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+    "slug": "demo-b",
+    "displayName": "Demo B"
+  },
+  "theme": {
+    "primary": "#009688",
+    "accent": "#8BC34A",
+    "logoUrl": "/icons/icon-192x192.png",
+    "faviconUrl": "/icons/icon-96x96.png",
+    "cssVars": { "--btn-radius": "4px" }
+  },
+  "features": {
+    "coupons": false,
+    "videos": true,
+    "reviews": false,
+    "customDomain": true
+  },
+  "limits": { "products": 10000, "admins": 10, "storageMB": 4096 },
+  "locale": "en",
+  "currency": "USD",
+  "cdnBaseUrl": "/"
+}

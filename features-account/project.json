@@ -1,0 +1,21 @@
+{
+  "name": "features-account",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "features-account/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["scope:features type:lib"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "features-account/jest.config.ts",
+        "tsConfig": "features-account/tsconfig.spec.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

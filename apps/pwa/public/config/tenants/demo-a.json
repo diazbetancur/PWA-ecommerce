@@ -1,0 +1,24 @@
+{
+  "tenant": {
+    "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "slug": "demo_a",
+    "displayName": "Demo A"
+  },
+  "theme": {
+    "primary": "#FF4081",
+    "accent": "#303F9F",
+    "logoUrl": "/icons/icon-192x192.png",
+    "faviconUrl": "/icons/icon-96x96.png",
+    "cssVars": { "--btn-radius": "12px" }
+  },
+  "features": {
+    "coupons": true,
+    "videos": false,
+    "reviews": true,
+    "customDomain": true
+  },
+  "limits": { "products": 5000, "admins": 5, "storageMB": 2048 },
+  "locale": "es-CO",
+  "currency": "COP",
+  "cdnBaseUrl": "/"
+}
