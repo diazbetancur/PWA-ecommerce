@@ -8,6 +8,7 @@
     "build": "nx build ecommerce",
     "build:prod": "nx build ecommerce --configuration=production",
     "build:prod:browser": "nx build ecommerce --configuration=production-browser",
+    "vercel-build": "nx build ecommerce --configuration=production-browser",
     "lint": "nx lint ecommerce",
     "test": "nx test ecommerce",
     "e2e": "nx e2e ecommerce-e2e",
