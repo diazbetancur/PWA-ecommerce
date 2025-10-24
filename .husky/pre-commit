@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
 
-npx lint-staged
-npm run test --silent
+# Husky v9+: don't source _/husky.sh (deprecated, will fail in v10)
+# Use npm exec to avoid Windows npx shim issues
+
+npm exec lint-staged
+npm test --silent
