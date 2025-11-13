@@ -11,3 +11,6 @@ export * from './lib/ui/index';
 export * from './lib/ui/header';
 export * from './lib/ui/footer';
 export * from './lib/ui/layout';
+
+// Demos and Testing
+export * from './lib/demos/api-usage-demo.component';

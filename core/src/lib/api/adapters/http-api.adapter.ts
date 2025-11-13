@@ -1,7 +1,6 @@
-import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { APP_ENV, AppEnv } from '../../config/app-env.token';
+import { ApiClientService } from '../../services/api-client.service';
 import { CartItem, Order, Product } from '../../models/types';
 import {
   AdminApi,
@@ -15,60 +14,58 @@ import {
   SuperadminApi,
 } from '../contracts';
 
+/**
+ * Adapter HTTP que implementa todas las APIs usando ApiClientService
+ * - Usa paths relativos automáticamente
+ * - Se beneficia del sistema de entornos y logging
+ * - Integrado con TenantHeaderInterceptor
+ */
 @Injectable({ providedIn: 'root' })
 export class HttpApiAdapter {
-  private readonly http = inject(HttpClient);
-  private readonly env: AppEnv = inject(APP_ENV);
-  private get base() {
-    return this.env.apiBaseUrl;
-  }
+  private readonly apiClient = inject(ApiClientService);
 
   products: ProductsApi = {
     list: (params?: { q?: string; page?: number; pageSize?: number }) =>
       firstValueFrom(
-        this.http.get<Product[]>(`${this.base}/products`, {
-          params: params as any,
-        })
+        this.apiClient.getWithParams<Product[]>('/products', params || {})
       ),
     byId: (id: string) =>
-      firstValueFrom(this.http.get<Product>(`${this.base}/products/${id}`)),
+      firstValueFrom(this.apiClient.get<Product>(`/products/${id}`)),
   };
 
   categories: CategoriesApi = {
     list: () =>
       firstValueFrom(
-        this.http.get<{ id: string; name: string; slug: string }[]>(
-          `${this.base}/categories`
-        )
+        this.apiClient.get<{ id: string; name: string; slug: string }[]>('/categories')
       ),
   };
 
   cart: CartApi = {
     get: () =>
       firstValueFrom(
-        this.http.get<{ items: CartItem[]; total: number }>(`${this.base}/cart`)
+        this.apiClient.get<{ items: CartItem[]; total: number }>('/cart')
       ),
     add: (productId: string, qty: number) =>
       firstValueFrom(
-        this.http.post<void>(`${this.base}/cart`, { productId, qty })
+        this.apiClient.post<void>('/cart', { productId, qty })
       ),
     remove: (productId: string) =>
-      firstValueFrom(this.http.delete<void>(`${this.base}/cart/${productId}`)),
+      firstValueFrom(this.apiClient.delete<void>(`/cart/${productId}`)),
   };
 
   orders: OrdersApi = {
-    list: () => firstValueFrom(this.http.get<Order[]>(`${this.base}/orders`)),
+    list: () => firstValueFrom(this.apiClient.get<Order[]>('/orders')),
     create: (payload: { items: CartItem[]; total: number }) =>
       firstValueFrom(
-        this.http.post<{ id: string }>(`${this.base}/orders`, payload)
+        this.apiClient.post<{ id: string }>('/orders', payload)
       ),
   };
 
   coupons: CouponsApi = {
     validate: (code: string) =>
       firstValueFrom(
-        this.http.post<{ valid: boolean; amount?: number }>(
-          `${this.base}/coupons/validate`,
+        this.apiClient.post<{ valid: boolean; amount?: number }>(
+          '/coupons/validate',
           { code }
         )
       ),
@@ -79,7 +76,7 @@ export class HttpApiAdapter {
       const form = new FormData();
       form.append('file', file);
       return firstValueFrom(
-        this.http.post<{ url: string }>(`${this.base}/media`, form)
+        this.apiClient.post<{ url: string }>('/media', form)
       );
     },
   };
@@ -87,14 +84,14 @@ export class HttpApiAdapter {
   auth: AuthApi = {
     login: (email: string, password: string) =>
       firstValueFrom(
-        this.http.post<{ token: string }>(`${this.base}/auth/login`, {
+        this.apiClient.post<{ token: string }>('/auth/login', {
           email,
           password,
         })
       ),
     refresh: (refreshToken: string) =>
       firstValueFrom(
-        this.http.post<{ token: string }>(`${this.base}/auth/refresh`, {
+        this.apiClient.post<{ token: string }>('/auth/refresh', {
           refreshToken,
         })
       ),
@@ -106,13 +103,13 @@ export class HttpApiAdapter {
     users: {
       list: () =>
         firstValueFrom(
-          this.http.get<{ id: string; email: string; role: string }[]>(
-            `${this.base}/admin/users`
+          this.apiClient.get<{ id: string; email: string; role: string }[]>(
+            '/admin/users'
           )
         ),
       assignRole: (userId: string, role: string) =>
         firstValueFrom(
-          this.http.post<void>(`${this.base}/admin/users/${userId}/role`, {
+          this.apiClient.post<void>(`/admin/users/${userId}/role`, {
             role,
           })
         ),
@@ -123,29 +120,29 @@ export class HttpApiAdapter {
     tenants: {
       list: () =>
         firstValueFrom(
-          this.http.get<
+          this.apiClient.get<
             { id: string; slug: string; plan: string; active: boolean }[]
-          >(`${this.base}/super/tenants`)
+          >('/super/tenants')
         ),
       create: (payload: { slug: string; plan: string }) =>
         firstValueFrom(
-          this.http.post<{ id: string }>(`${this.base}/super/tenants`, payload)
+          this.apiClient.post<{ id: string }>('/super/tenants', payload)
         ),
       pause: (id: string) =>
         firstValueFrom(
-          this.http.post<void>(`${this.base}/super/tenants/${id}/pause`, {})
+          this.apiClient.post<void>(`/super/tenants/${id}/pause`, {})
         ),
     },
     plans: {
       list: () =>
         firstValueFrom(
-          this.http.get<
+          this.apiClient.get<
             { id: string; name: string; features: Record<string, boolean> }[]
-          >(`${this.base}/super/plans`)
+          >('/super/plans')
         ),
       toggleFlag: (tenantId: string, flag: string, value: boolean) =>
         firstValueFrom(
-          this.http.post<void>(`${this.base}/super/tenants/${tenantId}/flags`, {
+          this.apiClient.post<void>(`/super/tenants/${tenantId}/flags`, {
             flag,
             value,
           })
@@ -154,8 +151,8 @@ export class HttpApiAdapter {
     metrics: {
       byTenant: (id: string) =>
         firstValueFrom(
-          this.http.get<{ visits: number; sales: number; conversion: number }>(
-            `${this.base}/super/metrics/${id}`
+          this.apiClient.get<{ visits: number; sales: number; conversion: number }>(
+            `/super/metrics/${id}`
           )
         ),
     },

@@ -31,6 +31,7 @@ import { appRoutes } from './app.routes';
 // Core providers (will be implemented in core lib)
 import {
   APP_ENV,
+  APP_ENV_INITIALIZER,
   AuthService,
   authTenantInterceptor,
   GlobalErrorHandler,
@@ -61,8 +62,9 @@ export const appConfig: ApplicationConfig = {
       }),
       loader: TranslocoHttpLoader,
     }),
+    // Inicializador del entorno (debe ir primero)
+    APP_ENV_INITIALIZER,
     {
-      // TODO(APP_INITIALIZER deprecation): keep until alternative is available for Angular v20
       provide: APP_INITIALIZER,
       multi: true,
       deps: [TenantConfigService],

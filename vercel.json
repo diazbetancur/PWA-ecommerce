@@ -1,4 +1,5 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "builds": [
     {
       "src": "package.json",
@@ -8,6 +9,7 @@
   ],
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist/apps/ecommerce/browser",
+  "installCommand": "npm install",
   "cleanUrls": true,
   "trailingSlash": false,
   "headers": [

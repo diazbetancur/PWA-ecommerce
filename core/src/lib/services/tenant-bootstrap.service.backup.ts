@@ -1,21 +1,21 @@
-import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { Injectable, inject, PLATFORM_ID, signal, computed } from '@angular/core';
+import { isPlatformBrowser, DOCUMENT } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { computed, inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { BehaviorSubject, firstValueFrom } from 'rxjs';
-import {
-    TenantBootstrapConfig,
-    TenantConfigResponse,
-    TenantResolutionError,
-    TenantResolutionStatus,
-    TenantResolutionStrategy
-} from '../interfaces/tenant-resolution.interface';
-import { TenantConfig } from '../models/types';
 import { ApiClientService } from './api-client.service';
+import { TenantConfig } from '../models/types';
+import {
+  TenantConfigResponse,
+  TenantResolutionStatus,
+  TenantResolutionError,
+  TenantResolutionStrategy,
+  TenantBootstrapConfig
+} from '../interfaces/tenant-resolution.interface';
 
 /**
  * 🚀 Servicio de Bootstrap de Tenants conectado al Backend Real de Azure
- *
+ * 
  * Características:
  * - ✅ Resolución inteligente de tenants (query param > subdomain > hostname > default)
  * - ✅ Integración completa con ApiClientService (sin hardcodear URLs)
@@ -24,17 +24,17 @@ import { ApiClientService } from './api-client.service';
  * - ✅ Compatible con SSR (Server-Side Rendering)
  * - ✅ Signals de Angular para reactividad óptima
  * - ✅ Mapeo automático de backend DTO a configuración interna
- *
+ * 
  * Endpoint del Backend:
  * GET /api/public/tenant/resolve?tenant={slug}
- *
+ * 
  * @example
  * // En APP_INITIALIZER
  * const bootstrap = inject(TenantBootstrapService);
  * await bootstrap.initialize();
- *
+ * 
  * // Para verificar estado
- * if (bootstrap.hasErrorState()) {
+ * if (bootstrap.hasError()) {
  *   router.navigate(['/tenant/not-found']);
  * }
  */
@@ -108,8 +108,8 @@ export class TenantBootstrapService {
   readonly tenantConfig$ = this._tenantConfig$.asObservable();
 
   // Computed helpers para verificaciones rápidas
-  readonly hasErrorState = computed(() => this._status() === 'error' || this._status() === 'not-found');
-  readonly isReady = computed(() =>
+  readonly hasError = computed(() => this._status() === 'error' || this._status() === 'not-found');
+  readonly isReady = computed(() => 
     this._status() === 'resolved' && !!this._currentTenant()
   );
   readonly needsRedirect = computed(() => {
@@ -119,10 +119,10 @@ export class TenantBootstrapService {
 
   /**
    * 🚀 Inicializa el tenant bootstrap conectándose al backend real de Azure
-   *
+   * 
    * Este método debe ser llamado en APP_INITIALIZER para cargar la configuración
    * del tenant antes de que la aplicación arranque completamente.
-   *
+   * 
    * Flujo:
    * 1. Detecta si está en SSR o Browser
    * 2. Resuelve el slug del tenant (query > subdomain > hostname > default)
@@ -131,7 +131,7 @@ export class TenantBootstrapService {
    * 5. Mapea la respuesta del backend a TenantConfig interno
    * 6. Aplica configuración al DOM (CSS vars, meta tags, etc.)
    * 7. Actualiza signals para reactividad
-   *
+   * 
    * @throws Error si el tenant no existe o hay problemas de red
    */
   async initialize(): Promise<void> {
@@ -177,7 +177,7 @@ export class TenantBootstrapService {
       // 3️⃣ Cargar configuración desde el backend de Azure
       console.log('🌐 [TenantBootstrap] Llamando al backend:', `/api/public/tenant/resolve?tenant=${strategy.value}`);
       const backendResponse = await this.loadTenantFromBackend(strategy.value);
-
+      
       // Guardar respuesta del backend para debugging
       this._backendResponse.set(backendResponse);
 
@@ -209,7 +209,7 @@ export class TenantBootstrapService {
       const duration = Date.now() - startTime;
       console.error(`❌ [TenantBootstrap] Error inicializando tenant (${duration}ms):`, error);
       this.handleTenantError(error as HttpErrorResponse, this._attemptedSlug());
-
+      
       // En caso de error, usar configuración por defecto para no bloquear la app
       // pero mantener el estado de error para que APP_INITIALIZER pueda redirigir
       this.setDefaultTenantConfig();
@@ -219,21 +219,125 @@ export class TenantBootstrapService {
   }
 
   /**
-   * 🔍 Resuelve la estrategia de tenant usando múltiples métodos
-   * Prioridad: query param > subdomain > hostname > default
+   * Maneja errores de tenant y establece el estado apropiado
    */
-  private resolveTenantStrategy(): TenantResolutionStrategy {
+  private handleTenantError(error: any, attemptedSlug: string | null): void {
+    let tenantError: TenantError;
+
+    if (error instanceof HttpErrorResponse) {
+      switch (error.status) {
+        case 404:
+          tenantError = {
+            code: 'NOT_FOUND',
+            message: `El tenant "${attemptedSlug}" no fue encontrado`,
+            slug: attemptedSlug || undefined,
+            timestamp: new Date()
+          };
+          break;
+        case 0:
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          tenantError = {
+            code: 'NETWORK_ERROR',
+            message: 'Error de conexión con el servidor. Por favor, intenta nuevamente.',
+            slug: attemptedSlug || undefined,
+            timestamp: new Date()
+          };
+          break;
+        default:
+          tenantError = {
+            code: 'UNKNOWN',
+            message: `Error del servidor: ${error.message}`,
+            slug: attemptedSlug || undefined,
+            timestamp: new Date()
+          };
+      }
+    } else if (error.message?.includes('configuración inválida')) {
+      tenantError = {
+        code: 'INVALID_CONFIG',
+        message: 'La configuración del tenant es inválida',
+        slug: attemptedSlug || undefined,
+        timestamp: new Date()
+      };
+    } else {
+      tenantError = {
+        code: 'UNKNOWN',
+        message: error instanceof Error ? error.message : 'Error desconocido',
+        slug: attemptedSlug || undefined,
+        timestamp: new Date()
+      };
+    }
+
+    this._error.set(tenantError);
+    this._status.set('error');
+
+    console.error('🔥 Tenant Error Details:', tenantError);
+  }
+
+  /**
+   * Reinicia el estado de error y reintenta cargar el tenant
+   */
+  async retryTenantLoad(newSlug?: string): Promise<void> {
+    if (newSlug) {
+      // Actualizar la URL si se proporciona un nuevo slug
+      const url = new URL(this.document.location.href);
+      url.searchParams.set('tenant', newSlug);
+      this.document.location.href = url.toString();
+    } else {
+      // Recargar el tenant actual
+      await this.initialize();
+    }
+  }
+
+  /**
+   * Verifica si el tenant actual tiene errores
+   */
+  hasError(): boolean {
+    return this._tenantStatus() === 'error';
+  }
+
+  /**
+   * Obtiene detalles del error actual
+   */
+  getCurrentError(): TenantError | null {
+    return this._tenantError();
+  }
+
+  /**
+   * Limpia el estado de error
+   */
+  clearError(): void {
+    this._tenantError.set(null);
+    this._error.set(null);
+    this._tenantStatus.set('loading');
+  }
+
+  /**
+   * Resuelve el slug del tenant usando diferentes estrategias
+   */
+  private resolveTenantSlug(): string {
+    const strategies = this.getTenantResolutionStrategies();
+
+    for (const strategy of strategies) {
+      if (strategy.value && strategy.value !== 'default') {
+        console.log(`Tenant resuelto por ${strategy.type}: ${strategy.value}`);
+        return strategy.value;
+      }
+    }
+
+    console.log('Usando tenant por defecto');
+    return this.DEFAULT_TENANT_CONFIG.tenant.slug;
+  }
+
+  /**
+   * Obtiene las estrategias de resolución de tenant en orden de prioridad
+   */
+  private getTenantResolutionStrategies(): TenantResolutionStrategy[] {
     // 1. Query parameter ?tenant=
     const urlParams = new URLSearchParams(this.document.location.search);
     const queryTenant = urlParams.get('tenant');
-    if (queryTenant) {
-      return {
-        type: 'query',
-        value: queryTenant,
-        source: `query parameter: ?tenant=${queryTenant}`,
-        priority: 1
-      };
-    }
 
     // 2. Subdomain
     const hostname = this.document.location.hostname;
@@ -241,47 +345,39 @@ export class TenantBootstrapService {
     const subdomain = subdomainMatch ? subdomainMatch[1] : '';
 
     // Excluir subdomains comunes que no son tenants
-    const excludedSubdomains = ['www', 'api', 'admin', 'app', 'staging', 'dev', 'localhost'];
-    if (subdomain && !excludedSubdomains.includes(subdomain)) {
-      return {
+    const excludedSubdomains = ['www', 'api', 'admin', 'app', 'staging', 'dev'];
+    const validSubdomain = subdomain && !excludedSubdomains.includes(subdomain) ? subdomain : '';
+
+    const strategies: TenantResolutionStrategy[] = [
+      {
+        type: 'query',
+        value: queryTenant || ''
+      },
+      {
         type: 'subdomain',
-        value: subdomain,
-        source: `subdomain: ${subdomain}.${hostname.split('.').slice(1).join('.')}`,
-        priority: 2
-      };
-    }
-
-    // 3. Hostname completo (dominios custom)
-    const mappedTenant = this.mapHostnameToTenant(hostname);
-    if (mappedTenant) {
-      return {
+        value: validSubdomain
+      },
+      {
         type: 'hostname',
-        value: mappedTenant,
-        source: `hostname mapping: ${hostname} -> ${mappedTenant}`,
-        priority: 3
-      };
-    }
+        value: this.mapHostnameToTenant(hostname)
+      },
+      {
+        type: 'default',
+        value: this.DEFAULT_TENANT_CONFIG.tenant.slug
+      }
+    ];
 
-    // 4. Tenant por defecto
-    return {
-      type: 'default',
-      value: this.config.defaultTenantSlug,
-      source: `default configuration`,
-      priority: 4
-    };
+    return strategies;
   }
 
   /**
-   * 🗺️ Mapea hostnames específicos a slugs de tenant
+   * Mapea hostnames específicos a slugs de tenant
    * Útil para dominios personalizados
    */
   private mapHostnameToTenant(hostname: string): string {
     const hostnameMap: Record<string, string> = {
-      'localhost': '',  // No mapear localhost
-      'localhost:4200': '',
+      'localhost:4200': 'default',
       'demo.example.com': 'demo',
-      'store-a.example.com': 'demo-a',
-      'store-b.example.com': 'demo-b',
       // Agregar más mapeos según sea necesario
     };
 
@@ -289,221 +385,36 @@ export class TenantBootstrapService {
   }
 
   /**
-   * 🌐 Carga la configuración del tenant desde el backend de Azure
-   * Usa ApiClientService para construcción automática de URL
+   * Carga la configuración del tenant desde el backend
    */
-  private async loadTenantFromBackend(tenantSlug: string): Promise<TenantConfigResponse> {
-    try {
-      // Usar ApiClientService que ya tiene configurado el apiBaseUrl
-      // El path relativo se concatenará automáticamente con el baseUrl
-      const response = await firstValueFrom(
-        this.apiClient.get<TenantConfigResponse>('/api/public/tenant/resolve', {
-          params: { tenant: tenantSlug }
-        })
-      );
+  private loadTenantConfig(tenantSlug: string): Observable<TenantConfig | null> {
+    // URL del endpoint público del backend
+    const apiUrl = `/api/public/tenant/resolve?tenant=${tenantSlug}`;
 
-      console.log('📦 [TenantBootstrap] Respuesta del backend:', response);
-      return response;
-
-    } catch (error) {
-      if (error instanceof HttpErrorResponse) {
-        if (error.status === 404) {
-          console.warn(`⚠️ [TenantBootstrap] Tenant "${tenantSlug}" no encontrado`);
-          throw new HttpErrorResponse({
-            error: { message: `Tenant "${tenantSlug}" no encontrado` },
-            status: 404,
-            statusText: 'Not Found',
-            url: `/api/public/tenant/resolve?tenant=${tenantSlug}`
-          });
+    return this.http.get<TenantApiResponse>(apiUrl).pipe(
+      map((response: TenantApiResponse) => {
+        if (response.success && response.data) {
+          return response.data;
         }
-        console.error('🔥 [TenantBootstrap] Error HTTP del backend:', error);
-        throw error;
-      }
-      console.error('🔥 [TenantBootstrap] Error inesperado:', error);
-      throw new Error(`Error cargando tenant: ${error}`);
-    }
-  }
+        throw new Error(response.message || 'Respuesta inválida del servidor');
+      }),
+      catchError((error: HttpErrorResponse) => {
+        console.error('Error cargando configuración del tenant:', error);
 
-  /**
-   * 🔄 Mapea la respuesta del backend (.NET) al formato interno de TenantConfig
-   */
-  private mapBackendResponseToTenantConfig(response: TenantConfigResponse): TenantConfig {
-    return {
-      tenant: {
-        id: response.tenant.id,
-        slug: response.tenant.slug,
-        displayName: response.tenant.displayName,
-        description: response.tenant.description,
-        contact: response.tenant.contact,
-        // Mapear branding desde la respuesta del backend
-        branding: {
-          primaryColor: response.branding.primaryColor,
-          secondaryColor: response.branding.secondaryColor,
-          accentColor: response.branding.accentColor,
-          backgroundColor: response.branding.backgroundColor,
-          textColor: response.branding.textColor,
-          logoUrl: response.branding.logoUrl,
-          faviconUrl: response.branding.faviconUrl,
-          headerLogo: response.branding.logoUrl,  // Reusar logo principal
-          footerLogo: response.branding.logoUrl   // Reusar logo principal
+        // Si el tenant no existe, intentar con el default
+        if (error.status === 404 && tenantSlug !== this.DEFAULT_TENANT_CONFIG.tenant.slug) {
+          console.log('Tenant no encontrado, intentando con default...');
+          return this.loadTenantConfig(this.DEFAULT_TENANT_CONFIG.tenant.slug);
         }
-      },
-      theme: {
-        primary: response.branding.primaryColor,
-        accent: response.branding.accentColor || response.branding.secondaryColor,
-        logoUrl: response.branding.logoUrl || '',
-        faviconUrl: response.branding.faviconUrl || '/favicon.ico',
-        background: response.branding.backgroundColor,
-        textColor: response.branding.textColor,
-        cssVars: {
-          'secondary-color': response.branding.secondaryColor,
-          'main-image-url': response.branding.mainImageUrl || ''
-        }
-      },
-      features: {
-        analytics: response.features.analyticsEnabled,
-        customDomain: response.features.customDomainEnabled,
-        sso: response.features.ssoEnabled,
-        apiAccess: response.features.apiAccessEnabled,
-        multiLanguage: response.features.multiLanguageEnabled,
-        pushNotifications: response.features.pushNotificationsEnabled || false,
-        dataExport: response.features.dataExportEnabled || false
-      },
-      limits: {
-        products: response.features.maxProducts || 1000,
-        admins: response.features.maxAdmins || 5,
-        storageMB: response.features.storageLimitMB || 500
-      },
-      locale: response.localization.locale,
-      currency: response.localization.currency,
-      cdnBaseUrl: '' // Puede venir de settings si lo agregas en el backend
-    };
+
+        // Para otros errores, retornar null para usar configuración por defecto
+        return of(null);
+      })
+    );
   }
 
   /**
-   * 🚨 Maneja errores de tenant y establece el estado apropiado
-   */
-  private handleTenantError(error: HttpErrorResponse | Error, attemptedSlug: string | null): void {
-    let tenantError: TenantResolutionError;
-
-    if (error instanceof HttpErrorResponse) {
-      switch (error.status) {
-        case 404:
-          tenantError = {
-            code: 'NOT_FOUND',
-            message: `El tenant "${attemptedSlug}" no fue encontrado en el sistema`,
-            slug: attemptedSlug || undefined,
-            statusCode: 404,
-            timestamp: new Date(),
-            retryable: false
-          };
-          this._status.set('not-found');
-          break;
-
-        case 0:
-          tenantError = {
-            code: 'NETWORK_ERROR',
-            message: 'No se pudo conectar al servidor. Verifica tu conexión a internet.',
-            slug: attemptedSlug || undefined,
-            statusCode: 0,
-            timestamp: new Date(),
-            retryable: true
-          };
-          this._status.set('error');
-          break;
-
-        case 500:
-        case 502:
-        case 503:
-        case 504:
-          tenantError = {
-            code: 'NETWORK_ERROR',
-            message: 'El servidor está experimentando problemas. Por favor, intenta nuevamente en unos momentos.',
-            slug: attemptedSlug || undefined,
-            statusCode: error.status,
-            timestamp: new Date(),
-            retryable: true
-          };
-          this._status.set('error');
-          break;
-
-        case 401:
-        case 403:
-          tenantError = {
-            code: 'UNAUTHORIZED',
-            message: 'No tienes permisos para acceder a este tenant.',
-            slug: attemptedSlug || undefined,
-            statusCode: error.status,
-            timestamp: new Date(),
-            retryable: false
-          };
-          this._status.set('error');
-          break;
-
-        default:
-          tenantError = {
-            code: 'UNKNOWN',
-            message: `Error del servidor (${error.status}): ${error.message}`,
-            slug: attemptedSlug || undefined,
-            statusCode: error.status,
-            timestamp: new Date(),
-            retryable: false
-          };
-          this._status.set('error');
-      }
-    } else {
-      tenantError = {
-        code: 'UNKNOWN',
-        message: error.message || 'Error desconocido al cargar el tenant',
-        slug: attemptedSlug || undefined,
-        timestamp: new Date(),
-        retryable: false
-      };
-      this._status.set('error');
-    }
-
-    this._error.set(tenantError);
-
-    console.error('🔥 [TenantBootstrap] Detalles del error:', {
-      code: tenantError.code,
-      message: tenantError.message,
-      slug: tenantError.slug,
-      statusCode: tenantError.statusCode,
-      retryable: tenantError.retryable,
-      timestamp: tenantError.timestamp
-    });
-  }
-
-  /**
-   * 💾 Obtiene configuración del cache
-   */
-  private getCachedConfig(slug: string): TenantConfig | null {
-    const cached = this.cache.get(slug);
-    if (!cached) return null;
-
-    const now = Date.now();
-    const isExpired = (now - cached.timestamp) > this.config.cacheTTL;
-
-    if (isExpired) {
-      this.cache.delete(slug);
-      return null;
-    }
-
-    return cached.config;
-  }
-
-  /**
-   * 💾 Guarda configuración en cache
-   */
-  private setCachedConfig(slug: string, config: TenantConfig): void {
-    this.cache.set(slug, {
-      config,
-      timestamp: Date.now()
-    });
-  }
-
-  /**
-   * 🎨 Aplica la configuración del tenant al DOM
+   * Aplica la configuración del tenant al DOM y estilos
    */
   private applyTenantConfiguration(config: TenantConfig): void {
     // Aplicar título de la página
@@ -520,14 +431,14 @@ export class TenantBootstrapService {
       this.updateFavicon(config.theme.faviconUrl);
     }
 
-    console.log('🎨 [TenantBootstrap] Configuración visual aplicada:', config.tenant.slug);
+    console.log('Configuración del tenant aplicada:', config.tenant.slug);
   }
 
   /**
-   * 🏷️ Actualiza los meta tags de la página
+   * Actualiza los meta tags de la página
    */
   private updateMetaTags(config: TenantConfig): void {
-    const description = config.tenant.description || `Tienda online de ${config.tenant.displayName}`;
+    const description = `Tienda online de ${config.tenant.displayName}`;
 
     // Description
     this.meta.updateTag({ name: 'description', content: description });
@@ -551,7 +462,7 @@ export class TenantBootstrapService {
   }
 
   /**
-   * 🎨 Aplica las variables CSS del theme
+   * Aplica las variables CSS del theme
    */
   private applyThemeVariables(config: TenantConfig): void {
     const root = this.document.documentElement;
@@ -578,10 +489,16 @@ export class TenantBootstrapService {
     // Material Design CSS variables integration
     root.style.setProperty('--mat-sys-primary', theme.primary);
     root.style.setProperty('--mat-sys-secondary', theme.accent);
+    root.style.setProperty('--mat-sys-tertiary', theme.accent);
+
+    // Variables adicionales para Material Design 3
+    if (theme.background) {
+      root.style.setProperty('--mat-sys-surface', theme.background);
+    }
   }
 
   /**
-   * 🖼️ Actualiza el favicon de la página
+   * Actualiza el favicon de la página
    */
   private updateFavicon(faviconUrl: string): void {
     const existingFavicon = this.document.querySelector('link[rel="icon"]') as HTMLLinkElement;
@@ -596,83 +513,48 @@ export class TenantBootstrapService {
   }
 
   /**
-   * 📋 Establece la configuración por defecto
+   * Establece la configuración por defecto
    */
   private setDefaultTenantConfig(): void {
     this.applyTenantConfiguration(this.DEFAULT_TENANT_CONFIG);
     this._currentTenant.set(this.DEFAULT_TENANT_CONFIG);
     this._tenantConfig$.next(this.DEFAULT_TENANT_CONFIG);
-    this._status.set('resolved');
   }
 
-  // ==================== Métodos Públicos ====================
+  // Métodos públicos para acceder a la configuración
 
   /**
-   * 🔑 Obtiene el slug del tenant actual
+   * Obtiene el slug del tenant actual
    */
   getTenantSlug(): string | null {
     return this._currentTenant()?.tenant.slug || null;
   }
 
   /**
-   * 🆔 Obtiene el ID del tenant para usar en requests al backend
+   * Obtiene el ID del tenant para usar en requests al backend
    */
   getTenantId(): string | null {
     return this._currentTenant()?.tenant.id || null;
   }
 
   /**
-   * 📦 Obtiene la configuración completa del tenant actual
+   * Obtiene la configuración completa del tenant actual
    */
   getTenantConfig(): TenantConfig | null {
     return this._currentTenant();
   }
 
   /**
-   * ✅ Verifica si el tenant está cargado
+   * Verifica si el tenant está cargado
    */
   isTenantLoaded(): boolean {
-    return this._currentTenant() !== null && this._status() === 'resolved';
+    return this._currentTenant() !== null;
   }
 
   /**
-   * 🔄 Recarga la configuración del tenant
+   * Recarga la configuración del tenant
    */
-  async reloadTenant(newSlug?: string): Promise<void> {
-    if (newSlug) {
-      // Actualizar la URL con el nuevo slug
-      const url = new URL(this.document.location.href);
-      url.searchParams.set('tenant', newSlug);
-      this.document.location.href = url.toString();
-    } else {
-      // Reinicializar con el slug actual
-      await this.initialize();
-    }
-  }
-
-  /**
-   * 🧹 Limpia el cache de tenants
-   */
-  clearCache(): void {
-    this.cache.clear();
-    console.log('🧹 [TenantBootstrap] Cache limpiado');
-  }
-
-  /**
-   * 🔍 Obtiene información de debugging
-   */
-  getDebugInfo() {
-    return {
-      currentTenant: this._currentTenant(),
-      status: this._status(),
-      error: this._error(),
-      attemptedSlug: this._attemptedSlug(),
-      strategy: this._resolvedStrategy(),
-      backendResponse: this._backendResponse(),
-      cacheSize: this.cache.size,
-      isReady: this.isReady(),
-      hasError: this.hasErrorState(),
-      needsRedirect: this.needsRedirect()
-    };
+  async reloadTenant(): Promise<void> {
+    await this.initialize();
   }
 }

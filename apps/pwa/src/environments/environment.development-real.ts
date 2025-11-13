@@ -1,0 +1,29 @@
+import { AppEnvironment } from '@core/services/app-env.service';
+
+/**
+ * Configuración para desarrollo con API real de Azure
+ * Usa la misma configuración de desarrollo pero apunta al backend real
+ */
+export const environment: AppEnvironment = {
+  production: false,
+  mockApi: false,  // 🔥 Usar API real
+  apiBaseUrl: 'https://api-ecommerce-d9fxeccbeeehdjd3.eastus-01.azurewebsites.net',
+  useTenantHeader: true,
+  fcm: {
+    vapidPublicKey: 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY'
+  },
+  analytics: {
+    enabled: false,  // Deshabilitado en development
+    trackingId: undefined
+  },
+  logging: {
+    level: 'debug',   // Full logging para desarrollo
+    enableConsole: true
+  },
+  features: {
+    advancedSearch: true,
+    darkMode: true,
+    notifications: true,  // Habilitado para probar con backend real
+    analytics: false
+  }
+};

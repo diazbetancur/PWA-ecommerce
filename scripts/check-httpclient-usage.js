@@ -23,6 +23,7 @@ const colors = {
 const ALLOWED_HTTPCLIENT_FILES = [
   'core/src/lib/services/api-client.service.ts',
   'core/src/lib/services/tenant-bootstrap.service.ts',
+  'core/src/lib/services/tenant-config.service.ts', // Necesita HttpClient para JSON locales en mock mode
   'core/src/lib/i18n/transloco.loader.ts',
   // Archivos de configuración
   'apps/pwa/src/app/app.config.ts',

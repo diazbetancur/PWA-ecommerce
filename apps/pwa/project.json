@@ -59,6 +59,18 @@
           },
           "optimization": true
         },
+        "development-real": {
+          "fileReplacements": [
+            {
+              "replace": "apps/pwa/src/environments/environment.ts",
+              "with": "apps/pwa/src/environments/environment.development-real.ts"
+            }
+          ],
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        },
         "production-browser": {
           "budgets": [
             {
@@ -78,6 +90,30 @@
             {
               "replace": "apps/pwa/src/environments/environment.ts",
               "with": "apps/pwa/src/environments/environment.prod.ts"
+            }
+          ],
+          "outputMode": "static",
+          "optimization": true
+        },
+        "production-vercel": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "4kb",
+              "maximumError": "8kb"
+            }
+          ],
+          "outputHashing": "all",
+          "serviceWorker": "apps/pwa/ngsw-config.json",
+          "fileReplacements": [
+            {
+              "replace": "apps/pwa/src/environments/environment.ts",
+              "with": "apps/pwa/src/environments/environment.runtime.ts"
             }
           ],
           "outputMode": "static",

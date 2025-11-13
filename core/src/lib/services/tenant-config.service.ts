@@ -3,14 +3,22 @@ import { Injectable, inject } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { APP_ENV, AppEnv } from '../config/app-env.token';
+import { ApiClientService } from './api-client.service';
 import { TenantConfig } from '../models/types';
 import { ManifestService } from './manifest.service';
 import { SeoService } from './seo.service';
 import { ThemeService } from './theme.service';
 
+/**
+ * Servicio para cargar y gestionar configuración de tenants
+ * - Usa ApiClientService para backend real
+ * - Mantiene HttpClient directo para archivos JSON locales en mock mode
+ * - Maneja la lógica de resolución de tenants por hostname/query params
+ */
 @Injectable({ providedIn: 'root' })
 export class TenantConfigService {
-  private readonly http = inject(HttpClient);
+  private readonly http = inject(HttpClient); // Solo para archivos JSON locales
+  private readonly apiClient = inject(ApiClientService); // Para backend real
   private readonly i18n = inject(TranslocoService);
   private readonly theme = inject(ThemeService);
   private readonly manifest = inject(ManifestService);
@@ -61,20 +69,18 @@ export class TenantConfigService {
       return;
     }
 
-    // If backend exists, you could call `${apiBaseUrl}/public/config`.
-    const url = this.env.mockApi
-      ? `/config/tenants/${tenantKey}.json`
-      : `${this.env.apiBaseUrl}/public/config`;
-
     try {
-      this._config = await firstValueFrom(
-        this.http.get<TenantConfig>(url, {
-          headers:
-            this.env.useTenantHeader && this.tenantSlug
-              ? { 'X-Tenant-Slug': this.tenantSlug }
-              : {},
-        })
-      );
+      // Diferent handling for mock vs real API
+      if (this.env.mockApi) {
+        // Para mock API, usar HttpClient directo para archivos JSON locales
+        const url = `/config/tenants/${tenantKey}.json`;
+        this._config = await firstValueFrom(this.http.get<TenantConfig>(url));
+      } else {
+        // Para backend real, usar ApiClientService con tenant resolution
+        this._config = await firstValueFrom(
+          this.apiClient.getTenantConfig(tenantKey)
+        ) as TenantConfig;
+      }
       // Re-apply dynamic aspects after loading
       this.applyDynamic(reapply);
     } catch (e) {
