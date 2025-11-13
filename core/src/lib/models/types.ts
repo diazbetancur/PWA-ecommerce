@@ -2,6 +2,30 @@ export interface TenantInfo {
   id: string;
   slug: string;
   displayName: string;
+  description?: string;
+  contact?: {
+    email?: string;
+    phone?: string;
+    address?: string;
+  };
+  socialLinks?: {
+    facebook?: string;
+    twitter?: string;
+    instagram?: string;
+    linkedin?: string;
+  };
+}
+
+export interface BrandingConfig {
+  primaryColor: string;
+  secondaryColor?: string;
+  accentColor?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  logoUrl?: string;
+  faviconUrl?: string;
+  headerLogo?: string;
+  footerLogo?: string;
 }
 
 export interface ThemeConfig {
@@ -16,7 +40,7 @@ export interface ThemeConfig {
 }
 
 export interface TenantConfig {
-  tenant: TenantInfo;
+  tenant: TenantInfo & { branding?: BrandingConfig };
   theme: ThemeConfig;
   features: Record<string, boolean>;
   limits: { products: number; admins: number; storageMB: number };

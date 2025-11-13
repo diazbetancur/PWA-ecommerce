@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { ApiFactoryService } from '@pwa/core';
+import { ApiFactoryService, ApiClientService } from '@pwa/core';
 import { Observable, from, map } from 'rxjs';
 
 export interface Category {
@@ -33,7 +32,7 @@ export interface Paged<T> {
 @Injectable({ providedIn: 'root' })
 export class CatalogService {
   private readonly api = inject(ApiFactoryService);
-  private readonly http = inject(HttpClient);
+  private readonly apiClient = inject(ApiClientService);
 
   getCategories(): Observable<Category[]> {
     return from(this.api.adapter.categories.list());

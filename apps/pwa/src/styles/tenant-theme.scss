@@ -1,0 +1,294 @@
+/* ===== VARIABLES CSS DEL TENANT ===== */
+/* Estas variables son inyectadas dinámicamente por el TenantBootstrapService */
+
+:root {
+  /* Variables básicas del tenant */
+  --tenant-primary-color: #1976d2;
+  --tenant-accent-color: #dc004e;
+  --tenant-background-color: #ffffff;
+  --tenant-text-color: #333333;
+
+  /* Variables Material Design que son sobrescritas por el tenant */
+  --mat-sys-primary: var(--tenant-primary-color);
+  --mat-sys-secondary: var(--tenant-accent-color);
+  --mat-sys-tertiary: var(--tenant-accent-color);
+  --mat-sys-surface: var(--tenant-background-color);
+
+  /* Variables adicionales para componentes personalizados */
+  --tenant-header-bg: var(--tenant-primary-color);
+  --tenant-header-text: #ffffff;
+  --tenant-button-primary-bg: var(--tenant-primary-color);
+  --tenant-button-primary-text: #ffffff;
+  --tenant-button-secondary-bg: var(--tenant-accent-color);
+  --tenant-button-secondary-text: #ffffff;
+
+  /* Variables para estados hover/focus - usando rgba para compatibilidad */
+  --tenant-primary-hover: rgba(25, 118, 210, 0.9); /* fallback */
+  --tenant-accent-hover: rgba(220, 0, 78, 0.9); /* fallback */
+
+  /* Variables para fondos alternativos */
+  --tenant-surface-variant: rgba(25, 118, 210, 0.05); /* fallback */
+  --tenant-outline: rgba(51, 51, 51, 0.3); /* fallback */
+
+  /* Animaciones para transiciones de tema */
+  transition:
+    --tenant-primary-color 0.3s ease-in-out,
+    --tenant-accent-color 0.3s ease-in-out,
+    --tenant-background-color 0.3s ease-in-out,
+    --tenant-text-color 0.3s ease-in-out;
+}
+
+/* ===== CLASES UTILITARIAS PARA TEMAS DEL TENANT ===== */
+
+/* Colores de fondo */
+.tenant-bg-primary {
+  background-color: var(--tenant-primary-color) !important;
+  color: var(--tenant-header-text) !important;
+}
+
+.tenant-bg-accent {
+  background-color: var(--tenant-accent-color) !important;
+  color: var(--tenant-button-secondary-text) !important;
+}
+
+.tenant-bg-surface {
+  background-color: var(--tenant-background-color) !important;
+  color: var(--tenant-text-color) !important;
+}
+
+/* Colores de texto */
+.tenant-text-primary {
+  color: var(--tenant-primary-color) !important;
+}
+
+.tenant-text-accent {
+  color: var(--tenant-accent-color) !important;
+}
+
+.tenant-text-on-surface {
+  color: var(--tenant-text-color) !important;
+}
+
+/* Bordes */
+.tenant-border-primary {
+  border-color: var(--tenant-primary-color) !important;
+}
+
+.tenant-border-accent {
+  border-color: var(--tenant-accent-color) !important;
+}
+
+.tenant-border-outline {
+  border-color: var(--tenant-outline) !important;
+}
+
+/* ===== BOTONES PERSONALIZADOS DEL TENANT ===== */
+
+.tenant-btn-primary {
+  background-color: var(--tenant-primary-color);
+  color: var(--tenant-button-primary-text);
+  border: 1px solid var(--tenant-primary-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: var(--tenant-primary-hover);
+    border-color: var(--tenant-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+}
+
+.tenant-btn-secondary {
+  background-color: transparent;
+  color: var(--tenant-primary-color);
+  border: 1px solid var(--tenant-primary-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: var(--tenant-primary-color);
+    color: var(--tenant-button-primary-text);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+}
+
+.tenant-btn-accent {
+  background-color: var(--tenant-accent-color);
+  color: var(--tenant-button-secondary-text);
+  border: 1px solid var(--tenant-accent-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: var(--tenant-accent-hover);
+    border-color: var(--tenant-accent-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+}
+
+/* ===== COMPONENTES ESPECÍFICOS CON TEMA ===== */
+
+/* Header principal */
+.tenant-header {
+  background-color: var(--tenant-primary-color);
+  color: var(--tenant-header-text);
+
+  .logo img {
+    max-height: 40px;
+    width: auto;
+  }
+
+  .nav-link {
+    color: var(--tenant-header-text);
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    &.active {
+      color: var(--tenant-accent-color);
+    }
+  }
+}
+
+/* Cards y superficies */
+.tenant-card {
+  background-color: var(--tenant-background-color);
+  color: var(--tenant-text-color);
+  border: 1px solid var(--tenant-outline);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  .card-header {
+    border-bottom: 1px solid var(--tenant-outline);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    color: var(--tenant-primary-color);
+    font-weight: 600;
+  }
+}
+
+/* Links */
+.tenant-link {
+  color: var(--tenant-primary-color);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--tenant-primary-hover);
+    text-decoration: underline;
+  }
+}
+
+/* Tags/badges */
+.tenant-badge {
+  background-color: var(--tenant-surface-variant);
+  color: var(--tenant-text-color);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  &.primary {
+    background-color: var(--tenant-primary-color);
+    color: var(--tenant-button-primary-text);
+  }
+
+  &.accent {
+    background-color: var(--tenant-accent-color);
+    color: var(--tenant-button-secondary-text);
+  }
+}
+
+/* ===== RESPONSIVIDAD Y ADAPTACIONES ===== */
+
+@media (max-width: 768px) {
+  .tenant-btn-primary,
+  .tenant-btn-secondary,
+  .tenant-btn-accent {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+
+  .tenant-card {
+    padding: 0.75rem;
+  }
+}
+
+/* ===== MODO OSCURO (si el tenant lo soporta) ===== */
+/* ===== MODO OSCURO (si el tenant lo soporta) ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tenant-background-color: #121212;
+    --tenant-text-color: #ffffff;
+    --tenant-surface-variant: rgba(25, 118, 210, 0.1);
+    --tenant-outline: rgba(255, 255, 255, 0.4);
+  }
+
+  .tenant-card {
+    background-color: #1e1e1e;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* ===== ANIMACIONES PARA TRANSICIONES ===== */
+* {
+  transition:
+    background-color 0.3s ease-in-out,
+    color 0.3s ease-in-out,
+    border-color 0.3s ease-in-out;
+}

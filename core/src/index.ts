@@ -7,7 +7,27 @@ export * from './lib/push/push.service';
 export * from './lib/services/manifest.service';
 export * from './lib/services/seo.service';
 export * from './lib/services/tenant-config.service';
+export * from './lib/services/tenant-bootstrap.service';
+export * from './lib/services/tenant-context.service';
+export * from './lib/services/api-client.service';
 export * from './lib/services/theme.service';
+
+// Interceptors
+export * from './lib/interceptors/tenant-header.interceptor';
+
+// Pipes
+export * from './lib/pipes';
+
+// Providers
+export * from './lib/providers/tenant-bootstrap.provider';
+export * from './lib/providers/tenant-interceptor.provider';
+export * from './lib/providers/tenant-app-initializer.provider';
+
+// Components
+export * from './lib/components';
+
+// Routes
+export * from './lib/routes';
 
 // Auth
 export * from './lib/auth/auth.service';

@@ -1,1 +1,287 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* ===== MULTI-TENANT GLOBAL STYLES ===== */
+
+/* CSS Custom Properties Base (fallbacks) */
+:root {
+  /* Tenant Colors (will be overridden dynamically) */
+  --tenant-primary-color: #3b82f6;
+  --tenant-secondary-color: #64748b;
+  --tenant-accent-color: #ef4444;
+  --tenant-background-color: #ffffff;
+  --tenant-text-color: #1f2937;
+
+  /* Derived Colors */
+  --tenant-primary-hover: #2563eb;
+  --tenant-primary-light: #eff6ff;
+  --tenant-border-color: rgba(31, 41, 55, 0.2);
+  --tenant-skeleton-color: #f3f4f6;
+
+  /* Layout */
+  --tenant-header-bg: var(--tenant-background-color);
+  --tenant-header-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --tenant-breadcrumb-bg: #f9fafb;
+
+  /* Footer */
+  --tenant-footer-text: #f9fafb;
+  --tenant-footer-text-muted: #d1d5db;
+  --tenant-footer-border: #374151;
+  --tenant-footer-code-bg: #374151;
+  --tenant-footer-social-hover: #374151;
+}
+
+/* Global Reset & Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--tenant-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif);
+  line-height: 1.6;
+  color: var(--tenant-text-color);
+  background: var(--tenant-background-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== TENANT-SPECIFIC OVERRIDES ===== */
+
+/* Tenant A - TechStore Pro (Blue Theme) */
+body.tenant-demo-a {
+  --tenant-font-family: 'Inter', system-ui, sans-serif;
+}
+
+.tenant-demo-a {
+  /* Specific overrides for tech store */
+  --tenant-border-radius: 8px;
+  --tenant-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* Tenant B - Fashion World (Pink Theme) */
+body.tenant-demo-b {
+  --tenant-font-family: 'Poppins', system-ui, sans-serif;
+}
+
+.tenant-demo-b {
+  /* Specific overrides for fashion store */
+  --tenant-border-radius: 12px;
+  --tenant-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.tenant-demo-b .app-header {
+  border-bottom: 2px solid var(--tenant-primary-color);
+}
+
+.tenant-demo-b .brand-text {
+  font-style: italic;
+  letter-spacing: 0.5px;
+}
+
+/* Tenant C - Green Garden (Green Theme) */
+body.tenant-demo-c {
+  --tenant-font-family: 'Roboto', system-ui, sans-serif;
+}
+
+.tenant-demo-c {
+  /* Natural, organic styling */
+  --tenant-border-radius: 6px;
+  --tenant-shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tenant-demo-c .app-header {
+  background: linear-gradient(135deg, var(--tenant-background-color) 0%, var(--tenant-primary-light, #f0fdf4) 100%);
+}
+
+/* ===== COMPONENT LIBRARY INTEGRATION ===== */
+
+/* Product Cards */
+.product-card {
+  border-radius: var(--tenant-border-radius, 8px);
+  box-shadow: var(--tenant-shadow-sm, 0 1px 2px 0 rgba(0, 0, 0, 0.05));
+  transition: all 0.2s ease;
+}
+
+.product-card:hover {
+  box-shadow: var(--tenant-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
+  transform: translateY(-2px);
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--tenant-primary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: var(--tenant-border-radius, 6px);
+  border: 1px solid var(--tenant-primary-color);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--tenant-primary-hover);
+  border-color: var(--tenant-primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--tenant-text-color);
+  padding: 0.5rem 1rem;
+  border-radius: var(--tenant-border-radius, 6px);
+  border: 1px solid var(--tenant-border-color);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--tenant-primary-light);
+  border-color: var(--tenant-primary-color);
+  color: var(--tenant-primary-color);
+}
+
+/* Form Elements */
+input, textarea, select {
+  border: 1px solid var(--tenant-border-color);
+  border-radius: var(--tenant-border-radius, 6px);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--tenant-primary-color);
+  box-shadow: 0 0 0 3px var(--tenant-primary-light);
+}
+
+/* Loading States */
+.skeleton {
+  background: var(--tenant-skeleton-color);
+  border-radius: var(--tenant-border-radius, 4px);
+  animation: skeleton-pulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes skeleton-pulse {
+  0% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  body {
+    font-size: 0.875rem;
+  }
+
+  .btn-primary, .btn-secondary {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --tenant-border-color: #000000;
+  }
+
+  .product-card {
+    border: 2px solid var(--tenant-text-color);
+  }
+}
+
+/* Dark Mode Support (if enabled by tenant) */
+@media (prefers-color-scheme: dark) {
+  body.dark-mode-enabled {
+    --tenant-background-color: #1f2937;
+    --tenant-text-color: #f9fafb;
+    --tenant-border-color: rgba(255, 255, 255, 0.2);
+    --tenant-skeleton-color: #374151;
+  }
+}
+
+/* ===== PWA SPECIFIC STYLES ===== */
+
+/* Install Prompt */
+.pwa-install-prompt {
+  background: var(--tenant-primary-color);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.pwa-install-prompt.show {
+  transform: translateY(0);
+}
+
+/* Offline Indicator */
+.offline-indicator {
+  background: #6b7280;
+  color: white;
+  padding: 0.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 70;
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+}
+
+.offline-indicator.show {
+  transform: translateY(0);
+}
+
+/* ===== UTILITY CLASSES ===== */
+.text-primary { color: var(--tenant-primary-color) !important; }
+.text-secondary { color: var(--tenant-secondary-color) !important; }
+.text-accent { color: var(--tenant-accent-color) !important; }
+.bg-primary { background: var(--tenant-primary-color) !important; }
+.bg-secondary { background: var(--tenant-secondary-color) !important; }
+.border-primary { border-color: var(--tenant-primary-color) !important; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Importar los estilos del sistema multi-tenant */
+@import './styles/tenant-theme.scss';
