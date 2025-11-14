@@ -32,6 +32,16 @@ import {
 } from './pages/placeholder.components';
 
 export const ADMIN_ROUTES: Routes = [
+  // Ruta de login SIN guard de autenticación
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('@pwa/features-account').then((m) => m.LoginComponent),
+    data: {
+      title: 'Login Administrativo',
+    },
+  },
+  // Rutas protegidas con guard de autenticación
   {
     path: '',
     loadComponent: () =>

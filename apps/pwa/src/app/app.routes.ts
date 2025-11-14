@@ -1,13 +1,17 @@
 import { Route } from '@angular/router';
-import { AuthGuard, RoleGuard } from '@pwa/core';
+import { AuthGuard, RoleGuard, tenantGuard } from '@pwa/core';
 import { AdminLayoutComponent, PublicLayoutComponent } from '@pwa/shared';
 
 export const appRoutes: Route[] = [
+  // Redirect por defecto a /admin si no hay tenant
+  { path: '', pathMatch: 'full', redirectTo: 'admin' },
+
+  // Rutas que REQUIEREN tenant activo
   {
     path: '',
     component: PublicLayoutComponent,
+    canActivate: [tenantGuard], // 🔐 Requiere tenant - si no hay, redirige a /admin
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'catalog' },
       {
         path: 'catalog',
         loadChildren: () => import('@pwa/catalog').then((m) => m.catalogRoutes),
@@ -29,12 +33,6 @@ export const appRoutes: Route[] = [
         path: 'account',
         loadChildren: () =>
           import('@pwa/features-account').then((m) => m.featuresAccountRoutes),
-      },
-      {
-        path: 'orders',
-        canActivate: [AuthGuard],
-        loadChildren: () =>
-          import('@pwa/features-orders').then((m) => m.featuresOrdersRoutes),
       },
       {
         path: 'orders',

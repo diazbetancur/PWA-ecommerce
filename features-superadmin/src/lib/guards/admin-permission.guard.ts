@@ -107,7 +107,7 @@ export const adminPermissionGuard: CanActivateFn = (
   // 1. Verificar que esté autenticado
   if (!authService.isAuthenticated()) {
     console.warn('[AdminPermissionGuard] Usuario no autenticado');
-    router.navigate(['/login'], {
+    router.navigate(['/admin/login'], {
       queryParams: { returnUrl: route.url.join('/') },
     });
     return false;
@@ -132,7 +132,7 @@ export const adminPermissionGuard: CanActivateFn = (
 
   if (!claims) {
     console.warn('[AdminPermissionGuard] No hay claims en el token');
-    router.navigate(['/login']);
+    router.navigate(['/admin/login']);
     return false;
   }
 
@@ -179,7 +179,10 @@ export const adminAuthGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   if (!authService.isAuthenticated()) {
-    router.navigate(['/login']);
+    console.log(
+      '🔒 [adminAuthGuard] No autenticado - redirigiendo a /admin/login'
+    );
+    router.navigate(['/admin/login']);
     return false;
   }
 
