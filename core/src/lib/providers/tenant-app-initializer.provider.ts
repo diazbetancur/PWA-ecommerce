@@ -37,6 +37,31 @@ export function tenantAppInitializerFactory(): () => Promise<void> {
       // Inicializar el tenant (llama al backend de Azure)
       await tenantBootstrap.initialize();
 
+      // Verificar si estamos en modo administrador general (sin tenant)
+      const attemptedSlug = tenantBootstrap.attemptedSlug();
+      const isGeneralAdminMode = !attemptedSlug || attemptedSlug.trim() === '';
+
+      if (isGeneralAdminMode) {
+        console.log(
+          '🔐 [APP_INITIALIZER] Modo administrador general detectado - redirigiendo al login admin...'
+        );
+
+        // Redirigir al login administrativo
+        setTimeout(() => {
+          router
+            .navigate(['/admin'], {
+              replaceUrl: true,
+            })
+            .catch((navError) => {
+              console.error(
+                '❌ [APP_INITIALIZER] Error navegando a /admin:',
+                navError
+              );
+            });
+        }, 100);
+        return;
+      }
+
       // Verificar si hubo errores
       if (tenantBootstrap.hasErrorState()) {
         const error = tenantBootstrap.error();
@@ -46,7 +71,7 @@ export function tenantAppInitializerFactory(): () => Promise<void> {
           status,
           error: error?.message,
           code: error?.code,
-          slug: tenantBootstrap.attemptedSlug(),
+          slug: attemptedSlug,
         });
 
         // Si el tenant no fue encontrado y está configurado para redirigir
@@ -61,7 +86,7 @@ export function tenantAppInitializerFactory(): () => Promise<void> {
             router
               .navigate(['/tenant/not-found'], {
                 queryParams: {
-                  slug: tenantBootstrap.attemptedSlug(),
+                  slug: attemptedSlug,
                   code: error?.code,
                   retryable: error?.retryable ? 'true' : 'false',
                 },

@@ -57,7 +57,7 @@ export class TenantBootstrapService {
 
   // Configuración del servicio (puede ser inyectada desde el exterior)
   private readonly config: TenantBootstrapConfig = {
-    defaultTenantSlug: 'demo-a',
+    defaultTenantSlug: '', // Vacío = modo admin (sin tenant específico)
     resolutionTimeout: 10000,
     maxRetries: 2,
     enableCache: true,
@@ -180,6 +180,22 @@ export class TenantBootstrapService {
         value: strategy.value,
         source: strategy.source,
       });
+
+      // 🔐 Si no hay tenant específico (slug vacío), activar modo admin general
+      if (!strategy.value || strategy.value.trim() === '') {
+        console.log(
+          '🔐 [TenantBootstrap] Sin tenant específico - activando modo administrador general'
+        );
+        this.setDefaultTenantConfig();
+        this._status.set('resolved');
+        this._isLoading.set(false);
+
+        // Marcar que estamos en modo admin sin tenant
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('admin-mode', 'general');
+        }
+        return;
+      }
 
       // 2️⃣ Verificar cache primero (si está habilitado)
       if (this.config.enableCache) {
