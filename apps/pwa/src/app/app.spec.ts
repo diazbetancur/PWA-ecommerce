@@ -8,11 +8,28 @@ describe('App', () => {
   const mockTenantContextService = {
     getCurrentTenant: jest.fn(),
     getTenantConfig: jest.fn(),
+    pwaBranding: jest.fn(),
   };
 
   beforeEach(async () => {
+    // Mock globalThis.matchMedia para evitar errores en PwaInstallService
+    Object.defineProperty(globalThis, 'matchMedia', {
+      writable: true,
+      value: jest.fn().mockImplementation((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      })),
+    });
+
     mockTenantContextService.getCurrentTenant.mockReturnValue(null);
     mockTenantContextService.getTenantConfig.mockReturnValue(null);
+    mockTenantContextService.pwaBranding.mockReturnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [App],

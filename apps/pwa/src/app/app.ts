@@ -1,10 +1,11 @@
-import { Component, DOCUMENT, inject, OnInit } from '@angular/core';
+import { Component, DOCUMENT, effect, inject, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { TenantContextService } from '@pwa/core';
+import { DynamicPwaAssetsService, TenantContextService } from '@pwa/core';
+import { IosInstallBannerComponent } from '@pwa/shared';
 
 @Component({
-  imports: [RouterModule],
+  imports: [RouterModule, IosInstallBannerComponent],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',
@@ -13,6 +14,27 @@ export class App implements OnInit {
   private readonly tenantContext = inject(TenantContextService);
   private readonly titleService = inject(Title);
   private readonly document = inject(DOCUMENT);
+  private readonly dynamicPwaAssets = inject(DynamicPwaAssetsService);
+
+  constructor() {
+    // Effect para aplicar branding PWA cuando el tenant cambia
+    effect(() => {
+      const branding = this.tenantContext.pwaBranding();
+      if (branding) {
+        // Pre-cargar assets del branding antes de aplicarlos
+        this.dynamicPwaAssets
+          .preloadBrandingAssets(branding)
+          .then(() => {
+            this.dynamicPwaAssets.applyBranding(branding);
+          })
+          .catch((error) => {
+            console.warn('Error precargando branding assets:', error);
+            // Aplicar de todas formas aunque fallen algunas imágenes
+            this.dynamicPwaAssets.applyBranding(branding);
+          });
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.updatePageTitle();

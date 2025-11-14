@@ -1,7 +1,7 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DEFAULT_TENANT_CONFIG } from '../config/default-tenant.config';
-import { TenantConfig } from '../models/types';
+import { TenantConfig, type TenantBranding } from '../models/types';
 import { TenantBootstrapService } from './tenant-bootstrap.service';
 
 /**
@@ -45,6 +45,44 @@ export class TenantContextService {
   readonly locale = computed(
     () => this.tenantBootstrap.currentTenant()?.locale ?? 'en-US'
   );
+
+  /**
+   * Computed para branding PWA del tenant
+   * Transforma BrandingConfig/ThemeConfig a TenantBranding para PWA
+   */
+  readonly pwaBranding = computed(() => {
+    const tenant = this.currentTenant();
+    const config = this.currentConfig();
+
+    if (!tenant || !config) {
+      return null;
+    }
+
+    const branding = tenant.branding;
+    const theme = config.theme;
+
+    // Construir TenantBranding desde la configuración existente
+    const pwaBranding: TenantBranding = {
+      name: tenant.displayName || tenant.slug,
+      shortName: tenant.displayName?.substring(0, 12) || tenant.slug,
+      description: tenant.description,
+      logoUrl: branding?.logoUrl || theme.logoUrl,
+      primaryColor: branding?.primaryColor || theme.primary,
+      secondaryColor: branding?.secondaryColor || theme.accent,
+      pwaIconUrl: branding?.faviconUrl || theme.faviconUrl,
+      faviconUrl: branding?.faviconUrl || theme.faviconUrl,
+      backgroundColor:
+        branding?.backgroundColor || theme.background || '#ffffff',
+      themeColor: branding?.primaryColor || theme.primary || '#000000',
+    };
+
+    return pwaBranding;
+  });
+
+  /**
+   * Verifica si el tenant actual es el general (admin sin tenant específico)
+   */
+  readonly isGeneralTenant = computed(() => this.isGeneralAdminMode());
 
   // Observables para compatibilidad con RxJS
   readonly tenantConfig$: Observable<TenantConfig | null> =

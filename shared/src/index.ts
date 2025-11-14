@@ -12,6 +12,9 @@ export * from './lib/ui/header';
 export * from './lib/ui/footer';
 export * from './lib/ui/layout';
 
+// PWA Components
+export * from './lib/components/ios-install-banner/ios-install-banner.component';
+
 // Demos and Testing
-// TODO: Fix demo component compilation errors before enabling
+// Note: demo component temporarily disabled - needs compilation fixes
 // export * from './lib/demos/api-usage-demo.component';

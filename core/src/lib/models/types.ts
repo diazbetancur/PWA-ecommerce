@@ -87,3 +87,21 @@ export interface JwtPayload {
   iat?: number;
   isSuperAdmin?: boolean;
 }
+
+/**
+ * Interfaz de branding PWA para multi-tenant
+ * Exportada desde types.ts para facilitar importación
+ */
+export interface TenantBranding {
+  name: string;
+  shortName?: string;
+  description?: string;
+  logoUrl?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  pwaIconUrl?: string;
+  faviconUrl?: string;
+  manifestUrl?: string;
+  backgroundColor?: string;
+  themeColor?: string;
+}

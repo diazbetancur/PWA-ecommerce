@@ -1,5 +1,10 @@
 // Models
 export * from './lib/models/types';
+// pwa-branding.types ya está incluido en types.ts
+
+// PWA Services
+export * from './lib/pwa/pwa-install.service';
+export * from './lib/pwa/dynamic-pwa-assets.service';
 
 // Services
 export * from './lib/logging/logger.service';
