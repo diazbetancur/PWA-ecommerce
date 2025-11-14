@@ -49,12 +49,7 @@
               "with": "apps/pwa/src/environments/environment.prod.ts"
             }
           ],
-          "server": "apps/pwa/src/main.server.ts",
-          "ssr": {
-            "entry": "apps/pwa/src/server.ts"
-          },
-          "outputMode": "server",
-          "prerender": false,
+          "outputMode": "static",
           "optimization": true
         },
         "development-real": {
