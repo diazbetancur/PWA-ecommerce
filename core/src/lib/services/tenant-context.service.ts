@@ -143,12 +143,50 @@ export class TenantContextService {
   }
 
   /**
+   * Verifica si estamos en modo de administrador general (sin tenant)
+   * @returns boolean
+   */
+  isGeneralAdminMode(): boolean {
+    const slug = this.getTenantSlug();
+    return slug === null || slug === 'general-admin';
+  }
+
+  /**
+   * Configura el contexto como administrador general
+   * Esto se usa cuando el usuario accede sin un tenant válido y debe ir al admin panel
+   */
+  setGeneralAdminMode(): void {
+    // Limpiar tenant actual
+    this.tenantBootstrap['_currentTenant'].set(null);
+
+    // Marcar como contexto general
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('admin-mode', 'general');
+    }
+  }
+
+  /**
+   * Sale del modo administrador general
+   */
+  exitGeneralAdminMode(): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('admin-mode');
+    }
+  }
+
+  /**
    * Verifica si una URL debe incluir headers de tenant
    * Por defecto, todas las URLs que empiecen con /api/ (excepto públicas)
    * @param url - URL a verificar
    * @returns boolean
    */
   shouldIncludeTenantHeaders(url: string): boolean {
+    // No incluir headers si estamos en modo admin general
+    if (this.isGeneralAdminMode()) {
+      // Solo incluir headers para URLs de admin
+      return url.includes('/api/admin/');
+    }
+
     // No incluir headers para URLs públicas
     if (url.includes('/api/public/') || url.includes('/api/health')) {
       return false;

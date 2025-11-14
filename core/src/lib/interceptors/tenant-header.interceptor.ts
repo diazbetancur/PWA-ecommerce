@@ -1,5 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent } from '@angular/common/http';
+import {
+  HttpInterceptor,
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { TenantContextService } from '../services/tenant-context.service';
@@ -21,11 +26,44 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
   private readonly tenantContext = inject(TenantContextService);
   private readonly envService = inject(AppEnvService);
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(
+    req: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
     const startTime = performance.now();
 
+    // Verificar si estamos en modo administrador general
+    const isGeneralAdmin = this.tenantContext.isGeneralAdminMode();
+
+    // En modo administrador general, solo agregar headers para rutas de admin
+    if (isGeneralAdmin) {
+      // Solo agregar header especial para rutas de admin
+      if (req.url.includes('/api/admin/')) {
+        const adminRequest = req.clone({
+          setHeaders: {
+            'X-Admin-Mode': 'general',
+          },
+        });
+
+        if (this.isDevelopment()) {
+          console.log(
+            `🔐 [TenantHeaderInterceptor] Modo Admin General\n` +
+              `   URL: ${req.method} ${req.url}\n` +
+              `   Header: X-Admin-Mode: general`
+          );
+        }
+
+        return next.handle(adminRequest);
+      }
+
+      // Para otras URLs en modo admin, continuar sin headers
+      return next.handle(req);
+    }
+
     // Verificar si esta URL necesita headers de tenant
-    const needsTenantHeaders = this.tenantContext.shouldIncludeTenantHeaders(req.url);
+    const needsTenantHeaders = this.tenantContext.shouldIncludeTenantHeaders(
+      req.url
+    );
 
     if (!needsTenantHeaders) {
       // Log de requests públicos (sin headers de tenant)
@@ -42,8 +80,8 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
     if (!tenantHeaders.slug && !tenantHeaders.key) {
       console.warn(
         `⚠️  [TenantHeaderInterceptor] No hay tenant cargado\n` +
-        `    URL: ${req.method} ${req.url}\n` +
-        `    Continuando sin headers de tenant...`
+          `    URL: ${req.method} ${req.url}\n` +
+          `    Continuando sin headers de tenant...`
       );
       return next.handle(req);
     }
@@ -61,7 +99,7 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
 
     // Crear nueva request con headers adicionales
     const tenantRequest = req.clone({
-      setHeaders: headersToAdd
+      setHeaders: headersToAdd,
     });
 
     // Log detallado en desarrollo ANTES de enviar el request
@@ -73,7 +111,8 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
     return next.handle(tenantRequest).pipe(
       tap({
         next: (event) => {
-          if (this.isDevelopment() && event.type === 4) { // HttpEventType.Response = 4
+          if (this.isDevelopment() && event.type === 4) {
+            // HttpEventType.Response = 4
             this.logTenantResponse(req, event, startTime);
           }
         },
@@ -81,7 +120,7 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
           if (this.isDevelopment()) {
             this.logTenantError(req, error, startTime);
           }
-        }
+        },
       })
     );
   }
@@ -90,7 +129,9 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
    * Verifica si estamos en modo desarrollo
    */
   private isDevelopment(): boolean {
-    return this.envService.isDevelopment && this.envService.isConsoleLoggingEnabled;
+    return (
+      this.envService.isDevelopment && this.envService.isConsoleLoggingEnabled
+    );
   }
 
   /**
@@ -108,7 +149,10 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
     console.group(`🔐 [TenantHeaderInterceptor] ${req.method} ${relativePath}`);
     console.log('📍 URL completa:', req.url);
     console.log('🏢 Tenant Slug:', tenantHeaders.slug);
-    console.log('🔑 Tenant Key:', tenantHeaders.key ? `${tenantHeaders.key.substring(0, 8)}...` : null);
+    console.log(
+      '🔑 Tenant Key:',
+      tenantHeaders.key ? `${tenantHeaders.key.substring(0, 8)}...` : null
+    );
     console.log('📋 Headers agregados:', headersToAdd);
 
     // Mostrar todos los headers del request (útil para debugging)
@@ -129,12 +173,18 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
   /**
    * Log de respuesta exitosa (modo desarrollo)
    */
-  private logTenantResponse(req: HttpRequest<any>, event: any, startTime: number): void {
+  private logTenantResponse(
+    req: HttpRequest<any>,
+    event: any,
+    startTime: number
+  ): void {
     const duration = Math.round(performance.now() - startTime);
     const urlObj = new URL(req.url);
     const relativePath = urlObj.pathname + urlObj.search;
 
-    console.group(`✅ [TenantHeaderInterceptor] ${req.method} ${relativePath} - ${event.status}`);
+    console.group(
+      `✅ [TenantHeaderInterceptor] ${req.method} ${relativePath} - ${event.status}`
+    );
     console.log('⏱️  Duración:', `${duration}ms`);
     console.log('📊 Status:', event.status, event.statusText);
     console.log('📍 URL:', req.url);
@@ -149,12 +199,18 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
   /**
    * Log de error (modo desarrollo)
    */
-  private logTenantError(req: HttpRequest<any>, error: any, startTime: number): void {
+  private logTenantError(
+    req: HttpRequest<any>,
+    error: any,
+    startTime: number
+  ): void {
     const duration = Math.round(performance.now() - startTime);
     const urlObj = new URL(req.url);
     const relativePath = urlObj.pathname + urlObj.search;
 
-    console.group(`❌ [TenantHeaderInterceptor] ${req.method} ${relativePath} - ERROR`);
+    console.group(
+      `❌ [TenantHeaderInterceptor] ${req.method} ${relativePath} - ERROR`
+    );
     console.error('⏱️  Duración:', `${duration}ms`);
     console.error('🚨 Status:', error.status, error.statusText);
     console.error('📍 URL:', req.url);

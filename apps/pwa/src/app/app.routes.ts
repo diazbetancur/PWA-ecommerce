@@ -37,17 +37,25 @@ export const appRoutes: Route[] = [
           import('@pwa/features-orders').then((m) => m.featuresOrdersRoutes),
       },
       {
-        path: 'superadmin',
-        canActivate: [AuthGuard, RoleGuard('superadmin')],
+        path: 'orders',
+        canActivate: [AuthGuard],
         loadChildren: () =>
-          import('@pwa/features-superadmin').then(
-            (m) => m.featuresSuperadminRoutes
-          ),
+          import('@pwa/features-orders').then((m) => m.featuresOrdersRoutes),
       },
     ],
   },
+  // Módulo de Administración General (Superadmin)
+  // Este módulo gestiona TODOS los tenants y configuraciones globales
+  // NO requiere tenant específico - trabaja en contexto "general-admin"
   {
     path: 'admin',
+    loadChildren: () =>
+      import('@pwa/features-superadmin').then((m) => m.ADMIN_ROUTES),
+  },
+  // Módulo de Administración de Tenant Específico
+  // Este módulo gestiona la administración DENTRO de un tenant particular
+  {
+    path: 'tenant-admin',
     component: AdminLayoutComponent,
     canActivate: [AuthGuard, RoleGuard('admin')],
     children: [

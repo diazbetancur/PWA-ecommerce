@@ -1,0 +1,66 @@
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'lib-access-denied',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="access-denied">
+      <div class="icon">
+        <span class="material-icons">block</span>
+      </div>
+      <h1>Acceso Denegado</h1>
+      <p>No tienes permisos para acceder a esta página.</p>
+      <a href="/admin" class="btn-primary">Volver al Dashboard</a>
+    </div>
+  `,
+  styles: [
+    `
+      .access-denied {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 400px;
+        text-align: center;
+        padding: 2rem;
+      }
+
+      .icon {
+        margin-bottom: 1rem;
+      }
+
+      .material-icons {
+        font-size: 5rem;
+        color: #ef4444;
+      }
+
+      h1 {
+        font-size: 2rem;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        color: #64748b;
+        margin-bottom: 2rem;
+      }
+
+      .btn-primary {
+        padding: 0.75rem 1.5rem;
+        background: #3b82f6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+
+      .btn-primary:hover {
+        background: #2563eb;
+      }
+    `,
+  ],
+})
+export class AccessDeniedComponent {}

@@ -77,9 +77,13 @@ export interface Order {
 }
 
 export interface JwtPayload {
-  tenantId: string;
+  tenantId?: string;
   sub: string;
+  email?: string;
+  name?: string;
   role: string;
   permissions: string[];
   exp: number;
+  iat?: number;
+  isSuperAdmin?: boolean;
 }
