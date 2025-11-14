@@ -54,9 +54,7 @@
             "entry": "apps/pwa/src/server.ts"
           },
           "outputMode": "server",
-          "prerender": {
-            "discoverRoutes": false
-          },
+          "prerender": false,
           "optimization": true
         },
         "development-real": {

@@ -1,36 +1,54 @@
-import { Injectable, inject, computed } from '@angular/core';
+import { Injectable, computed, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TenantBootstrapService } from './tenant-bootstrap.service';
+import { DEFAULT_TENANT_CONFIG } from '../config/default-tenant.config';
 import { TenantConfig } from '../models/types';
+import { TenantBootstrapService } from './tenant-bootstrap.service';
 
 /**
  * Servicio de contexto del tenant que actúa como una capa de abstracción
  * sobre TenantBootstrapService para ser usado por interceptors y otros servicios
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TenantContextService {
   private readonly tenantBootstrap = inject(TenantBootstrapService);
 
   // Signals computados que se actualizan automáticamente
-  readonly tenantSlug = computed(() => this.tenantBootstrap.currentTenant()?.tenant.slug ?? null);
-  readonly tenantKey = computed(() => this.tenantBootstrap.currentTenant()?.tenant.id ?? null);
-  readonly isReady = computed(() => this.tenantBootstrap.currentTenant() !== null);
+  readonly tenantSlug = computed(
+    () => this.tenantBootstrap.currentTenant()?.tenant.slug ?? null
+  );
+  readonly tenantKey = computed(
+    () => this.tenantBootstrap.currentTenant()?.tenant.id ?? null
+  );
+  readonly isReady = computed(
+    () => this.tenantBootstrap.currentTenant() !== null
+  );
   readonly currentConfig = computed(() => this.tenantBootstrap.currentTenant());
   readonly isLoading = computed(() => this.tenantBootstrap.isLoading());
 
   // Computed para datos del tenant
-  readonly currentTenant = computed(() => this.tenantBootstrap.currentTenant()?.tenant ?? null);
-  readonly tenantBranding = computed(() => this.currentTenant()?.branding ?? null);
-  readonly tenantDisplayName = computed(() => this.currentTenant()?.displayName ?? null);
+  readonly currentTenant = computed(
+    () => this.tenantBootstrap.currentTenant()?.tenant ?? null
+  );
+  readonly tenantBranding = computed(
+    () => this.currentTenant()?.branding ?? null
+  );
+  readonly tenantDisplayName = computed(
+    () => this.currentTenant()?.displayName ?? null
+  );
 
   // Computed para configuración regional y moneda
-  readonly currency = computed(() => this.tenantBootstrap.currentTenant()?.currency ?? 'USD');
-  readonly locale = computed(() => this.tenantBootstrap.currentTenant()?.locale ?? 'en-US');
+  readonly currency = computed(
+    () => this.tenantBootstrap.currentTenant()?.currency ?? 'USD'
+  );
+  readonly locale = computed(
+    () => this.tenantBootstrap.currentTenant()?.locale ?? 'en-US'
+  );
 
   // Observables para compatibilidad con RxJS
-  readonly tenantConfig$: Observable<TenantConfig | null> = this.tenantBootstrap.tenantConfig$;
+  readonly tenantConfig$: Observable<TenantConfig | null> =
+    this.tenantBootstrap.tenantConfig$;
 
   /**
    * Obtiene el slug del tenant actual
@@ -65,11 +83,28 @@ export class TenantContextService {
   }
 
   /**
+   * Obtiene la configuración del tenant o la configuración por defecto
+   * Útil para páginas como login donde necesitamos branding aunque no haya tenant
+   * @returns TenantConfig
+   */
+  getTenantConfigOrDefault(): TenantConfig {
+    return this.currentConfig() ?? DEFAULT_TENANT_CONFIG;
+  }
+
+  /**
    * Obtiene el tenant actual con toda su información
    * @returns Tenant data object | null
    */
   getCurrentTenant() {
     return this.currentTenant();
+  }
+
+  /**
+   * Alias para getCurrentTenantConfig (compatibilidad)
+   * @returns TenantConfig | null
+   */
+  getTenantConfig(): TenantConfig | null {
+    return this.getCurrentTenantConfig();
   }
 
   /**
@@ -103,7 +138,7 @@ export class TenantContextService {
   getTenantHeaders(): { slug: string | null; key: string | null } {
     return {
       slug: this.getTenantSlug(),
-      key: this.getTenantKey()
+      key: this.getTenantKey(),
     };
   }
 
@@ -149,7 +184,7 @@ export class TenantContextService {
       }, timeoutMs);
 
       // Subscribirse a cambios hasta que el tenant esté listo
-      const subscription = this.tenantConfig$.subscribe(config => {
+      const subscription = this.tenantConfig$.subscribe((config) => {
         if (config !== null) {
           clearTimeout(timeout);
           subscription.unsubscribe();

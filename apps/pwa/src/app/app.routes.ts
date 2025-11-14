@@ -1,4 +1,5 @@
 import { Route } from '@angular/router';
+import { AuthGuard, RoleGuard } from '@pwa/core';
 import { AdminLayoutComponent, PublicLayoutComponent } from '@pwa/shared';
 
 export const appRoutes: Route[] = [
@@ -18,6 +19,7 @@ export const appRoutes: Route[] = [
       },
       {
         path: 'checkout',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('@pwa/features-checkout').then(
             (m) => m.featuresCheckoutRoutes
@@ -30,11 +32,13 @@ export const appRoutes: Route[] = [
       },
       {
         path: 'orders',
+        canActivate: [AuthGuard],
         loadChildren: () =>
           import('@pwa/features-orders').then((m) => m.featuresOrdersRoutes),
       },
       {
         path: 'superadmin',
+        canActivate: [AuthGuard, RoleGuard('superadmin')],
         loadChildren: () =>
           import('@pwa/features-superadmin').then(
             (m) => m.featuresSuperadminRoutes
@@ -45,6 +49,7 @@ export const appRoutes: Route[] = [
   {
     path: 'admin',
     component: AdminLayoutComponent,
+    canActivate: [AuthGuard, RoleGuard('admin')],
     children: [
       {
         path: '',

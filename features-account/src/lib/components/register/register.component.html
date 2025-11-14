@@ -1,0 +1,153 @@
+<div class="register-container">
+  <div class="register-card">
+    <h1>Crear Cuenta</h1>
+    <p class="subtitle">Únete a {{ tenantName() }}</p>
+
+    @if (errorMessage()) {
+    <div class="alert alert-error">
+      {{ errorMessage() }}
+    </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">Nombre</label>
+          <input
+            type="text"
+            id="firstName"
+            formControlName="firstName"
+            placeholder="Juan"
+            [class.error]="getFieldError('firstName')"
+          />
+          @if (getFieldError('firstName')) {
+          <span class="error-message">{{ getFieldError('firstName') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Apellido</label>
+          <input
+            type="text"
+            id="lastName"
+            formControlName="lastName"
+            placeholder="Pérez"
+            [class.error]="getFieldError('lastName')"
+          />
+          @if (getFieldError('lastName')) {
+          <span class="error-message">{{ getFieldError('lastName') }}</span>
+          }
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="tu@email.com"
+          [class.error]="getFieldError('email')"
+        />
+        @if (getFieldError('email')) {
+        <span class="error-message">{{ getFieldError('email') }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="phoneNumber">Teléfono (opcional)</label>
+        <input
+          type="tel"
+          id="phoneNumber"
+          formControlName="phoneNumber"
+          placeholder="+34 600 000 000"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <div class="password-input">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            placeholder="••••••••"
+            [class.error]="getFieldError('password')"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+            aria-label="Mostrar contraseña"
+          >
+            {{ showPassword() ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        @if (getFieldError('password')) {
+        <span class="error-message">{{ getFieldError('password') }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Confirmar Contraseña</label>
+        <div class="password-input">
+          <input
+            [type]="showConfirmPassword() ? 'text' : 'password'"
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            placeholder="••••••••"
+            [class.error]="
+              getFieldError('confirmPassword') || !passwordsMatch()
+            "
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="toggleConfirmPasswordVisibility()"
+            aria-label="Mostrar contraseña"
+          >
+            {{ showConfirmPassword() ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        @if (getFieldError('confirmPassword')) {
+        <span class="error-message">{{
+          getFieldError('confirmPassword')
+        }}</span>
+        } @if (!passwordsMatch() &&
+        registerForm.get('confirmPassword')?.touched) {
+        <span class="error-message">Las contraseñas no coinciden</span>
+        }
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" formControlName="acceptTerms" />
+          <span>
+            Acepto los
+            <a href="/terms" target="_blank">términos y condiciones</a>
+          </span>
+        </label>
+      </div>
+      @if (getFieldError('acceptTerms')) {
+      <span class="error-message">{{ getFieldError('acceptTerms') }}</span>
+      }
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="isLoading() || registerForm.invalid || !passwordsMatch()"
+      >
+        @if (isLoading()) {
+        <span class="spinner"></span>
+        Creando cuenta... } @else { Crear Cuenta }
+      </button>
+    </form>
+
+    <div class="footer-links">
+      <p>
+        ¿Ya tienes cuenta?
+        <a routerLink="/account/login">Inicia sesión aquí</a>
+      </p>
+    </div>
+  </div>
+</div>

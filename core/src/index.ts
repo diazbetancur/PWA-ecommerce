@@ -8,13 +8,14 @@ export * from './lib/services/api-client.service';
 export * from './lib/services/app-env.service';
 export * from './lib/services/manifest.service';
 export * from './lib/services/seo.service';
-export * from './lib/services/tenant-config.service';
 export * from './lib/services/tenant-bootstrap.service';
+export * from './lib/services/tenant-config.service';
 
 // Configuration
 export * from './lib/config/app-env-initializer';
-export * from './lib/services/tenant-context.service';
+export * from './lib/config/default-tenant.config';
 export * from './lib/services/api-client.service';
+export * from './lib/services/tenant-context.service';
 export * from './lib/services/theme.service';
 
 // Interceptors
@@ -24,12 +25,14 @@ export * from './lib/interceptors/tenant-header.interceptor';
 export * from './lib/pipes';
 
 // Providers
+export * from './lib/providers/tenant-app-initializer.provider';
 export * from './lib/providers/tenant-bootstrap.provider';
 export * from './lib/providers/tenant-interceptor.provider';
-export * from './lib/providers/tenant-app-initializer.provider';
 
-// Components
-export * from './lib/components';
+export * from './lib/components/api-test-demo/api-test-demo.component';
+export * from './lib/components/currency-demo/currency-demo.component';
+export * from './lib/components/tenant-debug/tenant-debug.component';
+export * from './lib/components/tenant-not-found/tenant-not-found.component';
 
 // Routes
 export * from './lib/routes';

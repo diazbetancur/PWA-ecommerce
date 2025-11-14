@@ -1,8 +1,10 @@
-import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { TenantBootstrapService, TenantContextService, ApiClientService } from '@pwa/core';
+import { RouterModule } from '@angular/router';
+import { ApiClientService } from '../../services/api-client.service';
+import { TenantBootstrapService } from '../../services/tenant-bootstrap.service';
+import { TenantContextService } from '../../services/tenant-context.service';
 
 interface ApiTestResult {
   success: boolean;
@@ -24,9 +26,8 @@ interface ApiTestResult {
       <div class="debug-header">
         <div class="container">
           <h1 class="debug-title">
-            🔧 Tenant Debug Panel
-            @if (tenantSlug(); as slug) {
-              <span class="tenant-badge">{{ slug }}</span>
+            🔧 Tenant Debug Panel @if (tenantSlug(); as slug) {
+            <span class="tenant-badge">{{ slug }}</span>
             }
           </h1>
 
@@ -38,16 +39,11 @@ interface ApiTestResult {
               [disabled]="isRefreshing()"
             >
               @if (isRefreshing()) {
-                <span class="loading-spinner"></span>
-                Actualizando...
-              } @else {
-                🔄 Refresh
-              }
+              <span class="loading-spinner"></span>
+              Actualizando... } @else { 🔄 Refresh }
             </button>
 
-            <a routerLink="/" class="btn btn-outline">
-              ← Volver a App
-            </a>
+            <a routerLink="/" class="btn btn-outline"> ← Volver a App </a>
           </div>
         </div>
       </div>
@@ -89,82 +85,98 @@ interface ApiTestResult {
               </div>
 
               @if (tenantConfig(); as config) {
-                <!-- Branding Information -->
-                <div class="info-group">
-                  <h3>Branding</h3>
-                  <div class="info-grid">
-                    <div class="info-item">
-                      <label>Logo URL:</label>
-                      @if (config.tenant.branding?.logoUrl; as logoUrl) {
-                        <div class="logo-preview">
-                          <img [src]="logoUrl" alt="Logo" class="logo-img" loading="lazy" />
-                          <code class="logo-url">{{ logoUrl }}</code>
-                        </div>
-                      } @else {
-                        <code>No logo configured</code>
-                      }
+              <!-- Branding Information -->
+              <div class="info-group">
+                <h3>Branding</h3>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <label>Logo URL:</label>
+                    @if (config.tenant.branding?.logoUrl; as logoUrl) {
+                    <div class="logo-preview">
+                      <img
+                        [src]="logoUrl"
+                        alt="Logo"
+                        class="logo-img"
+                        loading="lazy"
+                      />
+                      <code class="logo-url">{{ logoUrl }}</code>
                     </div>
-
-                    @if (config.tenant.branding; as branding) {
-                      <div class="info-item">
-                        <label>Primary Color:</label>
-                        <div class="color-preview">
-                          <div class="color-swatch" [style.backgroundColor]="branding.primaryColor"></div>
-                          <code>{{ branding.primaryColor }}</code>
-                        </div>
-                      </div>
-                      <div class="info-item">
-                        <label>Secondary Color:</label>
-                        <div class="color-preview">
-                          <div class="color-swatch" [style.backgroundColor]="branding.secondaryColor"></div>
-                          <code>{{ branding.secondaryColor || 'N/A' }}</code>
-                        </div>
-                      </div>
-                      <div class="info-item">
-                        <label>Accent Color:</label>
-                        <div class="color-preview">
-                          <div class="color-swatch" [style.backgroundColor]="branding.accentColor"></div>
-                          <code>{{ branding.accentColor || 'N/A' }}</code>
-                        </div>
-                      </div>
+                    } @else {
+                    <code>No logo configured</code>
                     }
                   </div>
-                </div>
 
-                <!-- Configuration Details -->
-                <div class="info-group">
-                  <h3>Configuración</h3>
-                  <div class="info-grid">
-                    <div class="info-item">
-                      <label>Locale:</label>
-                      <code>{{ config.locale }}</code>
-                    </div>
-                    <div class="info-item">
-                      <label>Currency:</label>
-                      <code>{{ config.currency }}</code>
-                    </div>
-                    <div class="info-item">
-                      <label>CDN Base URL:</label>
-                      <code>{{ config.cdnBaseUrl || 'N/A' }}</code>
+                  @if (config.tenant.branding; as branding) {
+                  <div class="info-item">
+                    <label>Primary Color:</label>
+                    <div class="color-preview">
+                      <div
+                        class="color-swatch"
+                        [style.backgroundColor]="branding.primaryColor"
+                      ></div>
+                      <code>{{ branding.primaryColor }}</code>
                     </div>
                   </div>
-                </div>
-
-                <!-- Features -->
-                @if (config.features && Object.keys(config.features).length > 0) {
-                  <div class="info-group">
-                    <h3>Features Habilitadas</h3>
-                    <div class="features-grid">
-                      @for (feature of Object.entries(config.features); track feature[0]) {
-                        <div class="feature-item" [class.enabled]="feature[1]">
-                          <span class="feature-name">{{ feature[0] }}</span>
-                          <span class="feature-status">{{ feature[1] ? '✅' : '❌' }}</span>
-                        </div>
-                      }
+                  <div class="info-item">
+                    <label>Secondary Color:</label>
+                    <div class="color-preview">
+                      <div
+                        class="color-swatch"
+                        [style.backgroundColor]="branding.secondaryColor"
+                      ></div>
+                      <code>{{ branding.secondaryColor || 'N/A' }}</code>
                     </div>
                   </div>
-                }
-              }
+                  <div class="info-item">
+                    <label>Accent Color:</label>
+                    <div class="color-preview">
+                      <div
+                        class="color-swatch"
+                        [style.backgroundColor]="branding.accentColor"
+                      ></div>
+                      <code>{{ branding.accentColor || 'N/A' }}</code>
+                    </div>
+                  </div>
+                  }
+                </div>
+              </div>
+
+              <!-- Configuration Details -->
+              <div class="info-group">
+                <h3>Configuración</h3>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <label>Locale:</label>
+                    <code>{{ config.locale }}</code>
+                  </div>
+                  <div class="info-item">
+                    <label>Currency:</label>
+                    <code>{{ config.currency }}</code>
+                  </div>
+                  <div class="info-item">
+                    <label>CDN Base URL:</label>
+                    <code>{{ config.cdnBaseUrl || 'N/A' }}</code>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Features -->
+              @if (config.features && Object.keys(config.features).length > 0) {
+              <div class="info-group">
+                <h3>Features Habilitadas</h3>
+                <div class="features-grid">
+                  @for (feature of Object.entries(config.features); track
+                  feature[0]) {
+                  <div class="feature-item" [class.enabled]="feature[1]">
+                    <span class="feature-name">{{ feature[0] }}</span>
+                    <span class="feature-status">{{
+                      feature[1] ? '✅' : '❌'
+                    }}</span>
+                  </div>
+                  }
+                </div>
+              </div>
+              } }
             </div>
           </div>
 
@@ -182,19 +194,25 @@ interface ApiTestResult {
                       [(ngModel)]="selectedEndpoint"
                       class="endpoint-select"
                     >
-                      <option value="/api/catalog/products">GET /api/catalog/products</option>
-                      <option value="/api/catalog/categories">GET /api/catalog/categories</option>
-                      <option value="/api/public/health">GET /api/public/health</option>
+                      <option value="/api/catalog/products">
+                        GET /api/catalog/products
+                      </option>
+                      <option value="/api/catalog/categories">
+                        GET /api/catalog/categories
+                      </option>
+                      <option value="/api/public/health">
+                        GET /api/public/health
+                      </option>
                       <option value="custom">Custom endpoint...</option>
                     </select>
 
                     @if (selectedEndpoint() === 'custom') {
-                      <input
-                        type="text"
-                        [(ngModel)]="customEndpoint"
-                        placeholder="/api/custom/endpoint"
-                        class="custom-endpoint-input"
-                      />
+                    <input
+                      type="text"
+                      [(ngModel)]="customEndpoint"
+                      placeholder="/api/custom/endpoint"
+                      class="custom-endpoint-input"
+                    />
                     }
                   </div>
                 </div>
@@ -206,11 +224,8 @@ interface ApiTestResult {
                   [disabled]="isTestRunning()"
                 >
                   @if (isTestRunning()) {
-                    <span class="loading-spinner"></span>
-                    Ejecutando Test...
-                  } @else {
-                    🚀 Ejecutar Test
-                  }
+                  <span class="loading-spinner"></span>
+                  Ejecutando Test... } @else { 🚀 Ejecutar Test }
                 </button>
               </div>
 
@@ -232,62 +247,77 @@ interface ApiTestResult {
 
               <!-- Test Results -->
               @if (lastTestResult(); as result) {
-                <div class="test-results">
-                  <h4>
-                    Resultado del Test
-                    <span class="result-badge" [class]="result.success ? 'success' : 'error'">
-                      {{ result.success ? '✅ Success' : '❌ Error' }}
-                    </span>
-                    <small class="test-timestamp">
-                      {{ result.timestamp | date:'medium' }}
-                      ({{ result.duration }}ms)
-                    </small>
-                  </h4>
+              <div class="test-results">
+                <h4>
+                  Resultado del Test
+                  <span
+                    class="result-badge"
+                    [class]="result.success ? 'success' : 'error'"
+                  >
+                    {{ result.success ? '✅ Success' : '❌ Error' }}
+                  </span>
+                  <small class="test-timestamp">
+                    {{ result.timestamp | date : 'medium' }}
+                    ({{ result.duration }}ms)
+                  </small>
+                </h4>
 
-                  @if (result.status) {
-                    <div class="status-info">
-                      <strong>HTTP Status:</strong>
-                      <code [class]="getStatusClass(result.status)">{{ result.status }}</code>
-                    </div>
-                  }
-
-                  @if (result.headers) {
-                    <details class="response-headers">
-                      <summary>Response Headers</summary>
-                      <pre>{{ formatHeaders(result.headers) }}</pre>
-                    </details>
-                  }
-
-                  <div class="response-data">
-                    <h5>Response Data:</h5>
-                    @if (result.success && result.data) {
-                      <pre class="json-response success">{{ formatJson(result.data) }}</pre>
-                    } @else if (result.error) {
-                      <pre class="json-response error">{{ result.error }}</pre>
-                    }
-                  </div>
+                @if (result.status) {
+                <div class="status-info">
+                  <strong>HTTP Status:</strong>
+                  <code [class]="getStatusClass(result.status)">{{
+                    result.status
+                  }}</code>
                 </div>
+                } @if (result.headers) {
+                <details class="response-headers">
+                  <summary>Response Headers</summary>
+                  <pre>{{ formatHeaders(result.headers) }}</pre>
+                </details>
+                }
+
+                <div class="response-data">
+                  <h5>Response Data:</h5>
+                  @if (result.success && result.data) {
+                  <pre class="json-response success">{{
+                    formatJson(result.data)
+                  }}</pre>
+                  } @else if (result.error) {
+                  <pre class="json-response error">{{ result.error }}</pre>
+                  }
+                </div>
+              </div>
               }
 
               <!-- Test History -->
               @if (testHistory().length > 0) {
-                <div class="test-history">
-                  <h4>Historial de Tests (últimos 5)</h4>
-                  <div class="history-list">
-                    @for (test of testHistory().slice(-5).reverse(); track test.timestamp) {
-                      <div class="history-item" [class]="test.success ? 'success' : 'error'">
-                        <div class="history-header">
-                          <span class="history-endpoint">{{ getEndpointFromTest(test) }}</span>
-                          <span class="history-status">{{ test.success ? '✅' : '❌' }}</span>
-                          <span class="history-time">{{ test.timestamp | date:'shortTime' }}</span>
-                        </div>
-                        @if (!test.success) {
-                          <div class="history-error">{{ test.error }}</div>
-                        }
-                      </div>
+              <div class="test-history">
+                <h4>Historial de Tests (últimos 5)</h4>
+                <div class="history-list">
+                  @for (test of testHistory().slice(-5).reverse(); track
+                  test.timestamp) {
+                  <div
+                    class="history-item"
+                    [class]="test.success ? 'success' : 'error'"
+                  >
+                    <div class="history-header">
+                      <span class="history-endpoint">{{
+                        getEndpointFromTest(test)
+                      }}</span>
+                      <span class="history-status">{{
+                        test.success ? '✅' : '❌'
+                      }}</span>
+                      <span class="history-time">{{
+                        test.timestamp | date : 'shortTime'
+                      }}</span>
+                    </div>
+                    @if (!test.success) {
+                    <div class="history-error">{{ test.error }}</div>
                     }
                   </div>
+                  }
                 </div>
+              </div>
               }
             </div>
           </div>
@@ -298,9 +328,11 @@ interface ApiTestResult {
 
             <div class="json-viewer">
               @if (tenantConfig(); as config) {
-                <pre class="json-content">{{ formatJson(config) }}</pre>
+              <pre class="json-content">{{ formatJson(config) }}</pre>
               } @else {
-                <div class="no-data">No hay configuración de tenant disponible</div>
+              <div class="no-data">
+                No hay configuración de tenant disponible
+              </div>
               }
             </div>
 
@@ -325,600 +357,605 @@ interface ApiTestResult {
       </div>
     </div>
   `,
-  styles: [`
-    .tenant-debug-container {
-      min-height: 100vh;
-      background: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    .debug-header {
-      background: white;
-      border-bottom: 2px solid #e5e7eb;
-      padding: 2rem 0;
-      margin-bottom: 2rem;
-    }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      padding: 0 1rem;
-    }
-
-    .debug-title {
-      font-size: 2rem;
-      font-weight: 700;
-      color: #1f2937;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .tenant-badge {
-      background: #3b82f6;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    .debug-actions {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .debug-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-
-    @media (min-width: 1024px) {
-      .debug-grid {
-        grid-template-columns: 1fr 1fr;
+  styles: [
+    `
+      .tenant-debug-container {
+        min-height: 100vh;
+        background: #f8fafc;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          sans-serif;
       }
 
-      .full-width {
-        grid-column: 1 / -1;
+      .debug-header {
+        background: white;
+        border-bottom: 2px solid #e5e7eb;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
       }
-    }
 
-    .debug-card {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      padding: 2rem;
-      border: 1px solid #e5e7eb;
-    }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1rem;
+      }
 
-    .card-title {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #1f2937;
-      margin: 0 0 2rem 0;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .status-indicator {
-      font-size: 0.75rem;
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-
-    .status-indicator.loading {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-indicator.ok {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .status-indicator.error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .info-section {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-    }
-
-    .info-group h3 {
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: #374151;
-      margin: 0 0 1rem 0;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid #f3f4f6;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-
-    .info-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .info-item label {
-      font-weight: 600;
-      color: #6b7280;
-      font-size: 0.875rem;
-    }
-
-    .info-item code {
-      background: #f3f4f6;
-      padding: 0.5rem;
-      border-radius: 0.375rem;
-      font-family: 'Monaco', 'Consolas', monospace;
-      font-size: 0.875rem;
-      word-break: break-all;
-    }
-
-    .status-badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .status-badge.loading {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-badge.ok {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .status-badge.error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .logo-preview {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .logo-img {
-      max-width: 120px;
-      max-height: 40px;
-      object-fit: contain;
-      border: 1px solid #e5e7eb;
-      border-radius: 0.375rem;
-      padding: 0.5rem;
-      background: white;
-    }
-
-    .logo-url {
-      word-break: break-all;
-    }
-
-    .color-preview {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .color-swatch {
-      width: 2rem;
-      height: 2rem;
-      border-radius: 0.375rem;
-      border: 2px solid #e5e7eb;
-      flex-shrink: 0;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 0.5rem;
-    }
-
-    .feature-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem;
-      border-radius: 0.375rem;
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-    }
-
-    .feature-item.enabled {
-      background: #f0fdf4;
-      border-color: #bbf7d0;
-    }
-
-    .feature-name {
-      font-weight: 500;
-      color: #374151;
-    }
-
-    /* API Testing Styles */
-    .test-form {
-      margin-bottom: 2rem;
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
-    }
-
-    .form-group label {
-      display: block;
-      font-weight: 600;
-      color: #374151;
-      margin-bottom: 0.5rem;
-    }
-
-    .input-with-button {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-
-    .endpoint-select,
-    .custom-endpoint-input {
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.375rem;
-      font-family: 'Monaco', 'Consolas', monospace;
-      font-size: 0.875rem;
-    }
-
-    .endpoint-select {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .custom-endpoint-input {
-      flex: 1;
-      min-width: 250px;
-    }
-
-    .test-button {
-      width: 100%;
-      justify-content: center;
-    }
-
-    .headers-preview {
-      background: #f9fafb;
-      border: 1px solid #e5e7eb;
-      border-radius: 0.5rem;
-      padding: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .headers-preview h4 {
-      margin: 0 0 0.75rem 0;
-      color: #374151;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-
-    .headers-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-
-    .header-item code {
-      background: #1f2937;
-      color: #f9fafb;
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.25rem;
-      font-size: 0.75rem;
-    }
-
-    .test-results {
-      border: 2px solid #e5e7eb;
-      border-radius: 0.5rem;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-    }
-
-    .test-results h4 {
-      margin: 0 0 1rem 0;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .result-badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 1rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-
-    .result-badge.success {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .result-badge.error {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .test-timestamp {
-      color: #6b7280;
-      font-weight: normal;
-    }
-
-    .status-info {
-      margin-bottom: 1rem;
-      font-size: 0.875rem;
-    }
-
-    .status-info code {
-      padding: 0.25rem 0.5rem;
-      border-radius: 0.25rem;
-      font-weight: 600;
-    }
-
-    .status-info code.status-2xx {
-      background: #d1fae5;
-      color: #065f46;
-    }
-
-    .status-info code.status-4xx {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .status-info code.status-5xx {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .response-headers {
-      margin-bottom: 1rem;
-    }
-
-    .response-headers summary {
-      cursor: pointer;
-      font-weight: 600;
-      color: #374151;
-      padding: 0.5rem;
-      background: #f9fafb;
-      border-radius: 0.25rem;
-    }
-
-    .response-data h5 {
-      margin: 0 0 0.5rem 0;
-      color: #374151;
-      font-weight: 600;
-    }
-
-    .json-response {
-      background: #1f2937;
-      color: #f9fafb;
-      padding: 1rem;
-      border-radius: 0.5rem;
-      overflow-x: auto;
-      font-family: 'Monaco', 'Consolas', monospace;
-      font-size: 0.875rem;
-      line-height: 1.5;
-      max-height: 400px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .json-response.success {
-      border-left: 4px solid #10b981;
-    }
-
-    .json-response.error {
-      border-left: 4px solid #ef4444;
-      background: #7f1d1d;
-      color: #fecaca;
-    }
-
-    /* Test History */
-    .test-history {
-      border-top: 1px solid #e5e7eb;
-      padding-top: 1.5rem;
-    }
-
-    .test-history h4 {
-      margin: 0 0 1rem 0;
-      color: #374151;
-      font-weight: 600;
-    }
-
-    .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .history-item {
-      padding: 0.75rem;
-      border-radius: 0.375rem;
-      border: 1px solid #e5e7eb;
-    }
-
-    .history-item.success {
-      background: #f0fdf4;
-      border-color: #bbf7d0;
-    }
-
-    .history-item.error {
-      background: #fef2f2;
-      border-color: #fecaca;
-    }
-
-    .history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .history-endpoint {
-      font-family: 'Monaco', 'Consolas', monospace;
-      font-size: 0.875rem;
-      font-weight: 600;
-    }
-
-    .history-time {
-      font-size: 0.75rem;
-      color: #6b7280;
-    }
-
-    .history-error {
-      margin-top: 0.5rem;
-      font-size: 0.875rem;
-      color: #dc2626;
-      font-family: 'Monaco', 'Consolas', monospace;
-    }
-
-    /* JSON Viewer */
-    .json-viewer {
-      background: #1f2937;
-      border-radius: 0.5rem;
-      overflow: hidden;
-      margin-bottom: 1rem;
-    }
-
-    .json-content {
-      background: #1f2937;
-      color: #f9fafb;
-      padding: 2rem;
-      margin: 0;
-      overflow-x: auto;
-      font-family: 'Monaco', 'Consolas', monospace;
-      font-size: 0.875rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-      max-height: 500px;
-    }
-
-    .no-data {
-      padding: 2rem;
-      text-align: center;
-      color: #6b7280;
-      font-style: italic;
-    }
-
-    .json-actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.375rem;
-      font-weight: 500;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-      border: 1px solid transparent;
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-primary {
-      background: #3b82f6;
-      color: white;
-      border-color: #3b82f6;
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      background: #2563eb;
-      border-color: #2563eb;
-    }
-
-    .btn-secondary {
-      background: #6b7280;
-      color: white;
-      border-color: #6b7280;
-    }
-
-    .btn-secondary:hover:not(:disabled) {
-      background: #4b5563;
-      border-color: #4b5563;
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: #374151;
-      border-color: #d1d5db;
-    }
-
-    .btn-outline:hover:not(:disabled) {
-      background: #f3f4f6;
-      border-color: #9ca3af;
-    }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid transparent;
-      border-top: 2px solid currentColor;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
       .debug-title {
-        font-size: 1.5rem;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .tenant-badge {
+        background: #3b82f6;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        font-weight: 600;
       }
 
       .debug-actions {
-        flex-direction: column;
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .debug-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      @media (min-width: 1024px) {
+        .debug-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .full-width {
+          grid-column: 1 / -1;
+        }
       }
 
       .debug-card {
-        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        padding: 2rem;
+        border: 1px solid #e5e7eb;
+      }
+
+      .card-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 2rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .status-indicator {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .status-indicator.loading {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .status-indicator.ok {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .status-indicator.error {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+      }
+
+      .info-group h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #374151;
+        margin: 0 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f3f4f6;
       }
 
       .info-grid {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .info-item label {
+        font-weight: 600;
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+
+      .info-item code {
+        background: #f3f4f6;
+        padding: 0.5rem;
+        border-radius: 0.375rem;
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.875rem;
+        word-break: break-all;
+      }
+
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .status-badge.loading {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .status-badge.ok {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .status-badge.error {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .logo-preview {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .logo-img {
+        max-width: 120px;
+        max-height: 40px;
+        object-fit: contain;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.375rem;
+        padding: 0.5rem;
+        background: white;
+      }
+
+      .logo-url {
+        word-break: break-all;
+      }
+
+      .color-preview {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .color-swatch {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.375rem;
+        border: 2px solid #e5e7eb;
+        flex-shrink: 0;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 0.5rem;
+      }
+
+      .feature-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+      }
+
+      .feature-item.enabled {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+      }
+
+      .feature-name {
+        font-weight: 500;
+        color: #374151;
+      }
+
+      /* API Testing Styles */
+      .test-form {
+        margin-bottom: 2rem;
+      }
+
+      .form-group {
+        margin-bottom: 1rem;
+      }
+
+      .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+      }
+
+      .input-with-button {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .endpoint-select,
+      .custom-endpoint-input {
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.875rem;
+      }
+
+      .endpoint-select {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .custom-endpoint-input {
+        flex: 1;
+        min-width: 250px;
+      }
+
+      .test-button {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .headers-preview {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .headers-preview h4 {
+        margin: 0 0 0.75rem 0;
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .headers-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .header-item code {
+        background: #1f2937;
+        color: #f9fafb;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+      }
+
+      .test-results {
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .test-results h4 {
+        margin: 0 0 1rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .result-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .result-badge.success {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .result-badge.error {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .test-timestamp {
+        color: #6b7280;
+        font-weight: normal;
+      }
+
+      .status-info {
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+      }
+
+      .status-info code {
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-weight: 600;
+      }
+
+      .status-info code.status-2xx {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .status-info code.status-4xx {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .status-info code.status-5xx {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .response-headers {
+        margin-bottom: 1rem;
+      }
+
+      .response-headers summary {
+        cursor: pointer;
+        font-weight: 600;
+        color: #374151;
+        padding: 0.5rem;
+        background: #f9fafb;
+        border-radius: 0.25rem;
+      }
+
+      .response-data h5 {
+        margin: 0 0 0.5rem 0;
+        color: #374151;
+        font-weight: 600;
+      }
+
+      .json-response {
+        background: #1f2937;
+        color: #f9fafb;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        max-height: 400px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .json-response.success {
+        border-left: 4px solid #10b981;
+      }
+
+      .json-response.error {
+        border-left: 4px solid #ef4444;
+        background: #7f1d1d;
+        color: #fecaca;
+      }
+
+      /* Test History */
+      .test-history {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1.5rem;
+      }
+
+      .test-history h4 {
+        margin: 0 0 1rem 0;
+        color: #374151;
+        font-weight: 600;
+      }
+
+      .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .history-item {
+        padding: 0.75rem;
+        border-radius: 0.375rem;
+        border: 1px solid #e5e7eb;
+      }
+
+      .history-item.success {
+        background: #f0fdf4;
+        border-color: #bbf7d0;
+      }
+
+      .history-item.error {
+        background: #fef2f2;
+        border-color: #fecaca;
       }
 
       .history-header {
-        flex-direction: column;
-        align-items: flex-start;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
       }
-    }
-  `]
+
+      .history-endpoint {
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .history-time {
+        font-size: 0.75rem;
+        color: #6b7280;
+      }
+
+      .history-error {
+        margin-top: 0.5rem;
+        font-size: 0.875rem;
+        color: #dc2626;
+        font-family: 'Monaco', 'Consolas', monospace;
+      }
+
+      /* JSON Viewer */
+      .json-viewer {
+        background: #1f2937;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1rem;
+      }
+
+      .json-content {
+        background: #1f2937;
+        color: #f9fafb;
+        padding: 2rem;
+        margin: 0;
+        overflow-x: auto;
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+        max-height: 500px;
+      }
+
+      .no-data {
+        padding: 2rem;
+        text-align: center;
+        color: #6b7280;
+        font-style: italic;
+      }
+
+      .json-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      /* Buttons */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.375rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        border: 1px solid transparent;
+      }
+
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .btn-primary {
+        background: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+      }
+
+      .btn-primary:hover:not(:disabled) {
+        background: #2563eb;
+        border-color: #2563eb;
+      }
+
+      .btn-secondary {
+        background: #6b7280;
+        color: white;
+        border-color: #6b7280;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background: #4b5563;
+        border-color: #4b5563;
+      }
+
+      .btn-outline {
+        background: transparent;
+        color: #374151;
+        border-color: #d1d5db;
+      }
+
+      .btn-outline:hover:not(:disabled) {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid transparent;
+        border-top: 2px solid currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .debug-title {
+          font-size: 1.5rem;
+        }
+
+        .debug-actions {
+          flex-direction: column;
+        }
+
+        .debug-card {
+          padding: 1.5rem;
+        }
+
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .history-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    `,
+  ],
 })
 export class TenantDebugComponent {
   private readonly tenantBootstrap = inject(TenantBootstrapService);
@@ -938,14 +975,17 @@ export class TenantDebugComponent {
   tenantSlug = computed(() => this.tenantContext.getTenantSlug());
   tenantKey = computed(() => this.tenantContext.getTenantKey());
   tenantStatus = computed(() => this.tenantBootstrap.tenantStatus());
-  displayName = computed(() => this.tenantContext.getCurrentTenant()?.displayName);
+  displayName = computed(
+    () => this.tenantContext.getCurrentTenant()?.displayName
+  );
 
   tenantStatusClass = computed(() => {
     const status = this.tenantStatus();
     return {
-      'loading': status === 'loading',
-      'ok': status === 'ok',
-      'error': status === 'error'
+      loading: status === 'resolving',
+      ok: status === 'resolved',
+      error:
+        status === 'error' || status === 'not-found' || status === 'timeout',
     };
   });
 
@@ -969,9 +1009,10 @@ export class TenantDebugComponent {
    * Execute API test
    */
   async runApiTest(): Promise<void> {
-    const endpoint = this.selectedEndpoint() === 'custom'
-      ? this.customEndpoint()
-      : this.selectedEndpoint();
+    const endpoint =
+      this.selectedEndpoint() === 'custom'
+        ? this.customEndpoint()
+        : this.selectedEndpoint();
 
     if (!endpoint.trim()) {
       alert('Por favor ingresa un endpoint válido');
@@ -995,9 +1036,9 @@ export class TenantDebugComponent {
         headers: {
           'X-Tenant-Slug': this.tenantSlug() || '',
           'X-Tenant-Key': this.tenantKey() || '',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        status: 200
+        status: 200,
       };
 
       this.lastTestResult.set(result);
@@ -1012,7 +1053,7 @@ export class TenantDebugComponent {
         error: this.formatError(error),
         timestamp: new Date(),
         duration,
-        status: error?.status || 0
+        status: error?.status || 0,
       };
 
       this.lastTestResult.set(result);
@@ -1105,7 +1146,6 @@ export class TenantDebugComponent {
       textArea.value = text;
       document.body.appendChild(textArea);
       textArea.select();
-      // eslint-disable-next-line deprecation/deprecation
       document.execCommand('copy');
       textArea.remove();
       alert('📋 JSON copiado al portapapeles');
@@ -1128,7 +1168,9 @@ export class TenantDebugComponent {
 
     const a = document.createElement('a');
     a.href = url;
-    a.download = `tenant-config-${this.tenantSlug() || 'unknown'}-${Date.now()}.json`;
+    a.download = `tenant-config-${
+      this.tenantSlug() || 'unknown'
+    }-${Date.now()}.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();

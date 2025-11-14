@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
+import { Injectable, inject } from '@angular/core';
+import { APP_ENV } from '../config/app-env.token';
 
 /**
  * Interfaz que define la estructura de configuración del entorno
@@ -45,10 +45,18 @@ export interface AppEnvironment {
  * Proporciona una API limpia y type-safe para acceder a variables de entorno
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AppEnvService {
-  private readonly env: AppEnvironment = environment as AppEnvironment;
+  private readonly env: AppEnvironment = (inject(APP_ENV, {
+    optional: true,
+  }) || {
+    production: false,
+    mockApi: true,
+    apiBaseUrl: 'http://localhost:5200',
+    useTenantHeader: true,
+    fcm: { vapidPublicKey: '' },
+  }) as AppEnvironment;
 
   /**
    * Obtiene toda la configuración del entorno
@@ -142,7 +150,7 @@ export class AppEnvService {
       mode: this.isProduction ? 'production' : 'development',
       api: this.useMockApi ? 'mock' : 'real',
       baseUrl: this.apiBaseUrl,
-      version: this.getAppVersion()
+      version: this.getAppVersion(),
     };
   }
 
@@ -172,7 +180,10 @@ export class AppEnvService {
     }
 
     // Validar configuración FCM
-    if (!this.fcmConfig.vapidPublicKey || this.fcmConfig.vapidPublicKey.includes('REPLACE_WITH')) {
+    if (
+      !this.fcmConfig.vapidPublicKey ||
+      this.fcmConfig.vapidPublicKey.includes('REPLACE_WITH')
+    ) {
       errors.push('FCM VAPID key needs to be configured');
     }
 
@@ -183,7 +194,7 @@ export class AppEnvService {
 
     return {
       isValid: errors.length === 0,
-      errors
+      errors,
     };
   }
 
@@ -199,7 +210,10 @@ export class AppEnvService {
       console.log('🌐 API:', info.api);
       console.log('🔗 Base URL:', info.baseUrl);
       console.log('📦 Version:', info.version);
-      console.log('🏢 Tenant Headers:', this.useTenantHeader ? 'Enabled' : 'Disabled');
+      console.log(
+        '🏢 Tenant Headers:',
+        this.useTenantHeader ? 'Enabled' : 'Disabled'
+      );
 
       if (this.isDevelopment) {
         console.log('⚠️ Development mode - Full logging enabled');

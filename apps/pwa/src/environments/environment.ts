@@ -1,4 +1,4 @@
-import { AppEnvironment } from '@core/services/app-env.service';
+import { AppEnvironment } from '@pwa/core';
 
 export const environment: AppEnvironment = {
   production: false,
@@ -6,20 +6,20 @@ export const environment: AppEnvironment = {
   apiBaseUrl: 'http://localhost:5200',
   useTenantHeader: true,
   fcm: {
-    vapidPublicKey: 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY'
+    vapidPublicKey: 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY',
   },
   analytics: {
     enabled: false,
-    trackingId: undefined
+    trackingId: undefined,
   },
   logging: {
     level: 'debug',
-    enableConsole: true
+    enableConsole: true,
   },
   features: {
     advancedSearch: true,
     darkMode: true,
     notifications: false,
-    analytics: false
-  }
+    analytics: false,
+  },
 };

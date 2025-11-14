@@ -49,7 +49,7 @@ export interface ProductFilters {
  * Los headers de tenant se añaden automáticamente via TenantHeaderInterceptor
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CatalogService {
   private readonly apiClient = inject(ApiClientService);
@@ -66,7 +66,7 @@ export class CatalogService {
   ): Observable<CatalogApiResponse<CatalogProduct>> {
     const params: Record<string, string | number | boolean> = {
       page,
-      pageSize
+      pageSize,
     };
 
     // Agregar filtros si existen
@@ -89,11 +89,16 @@ export class CatalogService {
    * Obtiene un producto específico por ID
    */
   getProduct(productId: string): Observable<CatalogProduct> {
-    return this.apiClient.get<CatalogProduct>(`/api/catalog/products/${productId}`);
-  }    /**
+    return this.apiClient.get<CatalogProduct>(
+      `/api/catalog/products/${productId}`
+    );
+  }
+  /**
    * Obtiene las categorías del catálogo
    */
-  getCategories(includeInactive = false): Observable<CatalogApiResponse<CatalogCategory>> {
+  getCategories(
+    includeInactive = false
+  ): Observable<CatalogApiResponse<CatalogCategory>> {
     const params: Record<string, boolean> = {};
     if (includeInactive) {
       params['includeInactive'] = true;
@@ -117,7 +122,7 @@ export class CatalogService {
     const params: Record<string, string | number | boolean> = {
       q: query,
       page,
-      pageSize
+      pageSize,
     };
 
     // Combinar con otros filtros
@@ -138,7 +143,9 @@ export class CatalogService {
   /**
    * Obtiene productos destacados
    */
-  getFeaturedProducts(limit = 10): Observable<CatalogApiResponse<CatalogProduct>> {
+  getFeaturedProducts(
+    limit = 10
+  ): Observable<CatalogApiResponse<CatalogProduct>> {
     return this.apiClient.getWithParams<CatalogApiResponse<CatalogProduct>>(
       '/api/catalog/products/featured',
       { limit }
@@ -148,14 +155,21 @@ export class CatalogService {
   /**
    * Obtiene productos de una categoría específica
    */
-  getProductsByCategory(categoryId: string, page = 1, pageSize = 20): Observable<CatalogApiResponse<CatalogProduct>> {
+  getProductsByCategory(
+    categoryId: string,
+    page = 1,
+    pageSize = 20
+  ): Observable<CatalogApiResponse<CatalogProduct>> {
     return this.getProducts(page, pageSize, { categoryId });
   }
 
   /**
    * Obtiene productos relacionados
    */
-  getRelatedProducts(productId: string, limit = 5): Observable<CatalogApiResponse<CatalogProduct>> {
+  getRelatedProducts(
+    productId: string,
+    limit = 5
+  ): Observable<CatalogApiResponse<CatalogProduct>> {
     return this.apiClient.getWithParams<CatalogApiResponse<CatalogProduct>>(
       `/api/catalog/products/${productId}/related`,
       { limit }
@@ -180,7 +194,7 @@ export class CatalogService {
       displayName: config.tenant.displayName,
       currency: config.currency,
       locale: config.locale,
-      cdnBaseUrl: config.cdnBaseUrl
+      cdnBaseUrl: config.cdnBaseUrl,
     };
   }
 
@@ -200,11 +214,13 @@ export class CatalogService {
     }
 
     // Construir la URL usando el CDN base del tenant
-    const cdnBase = config.cdnBaseUrl.endsWith('/') ?
-      config.cdnBaseUrl :
-      `${config.cdnBaseUrl}/`;
+    const cdnBase = config.cdnBaseUrl.endsWith('/')
+      ? config.cdnBaseUrl
+      : `${config.cdnBaseUrl}/`;
 
-    const cleanPath = imagePath.startsWith('/') ? imagePath.substring(1) : imagePath;
+    const cleanPath = imagePath.startsWith('/')
+      ? imagePath.substring(1)
+      : imagePath;
 
     return `${cdnBase}${cleanPath}`;
   }
@@ -214,5 +230,29 @@ export class CatalogService {
    */
   isTenantReady(): boolean {
     return this.tenantContext.isTenantReady();
+  }
+
+  /**
+   * Formatea precio usando configuración del tenant
+   */
+  formatPrice(amount: number): string {
+    const cfg = this.tenantContext.getCurrentTenantConfig();
+    const currency = cfg?.currency || 'USD';
+    const locale = cfg?.locale || 'en-US';
+    try {
+      return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency,
+      }).format(amount);
+    } catch {
+      return amount.toFixed(2) + ' ' + currency;
+    }
+  }
+
+  /**
+   * Verifica si un producto está en stock
+   */
+  isInStock(product: { stock?: number }): boolean {
+    return (product.stock ?? 0) > 0;
   }
 }

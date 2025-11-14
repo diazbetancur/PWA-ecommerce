@@ -20,15 +20,16 @@ import { TenantContextService } from '../services/tenant-context.service';
 @Pipe({
   name: 'tenantCurrency',
   standalone: true,
-  pure: false // Necesario para reactividad con signals
+  pure: false, // Necesario para reactividad con signals
 })
 export class TenantCurrencyPipe implements PipeTransform {
   private readonly tenantContext = inject(TenantContextService);
-  private readonly currencyPipe = new CurrencyPipe();
 
   // Signals computados para reactividad
   private readonly currentLocale = computed(() => this.tenantContext.locale());
-  private readonly currentCurrency = computed(() => this.tenantContext.currency());
+  private readonly currentCurrency = computed(() =>
+    this.tenantContext.currency()
+  );
 
   /**
    * Transforma un valor numérico a formato de moneda del tenant
@@ -59,8 +60,9 @@ export class TenantCurrencyPipe implements PipeTransform {
     const finalDigitsInfo = digitsInfo || defaultDigitsInfo;
 
     try {
-      // Usar el CurrencyPipe nativo de Angular con configuración del tenant
-      const formatted = this.currencyPipe.transform(
+      // Crear CurrencyPipe con el locale correcto cada vez
+      const currencyPipe = new CurrencyPipe(tenantLocale);
+      const formatted = currencyPipe.transform(
         value,
         tenantCurrency,
         display,
@@ -75,7 +77,7 @@ export class TenantCurrencyPipe implements PipeTransform {
         value,
         currency: tenantCurrency,
         locale: tenantLocale,
-        error
+        error,
       });
 
       // Formato básico como fallback
@@ -91,26 +93,26 @@ export class TenantCurrencyPipe implements PipeTransform {
   private getDefaultDigitsInfo(currency: string): string {
     const currencyDefaults: Record<string, string> = {
       // Monedas sin decimales
-      'JPY': '1.0-0', // Yen japonés
-      'KRW': '1.0-0', // Won coreano
-      'VND': '1.0-0', // Dong vietnamita
-      'CLP': '1.0-0', // Peso chileno
+      JPY: '1.0-0', // Yen japonés
+      KRW: '1.0-0', // Won coreano
+      VND: '1.0-0', // Dong vietnamita
+      CLP: '1.0-0', // Peso chileno
 
       // Monedas con 2 decimales (mayoría)
-      'USD': '1.2-2', // Dólar estadounidense
-      'EUR': '1.2-2', // Euro
-      'GBP': '1.2-2', // Libra esterlina
-      'MXN': '1.2-2', // Peso mexicano
-      'CAD': '1.2-2', // Dólar canadiense
-      'AUD': '1.2-2', // Dólar australiano
-      'BRL': '1.2-2', // Real brasileño
-      'ARS': '1.2-2', // Peso argentino
-      'COP': '1.2-2', // Peso colombiano
+      USD: '1.2-2', // Dólar estadounidense
+      EUR: '1.2-2', // Euro
+      GBP: '1.2-2', // Libra esterlina
+      MXN: '1.2-2', // Peso mexicano
+      CAD: '1.2-2', // Dólar canadiense
+      AUD: '1.2-2', // Dólar australiano
+      BRL: '1.2-2', // Real brasileño
+      ARS: '1.2-2', // Peso argentino
+      COP: '1.2-2', // Peso colombiano
 
       // Monedas con 3 decimales
-      'BHD': '1.3-3', // Dinar bahreini
-      'JOD': '1.3-3', // Dinar jordano
-      'KWD': '1.3-3', // Dinar kuwaití
+      BHD: '1.3-3', // Dinar bahreini
+      JOD: '1.3-3', // Dinar jordano
+      KWD: '1.3-3', // Dinar kuwaití
     };
 
     return currencyDefaults[currency] || '1.2-2'; // Por defecto 2 decimales
@@ -125,7 +127,7 @@ export class TenantCurrencyPipe implements PipeTransform {
   private basicCurrencyFormat(value: number, currency: string): string {
     const formatted = value.toLocaleString('en-US', {
       minimumFractionDigits: 2,
-      maximumFractionDigits: 2
+      maximumFractionDigits: 2,
     });
 
     return `${currency} ${formatted}`;
@@ -138,11 +140,11 @@ export class TenantCurrencyPipe implements PipeTransform {
 @Pipe({
   name: 'tenantCurrencySymbol',
   standalone: true,
-  pure: false
+  pure: false,
 })
 export class TenantCurrencySymbolPipe implements PipeTransform {
   private readonly tenantContext = inject(TenantContextService);
-  private readonly currencyPipe = new CurrencyPipe();
+  private readonly currencyPipe = new CurrencyPipe('en-US');
 
   /**
    * Obtiene solo el símbolo de la moneda del tenant
@@ -175,17 +177,17 @@ export class TenantCurrencySymbolPipe implements PipeTransform {
    */
   private getBasicCurrencySymbol(currency: string): string {
     const symbols: Record<string, string> = {
-      'USD': '$',
-      'EUR': '€',
-      'GBP': '£',
-      'MXN': '$',
-      'JPY': '¥',
-      'CAD': 'C$',
-      'AUD': 'A$',
-      'BRL': 'R$',
-      'ARS': '$',
-      'COP': '$',
-      'CLP': '$'
+      USD: '$',
+      EUR: '€',
+      GBP: '£',
+      MXN: '$',
+      JPY: '¥',
+      CAD: 'C$',
+      AUD: 'A$',
+      BRL: 'R$',
+      ARS: '$',
+      COP: '$',
+      CLP: '$',
     };
 
     return symbols[currency] || currency;
@@ -198,7 +200,7 @@ export class TenantCurrencySymbolPipe implements PipeTransform {
 @Pipe({
   name: 'tenantNumber',
   standalone: true,
-  pure: false
+  pure: false,
 })
 export class TenantNumberPipe implements PipeTransform {
   private readonly tenantContext = inject(TenantContextService);
@@ -223,7 +225,10 @@ export class TenantNumberPipe implements PipeTransform {
     const numValue = Number(value);
 
     try {
-      return numValue.toLocaleString(tenantLocale, this.parseDigitsInfo(digitsInfo));
+      return numValue.toLocaleString(
+        tenantLocale,
+        this.parseDigitsInfo(digitsInfo)
+      );
     } catch {
       return numValue.toString();
     }
@@ -242,7 +247,7 @@ export class TenantNumberPipe implements PipeTransform {
       return {
         minimumIntegerDigits: Number(match[1]),
         minimumFractionDigits: Number(match[2]),
-        maximumFractionDigits: Number(match[3])
+        maximumFractionDigits: Number(match[3]),
       };
     }
 

@@ -182,28 +182,28 @@ export class CatalogService {
     const params: Record<string, string | number | boolean> = {};
 
     // Parámetros de búsqueda
-    if (filters.q) params.q = filters.q;
-    if (filters.categoryId) params.categoryId = filters.categoryId;
+    if (filters.q) params['q'] = filters.q;
+    if (filters.categoryId) params['categoryId'] = filters.categoryId;
 
     // Parámetros de precio
-    if (filters.minPrice !== undefined) params.minPrice = filters.minPrice;
-    if (filters.maxPrice !== undefined) params.maxPrice = filters.maxPrice;
+    if (filters.minPrice !== undefined) params['minPrice'] = filters.minPrice;
+    if (filters.maxPrice !== undefined) params['maxPrice'] = filters.maxPrice;
 
     // Filtros booleanos
-    if (filters.inStock !== undefined) params.inStock = filters.inStock;
+    if (filters.inStock !== undefined) params['inStock'] = filters.inStock;
 
     // Tags (convertir array a string)
     if (filters.tags && filters.tags.length > 0) {
-      params.tags = filters.tags.join(',');
+      params['tags'] = filters.tags.join(',');
     }
 
     // Paginación
-    params.page = filters.page || 1;
-    params.limit = filters.limit || 20;
+    params['page'] = filters.page || 1;
+    params['limit'] = filters.limit || 20;
 
     // Ordenamiento
-    if (filters.sortBy) params.sortBy = filters.sortBy;
-    if (filters.sortOrder) params.sortOrder = filters.sortOrder;
+    if (filters.sortBy) params['sortBy'] = filters.sortBy;
+    if (filters.sortOrder) params['sortOrder'] = filters.sortOrder;
 
     return params;
   }

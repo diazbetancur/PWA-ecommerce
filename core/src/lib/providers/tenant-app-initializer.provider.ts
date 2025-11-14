@@ -16,7 +16,7 @@ import { TenantBootstrapService } from '../services/tenant-bootstrap.service';
  *
  * @returns Promise<void> que se resuelve cuando el tenant está listo
  */
-export function tenantBootstrapFactory(): () => Promise<void> {
+export function tenantAppInitializerFactory(): () => Promise<void> {
   const platformId = inject(PLATFORM_ID);
   const tenantBootstrap = inject(TenantBootstrapService);
   const router = inject(Router);
@@ -24,7 +24,9 @@ export function tenantBootstrapFactory(): () => Promise<void> {
   return async (): Promise<void> => {
     // En SSR, simplemente inicializar con configuración por defecto
     if (!isPlatformBrowser(platformId)) {
-      console.log('🖥️ [APP_INITIALIZER] SSR detectado - saltando bootstrap de tenant');
+      console.log(
+        '🖥️ [APP_INITIALIZER] SSR detectado - saltando bootstrap de tenant'
+      );
       await tenantBootstrap.initialize();
       return;
     }
@@ -44,26 +46,33 @@ export function tenantBootstrapFactory(): () => Promise<void> {
           status,
           error: error?.message,
           code: error?.code,
-          slug: tenantBootstrap.attemptedSlug()
+          slug: tenantBootstrap.attemptedSlug(),
         });
 
         // Si el tenant no fue encontrado y está configurado para redirigir
         if (tenantBootstrap.needsRedirect()) {
-          console.log('🔀 [APP_INITIALIZER] Redirigiendo a página de error de tenant...');
+          console.log(
+            '🔀 [APP_INITIALIZER] Redirigiendo a página de error de tenant...'
+          );
 
           // Redirigir a la página de error
           // Usamos setTimeout para asegurar que el router esté listo
           setTimeout(() => {
-            router.navigate(['/tenant/not-found'], {
-              queryParams: {
-                slug: tenantBootstrap.attemptedSlug(),
-                code: error?.code,
-                retryable: error?.retryable ? 'true' : 'false'
-              },
-              replaceUrl: true
-            }).catch(navError => {
-              console.error('❌ [APP_INITIALIZER] Error navegando a /tenant/not-found:', navError);
-            });
+            router
+              .navigate(['/tenant/not-found'], {
+                queryParams: {
+                  slug: tenantBootstrap.attemptedSlug(),
+                  code: error?.code,
+                  retryable: error?.retryable ? 'true' : 'false',
+                },
+                replaceUrl: true,
+              })
+              .catch((navError) => {
+                console.error(
+                  '❌ [APP_INITIALIZER] Error navegando a /tenant/not-found:',
+                  navError
+                );
+              });
           }, 100);
         }
 
@@ -73,26 +82,33 @@ export function tenantBootstrapFactory(): () => Promise<void> {
         console.log('✅ [APP_INITIALIZER] Tenant inicializado correctamente:', {
           slug: tenant?.tenant.slug,
           displayName: tenant?.tenant.displayName,
-          strategy: tenantBootstrap.resolvedStrategy()?.type
+          strategy: tenantBootstrap.resolvedStrategy()?.type,
         });
       }
-
     } catch (error) {
-      console.error('❌ [APP_INITIALIZER] Error crítico en bootstrap del tenant:', error);
+      console.error(
+        '❌ [APP_INITIALIZER] Error crítico en bootstrap del tenant:',
+        error
+      );
 
       // No lanzar el error para no bloquear completamente la app
       // La app se iniciará con configuración por defecto
       // pero intentamos redirigir al error page
       setTimeout(() => {
-        router.navigate(['/tenant/not-found'], {
-          queryParams: {
-            code: 'UNKNOWN',
-            message: 'Error crítico al inicializar el tenant'
-          },
-          replaceUrl: true
-        }).catch(navError => {
-          console.error('❌ [APP_INITIALIZER] Error navegando después de error crítico:', navError);
-        });
+        router
+          .navigate(['/tenant/not-found'], {
+            queryParams: {
+              code: 'UNKNOWN',
+              message: 'Error crítico al inicializar el tenant',
+            },
+            replaceUrl: true,
+          })
+          .catch((navError) => {
+            console.error(
+              '❌ [APP_INITIALIZER] Error navegando después de error crítico:',
+              navError
+            );
+          });
       }, 100);
     }
   };
@@ -123,6 +139,6 @@ export function tenantBootstrapFactory(): () => Promise<void> {
 export const TENANT_APP_INITIALIZER: Provider = {
   provide: APP_INITIALIZER,
   multi: true,
-  useFactory: tenantBootstrapFactory,
-  deps: []
+  useFactory: tenantAppInitializerFactory,
+  deps: [],
 };

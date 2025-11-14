@@ -1,5 +1,5 @@
 import { APP_INITIALIZER, Provider } from '@angular/core';
-import { AppEnvService } from '@core/services/app-env.service';
+import { AppEnvService } from '../services/app-env.service';
 
 /**
  * Factory function que inicializa el entorno y valida la configuración

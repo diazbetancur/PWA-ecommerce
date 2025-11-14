@@ -47,6 +47,7 @@ export interface TenantConfig {
   locale: string;
   currency: string;
   cdnBaseUrl: string;
+  seo?: Record<string, unknown>;
 }
 
 export interface Product {

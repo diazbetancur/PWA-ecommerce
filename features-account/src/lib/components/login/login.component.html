@@ -1,0 +1,79 @@
+<div class="login-container">
+  <div class="login-card">
+    <h1>Iniciar Sesión</h1>
+    <p class="subtitle">Bienvenido a {{ tenantName() }}</p>
+
+    @if (errorMessage()) {
+    <div class="alert alert-error">
+      {{ errorMessage() }}
+    </div>
+    }
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="tu@email.com"
+          [class.error]="getFieldError('email')"
+        />
+        @if (getFieldError('email')) {
+        <span class="error-message">{{ getFieldError('email') }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <div class="password-input">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            placeholder="••••••••"
+            [class.error]="getFieldError('password')"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+            aria-label="Mostrar contraseña"
+          >
+            {{ showPassword() ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        @if (getFieldError('password')) {
+        <span class="error-message">{{ getFieldError('password') }}</span>
+        }
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" formControlName="rememberMe" />
+          <span>Recordarme</span>
+        </label>
+        <a routerLink="/account/forgot-password" class="forgot-link">
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+
+      <button
+        type="submit"
+        class="btn-primary"
+        [disabled]="isLoading() || loginForm.invalid"
+      >
+        @if (isLoading()) {
+        <span class="spinner"></span>
+        Iniciando sesión... } @else { Iniciar Sesión }
+      </button>
+    </form>
+
+    <div class="footer-links">
+      <p>
+        ¿No tienes cuenta?
+        <a routerLink="/account/register">Regístrate aquí</a>
+      </p>
+    </div>
+  </div>
+</div>

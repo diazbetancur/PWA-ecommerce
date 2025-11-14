@@ -1,11 +1,34 @@
 /**
  * Interfaces para la resolución de tenants desde el backend real
- * Endpoint: GET /api/public/tenant/resolve?tenant={slug}
  */
 
 /**
- * Respuesta del endpoint /api/public/tenant/resolve del backend de Azure
- * Esta interfaz representa la estructura completa que devuelve el backend .NET
+ * ✅ ALINEADO CON API DOCUMENTATION v1
+ * Respuesta del endpoint GET /public/tenant-config
+ * Header requerido: X-Tenant-Slug
+ *
+ * Ejemplo de respuesta:
+ * {
+ *   "name": "My Awesome Store",
+ *   "slug": "my-store",
+ *   "theme": {},
+ *   "seo": {},
+ *   "features": ["catalog", "cart", "checkout", "guest_checkout", "categories"]
+ * }
+ */
+export interface PublicTenantConfigResponse {
+  name: string; // Store name
+  slug: string; // Store slug
+  theme: Record<string, any>; // Theme configuration (empty for now)
+  seo: Record<string, any>; // SEO metadata (empty for now)
+  features: string[]; // List of enabled feature codes
+}
+
+/**
+ * ⚠️ LEGACY INTERFACE - To be deprecated
+ * Esta interfaz representa una estructura más completa que podría usarse
+ * en endpoints futuros o internos del backend.
+ * NO coincide con /public/tenant-config actual.
  */
 export interface TenantConfigResponse {
   /** Información básica del tenant */
@@ -163,18 +186,24 @@ export interface TenantResolveRequest {
  * Estados del proceso de resolución de tenant
  */
 export type TenantResolutionStatus =
-  | 'idle'          // No ha comenzado
-  | 'resolving'     // Resolviendo tenant
-  | 'resolved'      // Tenant resuelto exitosamente
-  | 'not-found'     // Tenant no encontrado
-  | 'error'         // Error en la resolución
-  | 'timeout';      // Timeout en la resolución
+  | 'idle' // No ha comenzado
+  | 'resolving' // Resolviendo tenant
+  | 'resolved' // Tenant resuelto exitosamente
+  | 'not-found' // Tenant no encontrado
+  | 'error' // Error en la resolución
+  | 'timeout'; // Timeout en la resolución
 
 /**
  * Información de error detallada
  */
 export interface TenantResolutionError {
-  code: 'NOT_FOUND' | 'NETWORK_ERROR' | 'INVALID_CONFIG' | 'TIMEOUT' | 'UNAUTHORIZED' | 'UNKNOWN';
+  code:
+    | 'NOT_FOUND'
+    | 'NETWORK_ERROR'
+    | 'INVALID_CONFIG'
+    | 'TIMEOUT'
+    | 'UNAUTHORIZED'
+    | 'UNKNOWN';
   message: string;
   slug?: string;
   hostname?: string;

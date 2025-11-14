@@ -1,5 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpParams,
+  HttpResponse,
+} from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { AppEnvService } from './app-env.service';
@@ -9,7 +14,15 @@ import { AppEnvService } from './app-env.service';
  */
 export interface ApiRequestOptions {
   headers?: HttpHeaders | { [header: string]: string | string[] };
-  params?: HttpParams | { [param: string]: string | number | boolean | ReadonlyArray<string | number | boolean> };
+  params?:
+    | HttpParams
+    | {
+        [param: string]:
+          | string
+          | number
+          | boolean
+          | ReadonlyArray<string | number | boolean>;
+      };
   observe?: 'body';
   reportProgress?: boolean;
   responseType?: 'json';
@@ -19,7 +32,8 @@ export interface ApiRequestOptions {
 /**
  * Opciones extendidas que incluyen observe: 'response'
  */
-export interface ApiRequestOptionsWithResponse extends Omit<ApiRequestOptions, 'observe'> {
+export interface ApiRequestOptionsWithResponse
+  extends Omit<ApiRequestOptions, 'observe'> {
   observe: 'response';
 }
 
@@ -66,7 +80,7 @@ interface ApiLogInfo {
  * - Incluye logging inteligente y manejo de errores
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiClientService {
   private readonly http = inject(HttpClient);
@@ -76,7 +90,7 @@ export class ApiClientService {
   private readonly defaultOptions: ApiClientOptions = {
     enableLogging: this.envService.isConsoleLoggingEnabled,
     enableErrorHandling: true,
-    timeout: 30000
+    timeout: 30000,
   };
 
   /**
@@ -87,12 +101,19 @@ export class ApiClientService {
   private buildFullUrl(relativePath: string): string {
     // Validar que el path sea relativo
     if (!relativePath.startsWith('/')) {
-      throw new Error(`ApiClientService: El path debe ser relativo y empezar con '/'. Recibido: ${relativePath}`);
+      throw new Error(
+        `ApiClientService: El path debe ser relativo y empezar con '/'. Recibido: ${relativePath}`
+      );
     }
 
     // Validar que no sea una URL absoluta
-    if (relativePath.startsWith('http://') || relativePath.startsWith('https://')) {
-      throw new Error(`ApiClientService: Se recibió una URL absoluta. Solo se permiten paths relativos. Recibido: ${relativePath}`);
+    if (
+      relativePath.startsWith('http://') ||
+      relativePath.startsWith('https://')
+    ) {
+      throw new Error(
+        `ApiClientService: Se recibió una URL absoluta. Solo se permiten paths relativos. Recibido: ${relativePath}`
+      );
     }
 
     const baseUrl = this.envService.apiBaseUrl;
@@ -104,11 +125,14 @@ export class ApiClientService {
     const fullUrl = `${cleanBaseUrl}${relativePath}`;
 
     // Log de construcción de URL en modo debug
-    if (this.envService.isDevelopment && this.envService.loggingLevel === 'debug') {
+    if (
+      this.envService.isDevelopment &&
+      this.envService.loggingLevel === 'debug'
+    ) {
       console.log(`🔗 URL Built: ${fullUrl}`, {
         baseUrl: cleanBaseUrl,
         relativePath,
-        mockApi: this.envService.useMockApi
+        mockApi: this.envService.useMockApi,
       });
     }
 
@@ -131,7 +155,13 @@ export class ApiClientService {
     options?: ApiRequestOptions,
     clientOptions?: ApiClientOptions
   ): Observable<T> {
-    return this.executeRequest<T>('GET', relativePath, undefined, options, clientOptions);
+    return this.executeRequest<T>(
+      'GET',
+      relativePath,
+      undefined,
+      options,
+      clientOptions
+    );
   }
 
   /**
@@ -147,7 +177,13 @@ export class ApiClientService {
     clientOptions?: ApiClientOptions
   ): Observable<HttpResponse<T>> {
     const finalOptions = { ...options, observe: 'response' as const };
-    return this.executeRequest<HttpResponse<T>>('GET', relativePath, undefined, finalOptions, clientOptions);
+    return this.executeRequest<HttpResponse<T>>(
+      'GET',
+      relativePath,
+      undefined,
+      finalOptions,
+      clientOptions
+    );
   }
 
   /**
@@ -164,7 +200,13 @@ export class ApiClientService {
     options?: ApiRequestOptions,
     clientOptions?: ApiClientOptions
   ): Observable<TResponse> {
-    return this.executeRequest<TResponse>('POST', relativePath, body, options, clientOptions);
+    return this.executeRequest<TResponse>(
+      'POST',
+      relativePath,
+      body,
+      options,
+      clientOptions
+    );
   }
 
   /**
@@ -182,7 +224,13 @@ export class ApiClientService {
     clientOptions?: ApiClientOptions
   ): Observable<HttpResponse<TResponse>> {
     const finalOptions = { ...options, observe: 'response' as const };
-    return this.executeRequest<HttpResponse<TResponse>>('POST', relativePath, body, finalOptions, clientOptions);
+    return this.executeRequest<HttpResponse<TResponse>>(
+      'POST',
+      relativePath,
+      body,
+      finalOptions,
+      clientOptions
+    );
   }
 
   /**
@@ -199,7 +247,13 @@ export class ApiClientService {
     options?: ApiRequestOptions,
     clientOptions?: ApiClientOptions
   ): Observable<TResponse> {
-    return this.executeRequest<TResponse>('PUT', relativePath, body, options, clientOptions);
+    return this.executeRequest<TResponse>(
+      'PUT',
+      relativePath,
+      body,
+      options,
+      clientOptions
+    );
   }
 
   /**
@@ -216,7 +270,13 @@ export class ApiClientService {
     options?: ApiRequestOptions,
     clientOptions?: ApiClientOptions
   ): Observable<TResponse> {
-    return this.executeRequest<TResponse>('PATCH', relativePath, body, options, clientOptions);
+    return this.executeRequest<TResponse>(
+      'PATCH',
+      relativePath,
+      body,
+      options,
+      clientOptions
+    );
   }
 
   /**
@@ -231,7 +291,13 @@ export class ApiClientService {
     options?: ApiRequestOptions,
     clientOptions?: ApiClientOptions
   ): Observable<T> {
-    return this.executeRequest<T>('DELETE', relativePath, undefined, options, clientOptions);
+    return this.executeRequest<T>(
+      'DELETE',
+      relativePath,
+      undefined,
+      options,
+      clientOptions
+    );
   }
 
   // ============================================================================
@@ -260,55 +326,80 @@ export class ApiClientService {
       this.logRequest(method, relativePath, body, fullUrl);
     }
 
-    let request$: Observable<T>;
+    let request$: Observable<any>;
 
-    // Crear la request según el método usando la URL completa
+    // Crear la request según el método usando la URL completa (evitar problemas de sobrecarga con union de options)
     switch (method) {
       case 'GET':
-        request$ = this.http.get<T>(fullUrl, options) as Observable<T>;
+        request$ = this.http.get(fullUrl, options as any);
         break;
       case 'POST':
-        request$ = this.http.post<T>(fullUrl, body, options) as Observable<T>;
+        request$ = this.http.post(fullUrl, body, options as any);
         break;
       case 'PUT':
-        request$ = this.http.put<T>(fullUrl, body, options) as Observable<T>;
+        request$ = this.http.put(fullUrl, body, options as any);
         break;
       case 'PATCH':
-        request$ = this.http.patch<T>(fullUrl, body, options) as Observable<T>;
+        request$ = this.http.patch(fullUrl, body, options as any);
         break;
       case 'DELETE':
-        request$ = this.http.delete<T>(fullUrl, options) as Observable<T>;
+        request$ = this.http.delete(fullUrl, options as any);
         break;
       default:
         throw new Error(`Método HTTP no soportado: ${method}`);
     }
 
-    // Agregar logging y manejo de errores
-    return request$.pipe(
-      // Log de respuesta exitosa
-      ...(config.enableLogging && this.envService.isConsoleLoggingEnabled
-        ? [tap((response) => this.logResponse(method, relativePath, startTime, response, fullUrl))]
-        : []),
+    // Aplicar logging y manejo de errores de forma secuencial para evitar spreads con tuplas
+    if (config.enableLogging && this.envService.isConsoleLoggingEnabled) {
+      request$ = request$.pipe(
+        tap((response) =>
+          this.logResponse(method, relativePath, startTime, response, fullUrl)
+        )
+      );
+    }
+    if (config.enableErrorHandling) {
+      request$ = request$.pipe(
+        catchError((error) =>
+          this.handleError(method, relativePath, error, startTime, fullUrl)
+        )
+      );
+    }
 
-      // Manejo de errores si está habilitado
-      ...(config.enableErrorHandling
-        ? [catchError((error) => this.handleError(method, relativePath, error, startTime, fullUrl))]
-        : [])
-    ) as Observable<T>;
+    return request$ as Observable<T>;
   }
 
   /**
    * Log de request saliente (mejorado con información de URL construction)
    */
-  private logRequest(method: string, relativePath: string, body?: unknown, fullUrl?: string): void {
+  private logRequest(
+    method: string,
+    relativePath: string,
+    body?: unknown,
+    fullUrl?: string
+  ): void {
     const timestamp = new Date().toISOString();
-    console.group(`%c🚀 API Request [${timestamp}]`, 'color: #0070f3; font-weight: bold');
-    console.log(`%c${method}%c ${relativePath}`, 'color: #0070f3; font-weight: bold', 'color: #666');
+    console.group(
+      `%c🚀 API Request [${timestamp}]`,
+      'color: #0070f3; font-weight: bold'
+    );
+    console.log(
+      `%c${method}%c ${relativePath}`,
+      'color: #0070f3; font-weight: bold',
+      'color: #666'
+    );
 
     if (this.envService.loggingLevel === 'debug' && fullUrl) {
       console.log('%cFull URL:', 'color: #0070f3; font-size: 0.9em', fullUrl);
-      console.log('%cBase URL:', 'color: #0070f3; font-size: 0.9em', this.envService.apiBaseUrl);
-      console.log('%cMock API:', 'color: #0070f3; font-size: 0.9em', this.envService.useMockApi);
+      console.log(
+        '%cBase URL:',
+        'color: #0070f3; font-size: 0.9em',
+        this.envService.apiBaseUrl
+      );
+      console.log(
+        '%cMock API:',
+        'color: #0070f3; font-size: 0.9em',
+        this.envService.useMockApi
+      );
     }
 
     if (body) {
@@ -321,12 +412,25 @@ export class ApiClientService {
   /**
    * Log de respuesta (mejorado con información de construcción de URL)
    */
-  private logResponse(method: string, relativePath: string, startTime: number, response: unknown, fullUrl?: string): void {
+  private logResponse(
+    method: string,
+    relativePath: string,
+    startTime: number,
+    response: unknown,
+    fullUrl?: string
+  ): void {
     const duration = Math.round(performance.now() - startTime);
     const timestamp = new Date().toISOString();
 
-    console.group(`%c✅ API Response [${timestamp}] - ${duration}ms`, 'color: #22c55e; font-weight: bold');
-    console.log(`%c${method}%c ${relativePath}`, 'color: #22c55e; font-weight: bold', 'color: #666');
+    console.group(
+      `%c✅ API Response [${timestamp}] - ${duration}ms`,
+      'color: #22c55e; font-weight: bold'
+    );
+    console.log(
+      `%c${method}%c ${relativePath}`,
+      'color: #22c55e; font-weight: bold',
+      'color: #666'
+    );
 
     if (this.envService.loggingLevel === 'debug' && fullUrl) {
       console.log('%cFull URL:', 'color: #22c55e; font-size: 0.9em', fullUrl);
@@ -339,14 +443,27 @@ export class ApiClientService {
   /**
    * Manejo de errores HTTP (mejorado)
    */
-  private handleError(method: string, relativePath: string, error: unknown, startTime: number, fullUrl?: string): Observable<never> {
+  private handleError(
+    method: string,
+    relativePath: string,
+    error: unknown,
+    startTime: number,
+    fullUrl?: string
+  ): Observable<never> {
     const duration = Math.round(performance.now() - startTime);
     const timestamp = new Date().toISOString();
 
     // Log del error basado en configuración del entorno
     if (this.envService.isConsoleLoggingEnabled) {
-      console.group(`%c❌ API Error [${timestamp}] - ${duration}ms`, 'color: #ef4444; font-weight: bold');
-      console.log(`%c${method}%c ${relativePath}`, 'color: #ef4444; font-weight: bold', 'color: #666');
+      console.group(
+        `%c❌ API Error [${timestamp}] - ${duration}ms`,
+        'color: #ef4444; font-weight: bold'
+      );
+      console.log(
+        `%c${method}%c ${relativePath}`,
+        'color: #ef4444; font-weight: bold',
+        'color: #666'
+      );
 
       if (this.envService.loggingLevel === 'debug' && fullUrl) {
         console.log('%cFull URL:', 'color: #ef4444; font-size: 0.9em', fullUrl);
@@ -369,7 +486,9 @@ export class ApiClientService {
    * @param params - Objeto con los parámetros
    * @returns HttpParams
    */
-  buildParams(params: Record<string, string | number | boolean | null | undefined>): HttpParams {
+  buildParams(
+    params: Record<string, string | number | boolean | null | undefined>
+  ): HttpParams {
     let httpParams = new HttpParams();
 
     for (const [key, value] of Object.entries(params)) {
@@ -404,10 +523,14 @@ export class ApiClientService {
     options?: Omit<ApiRequestOptions, 'params'>,
     clientOptions?: ApiClientOptions
   ): Observable<T> {
-    return this.get<T>(relativePath, {
-      ...options,
-      params: this.buildParams(params)
-    }, clientOptions);
+    return this.get<T>(
+      relativePath,
+      {
+        ...options,
+        params: this.buildParams(params),
+      },
+      clientOptions
+    );
   }
 
   /**
@@ -426,10 +549,15 @@ export class ApiClientService {
     options?: Omit<ApiRequestOptions, 'headers'>,
     clientOptions?: ApiClientOptions
   ): Observable<TResponse> {
-    return this.post<TResponse, TBody>(url, body, {
-      ...options,
-      headers: this.buildHeaders(headers)
-    }, clientOptions);
+    return this.post<TResponse, TBody>(
+      url,
+      body,
+      {
+        ...options,
+        headers: this.buildHeaders(headers),
+      },
+      clientOptions
+    );
   }
 
   /**
@@ -477,7 +605,9 @@ export class ApiClientService {
     timeout = 5000,
     options?: ApiRequestOptions
   ): Observable<T> {
-    return this.executeRequest<T>(method, relativePath, body, options, { timeout });
+    return this.executeRequest<T>(method, relativePath, body, options, {
+      timeout,
+    });
   }
 
   // ============================================================================
@@ -488,11 +618,19 @@ export class ApiClientService {
    * Obtiene información de conectividad con el backend
    * @returns Observable con información del health del API
    */
-  getHealthCheck(): Observable<{ status: string; timestamp: string; version?: string }> {
-    return this.get<{ status: string; timestamp: string; version?: string }>('/health', {}, {
-      enableLogging: true,
-      timeout: 5000
-    });
+  getHealthCheck(): Observable<{
+    status: string;
+    timestamp: string;
+    version?: string;
+  }> {
+    return this.get<{ status: string; timestamp: string; version?: string }>(
+      '/health',
+      {},
+      {
+        enableLogging: true,
+        timeout: 5000,
+      }
+    );
   }
 
   /**
@@ -502,7 +640,7 @@ export class ApiClientService {
    */
   getTenantConfig(tenantSlug: string): Observable<unknown> {
     return this.getWithParams('/api/public/tenant/resolve', {
-      slug: tenantSlug
+      slug: tenantSlug,
     });
   }
 
@@ -575,7 +713,7 @@ export class ApiClientService {
       baseUrl: this.envService.apiBaseUrl,
       mockApi: this.envService.useMockApi,
       loggingEnabled: this.envService.isConsoleLoggingEnabled,
-      environment: this.envService.isProduction ? 'production' : 'development'
+      environment: this.envService.isProduction ? 'production' : 'development',
     };
   }
 }

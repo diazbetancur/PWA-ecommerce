@@ -1,8 +1,11 @@
-import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ApiClientService } from '../services/api-client.service';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import { TestBed } from '@angular/core/testing';
 import { TenantHeaderInterceptor } from '../interceptors/tenant-header.interceptor';
+import { ApiClientService } from '../services/api-client.service';
 import { TenantContextService } from '../services/tenant-context.service';
 
 /**
@@ -12,14 +15,14 @@ import { TenantContextService } from '../services/tenant-context.service';
 describe('ApiClientService + TenantHeaderInterceptor Integration', () => {
   let apiClient: ApiClientService;
   let httpMock: HttpTestingController;
-  let tenantContext: jasmine.SpyObj<TenantContextService>;
+  let tenantContext: any;
 
   beforeEach(() => {
-    // Mock del TenantContextService
-    const tenantContextSpy = jasmine.createSpyObj('TenantContextService', [
-      'shouldIncludeTenantHeaders',
-      'getTenantHeaders'
-    ]);
+    // Mock del TenantContextService usando Jest
+    const tenantContextSpy = {
+      shouldIncludeTenantHeaders: jest.fn(),
+      getTenantHeaders: jest.fn(),
+    };
 
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -28,18 +31,18 @@ describe('ApiClientService + TenantHeaderInterceptor Integration', () => {
         {
           provide: HTTP_INTERCEPTORS,
           useClass: TenantHeaderInterceptor,
-          multi: true
+          multi: true,
         },
         {
           provide: TenantContextService,
-          useValue: tenantContextSpy
-        }
-      ]
+          useValue: tenantContextSpy,
+        },
+      ],
     });
 
     apiClient = TestBed.inject(ApiClientService);
     httpMock = TestBed.inject(HttpTestingController);
-    tenantContext = TestBed.inject(TenantContextService) as jasmine.SpyObj<TenantContextService>;
+    tenantContext = TestBed.inject(TenantContextService) as any;
   });
 
   afterEach(() => {
@@ -48,17 +51,19 @@ describe('ApiClientService + TenantHeaderInterceptor Integration', () => {
 
   it('debe agregar headers X-Tenant-Slug y X-Tenant-Key automáticamente', () => {
     // Configurar el mock del contexto de tenant
-    tenantContext.shouldIncludeTenantHeaders.and.returnValue(true);
-    tenantContext.getTenantHeaders.and.returnValue({
+    tenantContext.shouldIncludeTenantHeaders.mockReturnValue(true);
+    tenantContext.getTenantHeaders.mockReturnValue({
       slug: 'demo-tenant',
-      key: 'demo-key-123'
+      key: 'demo-key-123',
     });
 
     // Realizar una request GET
     apiClient.get<any[]>('/api/catalog/products').subscribe();
 
     // Verificar la request HTTP
-    const req = httpMock.expectOne('/api/catalog/products');
+    const req = httpMock.expectOne((req) =>
+      req.url.includes('/api/catalog/products')
+    );
 
     expect(req.request.method).toBe('GET');
     expect(req.request.headers.get('X-Tenant-Slug')).toBe('demo-tenant');
@@ -67,26 +72,30 @@ describe('ApiClientService + TenantHeaderInterceptor Integration', () => {
     // Simular respuesta
     req.flush([
       { id: '1', name: 'Producto 1', price: 29.99 },
-      { id: '2', name: 'Producto 2', price: 39.99 }
+      { id: '2', name: 'Producto 2', price: 39.99 },
     ]);
   });
 
   it('debe manejar POST con body tipado y headers de tenant', () => {
-    tenantContext.shouldIncludeTenantHeaders.and.returnValue(true);
-    tenantContext.getTenantHeaders.and.returnValue({
+    tenantContext.shouldIncludeTenantHeaders.mockReturnValue(true);
+    tenantContext.getTenantHeaders.mockReturnValue({
       slug: 'mi-tienda',
-      key: 'key-456'
+      key: 'key-456',
     });
 
     const newProduct = {
       name: 'Nuevo Producto',
       price: 49.99,
-      stock: 10
+      stock: 10,
     };
 
-    apiClient.post<{id: string}>('/api/catalog/products', newProduct).subscribe();
+    apiClient
+      .post<{ id: string }>('/api/catalog/products', newProduct)
+      .subscribe();
 
-    const req = httpMock.expectOne('/api/catalog/products');
+    const req = httpMock.expectOne((req) =>
+      req.url.includes('/api/catalog/products')
+    );
 
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(newProduct);
@@ -97,11 +106,13 @@ describe('ApiClientService + TenantHeaderInterceptor Integration', () => {
   });
 
   it('NO debe agregar headers para URLs públicas', () => {
-    tenantContext.shouldIncludeTenantHeaders.and.returnValue(false);
+    tenantContext.shouldIncludeTenantHeaders.mockReturnValue(false);
 
     apiClient.get<any>('/api/public/health').subscribe();
 
-    const req = httpMock.expectOne('/api/public/health');
+    const req = httpMock.expectOne((req) =>
+      req.url.includes('/api/public/health')
+    );
 
     expect(req.request.headers.get('X-Tenant-Slug')).toBeNull();
     expect(req.request.headers.get('X-Tenant-Key')).toBeNull();
@@ -110,23 +121,26 @@ describe('ApiClientService + TenantHeaderInterceptor Integration', () => {
   });
 
   it('debe funcionar con getWithParams incluyendo headers de tenant', () => {
-    tenantContext.shouldIncludeTenantHeaders.and.returnValue(true);
-    tenantContext.getTenantHeaders.and.returnValue({
+    tenantContext.shouldIncludeTenantHeaders.mockReturnValue(true);
+    tenantContext.getTenantHeaders.mockReturnValue({
       slug: 'test-tenant',
-      key: 'test-key'
+      key: 'test-key',
     });
 
-    apiClient.getWithParams<any[]>('/api/catalog/products', {
-      page: 1,
-      pageSize: 20,
-      category: 'electronics'
-    }).subscribe();
+    apiClient
+      .getWithParams<any[]>('/api/catalog/products', {
+        page: 1,
+        pageSize: 20,
+        category: 'electronics',
+      })
+      .subscribe();
 
-    const req = httpMock.expectOne((request) =>
-      request.url === '/api/catalog/products' &&
-      request.params.get('page') === '1' &&
-      request.params.get('pageSize') === '20' &&
-      request.params.get('category') === 'electronics'
+    const req = httpMock.expectOne(
+      (request) =>
+        request.url.includes('/api/catalog/products') &&
+        request.params.get('page') === '1' &&
+        request.params.get('pageSize') === '20' &&
+        request.params.get('category') === 'electronics'
     );
 
     expect(req.request.headers.get('X-Tenant-Slug')).toBe('test-tenant');
@@ -136,17 +150,23 @@ describe('ApiClientService + TenantHeaderInterceptor Integration', () => {
   });
 
   it('debe manejar el upload de archivos con headers de tenant', () => {
-    tenantContext.shouldIncludeTenantHeaders.and.returnValue(true);
-    tenantContext.getTenantHeaders.and.returnValue({
+    tenantContext.shouldIncludeTenantHeaders.mockReturnValue(true);
+    tenantContext.getTenantHeaders.mockReturnValue({
       slug: 'upload-tenant',
-      key: 'upload-key'
+      key: 'upload-key',
     });
 
-    const mockFile = new File(['contenido'], 'test.jpg', { type: 'image/jpeg' });
+    const mockFile = new File(['contenido'], 'test.jpg', {
+      type: 'image/jpeg',
+    });
 
-    apiClient.uploadFile<{url: string}>('/api/media/upload', mockFile).subscribe();
+    apiClient
+      .uploadFile<{ url: string }>('/api/media/upload', mockFile)
+      .subscribe();
 
-    const req = httpMock.expectOne('/api/media/upload');
+    const req = httpMock.expectOne((req) =>
+      req.url.includes('/api/media/upload')
+    );
 
     expect(req.request.method).toBe('POST');
     expect(req.request.body instanceof FormData).toBe(true);
