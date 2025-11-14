@@ -340,8 +340,9 @@ export class TenantBootstrapService {
       localhost: '', // No mapear localhost
       'localhost:4200': '',
       'demo.example.com': 'demo',
-      'store-a.example.com': 'demo-a',
-      'store-b.example.com': 'demo-b',
+      // Ejemplo de mapeo:
+      // 'store-a.example.com': 'tenant-a',
+      // 'store-b.example.com': 'tenant-b',
       // Agregar más mapeos según sea necesario
     };
 

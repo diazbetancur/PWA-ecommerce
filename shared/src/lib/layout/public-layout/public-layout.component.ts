@@ -20,12 +20,11 @@ import { APP_ENV, TenantConfigService } from '@pwa/core';
           cfg.tenantSlug
         }}</span>
       </nav>
-      <!-- Dev-only tenant switcher (visible when mockApi in non-production) -->
-      <div class="tenant-switch" *ngIf="!env.production && env.mockApi">
-        <!-- Hot switch without reload in dev -->
-        <button type="button" (click)="switch('demo-a')">demo-a</button>
-        |
-        <button type="button" (click)="switch('demo-b')">demo-b</button>
+      <!-- Dev-only tenant info (visible when mockApi in non-production) -->
+      <div class="tenant-info" *ngIf="!env.production && env.mockApi">
+        <span class="text-sm text-gray-500"
+          >Mock API: Use ?tenant=YOUR_TENANT</span
+        >
       </div>
     </header>
     <main id="main" role="main" tabindex="-1">
@@ -84,7 +83,11 @@ import { APP_ENV, TenantConfigService } from '@pwa/core';
 export class PublicLayoutComponent {
   readonly cfg = inject(TenantConfigService);
   readonly env = inject(APP_ENV);
-  async switch(slug: 'demo-a' | 'demo-b') {
+  async switch(slug: string) {
+    if (!slug || slug.trim() === '') {
+      console.warn('⚠️ Switch tenant: slug vacío');
+      return;
+    }
     await this.cfg.switchTenant(slug);
   }
 }

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Tenant Resolution</title>
+    <style>
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #f5f5f5;
+      }
+      .test-case {
+        background: white;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .test-case h3 {
+        margin-top: 0;
+        color: #333;
+      }
+      .result {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 5px;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 Test: Tenant Resolution Logic</h1>
+    <p>
+      Este test simula la lógica de resolución de tenant sin ejecutar Angular
+    </p>
+
+    <div class="test-case">
+      <h3>Caso 1: Sin query param (modo admin)</h3>
+      <button onclick="testCase1()">Ejecutar Test</button>
+      <div id="result1"></div>
+    </div>
+
+    <div class="test-case">
+      <h3>Caso 2: Con tenant específico (?tenant=my-tenant)</h3>
+      <button onclick="testCase2()">Ejecutar Test</button>
+      <div id="result2"></div>
+    </div>
+
+    <div class="test-case">
+      <h3>Caso 3: Query param vacío (?tenant=)</h3>
+      <button onclick="testCase3()">Ejecutar Test</button>
+      <div id="result3"></div>
+    </div>
+
+    <div class="test-case">
+      <h3>Caso 4: Tenant demo-a (NO debería funcionar ahora)</h3>
+      <button onclick="testCase4()">Ejecutar Test</button>
+      <div id="result4"></div>
+    </div>
+
+    <script>
+      // Simular la lógica de TenantConfigService.load()
+      function resolveTenant(searchString) {
+        const qp = new URLSearchParams(searchString);
+        const t = qp.get('tenant');
+
+        let override = null;
+        if (t && t.trim() !== '') {
+          override = t;
+        }
+
+        if (!override) {
+          console.log('🔐 Sin tenant específico - modo administrador general');
+          return null; // Sin tenant = modo admin
+        }
+
+        return override;
+      }
+
+      function displayResult(elementId, tenant, expected, testName) {
+        const resultDiv = document.getElementById(elementId);
+        const passed = tenant === expected;
+        const className = passed ? 'success' : 'error';
+
+        resultDiv.innerHTML = `
+                <div class="result ${className}">
+                    <strong>${passed ? '✅ PASS' : '❌ FAIL'}</strong><br>
+                    Test: ${testName}<br>
+                    Esperado: <code>${
+                      expected === null ? 'null (modo admin)' : expected
+                    }</code><br>
+                    Obtenido: <code>${
+                      tenant === null ? 'null (modo admin)' : tenant
+                    }</code>
+                </div>
+            `;
+      }
+
+      function testCase1() {
+        const search = ''; // Sin query param
+        const tenant = resolveTenant(search);
+        displayResult(
+          'result1',
+          tenant,
+          null,
+          'Sin query param debe retornar null'
+        );
+      }
+
+      function testCase2() {
+        const search = '?tenant=my-tenant';
+        const tenant = resolveTenant(search);
+        displayResult(
+          'result2',
+          tenant,
+          'my-tenant',
+          'Con tenant específico debe retornarlo'
+        );
+      }
+
+      function testCase3() {
+        const search = '?tenant=';
+        const tenant = resolveTenant(search);
+        displayResult(
+          'result3',
+          tenant,
+          null,
+          'Query param vacío debe retornar null'
+        );
+      }
+
+      function testCase4() {
+        const search = '?tenant=demo-a';
+        const tenant = resolveTenant(search);
+        // Ahora SÍ debería aceptar demo-a si se pasa explícitamente
+        displayResult(
+          'result4',
+          tenant,
+          'demo-a',
+          'demo-a explícito debe funcionar'
+        );
+      }
+
+      // Auto-ejecutar todos los tests
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          testCase1();
+          testCase2();
+          testCase3();
+          testCase4();
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

@@ -35,19 +35,27 @@ export class TenantConfigService {
   }
 
   async load(reapply = false): Promise<void> {
-    const host = globalThis.location?.host ?? '';
     const search = globalThis.location?.search ?? '';
     // Allow overriding tenant via query param or programmatic switchTenant
     let override: string | null = this._overrideSlug ?? null;
     if (!override) {
       const qp = new URLSearchParams(search);
       const t = qp.get('tenant');
-      if (t === 'demo-a' || t === 'demo-b') override = t;
+      // Solo aceptar tenants específicos del query param
+      if (t && t.trim() !== '') override = t;
     }
-    // Resolution: query param takes precedence; otherwise, infer by hostname
-    const tenantKey =
-      override ??
-      (/b\./i.test(host) || host.includes('demo-b') ? 'demo-b' : 'demo-a');
+
+    // 🔐 Si no hay tenant específico, NO cargar ninguno (modo admin)
+    if (!override) {
+      console.log(
+        '🔐 [TenantConfigService] Sin tenant específico - modo administrador general'
+      );
+      this._config = undefined;
+      return;
+    }
+
+    // Resolution: solo usar el tenant explícitamente especificado
+    const tenantKey = override;
 
     // During SSR build-time route extraction (no window available), avoid external HTTP
     // to prevent failures. Provide a minimal stub so the app can bootstrap.
@@ -77,9 +85,9 @@ export class TenantConfigService {
         this._config = await firstValueFrom(this.http.get<TenantConfig>(url));
       } else {
         // Para backend real, usar ApiClientService con tenant resolution
-        this._config = await firstValueFrom(
+        this._config = (await firstValueFrom(
           this.apiClient.getTenantConfig(tenantKey)
-        ) as TenantConfig;
+        )) as TenantConfig;
       }
       // Re-apply dynamic aspects after loading
       this.applyDynamic(reapply);

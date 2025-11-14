@@ -2,7 +2,16 @@
 
 ## 📋 Resumen de Cambios
 
-Se modificó el comportamiento del sistema multitenant para que cuando no se especifica un tenant (sin query param `?tenant=`), automáticamente redirija al login administrativo general en lugar de intentar cargar tenants de demostración.
+Se modificó el comportamiento del sistema multitenant para que cuando no se especifica un tenant (sin query param `?tenant=`), automáticamente redirija al login administrativo general en lugar de intentar cargar tenants de demostración (demo-a/demo-b).
+
+## 🔍 Problema Detectado
+
+El sistema tenía **DOS servicios de tenant** compitiendo:
+
+1. **TenantBootstrapService** (nuevo, Azure backend) - `/core/src/lib/services/tenant-bootstrap.service.ts`
+2. **TenantConfigService** (viejo, hardcoded) - `/core/src/lib/services/tenant-config.service.ts`
+
+El `TenantConfigService` estaba hardcodeando demo-a/demo-b en su lógica de resolución, sobrescribiendo los cambios del nuevo sistema.
 
 ---
 
@@ -21,7 +30,57 @@ Se modificó el comportamiento del sistema multitenant para que cuando no se esp
 
 ## 🔧 Archivos Modificados
 
-### 1. `/core/src/lib/services/tenant-bootstrap.service.ts`
+### 1. `/core/src/lib/services/tenant-config.service.ts` ⚠️ **CRÍTICO**
+
+**Líneas 37-55 - Lógica de load() modificada:**
+
+```typescript
+async load(reapply = false): Promise<void> {
+  const search = globalThis.location?.search ?? '';
+  // Allow overriding tenant via query param or programmatic switchTenant
+  let override: string | null = this._overrideSlug ?? null;
+  if (!override) {
+    const qp = new URLSearchParams(search);
+    const t = qp.get('tenant');
+    // Solo aceptar tenants específicos, NO usar demo-a/demo-b por defecto
+    if (t && t.trim() !== '') override = t;
+  }
+
+  // 🔐 Si no hay tenant específico, NO cargar ninguno (modo admin)
+  if (!override) {
+    console.log('🔐 [TenantConfigService] Sin tenant específico - modo administrador general');
+    this._config = undefined;
+    return;
+  }
+
+  // Resolution: solo usar el tenant explícitamente especificado
+  const tenantKey = override;
+  // ... resto del código
+}
+```
+
+**ANTES:**
+
+```typescript
+// Resolution: query param takes precedence; otherwise, infer by hostname
+const tenantKey = override ?? (/b\./i.test(host) || host.includes('demo-b') ? 'demo-b' : 'demo-a');
+```
+
+**Cambios clave:**
+
+1. ❌ Eliminado fallback automático a `demo-a`
+2. ❌ Eliminado fallback automático a `demo-b`
+3. ❌ Eliminada lógica de detección por hostname (`/b\./i.test(host)`)
+4. ✅ Si no hay query param `?tenant=`, retorna `undefined` (modo admin)
+5. ✅ Solo acepta tenants explícitamente especificados
+6. ✅ Log en consola cuando se detecta modo admin
+
+**Propósito:**
+Este es el servicio que realmente se está usando en `app.config.ts` línea 70-71. Era el responsable de cargar demo-a/demo-b automáticamente.
+
+---
+
+### 2. `/core/src/lib/services/tenant-bootstrap.service.ts`
 
 **Cambio en línea 60:**
 
@@ -348,6 +407,25 @@ El sistema PWA sigue funcionando:
 
 ---
 
-**Fecha de Implementación:** 2025
-**Estado:** ✅ Completado y testeado
+**Fecha de Implementación:** 14 de noviembre de 2025
+**Estado:** ⚠️ Código modificado - Requiere pruebas en navegador
 **Autor:** Arquitecto Senior - PWA Multi-Tenant System
+
+---
+
+## ⚠️ ACTUALIZACIÓN IMPORTANTE
+
+Se detectó que el problema estaba en **TenantConfigService** (no en TenantBootstrapService).
+
+### Archivo CRÍTICO Modificado:
+
+- ✅ `/core/src/lib/services/tenant-config.service.ts` - Método `load()`
+  - Eliminado fallback a `demo-a` y `demo-b`
+  - Ahora retorna `undefined` cuando no hay tenant
+  - Solo acepta tenants explícitamente especificados en `?tenant=`
+
+### Ver Documento Completo:
+
+📄 **SOLUCION-DEMO-TENANTS.md** - Contiene todos los detalles de implementación y pruebas
+
+---
