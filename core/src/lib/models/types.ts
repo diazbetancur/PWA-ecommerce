@@ -1,3 +1,36 @@
+// Auth Response Types
+export interface AuthUser {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber?: string;
+  fullName?: string;
+  isActive: boolean;
+  roles?: string[];
+  createdAt: string;
+  lastLoginAt?: string | null;
+}
+
+export interface AuthResponse {
+  token: string;
+  expiresAt: string;
+  user: AuthUser;
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber?: string;
+  fullName?: string;
+  isActive: boolean;
+  roles?: string[];
+  createdAt: string;
+  lastLoginAt?: string | null;
+}
+
 export interface TenantInfo {
   id: string;
   slug: string;

@@ -14,32 +14,30 @@ import {
 } from './guards/admin-permission.guard';
 import { ADMIN_PERMISSIONS } from './models/admin-auth.model';
 import {
-  TenantListComponent,
+  AdminProfileComponent,
+  AdminSettingsComponent,
+  AnalyticsDashboardComponent,
+  BillingOverviewComponent,
+  FeatureFlagsComponent,
+  SubscriptionListComponent,
+  SystemConfigComponent,
+  SystemLogsComponent,
+  TenantConfigComponent,
   TenantCreateComponent,
   TenantDetailComponent,
   TenantEditComponent,
-  TenantConfigComponent,
+  TenantListComponent,
   UserListComponent,
   UserRolesComponent,
-  SubscriptionListComponent,
-  BillingOverviewComponent,
-  AnalyticsDashboardComponent,
-  SystemConfigComponent,
-  FeatureFlagsComponent,
-  SystemLogsComponent,
-  AdminProfileComponent,
-  AdminSettingsComponent,
 } from './pages/placeholder.components';
 
 export const ADMIN_ROUTES: Routes = [
   // Ruta de login SIN guard de autenticación
+  // Usa componente específico con endpoint admin/auth/login
   {
     path: 'login',
     loadComponent: () =>
       import('@pwa/features-account').then((m) => m.LoginComponent),
-    data: {
-      title: 'Login Administrativo',
-    },
   },
   // Rutas protegidas con guard de autenticación
   {

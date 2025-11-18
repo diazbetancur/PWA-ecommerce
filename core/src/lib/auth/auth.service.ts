@@ -1,11 +1,15 @@
-import { Injectable, signal } from '@angular/core';
-import { JwtPayload } from '../models/types';
+import { inject, Injectable, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { AuthResponse, JwtPayload, UserProfile } from '../models/types';
+import { ApiClientService } from '../services/api-client.service';
 
 const STORAGE_PREFIX = 'mtkn_';
 const SUPERADMIN_TOKEN_KEY = 'superadmin_token';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly apiClient = inject(ApiClientService);
+
   private readonly _jwt = signal<string | null>(null);
   private readonly _claims = signal<JwtPayload | null>(null);
   private _tenantSlug: string | null = null;
@@ -152,5 +156,132 @@ export class AuthService {
    */
   getRole(): string | undefined {
     return this._claims()?.role;
+  }
+
+  /**
+   * Login universal que detecta automáticamente el endpoint correcto
+   * - Con tenant: usa /auth/login (con X-Tenant-Slug header automático)
+   * - Sin tenant: usa /admin/auth/login (modo superadmin, sin X-Tenant-Slug)
+   */
+  async login(credentials: {
+    email: string;
+    password: string;
+    rememberMe?: boolean;
+  }): Promise<void> {
+    // Detectar si hay tenant activo
+    const hasTenant = this._tenantSlug !== null;
+    const endpoint = hasTenant ? '/auth/login' : '/admin/auth/login';
+
+    console.log('🔐 [AuthService] Login ->', {
+      hasTenant,
+      endpoint,
+      tenantSlug: this._tenantSlug,
+    });
+
+    try {
+      // Si no hay tenant, inicializar modo superadmin
+      if (!hasTenant) {
+        this.initSuperAdmin();
+      }
+
+      // Llamar al endpoint correspondiente
+      const response = await firstValueFrom(
+        this.apiClient.post<AuthResponse>(endpoint, {
+          email: credentials.email,
+          password: credentials.password,
+        })
+      );
+
+      if (!response?.token) {
+        throw new Error('No se recibió token del servidor');
+      }
+
+      // Establecer el token recibido
+      this.setToken(response.token);
+
+      console.log('✅ [AuthService] Login exitoso', {
+        isSuperAdmin: this._isSuperAdmin(),
+        role: this.getRole(),
+        tenantSlug: this._tenantSlug,
+        expiresAt: response.expiresAt,
+      });
+    } catch (error) {
+      console.error('❌ [AuthService] Error en login:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Registro de usuario (solo para tenants, requiere X-Tenant-Slug)
+   * POST /auth/register
+   */
+  async register(data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber?: string;
+  }): Promise<void> {
+    if (!this._tenantSlug) {
+      throw new Error('El registro requiere un tenant activo');
+    }
+
+    console.log('📝 [AuthService] Registro ->', {
+      endpoint: '/auth/register',
+      tenantSlug: this._tenantSlug,
+    });
+
+    try {
+      const response = await firstValueFrom(
+        this.apiClient.post<AuthResponse>('/auth/register', data)
+      );
+
+      if (!response?.token) {
+        throw new Error('No se recibió token del servidor');
+      }
+
+      // Establecer el token recibido
+      this.setToken(response.token);
+
+      console.log('✅ [AuthService] Registro exitoso', {
+        email: data.email,
+        tenantSlug: this._tenantSlug,
+      });
+    } catch (error) {
+      console.error('❌ [AuthService] Error en registro:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Obtiene el perfil del usuario actual
+   * - Con tenant: GET /auth/me (con X-Tenant-Slug)
+   * - Sin tenant: GET /admin/auth/me (admin profile)
+   */
+  async getProfile(): Promise<UserProfile> {
+    const hasTenant = this._tenantSlug !== null;
+    const endpoint = hasTenant ? '/auth/me' : '/admin/auth/me';
+
+    console.log('👤 [AuthService] Obtener perfil ->', {
+      hasTenant,
+      endpoint,
+      tenantSlug: this._tenantSlug,
+    });
+
+    try {
+      const profile = await firstValueFrom(
+        this.apiClient.get<UserProfile>(endpoint)
+      );
+
+      console.log('✅ [AuthService] Perfil obtenido', {
+        email: profile.email,
+        isSuperAdmin: this._isSuperAdmin(),
+      });
+
+      return profile;
+    } catch (error) {
+      console.error('❌ [AuthService] Error obteniendo perfil:', error);
+      throw error;
+    }
   }
 }
