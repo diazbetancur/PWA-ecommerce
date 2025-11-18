@@ -9,7 +9,7 @@ export const GENERAL_TENANT_CONFIG = {
   /**
    * Identificador del tenant general
    */
-  slug: 'general-admin',
+  slug: null,
 
   /**
    * Nombre visible

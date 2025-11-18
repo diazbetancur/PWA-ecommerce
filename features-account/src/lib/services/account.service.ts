@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { ApiClientService, AuthService as CoreAuthService } from '@pwa/core';
 import { firstValueFrom } from 'rxjs';
 import {
-  AuthResponse,
   AuthState,
   ChangePasswordRequest,
   ForgotPasswordRequest,
@@ -31,29 +30,30 @@ export class AccountService {
 
   /**
    * Login del usuario
+   * Usa CoreAuthService que detecta automáticamente si es admin o tenant
    */
   async login(request: LoginRequest): Promise<void> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
     try {
-      const response = await firstValueFrom(
-        this.apiClient.post<AuthResponse>('/auth/login', {
-          email: request.email,
-          password: request.password,
-        })
-      );
+      // Usar CoreAuthService.login() que auto-detecta admin vs tenant
+      await this.coreAuth.login({
+        email: request.email,
+        password: request.password,
+        rememberMe: request.rememberMe,
+      });
 
-      // Guardar token en el AuthService core
-      this.coreAuth.setToken(response.token);
-
-      // Guardar refreshToken si viene
-      if (response.refreshToken && request.rememberMe) {
-        this.saveRefreshToken(response.refreshToken);
-      }
+      // Obtener el perfil del usuario después del login
+      const profile = await this.coreAuth.getProfile();
+      const claims = this.coreAuth.claims;
 
       this._state.update((s) => ({
         ...s,
-        user: response.user,
+        user: {
+          ...profile,
+          role: claims?.role || '',
+          permissions: claims?.permissions || [],
+        } as User,
         isAuthenticated: true,
         isLoading: false,
       }));
@@ -70,7 +70,7 @@ export class AccountService {
   }
 
   /**
-   * Registro de nuevo usuario
+   * Registro de nuevo usuario (solo para tenants)
    */
   async register(request: RegisterRequest): Promise<void> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
@@ -84,25 +84,26 @@ export class AccountService {
         throw new Error('Debes aceptar los términos y condiciones');
       }
 
-      const response = await firstValueFrom(
-        this.apiClient.post<AuthResponse>('/auth/register', {
-          email: request.email,
-          password: request.password,
-          firstName: request.firstName,
-          lastName: request.lastName,
-          phoneNumber: request.phoneNumber,
-        })
-      );
+      // Usar CoreAuthService.register() que valida tenant
+      await this.coreAuth.register({
+        email: request.email,
+        password: request.password,
+        firstName: request.firstName,
+        lastName: request.lastName,
+        phoneNumber: request.phoneNumber,
+      });
 
-      this.coreAuth.setToken(response.token);
-
-      if (response.refreshToken) {
-        this.saveRefreshToken(response.refreshToken);
-      }
+      // Obtener el perfil del usuario después del registro
+      const profile = await this.coreAuth.getProfile();
+      const claims = this.coreAuth.claims;
 
       this._state.update((s) => ({
         ...s,
-        user: response.user,
+        user: {
+          ...profile,
+          role: claims?.role || '',
+          permissions: claims?.permissions || [],
+        } as User,
         isAuthenticated: true,
         isLoading: false,
       }));
