@@ -63,7 +63,8 @@ echo "----------------------------------------"
 
 # Check environment files
 check_file "apps/pwa/src/environments/environment.ts"
-check_file "apps/pwa/src/environments/environment.development-real.ts"
+check_file "apps/pwa/src/environments/environment.dev.ts"
+check_file "apps/pwa/src/environments/environment.qa.ts"
 check_file "apps/pwa/src/environments/environment.prod.ts"
 
 # Check core services
@@ -78,7 +79,8 @@ echo "🔧 Verificando configuración de Azure..."
 echo "----------------------------------------"
 
 # Check Azure URLs
-check_azure_url "apps/pwa/src/environments/environment.development-real.ts" "Development-Real"
+check_azure_url "apps/pwa/src/environments/environment.dev.ts" "Development"
+check_azure_url "apps/pwa/src/environments/environment.qa.ts" "QA"
 check_azure_url "apps/pwa/src/environments/environment.prod.ts" "Production"
 
 echo ""
@@ -86,8 +88,10 @@ echo "📦 Verificando package.json scripts..."
 echo "----------------------------------------"
 
 # Check NPM scripts
-check_content "package.json" "start:real"
-check_content "package.json" "build:real"
+check_content "package.json" "start:dev"
+check_content "package.json" "start:qa"
+check_content "package.json" "build:dev"
+check_content "package.json" "build:qa"
 check_content "package.json" "start:prod"
 
 echo ""
@@ -95,8 +99,10 @@ echo "⚙️ Verificando project.json configuración..."
 echo "----------------------------------------"
 
 # Check Nx configuration
-check_content "apps/pwa/project.json" "development-real"
-check_content "apps/pwa/project.json" "environment.development-real.ts"
+check_content "apps/pwa/project.json" "\"dev\":"
+check_content "apps/pwa/project.json" "\"qa\":"
+check_content "apps/pwa/project.json" "environment.dev.ts"
+check_content "apps/pwa/project.json" "environment.qa.ts"
 
 echo ""
 echo "🔌 Verificando integración de servicios..."

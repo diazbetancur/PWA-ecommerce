@@ -1,8 +1,10 @@
 import { AppEnvironment } from '@pwa/core';
 
 /**
- * Configuración para desarrollo con API real de Azure
- * Usa la misma configuración de desarrollo pero apunta al backend real
+ * Configuración para ambiente DEV (Development con API real)
+ * - API real de desarrollo
+ * - Full logging
+ * - Features habilitados para desarrollo
  */
 export const environment: AppEnvironment = {
   production: false,

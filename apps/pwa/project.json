@@ -52,17 +52,29 @@
           "outputMode": "static",
           "optimization": true
         },
-        "development-real": {
+        "dev": {
           "fileReplacements": [
             {
               "replace": "apps/pwa/src/environments/environment.ts",
-              "with": "apps/pwa/src/environments/environment.development-real.ts"
+              "with": "apps/pwa/src/environments/environment.dev.ts"
             }
           ],
           "optimization": false,
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true
+        },
+        "qa": {
+          "fileReplacements": [
+            {
+              "replace": "apps/pwa/src/environments/environment.ts",
+              "with": "apps/pwa/src/environments/environment.qa.ts"
+            }
+          ],
+          "optimization": true,
+          "extractLicenses": true,
+          "sourceMap": false,
+          "namedChunks": false
         },
         "production-browser": {
           "budgets": [
@@ -124,6 +136,12 @@
         },
         "development": {
           "buildTarget": "ecommerce:build:development"
+        },
+        "dev": {
+          "buildTarget": "ecommerce:build:dev"
+        },
+        "qa": {
+          "buildTarget": "ecommerce:build:qa"
         }
       },
       "defaultConfiguration": "development"
