@@ -23,10 +23,8 @@ import {
   SystemConfigComponent,
   SystemLogsComponent,
   TenantConfigComponent,
-  TenantCreateComponent,
   TenantDetailComponent,
   TenantEditComponent,
-  TenantListComponent,
   UserListComponent,
   UserRolesComponent,
 } from './pages/placeholder.components';
@@ -73,14 +71,20 @@ export const ADMIN_ROUTES: Routes = [
         children: [
           {
             path: '',
-            component: TenantListComponent,
+            loadComponent: () =>
+              import('./pages/tenants-list/tenants-list.component').then(
+                (m) => m.TenantsListComponent
+              ),
             data: {
               title: 'Lista de Tenants',
             },
           },
           {
             path: 'create',
-            component: TenantCreateComponent,
+            loadComponent: () =>
+              import('./pages/tenant-create/tenant-create.component').then(
+                (m) => m.TenantCreateComponent
+              ),
             canActivate: [adminPermissionGuard],
             data: {
               title: 'Crear Tenant',

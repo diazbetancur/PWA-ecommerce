@@ -46,14 +46,14 @@ import { AdminMenuService } from '../../services/admin-menu.service';
               <span class="material-icons">{{ item.icon }}</span>
               } @if (!isMenuCollapsed()) {
               <span class="nav-label">{{ item.label }}</span>
-              @if (item.badge) {
+              } @if (item.badge && !isMenuCollapsed()) {
               <span class="badge" [class]="'badge-' + item.badge.color">{{
                 item.badge.text
               }}</span>
-              } }
+              }
             </a>
             } @else if (item.children) {
-            <div class="nav-group">
+            <div class="nav-group" [class.expanded]="isItemExpanded(item.id)">
               <button
                 class="nav-link nav-group-toggle"
                 (click)="toggleMenuItem(item.id)"
@@ -65,7 +65,7 @@ import { AdminMenuService } from '../../services/admin-menu.service';
                 <span class="material-icons expand-icon">expand_more</span>
                 }
               </button>
-              @if (!isMenuCollapsed()) {
+              @if (!isMenuCollapsed() && isItemExpanded(item.id)) {
               <div class="nav-children">
                 @for (child of item.children; track child.id) { @if
                 (child.route) {
@@ -252,6 +252,14 @@ import { AdminMenuService } from '../../services/admin-menu.service';
         justify-content: space-between;
       }
 
+      .nav-group .expand-icon {
+        transition: transform 0.2s ease;
+      }
+
+      .nav-group.expanded .expand-icon {
+        transform: rotate(180deg);
+      }
+
       .nav-children {
         padding-left: 1rem;
       }
@@ -433,6 +441,9 @@ export class AdminShellComponent {
   // Control de dropdowns
   readonly showUserMenu = signal(false);
 
+  // Control de items expandidos (por defecto todos cerrados)
+  private readonly expandedItems = signal<Set<string>>(new Set());
+
   /**
    * Toggle del menú lateral
    */
@@ -466,11 +477,22 @@ export class AdminShellComponent {
    * Expandir/colapsar item del menú
    */
   toggleMenuItem(itemId: string): void {
-    const item = this.menuService.findMenuItem(itemId);
-    if (item?.children) {
-      // Implementar lógica de expansión si es necesario
-      console.log('Toggle item:', itemId);
-    }
+    this.expandedItems.update((items) => {
+      const newSet = new Set(items);
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId);
+      } else {
+        newSet.add(itemId);
+      }
+      return newSet;
+    });
+  }
+
+  /**
+   * Verificar si un item está expandido
+   */
+  isItemExpanded(itemId: string): boolean {
+    return this.expandedItems().has(itemId);
   }
 
   /**

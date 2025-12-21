@@ -13,8 +13,8 @@
 
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { AuthService } from '@pwa/core';
-import { ADMIN_PERMISSIONS, ADMIN_ROLES } from '../models/admin-auth.model';
-import { AdminMenuItem, AdminMenuConfig } from '../models/admin-menu.model';
+import { ADMIN_PERMISSIONS } from '../models/admin-auth.model';
+import { AdminMenuConfig, AdminMenuItem } from '../models/admin-menu.model';
 
 @Injectable({
   providedIn: 'root',
@@ -46,21 +46,21 @@ export class AdminMenuService {
     },
     {
       id: 'tenants',
-      label: 'Gestión de Tenants',
-      icon: 'store',
+      label: 'Negocios (eCommerce)',
+      icon: 'storefront',
       order: 2,
       expanded: false,
       children: [
         {
           id: 'tenants-list',
-          label: 'Lista de Tenants',
-          icon: 'list',
+          label: 'Todos los Negocios',
+          icon: 'store',
           route: '/admin/tenants',
           requiredPermissions: [ADMIN_PERMISSIONS.TENANTS.VIEW],
         },
         {
           id: 'tenants-create',
-          label: 'Crear Tenant',
+          label: 'Crear Negocio',
           icon: 'add_business',
           route: '/admin/tenants/create',
           requiredPermissions: [ADMIN_PERMISSIONS.TENANTS.CREATE],
@@ -225,7 +225,7 @@ export class AdminMenuService {
    */
   private filterMenuItems(
     items: AdminMenuItem[],
-    userRole: string | undefined,
+    userRole: string | string[] | undefined,
     userPermissions: string[] | undefined
   ): AdminMenuItem[] {
     return items
@@ -260,7 +260,7 @@ export class AdminMenuService {
    */
   private hasAccess(
     item: AdminMenuItem,
-    userRole: string | undefined,
+    userRole: string | string[] | undefined,
     userPermissions: string[] | undefined
   ): boolean {
     // Si el item está deshabilitado, no mostrar
@@ -276,9 +276,20 @@ export class AdminMenuService {
       return true;
     }
 
+    // Normalizar el rol del usuario (puede ser string o array)
+    const roleStr = Array.isArray(userRole) ? userRole[0] : userRole;
+    const normalizedUserRole = roleStr?.toLowerCase().replace(/_/g, '');
+
     // Verificar roles (lógica OR: al menos uno)
-    if (item.requiredRoles && item.requiredRoles.length > 0 && userRole) {
-      if (item.requiredRoles.includes(userRole)) {
+    if (
+      item.requiredRoles &&
+      item.requiredRoles.length > 0 &&
+      normalizedUserRole
+    ) {
+      const normalizedRequired = item.requiredRoles.map((r) =>
+        r.toLowerCase().replace(/_/g, '')
+      );
+      if (normalizedRequired.includes(normalizedUserRole)) {
         return true;
       }
     }
@@ -297,13 +308,16 @@ export class AdminMenuService {
    * 👑 Verifica si el usuario es SUPER_ADMIN
    */
   private isSuperAdmin(
-    userRole: string | undefined,
+    userRole: string | string[] | undefined,
     userPermissions: string[] | undefined
   ): boolean {
+    // Si role es array, tomar el primer elemento
+    const roleStr = Array.isArray(userRole) ? userRole[0] : userRole;
+
+    // Normalizar el rol para soportar variantes: SuperAdmin, SUPER_ADMIN, super_admin
+    const normalizedRole = roleStr?.toLowerCase().replace(/_/g, '');
     return (
-      userRole === ADMIN_ROLES.SUPER_ADMIN ||
-      userPermissions?.includes('*') ||
-      false
+      normalizedRole === 'superadmin' || userPermissions?.includes('*') || false
     );
   }
 

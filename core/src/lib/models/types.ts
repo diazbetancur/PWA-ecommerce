@@ -114,8 +114,8 @@ export interface JwtPayload {
   sub: string;
   email?: string;
   name?: string;
-  role: string;
-  permissions: string[];
+  role?: string | string[]; // Puede venir como string o array desde .NET
+  permissions?: string[];
   exp: number;
   iat?: number;
   isSuperAdmin?: boolean;

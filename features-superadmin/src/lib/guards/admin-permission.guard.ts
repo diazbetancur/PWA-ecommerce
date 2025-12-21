@@ -22,7 +22,7 @@
  */
 
 import { inject } from '@angular/core';
-import { CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { AuthService, TenantContextService } from '@pwa/core';
 
 /**
@@ -55,17 +55,41 @@ export interface AdminPermissionGuardData {
 }
 
 /**
+ * Normaliza el rol que puede venir como string o array desde .NET
+ */
+function normalizeRole(role: string | string[] | undefined): string | null {
+  if (!role) return null;
+
+  // Si es array, tomar el primer elemento
+  const roleStr = Array.isArray(role) ? role[0] : role;
+
+  // Normalizar: quitar guiones bajos y convertir a minúsculas
+  return roleStr?.toLowerCase().replace(/_/g, '') || null;
+}
+
+/**
  * Helper para verificar si el usuario tiene el acceso requerido
  */
 function hasRequiredAccess(
-  claims: { role?: string; permissions?: string[] },
+  claims: { role?: string | string[]; permissions?: string[] },
   requiredRoles: string[],
   requiredPermissions: string[],
   mode: 'all' | 'any' = 'all'
 ): boolean {
-  // Verificar roles (lógica OR: al menos uno)
-  if (requiredRoles.length > 0 && requiredRoles.includes(claims.role || '')) {
+  const normalizedRole = normalizeRole(claims.role);
+  if (normalizedRole === 'superadmin') {
     return true;
+  }
+
+  // Verificar roles (lógica OR: al menos uno)
+  if (requiredRoles.length > 0 && normalizedRole) {
+    // Normalizar roles requeridos también
+    const normalizedRequired = requiredRoles.map((r) =>
+      r.toLowerCase().replace(/_/g, '')
+    );
+    if (normalizedRequired.includes(normalizedRole)) {
+      return true;
+    }
   }
 
   // Verificar permisos

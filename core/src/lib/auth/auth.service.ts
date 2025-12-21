@@ -48,9 +48,11 @@ export class AuthService {
       const claims = JSON.parse(json);
       this._claims.set(claims);
 
-      // Detectar si es token de superadmin
+      // Detectar si es token de superadmin (soporta variantes y array)
+      const roleStr = Array.isArray(claims.role) ? claims.role[0] : claims.role;
+      const normalizedRole = roleStr?.toLowerCase().replace(/_/g, '');
       const isSuperAdmin =
-        claims.isSuperAdmin === true || claims.role === 'SUPER_ADMIN';
+        claims.isSuperAdmin === true || normalizedRole === 'superadmin';
       this._isSuperAdmin.set(isSuperAdmin);
     } catch {
       this._claims.set(null);
@@ -105,7 +107,13 @@ export class AuthService {
   }
 
   hasRole(role: string) {
-    return this._claims()?.role === role;
+    const userRole = this._claims()?.role;
+    const roleStr = Array.isArray(userRole) ? userRole[0] : userRole;
+    // Comparación normalizada
+    return (
+      roleStr?.toLowerCase().replace(/_/g, '') ===
+      role.toLowerCase().replace(/_/g, '')
+    );
   }
 
   hasPermission(permission: string) {
@@ -152,10 +160,12 @@ export class AuthService {
   }
 
   /**
-   * Obtiene el rol del usuario actual
+   * Obtiene el rol del usuario actual (normalizado como string)
    */
   getRole(): string | undefined {
-    return this._claims()?.role;
+    const role = this._claims()?.role;
+    // Si es array, retornar el primer elemento
+    return Array.isArray(role) ? role[0] : role;
   }
 
   /**
