@@ -20,7 +20,8 @@ export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req.clone({ headers })).pipe(
     catchError((e) => {
-      if (e?.status === 401 || e?.status === 403) {
+      // 401 = No autenticado (token inválido/expirado) -> Desloguear
+      if (e?.status === 401) {
         auth.clear();
 
         // Determinar la ruta de login según el contexto
@@ -32,6 +33,10 @@ export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
         const loginRoute = hasTenantInToken ? '/login' : '/admin/login';
         router.navigateByUrl(loginRoute);
       }
+
+      // 403 = No autorizado (sin permisos) -> NO desloguear, dejar que el componente maneje el error
+      // El error se propaga al componente que hizo la petición
+
       return throwError(() => e);
     })
   );

@@ -18,39 +18,44 @@ export const featuresAdminRoutes: Route[] = [
       ),
   },
 
-  // === CATEGORÍAS ===
+  // === CATÁLOGO (incluye categorías, productos, etc) ===
   {
-    path: 'categories',
+    path: 'catalog',
     children: [
       {
         path: '',
+        redirectTo: 'categories',
+        pathMatch: 'full',
+      },
+      {
+        path: 'categories',
         loadComponent: () =>
           import('./pages/categories/categories-list.component').then(
             (m) => m.CategoriesListComponent
           ),
-        canActivate: [modulePermissionGuard('CATEGORIES', 'view')],
+        canActivate: [modulePermissionGuard('catalog')],
         data: {
           title: 'Categorías',
         },
       },
       {
-        path: 'create',
+        path: 'categories/create',
         loadComponent: () =>
           import('./pages/categories/category-form.component').then(
             (m) => m.CategoryFormComponent
           ),
-        canActivate: [modulePermissionGuard('CATEGORIES', 'create')],
+        canActivate: [modulePermissionGuard('catalog')],
         data: {
           title: 'Nueva Categoría',
         },
       },
       {
-        path: ':id/edit',
+        path: 'categories/:id/edit',
         loadComponent: () =>
           import('./pages/categories/category-form.component').then(
             (m) => m.CategoryFormComponent
           ),
-        canActivate: [modulePermissionGuard('CATEGORIES', 'update')],
+        canActivate: [modulePermissionGuard('catalog')],
         data: {
           title: 'Editar Categoría',
         },
@@ -58,18 +63,68 @@ export const featuresAdminRoutes: Route[] = [
     ],
   },
 
-  // Placeholder para futuros módulos
-  // === PRODUCTOS ===
-  // {
-  //   path: 'products',
-  //   canActivate: [modulePermissionGuard('PRODUCTS', 'view')],
-  //   loadChildren: () => import('./pages/products/products.routes')
-  // },
+  // === PEDIDOS ===
+  {
+    path: 'orders',
+    canActivate: [modulePermissionGuard('orders')],
+    loadComponent: () =>
+      import('./components/dashboard-welcome/dashboard-welcome.component').then(
+        (m) => m.DashboardWelcomeComponent
+      ),
+    data: {
+      title: 'Pedidos',
+    },
+  },
 
-  // === BANNERS ===
-  // {
-  //   path: 'banners',
-  //   canActivate: [modulePermissionGuard('BANNERS', 'view')],
-  //   loadChildren: () => import('./pages/banners/banners.routes')
-  // },
+  // === CLIENTES ===
+  {
+    path: 'customers',
+    canActivate: [modulePermissionGuard('customers')],
+    loadComponent: () =>
+      import('./components/dashboard-welcome/dashboard-welcome.component').then(
+        (m) => m.DashboardWelcomeComponent
+      ),
+    data: {
+      title: 'Clientes',
+    },
+  },
+
+  // === PROGRAMA DE LEALTAD ===
+  {
+    path: 'loyalty',
+    canActivate: [modulePermissionGuard('loyalty')],
+    loadComponent: () =>
+      import('./components/dashboard-welcome/dashboard-welcome.component').then(
+        (m) => m.DashboardWelcomeComponent
+      ),
+    data: {
+      title: 'Programa de Lealtad',
+    },
+  },
+
+  // === CONFIGURACIÓN ===
+  {
+    path: 'settings',
+    canActivate: [modulePermissionGuard('settings')],
+    loadComponent: () =>
+      import('./components/dashboard-welcome/dashboard-welcome.component').then(
+        (m) => m.DashboardWelcomeComponent
+      ),
+    data: {
+      title: 'Configuración',
+    },
+  },
+
+  // === PERMISOS ===
+  {
+    path: 'permissions',
+    canActivate: [modulePermissionGuard('permissions')],
+    loadComponent: () =>
+      import('./components/dashboard-welcome/dashboard-welcome.component').then(
+        (m) => m.DashboardWelcomeComponent
+      ),
+    data: {
+      title: 'Permisos',
+    },
+  },
 ];

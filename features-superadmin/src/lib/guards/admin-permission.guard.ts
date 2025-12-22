@@ -71,7 +71,7 @@ function normalizeRole(role: string | string[] | undefined): string | null {
  * Helper para verificar si el usuario tiene el acceso requerido
  */
 function hasRequiredAccess(
-  claims: { role?: string | string[]; permissions?: string[] },
+  claims: { role?: string | string[]; permissions?: any },
   requiredRoles: string[],
   requiredPermissions: string[],
   mode: 'all' | 'any' = 'all'
@@ -94,7 +94,11 @@ function hasRequiredAccess(
 
   // Verificar permisos
   if (requiredPermissions.length > 0) {
-    const userPermissions = claims.permissions || [];
+    const userPermissions = Array.isArray(claims.permissions)
+      ? claims.permissions.map((p: any) =>
+          typeof p === 'string' ? p : p.moduleCode
+        )
+      : [];
 
     // Permiso wildcard para super admin
     if (userPermissions.includes('*')) {

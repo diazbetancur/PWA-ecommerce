@@ -125,7 +125,7 @@ export class CategoryFormComponent implements OnInit {
         this.snackBar.open('Error al cargar la categoría', 'Cerrar', {
           duration: 3000,
         });
-        this.router.navigate(['/tenant-admin/categories']);
+        this.router.navigate(['/tenant-admin/catalog/categories']);
       },
     });
   }
@@ -153,7 +153,7 @@ export class CategoryFormComponent implements OnInit {
         this.snackBar.open('Categoría creada exitosamente', 'Cerrar', {
           duration: 3000,
         });
-        this.router.navigate(['/tenant-admin/categories']);
+        this.router.navigate(['/tenant-admin/catalog/categories']);
       },
       error: (error) => {
         console.error('Error creating category:', error);
@@ -176,7 +176,7 @@ export class CategoryFormComponent implements OnInit {
         this.snackBar.open('Categoría actualizada exitosamente', 'Cerrar', {
           duration: 3000,
         });
-        this.router.navigate(['/tenant-admin/categories']);
+        this.router.navigate(['/tenant-admin/catalog/categories']);
       },
       error: (error) => {
         console.error('Error updating category:', error);
@@ -191,7 +191,7 @@ export class CategoryFormComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/tenant-admin/categories']);
+    this.router.navigate(['/tenant-admin/catalog/categories']);
   }
 
   // Helpers para validaciones

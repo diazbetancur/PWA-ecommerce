@@ -126,6 +126,11 @@ export class LoginComponent {
       return;
     }
 
+    // 🔍 DEBUG: Si llegamos aquí, no es superadmin
+    console.log(
+      '[LoginComponent] User is NOT SuperAdmin, checking other roles...'
+    );
+
     console.log(
       '[LoginComponent] hasMultipleRoles:',
       this.userModeService.hasMultipleRoles()
@@ -167,9 +172,8 @@ export class LoginComponent {
     else if (this.userModeService.isCustomerOnly()) {
       console.log('[LoginComponent] → Path: Customer only - navigating to /');
       await this.router.navigate(['/']);
-      await this.router.navigate(['/']);
     }
-    // Si solo tiene roles de empleado (sin Customer), ir directo a admin
+    // 5️⃣ Si solo tiene roles de empleado (sin Customer), ir directo a admin del tenant
     else if (this.userModeService.hasEmployeeRoles()) {
       console.log(
         '[LoginComponent] → Path: Employee roles - navigating to /tenant-admin'

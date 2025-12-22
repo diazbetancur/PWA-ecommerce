@@ -38,6 +38,23 @@ mat-card {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+
+  // Usar colores del tenant
+  &.mat-mdc-raised-button.mat-primary {
+    background-color: var(--tenant-primary-color) !important;
+
+    ::ng-deep {
+      .mat-mdc-button-persistent-ripple,
+      .mdc-button__label,
+      mat-icon {
+        color: #000000 !important;
+      }
+    }
+
+    &:hover {
+      opacity: 0.9;
+    }
+  }
 }
 
 // Filtros
@@ -206,6 +223,23 @@ mat-card {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+
+    // Botones primarios con colores del tenant
+    &.mat-mdc-raised-button.mat-primary {
+      background-color: var(--tenant-primary-color) !important;
+
+      ::ng-deep {
+        .mat-mdc-button-persistent-ripple,
+        .mdc-button__label,
+        mat-icon {
+          color: #000000 !important;
+        }
+      }
+
+      &:hover {
+        opacity: 0.9;
+      }
+    }
   }
 }
 

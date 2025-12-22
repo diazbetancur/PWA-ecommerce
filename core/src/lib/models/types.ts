@@ -185,7 +185,8 @@ export interface JwtPayload {
   tenant_id?: string; // ID del tenant
   tenant_slug?: string; // Slug del tenant
   roles: string[]; // Array de roles (ej: ["Customer"], ["SuperAdmin"], ["Customer", "Manager"])
-  modules: string[]; // Array de módulos permitidos (ej: ["products", "categories", "banners"])
+  permissions?: ModulePermission[]; // Array de permisos con estructura completa del backend
+  modules?: string[]; // Array simple de códigos de módulo (legacy, usar permissions)
   exp: number; // Expiration timestamp
   iat?: number; // Issued at timestamp
   admin?: string | boolean; // Flag de admin para tokens sin tenant (ej: "true" o true)
@@ -195,7 +196,7 @@ export interface JwtPayload {
   role?: string | string[];
   /** @deprecated Use tenant_id instead */
   tenantId?: string;
-  /** @deprecated Use modules instead */
+  /** @deprecated Use permissions instead */
   modulePermissions?: ModulePermission[];
   /** @deprecated Use roles.includes('SuperAdmin') instead */
   isSuperAdmin?: boolean;

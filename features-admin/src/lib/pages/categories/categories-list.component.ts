@@ -103,17 +103,17 @@ export class CategoriesListComponent implements OnInit {
     return baseColumns;
   });
 
-  // Permisos
+  // Permisos - Todos los permisos son equivalentes al acceso del módulo catalog
   readonly canCreate = computed(() =>
-    this.menuService.canPerformAction('CATEGORIES', 'create')
+    this.menuService.canPerformAction('catalog')
   );
 
   readonly canUpdate = computed(() =>
-    this.menuService.canPerformAction('CATEGORIES', 'update')
+    this.menuService.canPerformAction('catalog')
   );
 
   readonly canDelete = computed(() =>
-    this.menuService.canPerformAction('CATEGORIES', 'delete')
+    this.menuService.canPerformAction('catalog')
   );
 
   ngOnInit(): void {
@@ -177,11 +177,15 @@ export class CategoriesListComponent implements OnInit {
   }
 
   createCategory(): void {
-    this.router.navigate(['/tenant-admin/categories/create']);
+    this.router.navigate(['/tenant-admin/catalog/categories/create']);
   }
 
   editCategory(category: CategoryListItem): void {
-    this.router.navigate(['/tenant-admin/categories', category.id, 'edit']);
+    this.router.navigate([
+      '/tenant-admin/catalog/categories',
+      category.id,
+      'edit',
+    ]);
   }
 
   async deleteCategory(category: CategoryListItem): Promise<void> {
@@ -214,6 +218,6 @@ export class CategoriesListComponent implements OnInit {
   }
 
   viewDetails(category: CategoryListItem): void {
-    this.router.navigate(['/tenant-admin/categories', category.id]);
+    this.router.navigate(['/tenant-admin/catalog/categories', category.id]);
   }
 }

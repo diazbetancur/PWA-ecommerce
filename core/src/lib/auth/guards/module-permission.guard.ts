@@ -22,14 +22,10 @@ import { AuthService } from '../auth.service';
 /**
  * Guard que verifica permisos de módulo
  *
- * @param moduleCode - Código del módulo (ej: 'PRODUCTS', 'ORDERS', 'CATEGORIES')
- * @param action - Acción requerida: 'view', 'create', 'update', 'delete'
+ * @param moduleCode - Código del módulo (ej: 'catalog', 'orders', 'customers')
  * @returns CanActivateFn
  */
-export function modulePermissionGuard(
-  moduleCode: string,
-  action: 'view' | 'create' | 'update' | 'delete' = 'view'
-): CanActivateFn {
+export function modulePermissionGuard(moduleCode: string): CanActivateFn {
   return () => {
     const authService = inject(AuthService);
     const menuService = inject(TenantAdminMenuService);
@@ -48,15 +44,14 @@ export function modulePermissionGuard(
       return false;
     }
 
-    // 3. Verificar el permiso específico
-    const hasPermission = menuService.canPerformAction(moduleCode, action);
+    // Verificar si el usuario tiene acceso al módulo
+    const hasPermission = menuService.canPerformAction(moduleCode);
 
     if (!hasPermission) {
       console.warn(
-        `[ModulePermissionGuard] Sin permiso: ${moduleCode}:${action}`,
+        `[ModulePermissionGuard] Sin permiso para módulo: ${moduleCode}`,
         {
           moduleCode,
-          action,
           userModules: authService.claims?.modules,
         }
       );

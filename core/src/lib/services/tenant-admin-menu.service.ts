@@ -1,8 +1,7 @@
 /**
  * 🎯 Servicio de Menú Administrativo para Usuarios Tenant
  *
- * Convierte los permisos de módulo (ModulePermission) recibidos del backend
- * en un menú administrativo dinámico basado en los permisos del usuario.
+ * Construye el menú dinámico basado en los módulos permitidos del usuario.
  *
  * Este servicio es para administradores DE UN TENANT ESPECÍFICO,
  * no para el SuperAdmin general.
@@ -26,14 +25,14 @@ export interface TenantAdminMenuItem {
 }
 
 /**
- * Mapeo de módulos del backend a configuración del menú
+ * Configuración de cada módulo del menú
  */
-interface MenuModuleConfig {
+interface ModuleConfig {
   label: string;
   icon: string;
-  route: string;
+  route?: string;
   order: number;
-  parentModule?: string; // Para agrupar bajo un padre
+  parentModule?: string; // Indica si es un submódulo
 }
 
 @Injectable({ providedIn: 'root' })
@@ -42,59 +41,85 @@ export class TenantAdminMenuService {
 
   /**
    * 📋 Mapeo de códigos de módulo a configuración de menú
-   *
-   * Ajusta este mapeo según los módulos de tu backend
+   * Coincide con los módulos del backend
    */
-  private readonly moduleConfigMap: Record<string, MenuModuleConfig> = {
-    PRODUCTS: {
-      label: 'Productos',
-      icon: 'inventory_2',
-      route: '/tenant-admin/products',
-      order: 2,
-      parentModule: 'CONFIG',
-    },
-    CATEGORIES: {
-      label: 'Categorías',
-      icon: 'category',
-      route: '/tenant-admin/categories',
+  private readonly moduleConfigMap: Record<string, ModuleConfig> = {
+    dashboard: {
+      label: 'Dashboard',
+      icon: 'dashboard',
+      route: '/tenant-admin/dashboard',
       order: 1,
-      parentModule: 'CONFIG',
     },
-    BANNERS: {
-      label: 'Banners',
-      icon: 'image',
-      route: '/tenant-admin/banners',
-      order: 3,
-      parentModule: 'CONFIG',
+    catalog: {
+      label: 'Categorías',
+      icon: 'inventory_2',
+      route: '/tenant-admin/catalog',
+      order: 2,
     },
-    ORDERS: {
-      label: 'Ventas',
+    orders: {
+      label: 'Pedidos',
       icon: 'shopping_cart',
       route: '/tenant-admin/orders',
-      order: 4,
+      order: 3,
     },
-    METRICS: {
-      label: 'Métricas',
-      icon: 'analytics',
-      route: '/tenant-admin/metrics',
-      order: 5,
-    },
-    CUSTOMERS: {
+    customers: {
       label: 'Clientes',
       icon: 'people',
       route: '/tenant-admin/customers',
-      order: 6,
+      order: 4,
     },
-    SETTINGS: {
-      label: 'Configuración General',
+    loyalty: {
+      label: 'Programa de Lealtad',
+      icon: 'star',
+      route: '/tenant-admin/loyalty',
+      order: 5,
+    },
+    // Settings es el módulo padre
+    settings: {
+      label: 'Configuración',
       icon: 'settings',
-      route: '/tenant-admin/settings',
+      order: 6,
+      // No tiene route porque es un padre con hijos
+    },
+    // Submódulos de settings
+    'settings.general': {
+      label: 'General',
+      icon: 'settings_applications',
+      route: '/tenant-admin/settings/general',
+      order: 1,
+      parentModule: 'settings',
+    },
+    'settings.branding': {
+      label: 'Marca',
+      icon: 'palette',
+      route: '/tenant-admin/settings/branding',
+      order: 2,
+      parentModule: 'settings',
+    },
+    'settings.payments': {
+      label: 'Pagos',
+      icon: 'payment',
+      route: '/tenant-admin/settings/payments',
+      order: 3,
+      parentModule: 'settings',
+    },
+    'settings.shipping': {
+      label: 'Envíos',
+      icon: 'local_shipping',
+      route: '/tenant-admin/settings/shipping',
+      order: 4,
+      parentModule: 'settings',
+    },
+    permissions: {
+      label: 'Permisos',
+      icon: 'security',
+      route: '/tenant-admin/permissions',
       order: 7,
     },
   };
 
   /**
-   * 🔍 Computed signal que devuelve el menú filtrado según permisos del usuario
+   * 🔍 Computed signal que devuelve el menú filtrado según módulos del usuario
    *
    * Se recalcula automáticamente cuando cambian los claims del AuthService
    */
@@ -109,12 +134,21 @@ export class TenantAdminMenuService {
       return [];
     }
 
-    // NUEVO: Obtener módulos desde el array 'modules' del JWT
-    // Formato: ["products", "categories", "banners"]
-    const allowedModules = claims.modules || [];
-    console.log('[TenantAdminMenuService] Allowed modules:', allowedModules);
+    // Obtener módulos desde el array del JWT
+    const modules = claims.modules || [];
+    console.log('[TenantAdminMenuService] Modules:', modules);
 
-    const menu = this.buildMenuFromModules(allowedModules);
+    // Si no hay módulos definidos, mostrar todos los módulos disponibles
+    if (modules.length === 0) {
+      console.log(
+        '[TenantAdminMenuService] No modules restriction - showing all modules'
+      );
+      // Incluir tanto módulos principales como submódulos
+      const allModules = Object.keys(this.moduleConfigMap);
+      return this.buildMenuFromModules(allModules);
+    }
+
+    const menu = this.buildMenuFromModules(modules);
     console.log('[TenantAdminMenuService] Built menu:', menu);
 
     return menu;
@@ -123,115 +157,118 @@ export class TenantAdminMenuService {
   /**
    * 🏗️ Construye el menú a partir del array de módulos permitidos
    *
-   * @param modules - Array de códigos de módulo (ej: ["products", "categories"])
-   *                  Si está vacío [] = todos los módulos disponibles
+   * @param modules - Array de códigos de módulo (ej: ["catalog", "orders", "customers", "settings"])
    */
   private buildMenuFromModules(modules: string[]): TenantAdminMenuItem[] {
     console.log(
       '[TenantAdminMenuService] Building menu from modules:',
       modules
     );
-    console.log(
-      '[TenantAdminMenuService] Empty modules array = ALL modules available'
-    );
 
-    const menuItems: TenantAdminMenuItem[] = [];
-    const configChildren: TenantAdminMenuItem[] = [];
+    // Separar módulos principales de submódulos
+    const mainModules = modules.filter((m) => !m.includes('.'));
+    const subModules = modules.filter((m) => m.includes('.'));
 
-    // Si modules está vacío, mostrar TODOS los módulos
-    const showAllModules = modules.length === 0;
-    console.log('[TenantAdminMenuService] Show all modules:', showAllModules);
-
-    // Filtrar módulos que están permitidos
-    const visibleModules = Object.entries(this.moduleConfigMap)
-      .filter(([code]) => {
-        // Si debe mostrar todos, incluir todos
-        if (showAllModules) return true;
-
-        // Si no, solo los que están en el array
-        const allowedModulesCodes = modules.map((m) => m.toUpperCase());
-        return allowedModulesCodes.includes(code);
-      })
-      .map(([code, config]) => ({ moduleCode: code, ...config }));
-
-    console.log(
-      '[TenantAdminMenuService] Visible modules:',
-      visibleModules.map((m) => m.moduleCode)
-    );
-
-    // Ordenar por el orden definido - crear nueva copia para no mutar
-    const sortedModules = [...visibleModules].sort((a, b) => {
-      return (a.order ?? 999) - (b.order ?? 999);
-    });
+    console.log('[TenantAdminMenuService] Main modules:', mainModules);
+    console.log('[TenantAdminMenuService] Sub modules:', subModules);
 
     // Construir items del menú
-    for (const module of sortedModules) {
-      // Crear item del menú basado en la configuración
-      const item: TenantAdminMenuItem = {
-        id: module.moduleCode.toLowerCase(),
-        label: module.label,
-        icon: module.icon,
-        route: module.route,
+    const menuItems: TenantAdminMenuItem[] = [];
+
+    // Procesar módulos principales
+    for (const moduleCode of mainModules) {
+      const config = this.moduleConfigMap[moduleCode.toLowerCase()];
+
+      if (!config) {
+        console.warn(
+          `[TenantAdminMenuService] Module not found in config: ${moduleCode}`
+        );
+        continue;
+      }
+
+      const menuItem: TenantAdminMenuItem = {
+        id: moduleCode.toLowerCase(),
+        label: config.label,
+        icon: config.icon,
+        route: config.route,
         visible: true,
       };
 
-      // Si pertenece a un módulo padre (ej: CONFIG), agregarlo al grupo
-      if (module.parentModule === 'CONFIG') {
-        configChildren.push(item);
+      // Si es "settings", buscar sus submódulos
+      if (moduleCode.toLowerCase() === 'settings') {
+        const settingsSubModules = subModules
+          .filter((sm) => sm.toLowerCase().startsWith('settings.'))
+          .map((sm) => {
+            const subConfig = this.moduleConfigMap[sm.toLowerCase()];
+            if (!subConfig) return null;
+
+            return {
+              id: sm.toLowerCase(),
+              label: subConfig.label,
+              icon: subConfig.icon,
+              route: subConfig.route,
+              visible: true,
+            } as TenantAdminMenuItem;
+          })
+          .filter((item): item is TenantAdminMenuItem => item !== null)
+          .sort((a, b) => {
+            const orderA = this.moduleConfigMap[a.id]?.order ?? 999;
+            const orderB = this.moduleConfigMap[b.id]?.order ?? 999;
+            return orderA - orderB;
+          });
+
+        // Solo agregar el módulo settings si tiene hijos
+        if (settingsSubModules.length > 0) {
+          menuItem.children = settingsSubModules;
+          menuItems.push(menuItem);
+        }
       } else {
-        menuItems.push(item);
+        // Módulos normales sin hijos
+        menuItems.push(menuItem);
       }
     }
 
-    // Si hay items de configuración, crear el grupo padre
-    if (configChildren.length > 0) {
-      menuItems.unshift({
-        id: 'configuration',
-        label: 'Configuración',
-        icon: 'tune',
-        children: configChildren,
-        visible: true,
-      });
-    }
+    // Ordenar por el orden configurado
+    menuItems.sort((a, b) => {
+      const orderA = this.moduleConfigMap[a.id]?.order ?? 999;
+      const orderB = this.moduleConfigMap[b.id]?.order ?? 999;
+      return orderA - orderB;
+    });
 
     return menuItems;
   }
 
   /**
-   * 🔐 Verifica si el usuario puede realizar una acción en un módulo
+   * ✅ Verifica si el usuario tiene acceso a un módulo específico
    *
-   * NOTA: Con la nueva estructura del token solo verificamos si el módulo está en la lista.
-   * Los permisos granulares (view/create/update/delete) se controlan desde el backend.
-   *
-   * Si modules está vacío [] = ACCESO TOTAL a todos los módulos
+   * @param moduleCode - Código del módulo a verificar (puede incluir submódulo como "settings.general")
    */
-  canPerformAction(
-    moduleCode: string,
-    action: 'view' | 'create' | 'update' | 'delete'
-  ): boolean {
+  canPerformAction(moduleCode: string): boolean {
     const claims = this.authService.claims;
-    const allowedModules = claims?.modules || [];
 
-    console.log('[TenantAdminMenuService] canPerformAction', {
-      moduleCode,
-      action,
-      allowedModules,
-      isEmpty: allowedModules.length === 0,
-    });
+    if (!claims) return false;
 
-    // Si el array está vacío, tiene acceso a TODOS los módulos
-    if (allowedModules.length === 0) {
-      console.log('[TenantAdminMenuService] Empty modules = FULL ACCESS');
+    const modules = claims.modules || [];
+
+    // Si el array está vacío, se asume acceso completo a todos los módulos
+    if (modules.length === 0) {
       return true;
     }
 
-    // Verificar si el módulo está en la lista de permitidos
-    const hasAccess = allowedModules.some(
-      (m) => m.toUpperCase() === moduleCode.toUpperCase()
-    );
+    const lowerModuleCode = moduleCode.toLowerCase();
 
-    console.log('[TenantAdminMenuService] Has access:', hasAccess);
-    return hasAccess;
+    // Verificar acceso directo al módulo
+    if (modules.includes(lowerModuleCode)) {
+      return true;
+    }
+
+    // Si es un submódulo (ej: "settings.general"), verificar si el padre está permitido
+    if (lowerModuleCode.includes('.')) {
+      const parentModule = lowerModuleCode.split('.')[0];
+      return modules.includes(parentModule);
+    }
+
+    return false;
   }
 
   /**
@@ -239,7 +276,14 @@ export class TenantAdminMenuService {
    */
   getAvailableModules(): string[] {
     const claims = this.authService.claims;
-    return claims?.modules || [];
+    const modules = claims?.modules || [];
+
+    // Si no hay módulos, retornar todos los disponibles
+    if (modules.length === 0) {
+      return Object.keys(this.moduleConfigMap);
+    }
+
+    return modules;
   }
 
   /**
