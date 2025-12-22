@@ -26,14 +26,14 @@ export interface Category {
 }
 
 export interface ProductFilters {
-  q?: string;           // Search query
-  categoryId?: string;  // Filter by category
-  minPrice?: number;    // Minimum price
-  maxPrice?: number;    // Maximum price
-  inStock?: boolean;    // Only in-stock products
-  tags?: string[];      // Filter by tags
-  page?: number;        // Page number (1-based)
-  limit?: number;       // Items per page
+  q?: string; // Search query
+  categoryId?: string; // Filter by category
+  minPrice?: number; // Minimum price
+  maxPrice?: number; // Maximum price
+  inStock?: boolean; // Only in-stock products
+  tags?: string[]; // Filter by tags
+  page?: number; // Page number (1-based)
+  limit?: number; // Items per page
   sortBy?: 'name' | 'price' | 'created' | 'popularity';
   sortOrder?: 'asc' | 'desc';
 }
@@ -54,7 +54,7 @@ export interface PaginatedResponse<T> {
  * - Signals para estado reactivo
  */
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class CatalogService {
   private readonly apiClient = inject(ApiClientService);
@@ -72,24 +72,28 @@ export class CatalogService {
    * @param filters - Filtros de búsqueda y paginación
    * @returns Observable con productos paginados
    */
-  getProducts(filters: ProductFilters = {}): Observable<PaginatedResponse<Product>> {
+  getProducts(
+    filters: ProductFilters = {}
+  ): Observable<PaginatedResponse<Product>> {
     this.isLoading.set(true);
     this.error.set(null);
 
-    return this.apiClient.getWithParams<PaginatedResponse<Product>>(
-      '/api/catalog/products',
-      this.buildProductParams(filters),
-      {},
-      { enableLogging: true }
-    ).pipe(
-      tap(() => this.isLoading.set(false)),
-      tap({
-        error: (err) => {
-          this.isLoading.set(false);
-          this.error.set(this.getErrorMessage(err));
-        }
-      })
-    );
+    return this.apiClient
+      .getWithParams<PaginatedResponse<Product>>(
+        '/api/catalog/products',
+        this.buildProductParams(filters),
+        {},
+        { enableLogging: true }
+      )
+      .pipe(
+        tap(() => this.isLoading.set(false)),
+        tap({
+          error: (err) => {
+            this.isLoading.set(false);
+            this.error.set(this.getErrorMessage(err));
+          },
+        })
+      );
   }
 
   /**
@@ -98,10 +102,14 @@ export class CatalogService {
    * @returns Observable con el producto
    */
   getProductById(productId: string): Observable<Product> {
-    return this.apiClient.get<Product>(`/api/catalog/products/${productId}`, {}, {
-      enableLogging: true,
-      timeout: 10000
-    });
+    return this.apiClient.get<Product>(
+      `/api/catalog/products/${productId}`,
+      {},
+      {
+        enableLogging: true,
+        timeout: 10000,
+      }
+    );
   }
 
   /**
@@ -124,15 +132,15 @@ export class CatalogService {
    */
   searchProducts(query: string, limit = 10): Observable<Product[]> {
     if (!query.trim()) {
-      return new Observable(subscriber => subscriber.next([]));
+      return new Observable((subscriber) => subscriber.next([]));
     }
 
-    return this.apiClient.getWithParams<PaginatedResponse<Product>>(
-      '/api/catalog/products/search',
-      { q: query.trim(), limit }
-    ).pipe(
-      map(response => response.items)
-    );
+    return this.apiClient
+      .getWithParams<PaginatedResponse<Product>>(
+        '/api/catalog/products/search',
+        { q: query.trim(), limit }
+      )
+      .pipe(map((response) => response.items));
   }
 
   // ============================================================================
@@ -153,7 +161,9 @@ export class CatalogService {
    * @returns Observable con la categoría
    */
   getCategoryById(categoryId: string): Observable<Category> {
-    return this.apiClient.get<Category>(`/api/catalog/categories/${categoryId}`);
+    return this.apiClient.get<Category>(
+      `/api/catalog/categories/${categoryId}`
+    );
   }
 
   /**
@@ -178,7 +188,9 @@ export class CatalogService {
    * @param filters - Filtros del producto
    * @returns Objeto con parámetros para la API
    */
-  private buildProductParams(filters: ProductFilters): Record<string, string | number | boolean> {
+  private buildProductParams(
+    filters: ProductFilters
+  ): Record<string, string | number | boolean> {
     const params: Record<string, string | number | boolean> = {};
 
     // Parámetros de búsqueda
@@ -236,12 +248,12 @@ export class CatalogService {
    * @returns Observable con productos destacados
    */
   getFeaturedProducts(limit = 8): Observable<Product[]> {
-    return this.apiClient.getWithParams<PaginatedResponse<Product>>(
-      '/api/catalog/products/featured',
-      { limit }
-    ).pipe(
-      map(response => response.items)
-    );
+    return this.apiClient
+      .getWithParams<PaginatedResponse<Product>>(
+        '/api/catalog/products/featured',
+        { limit }
+      )
+      .pipe(map((response) => response.items));
   }
 
   /**
@@ -266,10 +278,8 @@ export class CatalogService {
     return this.getProducts({
       sortBy: 'created',
       sortOrder: 'desc',
-      limit
-    }).pipe(
-      map(response => response.items)
-    );
+      limit,
+    }).pipe(map((response) => response.items));
   }
 
   /**
@@ -300,48 +310,52 @@ export class CatalogService {
    */
   getProductsAsAdmin(): Observable<Product[]> {
     // Usa el método de conveniencia admin() del ApiClientService
-    return this.apiClient.admin<PaginatedResponse<Product>>(
-      'products',
-      'GET',
-      undefined,
-      { includeDrafts: true, includeArchived: true }
-    ).pipe(
-      map(response => response.items)
-    );
+    return this.apiClient
+      .admin<PaginatedResponse<Product>>('products', 'GET', undefined, {
+        includeDrafts: true,
+        includeArchived: true,
+      })
+      .pipe(map((response) => response.items));
   }
 
   /**
    * Ejemplo de uso del método getCatalog() del ApiClientService
    */
   getProductsUsingCatalogMethod(): Observable<Product[]> {
-    return this.apiClient.getCatalog<PaginatedResponse<Product>>(
-      'products',
-      { limit: 50, sortBy: 'name' }
-    ).pipe(
-      map(response => response.items)
-    );
+    return this.apiClient
+      .getCatalog<PaginatedResponse<Product>>('products', {
+        limit: 50,
+        sortBy: 'name',
+      })
+      .pipe(map((response) => response.items));
   }
 
   /**
    * Ejemplo de request con timeout personalizado
    */
   getProductsWithCustomTimeout(): Observable<Product[]> {
-    return this.apiClient.withTimeout<PaginatedResponse<Product>>(
-      '/api/catalog/products',
-      'GET',
-      undefined,
-      15000 // 15 segundos de timeout
-    ).pipe(
-      map(response => response.items)
-    );
+    return this.apiClient
+      .withTimeout<PaginatedResponse<Product>>(
+        '/api/catalog/products',
+        'GET',
+        undefined,
+        15000 // 15 segundos de timeout
+      )
+      .pipe(map((response) => response.items));
   }
 
   /**
    * Ejemplo de health check del catálogo
    */
-  checkCatalogHealth(): Observable<{ status: string; products: number; categories: number }> {
-    return this.apiClient.get<{ status: string; products: number; categories: number }>(
-      '/api/catalog/health'
-    );
+  checkCatalogHealth(): Observable<{
+    status: string;
+    products: number;
+    categories: number;
+  }> {
+    return this.apiClient.get<{
+      status: string;
+      products: number;
+      categories: number;
+    }>('/api/catalog/health');
   }
 }

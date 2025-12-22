@@ -9,8 +9,7 @@ import { AppEnvironment } from '@pwa/core';
 export const environment: AppEnvironment = {
   production: false,
   mockApi: false, // 🔥 Usar API real
-  apiBaseUrl:
-    'https://api-ecommerce-d9fxeccbeeehdjd3.eastus-01.azurewebsites.net',
+  apiBaseUrl: 'http://localhost:5093',
   useTenantHeader: true,
   fcm: {
     vapidPublicKey: 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY',

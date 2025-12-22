@@ -10,7 +10,7 @@ class MockTenantContext {
   constructor() {
     this.tenant = {
       slug: 'demo-tenant',
-      key: 'demo-key-123'
+      key: 'demo-key-123',
     };
   }
 
@@ -31,7 +31,7 @@ class MockTenantContext {
   getTenantHeaders() {
     return {
       slug: this.tenant.slug,
-      key: this.tenant.key
+      key: this.tenant.key,
     };
   }
 }
@@ -52,7 +52,7 @@ class MockApiClientService {
     return {
       ...headers,
       'X-Tenant-Slug': tenantHeaders.slug,
-      'X-Tenant-Key': tenantHeaders.key
+      'X-Tenant-Key': tenantHeaders.key,
     };
   }
 
@@ -63,7 +63,7 @@ class MockApiClientService {
       url,
       method: 'GET',
       headers: finalHeaders,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -75,7 +75,7 @@ class MockApiClientService {
       method: 'POST',
       headers: finalHeaders,
       body,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
   }
 }
@@ -88,7 +88,7 @@ const colors = {
   red: '\\x1b[31m',
   cyan: '\\x1b[36m',
   reset: '\\x1b[0m',
-  bold: '\\x1b[1m'
+  bold: '\\x1b[1m',
 };
 
 function printHeader(text) {
@@ -131,14 +131,18 @@ async function runDemo() {
 
   // Test 2: POST con body y headers
   printInfo('Test 2: POST /api/catalog/products');
-  const result2 = await apiClient.post('/api/catalog/products', {
-    name: 'Nuevo Producto',
-    price: 29.99
-  }, {
-    headers: {
-      'Content-Type': 'application/json'
+  const result2 = await apiClient.post(
+    '/api/catalog/products',
+    {
+      name: 'Nuevo Producto',
+      price: 29.99,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
     }
-  });
+  );
   console.log('Request:', JSON.stringify(result2, null, 2));
 
   if (result2.headers['X-Tenant-Slug'] && result2.headers['Content-Type']) {
@@ -173,7 +177,9 @@ async function runDemo() {
 
   printHeader('📋 RESUMEN DEL COMPORTAMIENTO:');
   console.log();
-  console.log(`${colors.green}✅ URLs que reciben headers de tenant:${colors.reset}`);
+  console.log(
+    `${colors.green}✅ URLs que reciben headers de tenant:${colors.reset}`
+  );
   console.log('   • /api/catalog/products');
   console.log('   • /api/orders');
   console.log('   • /api/cart');
@@ -189,10 +195,16 @@ async function runDemo() {
 
   printHeader('🚀 En tu aplicación Angular:');
   console.log();
-  console.log(`${colors.cyan}// Uso del ApiClientService refinado${colors.reset}`);
-  console.log('const products = await this.apiClient.get<Product[]>(\'/api/catalog/products\').toPromise();');
+  console.log(
+    `${colors.cyan}// Uso del ApiClientService refinado${colors.reset}`
+  );
+  console.log(
+    "const products = await this.apiClient.get<Product[]>('/api/catalog/products').toPromise();"
+  );
   console.log();
-  console.log(`${colors.cyan}// Headers agregados automáticamente:${colors.reset}`);
+  console.log(
+    `${colors.cyan}// Headers agregados automáticamente:${colors.reset}`
+  );
   console.log('// X-Tenant-Slug: demo-tenant');
   console.log('// X-Tenant-Key: demo-key-123');
   console.log();

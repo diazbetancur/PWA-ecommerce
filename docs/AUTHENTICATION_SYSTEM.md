@@ -60,6 +60,7 @@ state = signal<AuthState>({
 ```
 
 **Características:**
+
 - Integrado con `ApiClientService` del core
 - Usa `AuthService` del core para gestión de tokens
 - Maneja refresh tokens en localStorage
@@ -69,6 +70,7 @@ state = signal<AuthState>({
 #### 3. **Componentes UI**
 
 ##### LoginComponent
+
 - Formulario reactivo con validaciones
 - Opción "Recordarme"
 - Toggle de visibilidad de contraseña
@@ -76,6 +78,7 @@ state = signal<AuthState>({
 - Diseño moderno con gradientes
 
 ##### RegisterComponent
+
 - Formulario completo con validaciones
 - Validación de contraseñas coincidentes
 - Checkbox de términos y condiciones
@@ -83,11 +86,13 @@ state = signal<AuthState>({
 - Campos: nombre, apellido, email, teléfono, contraseña
 
 ##### ForgotPasswordComponent
+
 - Formulario simple con email
 - Mensajes de éxito/error
 - Enlace para volver al login
 
 ##### ProfileComponent
+
 - Vista/edición de información personal
 - Cambio de contraseña
 - Información de cuenta (rol, fecha registro, último acceso)
@@ -107,6 +112,7 @@ state = signal<AuthState>({
 ## 🔒 Guards de Seguridad (Ya existentes en Core)
 
 ### AuthGuard
+
 Protege rutas que requieren autenticación:
 
 ```typescript
@@ -116,12 +122,13 @@ const routes: Routes = [
   {
     path: 'profile',
     component: ProfileComponent,
-    canActivate: [AuthGuard]
-  }
+    canActivate: [AuthGuard],
+  },
 ];
 ```
 
 ### RoleGuard
+
 Protege rutas por rol específico:
 
 ```typescript
@@ -131,12 +138,13 @@ const routes: Routes = [
   {
     path: 'admin',
     component: AdminComponent,
-    canActivate: [RoleGuard('admin')]
-  }
+    canActivate: [RoleGuard('admin')],
+  },
 ];
 ```
 
 ### PermissionGuard
+
 Protege rutas por permisos específicos:
 
 ```typescript
@@ -146,8 +154,8 @@ const routes: Routes = [
   {
     path: 'users',
     component: UsersComponent,
-    canActivate: [PermissionGuard('users:read')]
-  }
+    canActivate: [PermissionGuard('users:read')],
+  },
 ];
 ```
 
@@ -156,44 +164,73 @@ const routes: Routes = [
 ### Endpoints Utilizados
 
 ```typescript
-POST /auth/login
-Body: { email, password }
-Response: { token, refreshToken, user, expiresIn }
+POST / auth / login;
+Body: {
+  email, password;
+}
+Response: {
+  token, refreshToken, user, expiresIn;
+}
 
-POST /auth/register
-Body: { email, password, firstName, lastName, phoneNumber }
-Response: { token, refreshToken, user, expiresIn }
+POST / auth / register;
+Body: {
+  email, password, firstName, lastName, phoneNumber;
+}
+Response: {
+  token, refreshToken, user, expiresIn;
+}
 
-POST /auth/logout
-Response: { message }
+POST / auth / logout;
+Response: {
+  message;
+}
 
-POST /auth/forgot-password
-Body: { email }
-Response: { message }
+POST / auth / forgot - password;
+Body: {
+  email;
+}
+Response: {
+  message;
+}
 
-POST /auth/reset-password
-Body: { token, password }
-Response: { message }
+POST / auth / reset - password;
+Body: {
+  token, password;
+}
+Response: {
+  message;
+}
 
-POST /auth/change-password
-Body: { currentPassword, newPassword }
-Response: { message }
+POST / auth / change - password;
+Body: {
+  currentPassword, newPassword;
+}
+Response: {
+  message;
+}
 
-GET /auth/profile
-Response: User
+GET / auth / profile;
+Response: User;
 
-PUT /auth/profile
-Body: { firstName, lastName, phoneNumber, avatarUrl }
-Response: User
+PUT / auth / profile;
+Body: {
+  firstName, lastName, phoneNumber, avatarUrl;
+}
+Response: User;
 
-POST /auth/refresh
-Body: { refreshToken }
-Response: { token, refreshToken }
+POST / auth / refresh;
+Body: {
+  refreshToken;
+}
+Response: {
+  token, refreshToken;
+}
 ```
 
 ### Interceptor Multi-Tenant
 
 El sistema usa automáticamente el `authTenantInterceptor` que:
+
 - Añade el header `Authorization: Bearer {token}` automáticamente
 - Añade el header `X-Tenant-Id` con el slug del tenant
 - Maneja errores 401 (sin autenticación) y 403 (sin permisos)
@@ -202,6 +239,7 @@ El sistema usa automáticamente el `authTenantInterceptor` que:
 ## 💾 Gestión de Tokens
 
 ### JWT Storage
+
 Los tokens se almacenan en localStorage con prefijo por tenant:
 
 ```typescript
@@ -210,6 +248,7 @@ localStorage.setItem('mtkn_tenant1', jwtToken);
 ```
 
 ### Refresh Token
+
 Los refresh tokens se almacenan en localStorage:
 
 ```typescript
@@ -217,12 +256,13 @@ localStorage.setItem('refresh_token', refreshToken);
 ```
 
 ### Decodificación de JWT
+
 El `AuthService` del core decodifica automáticamente el JWT:
 
 ```typescript
 interface JwtPayload {
   tenantId: string;
-  sub: string;          // User ID
+  sub: string; // User ID
   role: string;
   permissions: string[];
   exp: number;
@@ -232,6 +272,7 @@ interface JwtPayload {
 ## 🎨 Diseño UI
 
 ### Características
+
 - Gradientes modernos (purple/blue)
 - Cards con sombras
 - Formularios responsivos
@@ -241,6 +282,7 @@ interface JwtPayload {
 - Toggle de visibilidad de contraseñas
 
 ### Responsive
+
 - Desktop: layout completo
 - Mobile: formularios en columna única
 - Breakpoint: 640px
@@ -256,8 +298,8 @@ import { featuresAccountRoutes } from '@pwa/features-account';
 export const appRoutes: Route[] = [
   {
     path: 'account',
-    loadChildren: () => featuresAccountRoutes
-  }
+    loadChildren: () => featuresAccountRoutes,
+  },
 ];
 ```
 
@@ -307,19 +349,20 @@ const routes: Routes = [
   {
     path: 'orders',
     component: OrdersComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard],
   },
   {
     path: 'admin',
     component: AdminComponent,
-    canActivate: [AuthGuard, RoleGuard('admin')]
-  }
+    canActivate: [AuthGuard, RoleGuard('admin')],
+  },
 ];
 ```
 
 ## 🔄 Flujo de Autenticación
 
 ### Login
+
 1. Usuario completa formulario
 2. `AccountService.login()` llama a `/auth/login`
 3. Backend retorna token + user
@@ -328,6 +371,7 @@ const routes: Routes = [
 6. Redirect a home
 
 ### Registro
+
 1. Usuario completa formulario con validaciones
 2. `AccountService.register()` llama a `/auth/register`
 3. Backend crea usuario y retorna token
@@ -335,6 +379,7 @@ const routes: Routes = [
 5. Redirect a home
 
 ### Refresh Token
+
 1. Token expira (detectado en interceptor)
 2. `AccountService.refreshToken()` se llama automáticamente
 3. Backend valida refreshToken y emite nuevo token
@@ -342,6 +387,7 @@ const routes: Routes = [
 5. Request original se reintenta
 
 ### Logout
+
 1. Usuario hace click en "Cerrar Sesión"
 2. `AccountService.logout()` llama a `/auth/logout`
 3. Token y refresh token se eliminan
@@ -351,10 +397,12 @@ const routes: Routes = [
 ## ✅ Validaciones Implementadas
 
 ### Login
+
 - Email requerido y válido
 - Contraseña requerida (mínimo 6 caracteres)
 
 ### Registro
+
 - Nombre y apellido requeridos
 - Email requerido y válido
 - Teléfono opcional
@@ -363,11 +411,13 @@ const routes: Routes = [
 - Términos y condiciones requeridos
 
 ### Cambio de Contraseña
+
 - Contraseña actual requerida
 - Nueva contraseña mínimo 6 caracteres
 - Confirmar nueva contraseña debe coincidir
 
 ### Actualización de Perfil
+
 - Nombre y apellido requeridos
 - Email no se puede cambiar
 - Teléfono opcional
@@ -375,6 +425,7 @@ const routes: Routes = [
 ## 🧪 Testing
 
 ### Tests Pendientes
+
 ```bash
 # AccountService
 - login success
@@ -397,6 +448,7 @@ const routes: Routes = [
 ## ✅ Estado de Implementación
 
 ### Completado
+
 1. ✅ Modelos, servicios, componentes de autenticación
 2. ✅ Rutas integradas en app.routes.ts
 3. ✅ AccountService inicializado en app.ts
@@ -405,6 +457,7 @@ const routes: Routes = [
 6. ✅ Protección por roles (admin, superadmin)
 
 ### Pendiente
+
 1. ⏳ Tests unitarios para AccountService y componentes
 2. ⏳ E2E tests con Playwright
 3. ⏳ Verificar integración con backend Azure real
@@ -435,23 +488,27 @@ npx nx serve pwa
 ### 3. Flujo de Prueba
 
 1. **Registro**:
+
    - Ir a /account/register
    - Completar formulario
    - Se crea usuario y auto-login
    - Redirección a home con usuario logueado
 
 2. **Login**:
+
    - Ir a /account/login
    - Ingresar credenciales
    - Marcar "Recordarme" para persistir sesión
    - Ver nombre de usuario en header
 
 3. **Header Interactivo**:
+
    - Ver nombre del usuario en desktop
    - Click en botón de usuario
    - Ver menú desplegable: Mi Perfil, Mis Pedidos, Cerrar Sesión
 
 4. **Perfil**:
+
    - Click en "Mi Perfil"
    - Ver información del usuario
    - Editar datos (nombre, apellido, teléfono)
@@ -459,6 +516,7 @@ npx nx serve pwa
    - Cerrar sesión
 
 5. **Guards**:
+
    - Sin login, intentar acceder /orders → redirect a /account/login
    - Sin login, intentar acceder /checkout → redirect a /account/login
    - Sin rol admin, intentar acceder /admin → sin acceso
@@ -476,20 +534,24 @@ npx nx serve pwa
 - `@angular/forms`: ^20.3.0
 - `@angular/router`: ^20.3.0
 - `rxjs`: ^7.8.0
-- `@pwa/core`: workspace:* (ApiClientService, AuthService)
+- `@pwa/core`: workspace:\* (ApiClientService, AuthService)
 
 ## 🔍 Troubleshooting
 
 ### Token no se persiste
+
 Verificar que `TenantBootstrapService.init()` se ejecuta antes que `AccountService.initializeFromToken()`
 
 ### Errores 401/403
+
 Verificar que `authTenantInterceptor` está registrado en providers
 
 ### Guards no funcionan
+
 Verificar que `AuthService.init(tenantSlug)` se ejecuta en app initialization
 
 ### Refresh token no funciona
+
 Verificar que el backend implementa `/auth/refresh` correctamente
 
 ---

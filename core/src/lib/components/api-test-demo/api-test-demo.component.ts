@@ -33,7 +33,10 @@ interface ApiTestResult {
     <div class="api-test-demo">
       <div class="header">
         <h2>🧪 Demo ApiClientService Multi-tenant</h2>
-        <p>Esta demo muestra cómo el ApiClientService automáticamente incluye headers de tenant</p>
+        <p>
+          Esta demo muestra cómo el ApiClientService automáticamente incluye
+          headers de tenant
+        </p>
       </div>
 
       <div class="test-grid">
@@ -43,11 +46,13 @@ interface ApiTestResult {
           <button
             class="btn btn-primary"
             (click)="testGet()"
-            [disabled]="isLoading()">
+            [disabled]="isLoading()"
+          >
             Test GET /api/catalog/products
           </button>
           <p class="description">
-            Prueba una petición GET tipada que debe incluir headers de tenant automáticamente
+            Prueba una petición GET tipada que debe incluir headers de tenant
+            automáticamente
           </p>
         </div>
 
@@ -57,7 +62,8 @@ interface ApiTestResult {
           <button
             class="btn btn-success"
             (click)="testPost()"
-            [disabled]="isLoading()">
+            [disabled]="isLoading()"
+          >
             Test POST /api/catalog/products
           </button>
           <p class="description">
@@ -71,7 +77,8 @@ interface ApiTestResult {
           <button
             class="btn btn-info"
             (click)="testGetWithParams()"
-            [disabled]="isLoading()">
+            [disabled]="isLoading()"
+          >
             Test GET con parámetros
           </button>
           <p class="description">
@@ -85,7 +92,8 @@ interface ApiTestResult {
           <button
             class="btn btn-warning"
             (click)="testGetWithResponse()"
-            [disabled]="isLoading()">
+            [disabled]="isLoading()"
+          >
             Test con HttpResponse
           </button>
           <p class="description">
@@ -96,258 +104,289 @@ interface ApiTestResult {
 
       <!-- Loading indicator -->
       @if (isLoading()) {
-        <div class="loading">
-          <div class="spinner"></div>
-          <span>Ejecutando request...</span>
-        </div>
+      <div class="loading">
+        <div class="spinner"></div>
+        <span>Ejecutando request...</span>
+      </div>
       }
 
       <!-- Resultados -->
       @if (testResults().length > 0) {
-        <div class="results">
-          <h3>📋 Resultados de las Pruebas</h3>
+      <div class="results">
+        <h3>📋 Resultados de las Pruebas</h3>
 
-          @for (result of testResults(); track result.timestamp) {
-            <div class="result-card" [class]="result.success ? 'success' : 'error'">
-              <div class="result-header">
-                <span class="method">{{ result.method }}</span>
-                <span class="url">{{ result.url }}</span>
-                <span class="status">{{ result.success ? '✅' : '❌' }}</span>
-                <span class="duration">{{ result.duration }}ms</span>
-              </div>
+        @for (result of testResults(); track result.timestamp) {
+        <div class="result-card" [class]="result.success ? 'success' : 'error'">
+          <div class="result-header">
+            <span class="method">{{ result.method }}</span>
+            <span class="url">{{ result.url }}</span>
+            <span class="status">{{ result.success ? '✅' : '❌' }}</span>
+            <span class="duration">{{ result.duration }}ms</span>
+          </div>
 
-              @if (result.headers) {
-                <div class="headers">
-                  <h4>Headers enviados:</h4>
-                  <pre>{{ formatHeaders(result.headers) }}</pre>
-                </div>
-              }
-
-              @if (result.response && result.success) {
-                <div class="response">
-                  <h4>Response:</h4>
-                  <pre>{{ formatJson(result.response) }}</pre>
-                </div>
-              }
-
-              @if (result.error && !result.success) {
-                <div class="error">
-                  <h4>Error:</h4>
-                  <pre>{{ result.error }}</pre>
-                </div>
-              }
-
-              <div class="timestamp">{{ result.timestamp }}</div>
-            </div>
+          @if (result.headers) {
+          <div class="headers">
+            <h4>Headers enviados:</h4>
+            <pre>{{ formatHeaders(result.headers) }}</pre>
+          </div>
+          } @if (result.response && result.success) {
+          <div class="response">
+            <h4>Response:</h4>
+            <pre>{{ formatJson(result.response) }}</pre>
+          </div>
+          } @if (result.error && !result.success) {
+          <div class="error">
+            <h4>Error:</h4>
+            <pre>{{ result.error }}</pre>
+          </div>
           }
 
-          <button class="btn btn-secondary" (click)="clearResults()">
-            Limpiar Resultados
-          </button>
+          <div class="timestamp">{{ result.timestamp }}</div>
         </div>
+        }
+
+        <button class="btn btn-secondary" (click)="clearResults()">
+          Limpiar Resultados
+        </button>
+      </div>
       }
     </div>
   `,
-  styles: [`
-    .api-test-demo {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem;
-      font-family: system-ui, sans-serif;
-    }
+  styles: [
+    `
+      .api-test-demo {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        font-family: system-ui, sans-serif;
+      }
 
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-      padding: 1rem;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border-radius: 8px;
-    }
+      .header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 8px;
+      }
 
-    .header h2 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.5rem;
-    }
+      .header h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+      }
 
-    .header p {
-      margin: 0;
-      opacity: 0.9;
-    }
+      .header p {
+        margin: 0;
+        opacity: 0.9;
+      }
 
-    .test-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-      margin-bottom: 2rem;
-    }
+      .test-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
 
-    .test-card {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 1.5rem;
-      text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
+      .test-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
 
-    .test-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    }
+      .test-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      }
 
-    .test-card h3 {
-      margin: 0 0 1rem 0;
-      color: #333;
-      font-size: 1.1rem;
-    }
+      .test-card h3 {
+        margin: 0 0 1rem 0;
+        color: #333;
+        font-size: 1.1rem;
+      }
 
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      margin-bottom: 1rem;
-      width: 100%;
-    }
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 1rem;
+        width: 100%;
+      }
 
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+      .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
 
-    .btn-primary { background: #007bff; color: white; }
-    .btn-primary:hover:not(:disabled) { background: #0056b3; }
+      .btn-primary {
+        background: #007bff;
+        color: white;
+      }
+      .btn-primary:hover:not(:disabled) {
+        background: #0056b3;
+      }
 
-    .btn-success { background: #28a745; color: white; }
-    .btn-success:hover:not(:disabled) { background: #1e7e34; }
+      .btn-success {
+        background: #28a745;
+        color: white;
+      }
+      .btn-success:hover:not(:disabled) {
+        background: #1e7e34;
+      }
 
-    .btn-info { background: #17a2b8; color: white; }
-    .btn-info:hover:not(:disabled) { background: #117a8b; }
+      .btn-info {
+        background: #17a2b8;
+        color: white;
+      }
+      .btn-info:hover:not(:disabled) {
+        background: #117a8b;
+      }
 
-    .btn-warning { background: #ffc107; color: #212529; }
-    .btn-warning:hover:not(:disabled) { background: #e0a800; }
+      .btn-warning {
+        background: #ffc107;
+        color: #212529;
+      }
+      .btn-warning:hover:not(:disabled) {
+        background: #e0a800;
+      }
 
-    .btn-secondary { background: #6c757d; color: white; }
-    .btn-secondary:hover:not(:disabled) { background: #545b62; }
+      .btn-secondary {
+        background: #6c757d;
+        color: white;
+      }
+      .btn-secondary:hover:not(:disabled) {
+        background: #545b62;
+      }
 
-    .description {
-      font-size: 0.9rem;
-      color: #666;
-      margin: 0;
-      line-height: 1.4;
-    }
+      .description {
+        font-size: 0.9rem;
+        color: #666;
+        margin: 0;
+        line-height: 1.4;
+      }
 
-    .loading {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      padding: 2rem;
-      background: #f8f9fa;
-      border-radius: 8px;
-      margin-bottom: 2rem;
-    }
+      .loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 2rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+      }
 
-    .spinner {
-      width: 24px;
-      height: 24px;
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid #007bff;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
+      .spinner {
+        width: 24px;
+        height: 24px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
 
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
 
-    .results {
-      margin-top: 2rem;
-    }
+      .results {
+        margin-top: 2rem;
+      }
 
-    .results h3 {
-      color: #333;
-      margin-bottom: 1rem;
-    }
+      .results h3 {
+        color: #333;
+        margin-bottom: 1rem;
+      }
 
-    .result-card {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-    }
+      .result-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
 
-    .result-card.success {
-      border-left: 4px solid #28a745;
-    }
+      .result-card.success {
+        border-left: 4px solid #28a745;
+      }
 
-    .result-card.error {
-      border-left: 4px solid #dc3545;
-    }
+      .result-card.error {
+        border-left: 4px solid #dc3545;
+      }
 
-    .result-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      flex-wrap: wrap;
-    }
+      .result-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+      }
 
-    .method {
-      background: #007bff;
-      color: white;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
+      .method {
+        background: #007bff;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
 
-    .url {
-      color: #666;
-      font-family: monospace;
-      font-size: 0.9rem;
-      flex: 1;
-    }
+      .url {
+        color: #666;
+        font-family: monospace;
+        font-size: 0.9rem;
+        flex: 1;
+      }
 
-    .duration {
-      color: #999;
-      font-size: 0.8rem;
-    }
+      .duration {
+        color: #999;
+        font-size: 0.8rem;
+      }
 
-    .headers, .response, .error {
-      margin: 1rem 0;
-    }
+      .headers,
+      .response,
+      .error {
+        margin: 1rem 0;
+      }
 
-    .headers h4, .response h4, .error h4 {
-      color: #333;
-      margin: 0 0 0.5rem 0;
-      font-size: 0.9rem;
-    }
+      .headers h4,
+      .response h4,
+      .error h4 {
+        color: #333;
+        margin: 0 0 0.5rem 0;
+        font-size: 0.9rem;
+      }
 
-    pre {
-      background: #f8f9fa;
-      padding: 0.75rem;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
+      pre {
+        background: #f8f9fa;
+        padding: 0.75rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        overflow-x: auto;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
 
-    .timestamp {
-      color: #999;
-      font-size: 0.8rem;
-      text-align: right;
-      margin-top: 1rem;
-      border-top: 1px solid #eee;
-      padding-top: 0.5rem;
-    }
-  `]
+      .timestamp {
+        color: #999;
+        font-size: 0.8rem;
+        text-align: right;
+        margin-top: 1rem;
+        border-top: 1px solid #eee;
+        padding-top: 0.5rem;
+      }
+    `,
+  ],
 })
 export class ApiTestDemoComponent {
   private readonly apiClient = inject(ApiClientService);
@@ -365,12 +404,18 @@ export class ApiTestDemoComponent {
 
     try {
       // Usando el método GET tipado del ApiClientService
-      const products = await this.apiClient.get<CatalogProduct[]>('/api/catalog/products', {
-        // Habilitamos logging para ver los headers en la consola
-      }, {
-        enableLogging: true,
-        enableErrorHandling: true
-      }).toPromise();
+      const products = await this.apiClient
+        .get<CatalogProduct[]>(
+          '/api/catalog/products',
+          {
+            // Habilitamos logging para ver los headers en la consola
+          },
+          {
+            enableLogging: true,
+            enableErrorHandling: true,
+          }
+        )
+        .toPromise();
 
       const duration = Math.round(performance.now() - startTime);
 
@@ -384,10 +429,9 @@ export class ApiTestDemoComponent {
         headers: {
           'X-Tenant-Slug': 'demo-tenant',
           'X-Tenant-Key': 'demo-key-123',
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
-
     } catch (error) {
       const duration = Math.round(performance.now() - startTime);
 
@@ -397,7 +441,7 @@ export class ApiTestDemoComponent {
         success: false,
         timestamp: new Date().toLocaleTimeString(),
         duration,
-        error: this.formatError(error)
+        error: this.formatError(error),
       });
     } finally {
       this.isLoading.set(false);
@@ -415,21 +459,23 @@ export class ApiTestDemoComponent {
       const newProduct = {
         name: 'Producto Demo',
         price: 29.99,
-        stock: 100
+        stock: 100,
       };
 
-      const result = await this.apiClient.post<{ id: string }, typeof newProduct>(
-        '/api/catalog/products',
-        newProduct,
-        {
-          headers: {
-            'Content-Type': 'application/json'
+      const result = await this.apiClient
+        .post<{ id: string }, typeof newProduct>(
+          '/api/catalog/products',
+          newProduct,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+          {
+            enableLogging: true,
           }
-        },
-        {
-          enableLogging: true
-        }
-      ).toPromise();
+        )
+        .toPromise();
 
       const duration = Math.round(performance.now() - startTime);
 
@@ -443,10 +489,9 @@ export class ApiTestDemoComponent {
         headers: {
           'X-Tenant-Slug': 'demo-tenant',
           'X-Tenant-Key': 'demo-key-123',
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
-
     } catch (error) {
       const duration = Math.round(performance.now() - startTime);
 
@@ -456,7 +501,7 @@ export class ApiTestDemoComponent {
         success: false,
         timestamp: new Date().toLocaleTimeString(),
         duration,
-        error: this.formatError(error)
+        error: this.formatError(error),
       });
     } finally {
       this.isLoading.set(false);
@@ -471,23 +516,25 @@ export class ApiTestDemoComponent {
     this.isLoading.set(true);
 
     try {
-      const products = await this.apiClient.getWithParams<CatalogProduct[]>(
-        '/api/catalog/products',
-        {
-          page: 1,
-          pageSize: 10,
-          category: 'electronics',
-          sort: 'price_asc'
-        },
-        {
-          headers: {
-            'Accept': 'application/json'
+      const products = await this.apiClient
+        .getWithParams<CatalogProduct[]>(
+          '/api/catalog/products',
+          {
+            page: 1,
+            pageSize: 10,
+            category: 'electronics',
+            sort: 'price_asc',
+          },
+          {
+            headers: {
+              Accept: 'application/json',
+            },
+          },
+          {
+            enableLogging: true,
           }
-        },
-        {
-          enableLogging: true
-        }
-      ).toPromise();
+        )
+        .toPromise();
 
       const duration = Math.round(performance.now() - startTime);
 
@@ -501,10 +548,9 @@ export class ApiTestDemoComponent {
         headers: {
           'X-Tenant-Slug': 'demo-tenant',
           'X-Tenant-Key': 'demo-key-123',
-          'Accept': 'application/json'
-        }
+          Accept: 'application/json',
+        },
       });
-
     } catch (error) {
       const duration = Math.round(performance.now() - startTime);
 
@@ -514,7 +560,7 @@ export class ApiTestDemoComponent {
         success: false,
         timestamp: new Date().toLocaleTimeString(),
         duration,
-        error: this.formatError(error)
+        error: this.formatError(error),
       });
     } finally {
       this.isLoading.set(false);
@@ -529,15 +575,17 @@ export class ApiTestDemoComponent {
     this.isLoading.set(true);
 
     try {
-      const response = await this.apiClient.getWithResponse<CatalogProduct[]>(
-        '/api/catalog/products',
-        {
-          observe: 'response'
-        },
-        {
-          enableLogging: true
-        }
-      ).toPromise();
+      const response = await this.apiClient
+        .getWithResponse<CatalogProduct[]>(
+          '/api/catalog/products',
+          {
+            observe: 'response',
+          },
+          {
+            enableLogging: true,
+          }
+        )
+        .toPromise();
 
       const duration = Math.round(performance.now() - startTime);
 
@@ -550,14 +598,13 @@ export class ApiTestDemoComponent {
         response: {
           status: response?.status,
           headers: this.extractHeaders(response),
-          body: response?.body
+          body: response?.body,
         },
         headers: {
           'X-Tenant-Slug': 'demo-tenant',
-          'X-Tenant-Key': 'demo-key-123'
-        }
+          'X-Tenant-Key': 'demo-key-123',
+        },
       });
-
     } catch (error) {
       const duration = Math.round(performance.now() - startTime);
 
@@ -567,7 +614,7 @@ export class ApiTestDemoComponent {
         success: false,
         timestamp: new Date().toLocaleTimeString(),
         duration,
-        error: this.formatError(error)
+        error: this.formatError(error),
       });
     } finally {
       this.isLoading.set(false);
@@ -578,7 +625,7 @@ export class ApiTestDemoComponent {
    * Agregar resultado a la lista
    */
   private addResult(result: ApiTestResult): void {
-    this.testResults.update(results => [result, ...results]);
+    this.testResults.update((results) => [result, ...results]);
   }
 
   /**
@@ -621,7 +668,9 @@ export class ApiTestDemoComponent {
   /**
    * Extraer headers del HttpResponse
    */
-  private extractHeaders(response: HttpResponse<unknown> | undefined): Record<string, string> {
+  private extractHeaders(
+    response: HttpResponse<unknown> | undefined
+  ): Record<string, string> {
     if (!response?.headers) return {};
 
     const headers: Record<string, string> = {};

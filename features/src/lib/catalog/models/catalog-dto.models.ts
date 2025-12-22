@@ -175,10 +175,12 @@ export interface Category {
  */
 export interface CatalogFilters {
   categoryId?: string;
+  categorySlug?: string;
   search?: string;
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;
+  featured?: boolean;
   tags?: string[];
 }
 

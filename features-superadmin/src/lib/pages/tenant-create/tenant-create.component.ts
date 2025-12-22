@@ -1,14 +1,61 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import {
+  AbstractControl,
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Plan, TenantPlan } from '../../models/tenant.model';
+import {
+  CreateTenantError,
+  CreateTenantResponse,
+  Plan,
+  TenantPlan,
+} from '../../models/tenant.model';
 import { TenantAdminService } from '../../services/tenant-admin.service';
+
+/**
+ * Validador personalizado para email con dominio válido
+ * Acepta: user@domain.com, user@domain.co, etc.
+ * Rechaza: user@domain (sin extensión)
+ */
+function emailWithDomainValidator(
+  control: AbstractControl
+): ValidationErrors | null {
+  if (!control.value) {
+    return null; // Si está vacío, el required lo manejará
+  }
+
+  // Regex que valida email con dominio y extensión
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+  if (!emailRegex.test(control.value)) {
+    return { invalidEmailFormat: true };
+  }
+
+  return null;
+}
+
+/**
+ * Normaliza un string para usarlo como slug
+ * - Convierte a minúsculas
+ * - Reemplaza espacios y caracteres especiales por guiones
+ * - Elimina caracteres no válidos
+ * - Elimina guiones consecutivos
+ */
+function normalizeToSlug(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // Elimina acentos
+    .replace(/[^a-z0-9\s-]/g, '') // Solo letras, números, espacios y guiones
+    .replace(/\s+/g, '-') // Espacios a guiones
+    .replace(/-+/g, '-') // Guiones consecutivos a uno solo
+    .replace(/^-|-$/g, ''); // Elimina guiones al inicio y final
+}
 
 @Component({
   selector: 'lib-tenant-create',
@@ -24,7 +71,8 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
         <div class="header-content">
           <h1 class="page-title">Crear Nuevo Comercio</h1>
           <p class="page-subtitle">
-            Crea un nuevo comercio con su base de datos y configuración inicial
+            Registra un nuevo comercio con su base de datos y configuración
+            inicial
           </p>
         </div>
       </div>
@@ -32,60 +80,29 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
       <!-- Form Card -->
       <div class="form-card">
         <form [formGroup]="tenantForm" (ngSubmit)="onSubmit()">
-          <!-- Slug -->
-          <div class="form-group">
-            <label class="form-label" for="slug">
-              Slug <span class="required">*</span>
-            </label>
-            <input
-              id="slug"
-              type="text"
-              class="form-input"
-              formControlName="slug"
-              placeholder="mi-tienda"
-              [class.error]="isFieldInvalid('slug')"
-            />
-            <p class="form-hint">
-              <span class="material-icons hint-icon">info</span>
-              Identificador único para el comercio. Solo letras minúsculas,
-              números y guiones. Ejemplo: mi-tienda-online
-            </p>
-            @if (isFieldInvalid('slug')) {
-            <p class="form-error">
-              <span class="material-icons">error</span>
-              @if (tenantForm.get('slug')?.hasError('required')) { El slug es
-              requerido } @else if (tenantForm.get('slug')?.hasError('pattern'))
-              { Solo se permiten letras minúsculas, números y guiones } @else if
-              (tenantForm.get('slug')?.hasError('minlength')) { Mínimo 3
-              caracteres } @else if
-              (tenantForm.get('slug')?.hasError('maxlength')) { Máximo 50
-              caracteres }
-            </p>
-            }
-          </div>
-
-          <!-- Name -->
+          <!-- Nombre del Comercio -->
           <div class="form-group">
             <label class="form-label" for="name">
-              Nombre <span class="required">*</span>
+              Nombre del Comercio <span class="required">*</span>
             </label>
             <input
               id="name"
               type="text"
               class="form-input"
               formControlName="name"
-              placeholder="Mi Tienda Online"
+              placeholder="Ej: Mi Tienda Online"
               [class.error]="isFieldInvalid('name')"
+              (input)="onNameChange()"
             />
             <p class="form-hint">
               <span class="material-icons hint-icon">info</span>
-              Nombre visible del comercio
+              Nombre visible de la tienda que verán los clientes
             </p>
             @if (isFieldInvalid('name')) {
             <p class="form-error">
               <span class="material-icons">error</span>
-              @if (tenantForm.get('name')?.hasError('required')) { El nombre es
-              requerido } @else if
+              @if (tenantForm.get('name')?.hasError('required')) { El nombre del
+              comercio es requerido } @else if
               (tenantForm.get('name')?.hasError('minlength')) { Mínimo 3
               caracteres } @else if
               (tenantForm.get('name')?.hasError('maxlength')) { Máximo 100
@@ -94,10 +111,57 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
             }
           </div>
 
+          <!-- Identificador (Slug) - Solo lectura, generado automáticamente -->
+          <div class="form-group">
+            <label class="form-label" for="slug">
+              Identificador del Comercio
+              <span class="badge-auto">Automático</span>
+            </label>
+            <div class="slug-preview">
+              <span class="slug-prefix">URL:</span>
+              <code class="slug-value">{{
+                tenantForm.get('slug')?.value || 'nombre-del-comercio'
+              }}</code>
+            </div>
+            <p class="form-hint">
+              <span class="material-icons hint-icon">link</span>
+              Este identificador se usa en la URL para acceder a tu comercio. Se
+              genera automáticamente del nombre.
+            </p>
+          </div>
+
+          <!-- Email del Administrador -->
+          <div class="form-group">
+            <label class="form-label" for="adminEmail">
+              Email del Administrador <span class="required">*</span>
+            </label>
+            <input
+              id="adminEmail"
+              type="email"
+              class="form-input"
+              formControlName="adminEmail"
+              placeholder="admin@micomercio.com"
+              [class.error]="isFieldInvalid('adminEmail')"
+            />
+            <p class="form-hint">
+              <span class="material-icons hint-icon">person</span>
+              Este email se usará para el acceso del administrador del comercio
+            </p>
+            @if (isFieldInvalid('adminEmail')) {
+            <p class="form-error">
+              <span class="material-icons">error</span>
+              @if (tenantForm.get('adminEmail')?.hasError('required')) { El
+              email del administrador es requerido } @else if
+              (tenantForm.get('adminEmail')?.hasError('invalidEmailFormat')) {
+              Ingresa un email válido (ej: usuario&#64;dominio.com) }
+            </p>
+            }
+          </div>
+
           <!-- Plan -->
           <div class="form-group">
-            <label class="form-label" for="planCode">
-              Plan <span class="required">*</span>
+            <label class="form-label">
+              Plan del Comercio <span class="required">*</span>
             </label>
 
             @if (isLoadingPlans()) {
@@ -156,7 +220,7 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
             } @if (isFieldInvalid('planCode')) {
             <p class="form-error">
               <span class="material-icons">error</span>
-              Selecciona un plan
+              Selecciona un plan para el comercio
             </p>
             }
           </div>
@@ -168,6 +232,12 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
             <div class="alert-content">
               <strong>Error al crear comercio</strong>
               <p>{{ error() }}</p>
+              @if (errorSuggestion()) {
+              <p class="error-suggestion">
+                <span class="material-icons">lightbulb</span>
+                {{ errorSuggestion() }}
+              </p>
+              }
             </div>
           </div>
           }
@@ -190,7 +260,7 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
               @if (isLoading()) {
               <span class="spinner-small"></span>
               Creando... } @else {
-              <span class="material-icons">add</span>
+              <span class="material-icons">add_business</span>
               Crear Comercio }
             </button>
           </div>
@@ -200,72 +270,126 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
       <!-- Success Modal -->
       @if (showSuccessModal()) {
       <div class="modal-overlay" (click)="closeSuccessModal()">
-        <div class="modal-content" (click)="$event.stopPropagation()">
+        <div
+          class="modal-content success-modal"
+          (click)="$event.stopPropagation()"
+        >
           <div class="modal-header success">
             <span class="material-icons modal-icon">check_circle</span>
             <h2>¡Comercio Creado Exitosamente!</h2>
           </div>
           <div class="modal-body">
-            <p class="success-message">
-              El comercio <strong>{{ createdTenant()?.slug }}</strong> ha sido
-              creado correctamente.
-            </p>
+            <!-- Mensaje del backend -->
+            @if (createdTenant()?.message) {
+            <div class="success-message">
+              <span class="material-icons">info</span>
+              <p>{{ createdTenant()?.message }}</p>
+            </div>
+            }
 
-            @if (createdTenant()?.adminPassword) {
-            <div class="credentials-box">
-              <div class="credentials-header">
-                <span class="material-icons">vpn_key</span>
-                <h3>Credenciales de Administrador</h3>
+            <!-- Datos del Comercio -->
+            <div class="info-section">
+              <h4>
+                <span class="material-icons">storefront</span>
+                Datos del Comercio
+              </h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Identificador</label>
+                  <code>{{ createdTenant()?.slug }}</code>
+                </div>
+                <div class="info-item">
+                  <label>Estado</label>
+                  <span class="badge-status">{{
+                    createdTenant()?.status
+                  }}</span>
+                </div>
               </div>
+            </div>
+
+            <!-- Credenciales del Administrador -->
+            @if (createdTenant()?.temporaryPassword) {
+            <div class="credentials-section">
+              <h4>
+                <span class="material-icons">vpn_key</span>
+                Credenciales del Administrador
+              </h4>
+
               <div class="credential-item">
-                <label>Usuario</label>
+                <label>Email</label>
                 <div class="credential-value">
-                  <code>admin&#64;{{ createdTenant()?.slug }}</code>
+                  <code>{{ createdTenant()?.adminEmail }}</code>
                   <button
                     class="btn-copy"
-                    (click)="copyToClipboard('admin@' + createdTenant()?.slug)"
+                    (click)="copyToClipboard(createdTenant()?.adminEmail!)"
                     title="Copiar"
                   >
                     <span class="material-icons">content_copy</span>
                   </button>
                 </div>
               </div>
+
               <div class="credential-item">
                 <label>Contraseña Temporal</label>
                 <div class="credential-value">
-                  <code>{{ createdTenant()?.adminPassword }}</code>
+                  <code class="password">{{
+                    createdTenant()?.temporaryPassword
+                  }}</code>
                   <button
                     class="btn-copy"
-                    (click)="copyToClipboard(createdTenant()?.adminPassword!)"
+                    (click)="
+                      copyToClipboard(createdTenant()?.temporaryPassword!)
+                    "
                     title="Copiar"
                   >
                     <span class="material-icons">content_copy</span>
                   </button>
                 </div>
               </div>
+
               <div class="credentials-warning">
                 <span class="material-icons">warning</span>
-                <p>
-                  <strong>¡Importante!</strong> Guarda estas credenciales. La
-                  contraseña solo se muestra una vez.
-                </p>
+                <div>
+                  <strong>¡Importante!</strong>
+                  <p>
+                    Guarda estas credenciales en un lugar seguro. La contraseña
+                    temporal solo se muestra una vez y debe ser cambiada en el
+                    primer inicio de sesión.
+                  </p>
+                </div>
               </div>
             </div>
             }
 
+            <!-- Acceso Directo -->
+            <div class="access-section">
+              <h4>
+                <span class="material-icons">link</span>
+                Acceso al Comercio
+              </h4>
+              <div class="access-url">
+                <code>{{ getAccessUrl() }}</code>
+                <button
+                  class="btn-copy"
+                  (click)="copyToClipboard(getAccessUrl())"
+                  title="Copiar URL"
+                >
+                  <span class="material-icons">content_copy</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Próximos Pasos -->
             <div class="next-steps">
               <h4>
                 <span class="material-icons">checklist</span>
                 Próximos pasos
               </h4>
               <ol>
-                <li>Guarda las credenciales de administrador</li>
-                <li>
-                  Accede con el tenant:
-                  <code>?tenant={{ createdTenant()?.slug }}</code>
-                </li>
-                <li>Inicia sesión con las credenciales proporcionadas</li>
-                <li>Cambia la contraseña por una segura</li>
+                <li>Guarda las credenciales del administrador</li>
+                <li>Accede usando la URL del comercio</li>
+                <li>Inicia sesión con el email y contraseña proporcionados</li>
+                <li>Cambia la contraseña temporal por una segura</li>
               </ol>
             </div>
           </div>
@@ -273,12 +397,20 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
             <button class="btn btn-secondary" (click)="closeSuccessModal()">
               Cerrar
             </button>
-            <button class="btn btn-primary" (click)="viewTenantDetails()">
-              <span class="material-icons">visibility</span>
-              Ver Detalles
+            <button class="btn btn-primary" (click)="openAccessUrl()">
+              <span class="material-icons">open_in_new</span>
+              Ir al Comercio
             </button>
           </div>
         </div>
+      </div>
+      }
+
+      <!-- Copied Toast -->
+      @if (showCopiedToast()) {
+      <div class="toast-copied">
+        <span class="material-icons">check</span>
+        Copiado al portapapeles
       </div>
       }
     </div>
@@ -349,7 +481,9 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
       }
 
       .form-label {
-        display: block;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
         font-size: 0.95rem;
         font-weight: 500;
         color: #374151;
@@ -358,6 +492,15 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
 
       .required {
         color: #ef4444;
+      }
+
+      .badge-auto {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.5rem;
+        background: #e0e7ff;
+        color: #4f46e5;
+        border-radius: 1rem;
+        font-weight: 500;
       }
 
       .form-input {
@@ -381,6 +524,30 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
 
       .form-input.error:focus {
         box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+      }
+
+      /* Slug Preview */
+      .slug-preview {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+      }
+
+      .slug-prefix {
+        font-size: 0.875rem;
+        color: #6b7280;
+      }
+
+      .slug-value {
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.95rem;
+        color: #3b82f6;
+        background: transparent;
+        padding: 0;
       }
 
       .form-hint {
@@ -473,12 +640,6 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
         margin: 0 0 0.5rem 0;
       }
 
-      .plan-description {
-        font-size: 0.875rem;
-        color: #6b7280;
-        margin: 0 0 1rem 0;
-      }
-
       .plan-features {
         list-style: none;
         padding: 0;
@@ -555,6 +716,12 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
         color: #991b1b;
       }
 
+      .alert-warning {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        color: #92400e;
+      }
+
       .alert .material-icons {
         font-size: 24px;
       }
@@ -571,6 +738,24 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
       .alert-content p {
         margin: 0;
         font-size: 0.95rem;
+      }
+
+      .error-suggestion {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-top: 0.75rem !important;
+        padding: 0.5rem 0.75rem;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        color: #92400e;
+      }
+
+      .error-suggestion .material-icons {
+        font-size: 18px;
+        flex-shrink: 0;
+        color: #f59e0b;
       }
 
       /* Actions */
@@ -600,40 +785,32 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
         cursor: not-allowed;
       }
 
-      .btn-secondary {
-        background: white;
-        color: #374151;
-        border: 1px solid #d1d5db;
-      }
-
-      .btn-secondary:hover:not(:disabled) {
-        background: #f9fafb;
-        border-color: #9ca3af;
-      }
-
       .btn-primary {
         background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
         color: white;
       }
 
       .btn-primary:hover:not(:disabled) {
-        transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        transform: translateY(-1px);
+      }
+
+      .btn-secondary {
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      .btn-secondary:hover:not(:disabled) {
+        background: #e5e7eb;
       }
 
       .spinner-small {
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
         border: 2px solid rgba(255, 255, 255, 0.3);
         border-top-color: white;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
-      }
-
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
       }
 
       /* Modal */
@@ -648,7 +825,17 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
         align-items: center;
         justify-content: center;
         z-index: 1000;
-        padding: 2rem;
+        padding: 1rem;
+        animation: fadeIn 0.2s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
       }
 
       .modal-content {
@@ -658,65 +845,164 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
         width: 100%;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        animation: slideUp 0.3s ease-out;
+      }
+
+      .success-modal {
+        max-width: 650px;
+      }
+
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .modal-header {
-        padding: 2rem 2rem 1rem;
+        padding: 1.5rem 2rem;
         text-align: center;
+        border-bottom: 1px solid #e5e7eb;
       }
 
       .modal-header.success {
-        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
       }
 
       .modal-icon {
-        font-size: 64px;
+        font-size: 48px;
         color: #10b981;
-        margin-bottom: 1rem;
+        margin-bottom: 0.5rem;
       }
 
       .modal-header h2 {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #1f2937;
         margin: 0;
+        font-size: 1.5rem;
+        color: #065f46;
       }
 
       .modal-body {
-        padding: 2rem;
+        padding: 1.5rem 2rem;
       }
 
-      .success-message {
-        text-align: center;
-        color: #374151;
-        margin-bottom: 2rem;
+      /* Info Section */
+      .info-section,
+      .credentials-section,
+      .access-section,
+      .next-steps {
+        margin-bottom: 1.5rem;
       }
 
-      .credentials-box {
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.75rem;
-        padding: 1.5rem;
-        margin-bottom: 2rem;
-      }
-
-      .credentials-header {
+      .info-section h4,
+      .credentials-section h4,
+      .access-section h4,
+      .next-steps h4 {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        margin-bottom: 1rem;
-        color: #374151;
-      }
-
-      .credentials-header .material-icons {
-        font-size: 24px;
-      }
-
-      .credentials-header h3 {
         font-size: 1rem;
-        font-weight: 600;
+        color: #374151;
+        margin: 0 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .info-section h4 .material-icons,
+      .credentials-section h4 .material-icons,
+      .access-section h4 .material-icons,
+      .next-steps h4 .material-icons {
+        color: #6b7280;
+        font-size: 20px;
+      }
+
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+
+      .info-item label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .info-item span,
+      .info-item code {
+        font-size: 0.95rem;
+        color: #1f2937;
+      }
+
+      .info-item code {
+        font-family: 'Monaco', 'Menlo', monospace;
+        color: #3b82f6;
+      }
+
+      .badge-plan {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: #dbeafe;
+        color: #1d4ed8;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      .badge-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: #d1fae5;
+        color: #065f46;
+        border-radius: 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+
+      /* Success Message */
+      .success-message {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 0.75rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .success-message .material-icons {
+        color: #059669;
+        flex-shrink: 0;
+      }
+
+      .success-message p {
         margin: 0;
+        color: #065f46;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      /* Credentials Section */
+      .credentials-section {
+        background: #fefce8;
+        border: 1px solid #fef08a;
+        border-radius: 0.75rem;
+        padding: 1rem;
+      }
+
+      .credentials-section h4 {
+        border-bottom-color: #fef08a;
       }
 
       .credential-item {
@@ -729,124 +1015,199 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
 
       .credential-item label {
         display: block;
-        font-size: 0.875rem;
-        font-weight: 500;
+        font-size: 0.75rem;
         color: #6b7280;
-        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.25rem;
       }
 
       .credential-value {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
       }
 
       .credential-value code {
         flex: 1;
-        padding: 0.75rem;
-        background: white;
-        border: 1px solid #d1d5db;
-        border-radius: 0.375rem;
-        font-family: 'Monaco', 'Courier New', monospace;
+        font-family: 'Monaco', 'Menlo', monospace;
         font-size: 0.95rem;
         color: #1f2937;
+      }
+
+      .credential-value code.password {
+        color: #dc2626;
+        font-weight: 600;
       }
 
       .btn-copy {
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 36px;
-        height: 36px;
-        border: 1px solid #d1d5db;
-        background: white;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: #f3f4f6;
         border-radius: 0.375rem;
         cursor: pointer;
         transition: all 0.2s;
-        color: #6b7280;
       }
 
       .btn-copy:hover {
-        background: #f3f4f6;
-        border-color: #9ca3af;
-        color: #374151;
+        background: #e5e7eb;
       }
 
       .btn-copy .material-icons {
         font-size: 18px;
+        color: #6b7280;
       }
 
       .credentials-warning {
         display: flex;
         align-items: flex-start;
         gap: 0.75rem;
-        margin-top: 1.5rem;
-        padding: 1rem;
+        margin-top: 1rem;
+        padding: 0.75rem;
         background: #fef3c7;
-        border: 1px solid #fde68a;
         border-radius: 0.5rem;
       }
 
       .credentials-warning .material-icons {
-        font-size: 20px;
         color: #d97706;
+        font-size: 20px;
         flex-shrink: 0;
       }
 
-      .credentials-warning p {
-        margin: 0;
-        font-size: 0.875rem;
+      .credentials-warning strong {
+        display: block;
         color: #92400e;
+        font-size: 0.875rem;
       }
 
-      .next-steps {
-        background: #eff6ff;
-        border: 1px solid #dbeafe;
-        border-radius: 0.75rem;
-        padding: 1.5rem;
+      .credentials-warning p {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.825rem;
+        color: #78350f;
       }
 
-      .next-steps h4 {
+      /* Access Section */
+      .access-url {
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1e40af;
-        margin: 0 0 1rem 0;
+        padding: 0.75rem 1rem;
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
       }
 
-      .next-steps .material-icons {
-        font-size: 20px;
+      .access-url code {
+        flex: 1;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.875rem;
+        color: #3b82f6;
+        word-break: break-all;
       }
 
+      /* Next Steps */
       .next-steps ol {
         margin: 0;
-        padding-left: 1.5rem;
+        padding-left: 1.25rem;
       }
 
       .next-steps li {
-        color: #374151;
         font-size: 0.95rem;
+        color: #374151;
         margin-bottom: 0.5rem;
       }
 
-      .next-steps code {
-        padding: 0.25rem 0.5rem;
-        background: white;
-        border: 1px solid #dbeafe;
-        border-radius: 0.25rem;
-        font-family: 'Monaco', 'Courier New', monospace;
-        font-size: 0.875rem;
-        color: #1e40af;
+      .next-steps li:last-child {
+        margin-bottom: 0;
       }
 
       .modal-footer {
         display: flex;
         gap: 1rem;
         justify-content: flex-end;
-        padding: 1.5rem 2rem 2rem;
+        padding: 1rem 2rem;
         border-top: 1px solid #e5e7eb;
+        background: #f9fafb;
+        border-radius: 0 0 1rem 1rem;
+      }
+
+      /* Toast */
+      .toast-copied {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: #1f2937;
+        color: white;
+        border-radius: 0.5rem;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: toastIn 0.3s ease-out;
+        z-index: 1100;
+      }
+
+      .toast-copied .material-icons {
+        font-size: 18px;
+        color: #10b981;
+      }
+
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 640px) {
+        .create-container {
+          padding: 1rem;
+        }
+
+        .form-card {
+          padding: 1.5rem;
+        }
+
+        .plan-cards {
+          grid-template-columns: 1fr;
+        }
+
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .modal-content {
+          margin: 0.5rem;
+        }
+
+        .modal-body {
+          padding: 1rem;
+        }
+
+        .modal-footer {
+          flex-direction: column;
+        }
+
+        .modal-footer .btn {
+          width: 100%;
+          justify-content: center;
+        }
       }
     `,
   ],
@@ -863,28 +1224,17 @@ export class TenantCreateComponent implements OnInit {
   readonly isLoading = signal(false);
   readonly isLoadingPlans = signal(true);
   readonly error = signal<string | null>(null);
+  readonly errorSuggestion = signal<string | null>(null);
   readonly showSuccessModal = signal(false);
+  readonly showCopiedToast = signal(false);
   readonly plans = signal<Plan[]>([]);
-  readonly createdTenant = signal<{
-    slug: string;
-    status: string;
-    adminPassword?: string;
-  } | null>(null);
+  readonly createdTenant = signal<CreateTenantResponse | null>(null);
 
   // Form
   readonly tenantForm: FormGroup;
 
   constructor() {
     this.tenantForm = this.fb.group({
-      slug: [
-        '',
-        [
-          Validators.required,
-          Validators.minLength(3),
-          Validators.maxLength(50),
-          Validators.pattern(/^[a-z0-9-]+$/),
-        ],
-      ],
       name: [
         '',
         [
@@ -893,6 +1243,8 @@ export class TenantCreateComponent implements OnInit {
           Validators.maxLength(100),
         ],
       ],
+      slug: ['', [Validators.required]], // Se genera automáticamente
+      adminEmail: ['', [Validators.required, emailWithDomainValidator]],
       planCode: [null, [Validators.required]],
     });
   }
@@ -914,6 +1266,15 @@ export class TenantCreateComponent implements OnInit {
     }
   }
 
+  /**
+   * Genera el slug automáticamente cuando cambia el nombre
+   */
+  onNameChange(): void {
+    const name = this.tenantForm.get('name')?.value || '';
+    const slug = normalizeToSlug(name);
+    this.tenantForm.patchValue({ slug }, { emitEvent: false });
+  }
+
   isFieldInvalid(fieldName: string): boolean {
     const field = this.tenantForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
@@ -927,21 +1288,33 @@ export class TenantCreateComponent implements OnInit {
 
     this.isLoading.set(true);
     this.error.set(null);
+    this.errorSuggestion.set(null);
 
     try {
-      const response = await this.tenantService.createTenant(
-        this.tenantForm.value
-      );
+      const formValue = this.tenantForm.value;
+      const response = await this.tenantService.createTenant({
+        slug: formValue.slug,
+        name: formValue.name,
+        planCode: formValue.planCode,
+        adminEmail: formValue.adminEmail,
+      });
 
       this.createdTenant.set(response);
       this.showSuccessModal.set(true);
       this.tenantForm.reset();
-    } catch (err) {
-      this.error.set(
-        err instanceof Error
-          ? err.message
-          : 'Error al crear el tenant. Inténtalo de nuevo.'
-      );
+    } catch (err: unknown) {
+      // Intentar extraer error y sugerencia del backend
+      const errorResponse = (err as { error?: CreateTenantError })?.error;
+      if (errorResponse?.error) {
+        this.error.set(errorResponse.error);
+        if (errorResponse.suggestion) {
+          this.errorSuggestion.set(errorResponse.suggestion);
+        }
+      } else if (err instanceof Error) {
+        this.error.set(err.message);
+      } else {
+        this.error.set('Error al crear el comercio. Inténtalo de nuevo.');
+      }
     } finally {
       this.isLoading.set(false);
     }
@@ -957,20 +1330,29 @@ export class TenantCreateComponent implements OnInit {
     this.goBack();
   }
 
-  viewTenantDetails(): void {
+  getAccessUrl(): string {
     const tenant = this.createdTenant();
-    if (tenant) {
-      this.showSuccessModal.set(false);
-      // Aquí usaremos el slug para buscar el ID
-      this.router.navigate(['/admin/tenants']);
+    if (!tenant) return '';
+
+    // En desarrollo usa localhost, en producción usaría el dominio real
+    const baseUrl = window.location.origin;
+    return `${baseUrl}?tenant=${tenant.slug}`;
+  }
+
+  openAccessUrl(): void {
+    const url = this.getAccessUrl();
+    if (url) {
+      window.open(url, '_blank');
     }
   }
 
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text).then(
       () => {
-        // Podrías agregar un toast notification aquí
-        console.log('Copiado al portapapeles');
+        this.showCopiedToast.set(true);
+        setTimeout(() => {
+          this.showCopiedToast.set(false);
+        }, 2000);
       },
       (err) => {
         console.error('Error al copiar:', err);

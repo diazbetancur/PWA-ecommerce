@@ -16,57 +16,60 @@ import { TenantBootstrapService, TenantContextService } from '@pwa/core';
     <div class="dashboard">
       <!-- Mostrar loader mientras carga el tenant -->
       @if (tenantBootstrap.isLoading()) {
-        <div class="loading">
-          <p>Cargando configuración del tenant...</p>
-        </div>
+      <div class="loading">
+        <p>Cargando configuración del tenant...</p>
+      </div>
       }
 
       <!-- Mostrar error si falla -->
       @else if (tenantBootstrap.hasErrorState()) {
-        <div class="error">
-          <p>Error: {{ tenantBootstrap.error()?.message }}</p>
-          <button (click)="retryLoad()">Reintentar</button>
-        </div>
+      <div class="error">
+        <p>Error: {{ tenantBootstrap.error()?.message }}</p>
+        <button (click)="retryLoad()">Reintentar</button>
+      </div>
       }
 
       <!-- Mostrar contenido cuando está listo -->
       @else if (tenantBootstrap.isReady()) {
-        <div class="content">
-          <h1>Bienvenido a {{ displayName() }}</h1>
-          <p>Tenant: {{ tenantSlug() }}</p>
-          <p>Moneda: {{ currency() }}</p>
-          <p>Locale: {{ locale() }}</p>
+      <div class="content">
+        <h1>Bienvenido a {{ displayName() }}</h1>
+        <p>Tenant: {{ tenantSlug() }}</p>
+        <p>Moneda: {{ currency() }}</p>
+        <p>Locale: {{ locale() }}</p>
 
-          <!-- Usar colores del tenant -->
-          <button [style.background-color]="primaryColor()">
-            Botón con color del tenant
-          </button>
-        </div>
+        <!-- Usar colores del tenant -->
+        <button [style.background-color]="primaryColor()">
+          Botón con color del tenant
+        </button>
+      </div>
       }
     </div>
   `,
-  styles: [`
-    .dashboard {
-      padding: 2rem;
-    }
+  styles: [
+    `
+      .dashboard {
+        padding: 2rem;
+      }
 
-    .loading, .error {
-      text-align: center;
-      padding: 3rem;
-    }
+      .loading,
+      .error {
+        text-align: center;
+        padding: 3rem;
+      }
 
-    .error {
-      color: var(--tenant-accent-color, #dc2626);
-    }
+      .error {
+        color: var(--tenant-accent-color, #dc2626);
+      }
 
-    button {
-      color: white;
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  `]
+      button {
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    `,
+  ],
 })
 export class DashboardComponent {
   // Inyectar servicios
@@ -74,24 +77,19 @@ export class DashboardComponent {
   readonly tenantContext = inject(TenantContextService);
 
   // Computed properties para reactividad automática
-  readonly displayName = computed(() =>
-    this.tenantBootstrap.currentTenant()?.tenant.displayName || 'Cargando...'
+  readonly displayName = computed(
+    () =>
+      this.tenantBootstrap.currentTenant()?.tenant.displayName || 'Cargando...'
   );
 
-  readonly tenantSlug = computed(() =>
-    this.tenantContext.tenantSlug()
-  );
+  readonly tenantSlug = computed(() => this.tenantContext.tenantSlug());
 
-  readonly currency = computed(() =>
-    this.tenantContext.currency()
-  );
+  readonly currency = computed(() => this.tenantContext.currency());
 
-  readonly locale = computed(() =>
-    this.tenantContext.locale()
-  );
+  readonly locale = computed(() => this.tenantContext.locale());
 
-  readonly primaryColor = computed(() =>
-    this.tenantBootstrap.currentTenant()?.theme.primary || '#1976d2'
+  readonly primaryColor = computed(
+    () => this.tenantBootstrap.currentTenant()?.theme.primary || '#1976d2'
   );
 
   // Método para reintentar carga
@@ -140,7 +138,7 @@ export class ProductService {
 
     return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: currency
+      currency: currency,
     }).format(price);
   }
 
@@ -198,68 +196,71 @@ export class ProductService {
       <button (click)="clearCache()">Limpiar Cache</button>
     </div>
   `,
-  styles: [`
-    .tenant-info {
-      background: var(--tenant-background-color, white);
-      border: 1px solid var(--tenant-primary-color, #ccc);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin: 1rem 0;
-    }
+  styles: [
+    `
+      .tenant-info {
+        background: var(--tenant-background-color, white);
+        border: 1px solid var(--tenant-primary-color, #ccc);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+      }
 
-    .info-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      margin: 1rem 0;
-    }
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin: 1rem 0;
+      }
 
-    .info-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
 
-    .info-item strong {
-      color: var(--tenant-primary-color, #1976d2);
-      font-size: 0.875rem;
-    }
+      .info-item strong {
+        color: var(--tenant-primary-color, #1976d2);
+        font-size: 0.875rem;
+      }
 
-    .status {
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      display: inline-block;
-    }
+      .status {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        display: inline-block;
+      }
 
-    .status.resolved {
-      background: #d4edda;
-      color: #155724;
-    }
+      .status.resolved {
+        background: #d4edda;
+        color: #155724;
+      }
 
-    .status.error, .status.not-found {
-      background: #f8d7da;
-      color: #721c24;
-    }
+      .status.error,
+      .status.not-found {
+        background: #f8d7da;
+        color: #721c24;
+      }
 
-    .status.resolving {
-      background: #fff3cd;
-      color: #856404;
-    }
+      .status.resolving {
+        background: #fff3cd;
+        color: #856404;
+      }
 
-    button {
-      margin-right: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: var(--tenant-primary-color, #1976d2);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
+      button {
+        margin-right: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: var(--tenant-primary-color, #1976d2);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
 
-    button:hover {
-      opacity: 0.9;
-    }
-  `]
+      button:hover {
+        opacity: 0.9;
+      }
+    `,
+  ],
 })
 export class TenantInfoComponent {
   readonly tenantBootstrap = inject(TenantBootstrapService);
@@ -274,7 +275,7 @@ export class TenantInfoComponent {
       status: debug.status,
       hasError: debug.hasError,
       isReady: debug.isReady,
-      cacheSize: debug.cacheSize
+      cacheSize: debug.cacheSize,
     });
   }
 
@@ -291,7 +292,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'tenantPrice',
-  standalone: true
+  standalone: true,
 })
 export class TenantPricePipe implements PipeTransform {
   private readonly tenantContext = inject(TenantContextService);
@@ -302,7 +303,7 @@ export class TenantPricePipe implements PipeTransform {
 
     return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: currency
+      currency: currency,
     }).format(value);
   }
 }
@@ -340,7 +341,7 @@ import { effect } from '@angular/core';
 
 @Component({
   selector: 'app-analytics',
-  template: `<div>Analytics tracking...</div>`
+  template: `<div>Analytics tracking...</div>`,
 })
 export class AnalyticsComponent {
   private readonly tenantBootstrap = inject(TenantBootstrapService);
@@ -353,7 +354,10 @@ export class AnalyticsComponent {
       if (tenant && this.tenantBootstrap.isReady()) {
         // Inicializar analytics con datos del tenant
         this.initializeAnalytics(tenant.tenant.slug);
-        console.log('📊 Analytics inicializado para tenant:', tenant.tenant.displayName);
+        console.log(
+          '📊 Analytics inicializado para tenant:',
+          tenant.tenant.displayName
+        );
       }
     });
 
@@ -383,7 +387,7 @@ import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-theme-manager',
-  template: `<div>Theme Manager</div>`
+  template: `<div>Theme Manager</div>`,
 })
 export class ThemeManagerComponent implements OnInit, OnDestroy {
   private readonly tenantBootstrap = inject(TenantBootstrapService);
@@ -391,12 +395,17 @@ export class ThemeManagerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Suscribirse a cambios del tenant (si necesitas RxJS)
-    this.subscription = this.tenantBootstrap.tenantConfig$.subscribe(config => {
-      if (config) {
-        console.log('🎨 Tenant config actualizado:', config.tenant.displayName);
-        this.applyTheme(config.theme);
+    this.subscription = this.tenantBootstrap.tenantConfig$.subscribe(
+      (config) => {
+        if (config) {
+          console.log(
+            '🎨 Tenant config actualizado:',
+            config.tenant.displayName
+          );
+          this.applyTheme(config.theme);
+        }
       }
-    });
+    );
   }
 
   ngOnDestroy() {

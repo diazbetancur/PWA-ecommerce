@@ -1,8 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Router, RouterLink } from '@angular/router';
-import { TenantContextService } from '@pwa/core';
+import {
+  AuthService,
+  ModeSelectorDialogComponent,
+  TenantContextService,
+  UserModeService,
+} from '@pwa/core';
 import { AccountService } from '../../services';
 
 @Component({
@@ -17,6 +23,9 @@ export class RegisterComponent {
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
   private readonly tenantContext = inject(TenantContextService);
+  private readonly userModeService = inject(UserModeService);
+  private readonly dialog = inject(MatDialog);
+  private readonly authService = inject(AuthService);
 
   readonly showPassword = signal(false);
   readonly showConfirmPassword = signal(false);
@@ -58,11 +67,86 @@ export class RegisterComponent {
     try {
       const values = this.registerForm.getRawValue();
       await this.accountService.register(values);
-      await this.router.navigate(['/']);
+
+      // Determinar redirección basada en roles del usuario
+      await this.navigateAfterRegister();
     } catch (error) {
       this.errorMessage.set(
         error instanceof Error ? error.message : 'Error al registrar usuario'
       );
+    }
+  }
+
+  /**
+   * Navega a la ruta apropiada después del registro según los roles del usuario
+   */
+  private async navigateAfterRegister(): Promise<void> {
+    // Inicializar el servicio de modo
+    this.userModeService.init();
+
+    // Verificar si hay tenant activo en el contexto
+    const tenantSlug = this.tenantContext.tenantSlug();
+    const hasTenant = !!tenantSlug;
+    console.log('[RegisterComponent] Tenant slug:', tenantSlug);
+    console.log('[RegisterComponent] Has active tenant:', hasTenant);
+
+    // Obtener roles del token
+    const claims = this.authService.claims;
+    const roles = claims?.roles || [];
+    console.log('[RegisterComponent] User roles from token:', roles);
+
+    // Normalizar roles para comparación
+    const normalizedRoles = roles.map((r) =>
+      r.toLowerCase().replaceAll('_', '')
+    );
+    const isSuperAdmin = normalizedRoles.includes('superadmin');
+
+    // 1️⃣ Si es SuperAdmin SIN tenant activo → Admin General
+    if (isSuperAdmin && !hasTenant) {
+      console.log(
+        '[RegisterComponent] → Path: SuperAdmin without tenant - navigating to /admin'
+      );
+      await this.router.navigate(['/admin']);
+      return;
+    }
+
+    // 2️⃣ Si es SuperAdmin CON tenant activo → Admin del Tenant
+    if (isSuperAdmin && hasTenant) {
+      console.log(
+        '[RegisterComponent] → Path: SuperAdmin with tenant - navigating to /tenant-admin'
+      );
+      await this.router.navigate(['/tenant-admin']);
+      return;
+    }
+
+    // Si tiene múltiples roles, mostrar selector de modo
+    if (this.userModeService.hasMultipleRoles()) {
+      const dialogRef = this.dialog.open(ModeSelectorDialogComponent, {
+        disableClose: true,
+        width: '600px',
+        maxWidth: '90vw',
+      });
+
+      const { firstValueFrom } = await import('rxjs');
+      const selectedMode = await firstValueFrom(dialogRef.afterClosed());
+
+      if (selectedMode === 'customer') {
+        await this.router.navigate(['/']);
+      } else if (selectedMode === 'employee') {
+        await this.router.navigate(['/tenant-admin']);
+      }
+    }
+    // Si solo es Customer, ir al catálogo
+    else if (this.userModeService.isCustomerOnly()) {
+      await this.router.navigate(['/']);
+    }
+    // Si solo tiene roles de empleado (sin Customer), ir directo a admin
+    else if (this.userModeService.hasEmployeeRoles()) {
+      await this.router.navigate(['/tenant-admin']);
+    }
+    // Fallback: ir al home
+    else {
+      await this.router.navigate(['/']);
     }
   }
 

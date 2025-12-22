@@ -21,31 +21,37 @@ Hemos implementado una arquitectura robusta y escalable para manejar múltiples 
 ## 🔧 Configuración de Entornos
 
 ### 1. Development (Mock API) - Por defecto
+
 ```bash
 npm start
 ```
 
 **Configuración**: `environment.ts`
+
 - ✅ Mock API habilitado
 - ✅ Logging completo
 - ✅ Todas las features habilitadas para testing
 
 ### 2. Development (Azure Real API)
+
 ```bash
 npm run start:real
 ```
 
 **Configuración**: `environment.development-real.ts`
+
 - 🌐 API Real: `https://api-ecommerce-d9fxeccbeeehdjd3.eastus-01.azurewebsites.net`
 - ✅ Logging completo para debugging
 - ✅ Features de notificaciones habilitadas
 
 ### 3. Production
+
 ```bash
 npm run build:prod
 ```
 
 **Configuración**: `environment.prod.ts`
+
 - 🌐 API Real: `https://api-ecommerce-d9fxeccbeeehdjd3.eastus-01.azurewebsites.net`
 - ⚠️ Logging mínimo (solo warnings y errores)
 - ✅ Analytics habilitado
@@ -81,7 +87,7 @@ private readonly env = inject(AppEnvService);
 
 // Verificar entorno
 env.isProduction           // true/false
-env.isDevelopment          // true/false  
+env.isDevelopment          // true/false
 env.useMockApi            // true/false
 env.useRealApi            // true/false
 
@@ -143,27 +149,30 @@ export class MyComponent {
 
 ```typescript
 // GET request tipado
-this.apiClient.get<Product[]>('/api/products').subscribe(products => {
+this.apiClient.get<Product[]>('/api/products').subscribe((products) => {
   // products es tipado como Product[]
 });
 
 // POST con tipado completo
-this.apiClient.post<OrderResponse, CreateOrderDto>(
-  '/api/orders',
-  newOrderData
-).subscribe(response => {
+this.apiClient.post<OrderResponse, CreateOrderDto>('/api/orders', newOrderData).subscribe((response) => {
   // response es tipado como OrderResponse
 });
 
 // Con opciones personalizadas
-this.apiClient.get<User>('/api/user/profile', {
-  headers: { 'Custom-Header': 'value' }
-}, {
-  enableLogging: true,
-  timeout: 5000
-}).subscribe(user => {
-  // Configuración personalizada aplicada
-});
+this.apiClient
+  .get<User>(
+    '/api/user/profile',
+    {
+      headers: { 'Custom-Header': 'value' },
+    },
+    {
+      enableLogging: true,
+      timeout: 5000,
+    }
+  )
+  .subscribe((user) => {
+    // Configuración personalizada aplicada
+  });
 ```
 
 ---
@@ -173,12 +182,12 @@ this.apiClient.get<User>('/api/user/profile', {
 ```json
 {
   "scripts": {
-    "start": "nx serve ecommerce",                        // Development (Mock)
+    "start": "nx serve ecommerce", // Development (Mock)
     "start:real": "nx serve ecommerce --configuration=development-real", // Development (Real API)
-    "start:prod": "nx serve ecommerce --configuration=production",        // Production local
-    "build": "nx build ecommerce",                        // Build development
+    "start:prod": "nx serve ecommerce --configuration=production", // Production local
+    "build": "nx build ecommerce", // Build development
     "build:real": "nx build ecommerce --configuration=development-real", // Build dev-real
-    "build:prod": "nx build ecommerce --configuration=production",       // Build production
+    "build:prod": "nx build ecommerce --configuration=production", // Build production
     "build:prod:browser": "nx build ecommerce --configuration=production-browser" // Browser build
   }
 }
@@ -218,22 +227,22 @@ export interface AppEnvironment {
 ```typescript
 export const environment: AppEnvironment = {
   production: false,
-  mockApi: false,  // 🔥 API real habilitado
+  mockApi: false, // 🔥 API real habilitado
   apiBaseUrl: 'https://api-ecommerce-d9fxeccbeeehdjd3.eastus-01.azurewebsites.net',
   useTenantHeader: true,
   fcm: {
-    vapidPublicKey: 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY'
+    vapidPublicKey: 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY',
   },
   logging: {
-    level: 'debug',   // Full logging para desarrollo
-    enableConsole: true
+    level: 'debug', // Full logging para desarrollo
+    enableConsole: true,
   },
   features: {
     advancedSearch: true,
     darkMode: true,
-    notifications: true,  // Habilitado para probar con backend real
-    analytics: false
-  }
+    notifications: true, // Habilitado para probar con backend real
+    analytics: false,
+  },
 };
 ```
 
@@ -256,7 +265,7 @@ import { EnvironmentDemoComponent } from '@shared/demos/environment-demo.compone
 
 @Component({
   imports: [EnvironmentDemoComponent],
-  template: '<app-environment-demo />'
+  template: '<app-environment-demo />',
 })
 export class MyPageComponent {}
 ```
@@ -274,7 +283,7 @@ private readonly env = inject(AppEnvService);
 ngOnInit() {
   // Ver toda la configuración
   console.log('Environment Info:', this.env.getEnvironmentInfo());
-  
+
   // Validar configuración
   const validation = this.env.validateEnvironment();
   if (!validation.isValid) {
@@ -289,7 +298,7 @@ ngOnInit() {
 // Test básico de conectividad
 this.apiClient.get('/health').subscribe({
   next: (response) => console.log('✅ API Connected:', response),
-  error: (error) => console.error('❌ API Error:', error)
+  error: (error) => console.error('❌ API Error:', error),
 });
 ```
 
@@ -302,14 +311,16 @@ El sistema automáticamente incluye headers de tenant si `useTenantHeader: true`
 ## 🚀 Próximos Pasos
 
 ### 1. Configurar FCM (Firebase Cloud Messaging)
+
 ```typescript
 // Reemplazar en todos los environments
 fcm: {
-  vapidPublicKey: 'TU_VAPID_KEY_REAL'
+  vapidPublicKey: 'TU_VAPID_KEY_REAL';
 }
 ```
 
 ### 2. Configurar Analytics (Solo Production)
+
 ```typescript
 // En environment.prod.ts
 analytics: {
@@ -319,6 +330,7 @@ analytics: {
 ```
 
 ### 3. Personalizar Feature Flags
+
 ```typescript
 // Añadir nuevas features según tus necesidades
 features: {
@@ -337,9 +349,9 @@ Asegúrate de que tu backend de Azure permita requests desde tu dominio:
 ```javascript
 // Dominios permitidos
 const allowedOrigins = [
-  'http://localhost:4200',      // Development
-  'https://tu-dominio.com',     // Production
-  'https://preview-*.vercel.app' // Vercel previews
+  'http://localhost:4200', // Development
+  'https://tu-dominio.com', // Production
+  'https://preview-*.vercel.app', // Vercel previews
 ];
 ```
 
@@ -348,6 +360,7 @@ const allowedOrigins = [
 ## 💡 Mejores Prácticas
 
 ### 1. Usar el AppEnvService siempre
+
 ```typescript
 // ✅ Correcto
 private readonly env = inject(AppEnvService);
@@ -359,6 +372,7 @@ const apiUrl = environment.apiBaseUrl;
 ```
 
 ### 2. Feature Flags para nuevas funcionalidades
+
 ```typescript
 // ✅ Usar feature flags para código experimental
 if (this.env.isFeatureEnabled('newFeature')) {
@@ -367,6 +381,7 @@ if (this.env.isFeatureEnabled('newFeature')) {
 ```
 
 ### 3. Logging condicionado
+
 ```typescript
 // ✅ Usar el sistema de logging del entorno
 if (this.env.isConsoleLoggingEnabled) {

@@ -10,11 +10,13 @@
 ### ✅ Nuevos Archivos
 
 1. **`scripts/inject-env-vars.js`**
+
    - Script que lee variables de entorno de Vercel
    - Genera `environment.runtime.ts` en build-time
    - Muestra output colorizado con información del proceso
 
 2. **`.env.example`**
+
    - Plantilla con todas las variables soportadas
    - Comentarios explicativos para cada variable
    - Instrucciones de uso para local y Vercel
@@ -28,19 +30,23 @@
 ### ✅ Archivos Modificados
 
 4. **`package.json`**
+
    - Agregado: `prebuild:vercel` (ejecuta script de inyección)
    - Agregado: `build:vercel` (usa configuración production-vercel)
    - Actualizado: `vercel-build` (ejecuta ambos en secuencia)
 
 5. **`apps/pwa/project.json`**
+
    - Agregada configuración: `production-vercel`
    - File replacement: usa `environment.runtime.ts` en lugar de `environment.ts`
 
 6. **`vercel.json`**
+
    - Agregado: `installCommand`
    - Mantiene: `buildCommand` apuntando a `vercel-build`
 
 7. **`.gitignore`**
+
    - Agregado: `.env`, `.env.local`, `.env.*.local`
    - Agregado: `environment.runtime.ts` (archivo generado)
 
@@ -68,6 +74,7 @@ npm run vercel-build
 ```
 
 **Flujo**:
+
 ```
 1. Ejecuta: node scripts/inject-env-vars.js
    ├─ Lee: process.env.NG_APP_API_BASE_URL
@@ -83,14 +90,14 @@ npm run vercel-build
 
 ### 3. **Variables de Entorno Soportadas**
 
-| Variable | Default | Descripción |
-|----------|---------|-------------|
-| `NG_APP_API_BASE_URL` | URL de Azure | **Requerida**: URL del backend |
-| `NG_APP_VAPID_PUBLIC_KEY` | Placeholder | Clave VAPID para FCM |
-| `NG_APP_GA_TRACKING_ID` | `undefined` | ID de Google Analytics |
-| `NG_APP_ENABLE_ANALYTICS` | `false` | Habilitar/deshabilitar analytics |
-| `NG_APP_LOG_LEVEL` | `warn` | Nivel de logs: debug/info/warn/error |
-| `NG_APP_ENABLE_CONSOLE` | `false` | Habilitar console.log en producción |
+| Variable                  | Default      | Descripción                          |
+| ------------------------- | ------------ | ------------------------------------ |
+| `NG_APP_API_BASE_URL`     | URL de Azure | **Requerida**: URL del backend       |
+| `NG_APP_VAPID_PUBLIC_KEY` | Placeholder  | Clave VAPID para FCM                 |
+| `NG_APP_GA_TRACKING_ID`   | `undefined`  | ID de Google Analytics               |
+| `NG_APP_ENABLE_ANALYTICS` | `false`      | Habilitar/deshabilitar analytics     |
+| `NG_APP_LOG_LEVEL`        | `warn`       | Nivel de logs: debug/info/warn/error |
+| `NG_APP_ENABLE_CONSOLE`   | `false`      | Habilitar console.log en producción  |
 
 ---
 
@@ -147,16 +154,19 @@ NG_APP_ENABLE_CONSOLE = true
 **Framework Preset**: Other (o auto-detect)
 
 **Build Command**:
+
 ```bash
 npm run vercel-build
 ```
 
 **Output Directory**:
+
 ```
 dist/apps/ecommerce/browser
 ```
 
 **Install Command**:
+
 ```bash
 npm install
 ```
@@ -282,6 +292,7 @@ node scripts/inject-env-vars.js
 ### ❌ Variables no se aplican en Vercel
 
 **Solución**:
+
 1. Verifica que agregaste las variables en **Environment Variables**
 2. Asegúrate de seleccionar **Production** (o Preview/Development)
 3. **Redeploy** el proyecto (las variables solo se aplican en nuevos builds)
@@ -289,6 +300,7 @@ node scripts/inject-env-vars.js
 ### ❌ API URL incorrecta en producción
 
 **Solución**:
+
 ```bash
 # 1. Verifica la variable en Vercel Dashboard
 Project Settings > Environment Variables > NG_APP_API_BASE_URL

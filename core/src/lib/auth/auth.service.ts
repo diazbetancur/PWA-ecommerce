@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthResponse, JwtPayload, UserProfile } from '../models/types';
 import { ApiClientService } from '../services/api-client.service';
+import { TenantConfigService } from '../services/tenant-config.service';
 
 const STORAGE_PREFIX = 'mtkn_';
 const SUPERADMIN_TOKEN_KEY = 'superadmin_token';
@@ -9,37 +10,25 @@ const SUPERADMIN_TOKEN_KEY = 'superadmin_token';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly apiClient = inject(ApiClientService);
-
+  private readonly tenantConfig = inject(TenantConfigService);
   private readonly _jwt = signal<string | null>(null);
   private readonly _claims = signal<JwtPayload | null>(null);
-  private _tenantSlug: string | null = null;
   private readonly _isSuperAdmin = signal<boolean>(false);
+  private _tenantSlug: string | null = null;
 
-  /**
-   * Inicializa el servicio para un tenant específico
-   */
   init(tenantSlug: string) {
     this._tenantSlug = tenantSlug;
     const token = globalThis.localStorage?.getItem(STORAGE_PREFIX + tenantSlug);
     if (token) this.setToken(token);
   }
 
-  /**
-   * Inicializa el servicio en modo superadmin (sin tenant)
-   * Este método se usa cuando el usuario accede al panel de administración general
-   */
   initSuperAdmin() {
     this._tenantSlug = null;
     this._isSuperAdmin.set(true);
     const token = globalThis.localStorage?.getItem(SUPERADMIN_TOKEN_KEY);
-    if (token) {
-      this.setToken(token);
-    }
+    if (token) this.setToken(token);
   }
 
-  /**
-   * Establece el token JWT y extrae los claims
-   */
   setToken(token: string) {
     this._jwt.set(token);
     try {
@@ -48,9 +37,8 @@ export class AuthService {
       const claims = JSON.parse(json);
       this._claims.set(claims);
 
-      // Detectar si es token de superadmin (soporta variantes y array)
       const roleStr = Array.isArray(claims.role) ? claims.role[0] : claims.role;
-      const normalizedRole = roleStr?.toLowerCase().replace(/_/g, '');
+      const normalizedRole = roleStr?.toLowerCase().replaceAll('_', '');
       const isSuperAdmin =
         claims.isSuperAdmin === true || normalizedRole === 'superadmin';
       this._isSuperAdmin.set(isSuperAdmin);
@@ -59,7 +47,6 @@ export class AuthService {
       this._isSuperAdmin.set(false);
     }
 
-    // Guardar token en localStorage
     if (this._isSuperAdmin()) {
       globalThis.localStorage?.setItem(SUPERADMIN_TOKEN_KEY, token);
     } else if (this._tenantSlug) {
@@ -70,9 +57,6 @@ export class AuthService {
     }
   }
 
-  /**
-   * Limpia el token y los claims
-   */
   clear() {
     this._jwt.set(null);
     this._claims.set(null);
@@ -82,7 +66,6 @@ export class AuthService {
     } else if (this._tenantSlug) {
       globalThis.localStorage?.removeItem(STORAGE_PREFIX + this._tenantSlug);
     }
-
     this._isSuperAdmin.set(false);
   }
 
@@ -94,9 +77,6 @@ export class AuthService {
     return this._claims();
   }
 
-  /**
-   * Verifica si el usuario actual es superadmin
-   */
   get isSuperAdmin() {
     return this._isSuperAdmin();
   }
@@ -107,124 +87,82 @@ export class AuthService {
   }
 
   hasRole(role: string) {
-    const userRole = this._claims()?.role;
-    const roleStr = Array.isArray(userRole) ? userRole[0] : userRole;
-    // Comparación normalizada
+    const roles = this._claims()?.roles;
+    const roleStr = Array.isArray(roles) ? roles[0] : roles;
     return (
-      roleStr?.toLowerCase().replace(/_/g, '') ===
-      role.toLowerCase().replace(/_/g, '')
+      roleStr?.toLowerCase().replaceAll('_', '') ===
+      role.toLowerCase().replaceAll('_', '')
     );
   }
 
-  hasPermission(permission: string) {
-    return this._claims()?.permissions?.includes(permission) ?? false;
-  }
-
   /**
-   * Verifica si el usuario tiene todos los permisos especificados
+   * Verifica si el usuario tiene acceso a un módulo específico
+   * @param module - Nombre del módulo (ej: 'products', 'categories')
    */
-  hasAllPermissions(permissions: string[]): boolean {
-    const userPermissions = this._claims()?.permissions || [];
-
-    // Wildcard permission
-    if (userPermissions.includes('*')) {
-      return true;
-    }
-
-    return permissions.every((permission) =>
-      userPermissions.includes(permission)
-    );
+  hasPermission(module: string): boolean {
+    const modules = this._claims()?.modules || [];
+    return modules.some((m) => m.toLowerCase() === module.toLowerCase());
   }
 
   /**
-   * Verifica si el usuario tiene al menos uno de los permisos especificados
+   * Verifica si el usuario tiene acceso a todos los módulos especificados
    */
-  hasAnyPermission(permissions: string[]): boolean {
-    const userPermissions = this._claims()?.permissions || [];
-
-    // Wildcard permission
-    if (userPermissions.includes('*')) {
-      return true;
-    }
-
-    return permissions.some((permission) =>
-      userPermissions.includes(permission)
+  hasAllPermissions(modules: string[]): boolean {
+    const userModules = this._claims()?.modules || [];
+    return modules.every((module) =>
+      userModules.some((m) => m.toLowerCase() === module.toLowerCase())
     );
   }
 
   /**
-   * Obtiene todos los permisos del usuario actual
+   * Verifica si el usuario tiene acceso a alguno de los módulos especificados
+   */
+  hasAnyPermission(modules: string[]): boolean {
+    const userModules = this._claims()?.modules || [];
+    return modules.some((module) =>
+      userModules.some((m) => m.toLowerCase() === module.toLowerCase())
+    );
+  }
+
+  /**
+   * Obtiene la lista de módulos permitidos para el usuario
    */
   getPermissions(): string[] {
-    return this._claims()?.permissions || [];
+    return this._claims()?.modules || [];
   }
 
-  /**
-   * Obtiene el rol del usuario actual (normalizado como string)
-   */
   getRole(): string | undefined {
-    const role = this._claims()?.role;
-    // Si es array, retornar el primer elemento
-    return Array.isArray(role) ? role[0] : role;
+    const roles = this._claims()?.roles;
+    return Array.isArray(roles) ? roles[0] : roles;
   }
 
-  /**
-   * Login universal que detecta automáticamente el endpoint correcto
-   * - Con tenant: usa /auth/login (con X-Tenant-Slug header automático)
-   * - Sin tenant: usa /admin/auth/login (modo superadmin, sin X-Tenant-Slug)
-   */
   async login(credentials: {
     email: string;
     password: string;
     rememberMe?: boolean;
   }): Promise<void> {
-    // Detectar si hay tenant activo
-    const hasTenant = this._tenantSlug !== null;
+    // Verificar si hay tenant activo desde TenantConfigService
+    const hasTenant = !!this.tenantConfig.tenantSlug;
     const endpoint = hasTenant ? '/auth/login' : '/admin/auth/login';
 
-    console.log('🔐 [AuthService] Login ->', {
-      hasTenant,
-      endpoint,
-      tenantSlug: this._tenantSlug,
-    });
-
-    try {
-      // Si no hay tenant, inicializar modo superadmin
-      if (!hasTenant) {
-        this.initSuperAdmin();
-      }
-
-      // Llamar al endpoint correspondiente
-      const response = await firstValueFrom(
-        this.apiClient.post<AuthResponse>(endpoint, {
-          email: credentials.email,
-          password: credentials.password,
-        })
-      );
-
-      if (!response?.token) {
-        throw new Error('No se recibió token del servidor');
-      }
-
-      // Establecer el token recibido
-      this.setToken(response.token);
-
-      console.log('✅ [AuthService] Login exitoso', {
-        isSuperAdmin: this._isSuperAdmin(),
-        role: this.getRole(),
-        tenantSlug: this._tenantSlug,
-        expiresAt: response.expiresAt,
-      });
-    } catch (error) {
-      console.error('❌ [AuthService] Error en login:', error);
-      throw error;
+    if (!hasTenant) {
+      this.initSuperAdmin();
     }
+
+    const response = await firstValueFrom(
+      this.apiClient.post<AuthResponse>(endpoint, {
+        email: credentials.email,
+        password: credentials.password,
+      })
+    );
+
+    if (!response?.token) {
+      throw new Error('No se recibió token del servidor');
+    }
+
+    this.setToken(response.token);
   }
 
-  /**
-   * Registro de usuario (solo para tenants, requiere X-Tenant-Slug)
-   * POST /auth/register
-   */
   async register(data: {
     email: string;
     password: string;
@@ -236,62 +174,29 @@ export class AuthService {
       throw new Error('El registro requiere un tenant activo');
     }
 
-    console.log('📝 [AuthService] Registro ->', {
-      endpoint: '/auth/register',
-      tenantSlug: this._tenantSlug,
-    });
+    const response = await firstValueFrom(
+      this.apiClient.post<AuthResponse>('/auth/register', data)
+    );
 
-    try {
-      const response = await firstValueFrom(
-        this.apiClient.post<AuthResponse>('/auth/register', data)
-      );
-
-      if (!response?.token) {
-        throw new Error('No se recibió token del servidor');
-      }
-
-      // Establecer el token recibido
-      this.setToken(response.token);
-
-      console.log('✅ [AuthService] Registro exitoso', {
-        email: data.email,
-        tenantSlug: this._tenantSlug,
-      });
-    } catch (error) {
-      console.error('❌ [AuthService] Error en registro:', error);
-      throw error;
+    if (!response?.token) {
+      throw new Error('No se recibió token del servidor');
     }
+
+    this.setToken(response.token);
   }
 
-  /**
-   * Obtiene el perfil del usuario actual
-   * - Con tenant: GET /auth/me (con X-Tenant-Slug)
-   * - Sin tenant: GET /admin/auth/me (admin profile)
-   */
   async getProfile(): Promise<UserProfile> {
-    const hasTenant = this._tenantSlug !== null;
-    const endpoint = hasTenant ? '/auth/me' : '/admin/auth/me';
+    // Verificar si hay tenant activo
+    const hasTenant = !!this.tenantConfig.tenantSlug;
+    let endpoint = hasTenant ? '/auth/me' : '/admin/auth/me';
 
-    console.log('👤 [AuthService] Obtener perfil ->', {
-      hasTenant,
-      endpoint,
-      tenantSlug: this._tenantSlug,
-    });
-
-    try {
-      const profile = await firstValueFrom(
-        this.apiClient.get<UserProfile>(endpoint)
-      );
-
-      console.log('✅ [AuthService] Perfil obtenido', {
-        email: profile.email,
-        isSuperAdmin: this._isSuperAdmin(),
-      });
-
-      return profile;
-    } catch (error) {
-      console.error('❌ [AuthService] Error obteniendo perfil:', error);
-      throw error;
+    // Agregar tenant como query parameter si está disponible
+    if (hasTenant && this.tenantConfig.tenantSlug) {
+      endpoint = `${endpoint}?tenant=${encodeURIComponent(
+        this.tenantConfig.tenantSlug
+      )}`;
     }
+
+    return await firstValueFrom(this.apiClient.get<UserProfile>(endpoint));
   }
 }

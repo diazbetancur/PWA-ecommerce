@@ -36,7 +36,9 @@ export class HttpApiAdapter {
   categories: CategoriesApi = {
     list: () =>
       firstValueFrom(
-        this.apiClient.get<{ id: string; name: string; slug: string }[]>('/categories')
+        this.apiClient.get<{ id: string; name: string; slug: string }[]>(
+          '/categories'
+        )
       ),
   };
 
@@ -46,9 +48,7 @@ export class HttpApiAdapter {
         this.apiClient.get<{ items: CartItem[]; total: number }>('/cart')
       ),
     add: (productId: string, qty: number) =>
-      firstValueFrom(
-        this.apiClient.post<void>('/cart', { productId, qty })
-      ),
+      firstValueFrom(this.apiClient.post<void>('/cart', { productId, qty })),
     remove: (productId: string) =>
       firstValueFrom(this.apiClient.delete<void>(`/cart/${productId}`)),
   };
@@ -56,9 +56,7 @@ export class HttpApiAdapter {
   orders: OrdersApi = {
     list: () => firstValueFrom(this.apiClient.get<Order[]>('/orders')),
     create: (payload: { items: CartItem[]; total: number }) =>
-      firstValueFrom(
-        this.apiClient.post<{ id: string }>('/orders', payload)
-      ),
+      firstValueFrom(this.apiClient.post<{ id: string }>('/orders', payload)),
   };
 
   coupons: CouponsApi = {
@@ -151,9 +149,11 @@ export class HttpApiAdapter {
     metrics: {
       byTenant: (id: string) =>
         firstValueFrom(
-          this.apiClient.get<{ visits: number; sales: number; conversion: number }>(
-            `/super/metrics/${id}`
-          )
+          this.apiClient.get<{
+            visits: number;
+            sales: number;
+            conversion: number;
+          }>(`/super/metrics/${id}`)
         ),
     },
   };

@@ -64,7 +64,7 @@ function normalizeRole(role: string | string[] | undefined): string | null {
   const roleStr = Array.isArray(role) ? role[0] : role;
 
   // Normalizar: quitar guiones bajos y convertir a minúsculas
-  return roleStr?.toLowerCase().replace(/_/g, '') || null;
+  return roleStr?.toLowerCase().replaceAll('_', '') || null;
 }
 
 /**
@@ -85,7 +85,7 @@ function hasRequiredAccess(
   if (requiredRoles.length > 0 && normalizedRole) {
     // Normalizar roles requeridos también
     const normalizedRequired = requiredRoles.map((r) =>
-      r.toLowerCase().replace(/_/g, '')
+      r.toLowerCase().replaceAll('_', '')
     );
     if (normalizedRequired.includes(normalizedRole)) {
       return true;
@@ -186,7 +186,7 @@ export const adminPermissionGuard: CanActivateFn = (
     requiredPermissions,
     requiredRoles,
     userRole: claims.role,
-    userPermissions: claims.permissions,
+    userModules: claims.modules,
   });
 
   router.navigateByUrl(redirectTo);

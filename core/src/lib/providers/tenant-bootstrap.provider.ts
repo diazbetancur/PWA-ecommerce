@@ -27,7 +27,7 @@ export function tenantBootstrapFactory(): () => Promise<void> {
 export const provideTenantBootstrap = (): Provider => ({
   provide: APP_INITIALIZER,
   useFactory: tenantBootstrapFactory,
-  multi: true
+  multi: true,
 });
 
 /**

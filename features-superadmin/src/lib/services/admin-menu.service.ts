@@ -166,18 +166,37 @@ export class AdminMenuService {
   readonly filteredMenu = computed(() => {
     const claims = this.authService.claims;
 
+    console.log('[AdminMenuService] Computing filtered menu');
+    console.log('[AdminMenuService] Claims:', claims);
+
     if (!claims) {
+      console.log('[AdminMenuService] No claims - returning empty menu');
       return []; // Usuario no autenticado
     }
 
-    // Caso especial: usuarios con rol SUPER_ADMIN tienen acceso completo al menú
-    if (this.isSuperAdmin(claims.role, claims.permissions)) {
-      return this.sortMenuItems(this.baseMenuItems);
+    // Usar el nuevo sistema de roles (array) o detectar desde 'admin' flag
+    const roles = claims.roles || [];
+    const modules = claims.modules || [];
+    const isAdminFlag = claims.admin === 'true' || claims.admin === true;
+
+    console.log('[AdminMenuService] Roles:', roles);
+    console.log('[AdminMenuService] Modules:', modules);
+    console.log('[AdminMenuService] Admin flag:', isAdminFlag);
+
+    // Caso especial: usuarios con rol SUPER_ADMIN o admin flag tienen acceso completo al menú
+    if (this.isSuperAdmin(roles, modules, isAdminFlag)) {
+      console.log(
+        '[AdminMenuService] SuperAdmin/Admin detected - returning full menu'
+      );
+      const fullMenu = this.sortMenuItems(this.baseMenuItems);
+      console.log('[AdminMenuService] Full menu:', fullMenu);
+      return fullMenu;
     }
 
+    console.log('[AdminMenuService] Not SuperAdmin - filtering menu');
     // Filtrar recursivamente según permisos
     return this.sortMenuItems(
-      this.filterMenuItems(this.baseMenuItems, claims.role, claims.permissions)
+      this.filterMenuItems(this.baseMenuItems, roles, modules)
     );
   });
 
@@ -226,17 +245,17 @@ export class AdminMenuService {
   private filterMenuItems(
     items: AdminMenuItem[],
     userRole: string | string[] | undefined,
-    userPermissions: string[] | undefined
+    userModules: string[] | undefined
   ): AdminMenuItem[] {
     return items
-      .filter((item) => this.hasAccess(item, userRole, userPermissions))
+      .filter((item) => this.hasAccess(item, userRole, userModules))
       .map((item) => {
         // Si tiene hijos, filtrar recursivamente
         if (item.children && item.children.length > 0) {
           const filteredChildren = this.filterMenuItems(
             item.children,
             userRole,
-            userPermissions
+            userModules
           );
 
           // Solo incluir el item padre si tiene hijos visibles
@@ -261,7 +280,7 @@ export class AdminMenuService {
   private hasAccess(
     item: AdminMenuItem,
     userRole: string | string[] | undefined,
-    userPermissions: string[] | undefined
+    userModules: string[] | undefined
   ): boolean {
     // Si el item está deshabilitado, no mostrar
     if (item.disabled) {
@@ -278,7 +297,7 @@ export class AdminMenuService {
 
     // Normalizar el rol del usuario (puede ser string o array)
     const roleStr = Array.isArray(userRole) ? userRole[0] : userRole;
-    const normalizedUserRole = roleStr?.toLowerCase().replace(/_/g, '');
+    const normalizedUserRole = roleStr?.toLowerCase().replaceAll('_', '');
 
     // Verificar roles (lógica OR: al menos uno)
     if (
@@ -287,17 +306,17 @@ export class AdminMenuService {
       normalizedUserRole
     ) {
       const normalizedRequired = item.requiredRoles.map((r) =>
-        r.toLowerCase().replace(/_/g, '')
+        r.toLowerCase().replaceAll('_', '')
       );
       if (normalizedRequired.includes(normalizedUserRole)) {
         return true;
       }
     }
 
-    // Verificar permisos (lógica AND: todos)
+    // Verificar permisos (ahora basado en módulos)
     if (item.requiredPermissions && item.requiredPermissions.length > 0) {
       return item.requiredPermissions.every((permission) =>
-        userPermissions?.includes(permission)
+        userModules?.includes(permission)
       );
     }
 
@@ -307,18 +326,28 @@ export class AdminMenuService {
   /**
    * 👑 Verifica si el usuario es SUPER_ADMIN
    */
+  /**
+   * 🔐 Verifica si un usuario tiene rol de SuperAdmin
+   * @param userRole - Rol del usuario (puede ser string o array)
+   * @param userModules - Módulos del usuario (nuevo sistema de permisos)
+   * @param isAdminFlag - Flag directo de admin desde el token
+   */
   private isSuperAdmin(
     userRole: string | string[] | undefined,
-    userPermissions: string[] | undefined
+    userModules: string[] | undefined,
+    isAdminFlag?: boolean
   ): boolean {
+    // Si tiene el flag de admin directo, es SuperAdmin
+    if (isAdminFlag) {
+      return true;
+    }
+
     // Si role es array, tomar el primer elemento
     const roleStr = Array.isArray(userRole) ? userRole[0] : userRole;
 
     // Normalizar el rol para soportar variantes: SuperAdmin, SUPER_ADMIN, super_admin
-    const normalizedRole = roleStr?.toLowerCase().replace(/_/g, '');
-    return (
-      normalizedRole === 'superadmin' || userPermissions?.includes('*') || false
-    );
+    const normalizedRole = roleStr?.toLowerCase().replaceAll('_', '');
+    return normalizedRole === 'superadmin' || false;
   }
 
   /**

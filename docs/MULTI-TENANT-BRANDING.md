@@ -5,6 +5,7 @@ Sistema completo de branding multi-tenant para PWA Angular 20+ con componentes d
 ## 📋 Características
 
 ### ✅ **HeaderComponent**
+
 - 🔧 Obtiene `logoUrl`, `displayName` y colores del `TenantContextService`
 - 🎨 Actualiza dinámicamente estilos via CSS custom properties
 - 🖼️ Soporte completo para imágenes por tenant desde backend
@@ -13,6 +14,7 @@ Sistema completo de branding multi-tenant para PWA Angular 20+ con componentes d
 - ♿ Accesibilidad completa (ARIA labels, navegación por teclado)
 
 ### ✅ **FooterComponent**
+
 - 📝 Refleja automáticamente el nombre del tenant
 - 📞 Información de contacto dinámica por tenant
 - 🌐 Links de redes sociales configurables
@@ -20,6 +22,7 @@ Sistema completo de branding multi-tenant para PWA Angular 20+ con componentes d
 - 🔧 Información de debug del tenant (solo desarrollo)
 
 ### ✅ **LayoutComponent**
+
 - 🏗️ Contiene `<app-header>` y `<app-footer>`
 - 🎨 Aplica theme del tenant al `<body>` via CSS variables
 - ⚡ Loading states globales
@@ -28,6 +31,7 @@ Sistema completo de branding multi-tenant para PWA Angular 20+ con componentes d
 - 🎯 Integración completa con el sistema multi-tenant existente
 
 ### ✅ **Reactive System**
+
 - 🔄 Reacciona automáticamente cuando cambia el tenant (`?tenant=demo-b`)
 - ⚡ Powered by Angular Signals para máximo rendimiento
 - 🎨 CSS custom properties actualizadas en tiempo real
@@ -46,7 +50,7 @@ import { LayoutComponent } from '@pwa/shared';
   selector: 'app-root',
   standalone: true,
   imports: [LayoutComponent],
-  template: `<app-layout></app-layout>`
+  template: `<app-layout></app-layout>`,
 })
 export class AppComponent implements OnInit {
   private readonly tenantBootstrap = inject(TenantBootstrapService);
@@ -68,20 +72,20 @@ const tenantConfig: TenantConfig = {
     description: 'La mejor tienda de tecnología...',
     contact: {
       email: 'contacto@techstore-pro.com',
-      phone: '+1 (555) 123-4567'
+      phone: '+1 (555) 123-4567',
     },
     socialLinks: {
       facebook: 'https://facebook.com/techstore-pro',
-      instagram: 'https://instagram.com/techstore.pro'
+      instagram: 'https://instagram.com/techstore.pro',
     },
     branding: {
       primaryColor: '#2563eb',
-      secondaryColor: '#475569', 
+      secondaryColor: '#475569',
       accentColor: '#dc2626',
       backgroundColor: '#ffffff',
       textColor: '#1e293b',
-      logoUrl: 'https://cdn.techstore-pro.com/logo.svg'
-    }
+      logoUrl: 'https://cdn.techstore-pro.com/logo.svg',
+    },
   },
   // ... resto de configuración
 };
@@ -99,12 +103,12 @@ El sistema genera automáticamente estas CSS custom properties:
   --tenant-accent-color: #dc2626;
   --tenant-background-color: #ffffff;
   --tenant-text-color: #1e293b;
-  
+
   /* Colores derivados */
   --tenant-primary-hover: #1d4ed8;
   --tenant-primary-light: rgba(37, 99, 235, 0.1);
   --tenant-border-color: rgba(31, 41, 55, 0.2);
-  
+
   /* Layout específico */
   --tenant-header-bg: #ffffff;
   --tenant-header-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -121,14 +125,14 @@ http://localhost:4200?tenant=demo-a
 # o
 http://demo-a.localhost:4200
 
-# Tenant B - Fashion World (Rosa)  
+# Tenant B - Fashion World (Rosa)
 http://localhost:4200?tenant=demo-b
 # o
 http://demo-b.localhost:4200
 
 # Tenant C - Green Garden (Verde)
 http://localhost:4200?tenant=demo-c
-# o  
+# o
 http://demo-c.localhost:4200
 ```
 
@@ -150,7 +154,7 @@ await tenantBootstrap.switchTenant('demo-b');
 ```mermaid
 graph TB
     A[URL/Query Params] --> B[TenantBootstrapService]
-    B --> C[TenantContextService]  
+    B --> C[TenantContextService]
     C --> D[HeaderComponent]
     C --> E[FooterComponent]
     C --> F[LayoutComponent]
@@ -165,7 +169,7 @@ graph TB
 ├── header/
 │   ├── header.component.ts     # Header con branding dinámico
 │   └── index.ts               # Barrel export
-├── footer/ 
+├── footer/
 │   ├── footer.component.ts     # Footer con info del tenant
 │   └── index.ts               # Barrel export
 └── layout/
@@ -191,7 +195,7 @@ graph TB
   --tenant-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.tenant-demo-b {  
+.tenant-demo-b {
   --tenant-border-radius: 12px;
   --tenant-shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
@@ -212,38 +216,43 @@ graph TB
       <button class="btn-primary">Action</button>
     </div>
   `,
-  styles: [`
-    .custom-card {
-      border: 1px solid var(--tenant-border-color);
-      border-radius: var(--tenant-border-radius, 8px);
-      background: var(--tenant-background-color);
-    }
-    
-    .btn-primary {
-      background: var(--tenant-primary-color);
-      border-radius: var(--tenant-border-radius, 6px);
-    }
-  `]
+  styles: [
+    `
+      .custom-card {
+        border: 1px solid var(--tenant-border-color);
+        border-radius: var(--tenant-border-radius, 8px);
+        background: var(--tenant-background-color);
+      }
+
+      .btn-primary {
+        background: var(--tenant-primary-color);
+        border-radius: var(--tenant-border-radius, 6px);
+      }
+    `,
+  ],
 })
-export class CustomComponent { }
+export class CustomComponent {}
 ```
 
 ## 📱 PWA Features
 
 ### Meta Theme Color
+
 El sistema actualiza automáticamente el `theme-color` para navegadores móviles:
 
 ```html
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="#2563eb" />
 ```
 
 ### Responsive Design
+
 - 📱 Mobile-first approach
 - 🖥️ Breakpoints optimizados
 - 🍔 Hamburger menu para móviles
 - 👆 Touch-friendly interactions
 
 ### Accessibility
+
 - ♿ ARIA labels en todos los elementos interactivos
 - ⌨️ Navegación completa por teclado
 - 🔍 High contrast mode support
@@ -252,18 +261,20 @@ El sistema actualiza automáticamente el `theme-color` para navegadores móviles
 ## 🐛 Debug y Desarrollo
 
 ### Debug Mode
+
 En desarrollo, el `LayoutComponent` muestra información de debug:
 
 ```json
 {
   "slug": "demo-a",
-  "displayName": "TechStore Pro", 
+  "displayName": "TechStore Pro",
   "branding": { "primaryColor": "#2563eb" },
   "loadedAt": "2025-11-13T10:30:00Z"
 }
 ```
 
 ### Logs del Sistema
+
 ```typescript
 // TenantBootstrapService logs automáticamente:
 console.log('✅ Tenant initialized:', tenantConfig);

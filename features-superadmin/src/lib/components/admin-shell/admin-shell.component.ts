@@ -433,7 +433,7 @@ export class AdminShellComponent {
   readonly userClaims = computed(() => this.authService.claims);
   readonly userName = computed(() => {
     const claims = this.userClaims();
-    return claims?.name || claims?.email || 'Admin';
+    return claims?.email || 'Admin';
   });
   readonly userEmail = computed(() => this.userClaims()?.email || '');
   readonly userRole = computed(() => this.userClaims()?.role || '');

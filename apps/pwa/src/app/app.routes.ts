@@ -1,17 +1,19 @@
 import { Route } from '@angular/router';
-import { AuthGuard, RoleGuard, tenantGuard } from '@pwa/core';
-import { AdminLayoutComponent, PublicLayoutComponent } from '@pwa/shared';
+import { AuthGuard, EmployeeGuard, tenantGuard } from '@pwa/core';
+import { PublicLayoutComponent, TenantAdminLayoutComponent } from '@pwa/shared';
 
 export const appRoutes: Route[] = [
-  // Redirect por defecto a /admin si no hay tenant
-  { path: '', pathMatch: 'full', redirectTo: 'admin' },
-
-  // Rutas que REQUIEREN tenant activo
+  // Rutas que REQUIEREN tenant activo (tienda pública)
   {
     path: '',
     component: PublicLayoutComponent,
-    canActivate: [tenantGuard], // 🔐 Requiere tenant - si no hay, redirige a /admin
+    canActivate: [tenantGuard],
     children: [
+      // Home/Catálogo como página principal del tenant
+      {
+        path: '',
+        loadChildren: () => import('@pwa/catalog').then((m) => m.catalogRoutes),
+      },
       {
         path: 'catalog',
         loadChildren: () => import('@pwa/catalog').then((m) => m.catalogRoutes),
@@ -54,8 +56,8 @@ export const appRoutes: Route[] = [
   // Este módulo gestiona la administración DENTRO de un tenant particular
   {
     path: 'tenant-admin',
-    component: AdminLayoutComponent,
-    canActivate: [AuthGuard, RoleGuard('admin')],
+    component: TenantAdminLayoutComponent,
+    canActivate: [AuthGuard, EmployeeGuard],
     children: [
       {
         path: '',

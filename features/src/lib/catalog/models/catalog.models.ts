@@ -34,21 +34,40 @@ export interface ProductSummary {
 export interface Category {
   id: string;
   name: string;
+  slug: string;
   description?: string;
-  imageUrl?: string;
+  imageUrl?: string | null;
   parentId?: string;
+  parentSlug?: string;
+  parentName?: string;
   sortOrder?: number;
-  active: boolean;
-  productsCount?: number;
+  active?: boolean;
+  productCount?: number;
+  children?: Category[];
+  metaTitle?: string;
+  metaDescription?: string;
+}
+
+export interface StoreBanner {
+  id: string;
+  title: string;
+  subtitle?: string | null;
+  imageUrlDesktop: string;
+  imageUrlMobile?: string | null;
+  targetUrl?: string | null;
+  buttonText?: string | null;
+  position: 'hero' | 'sidebar' | 'footer';
 }
 
 export interface CatalogFilters {
   categoryId?: string;
+  categorySlug?: string;
   search?: string;
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;
   tags?: string[];
+  featured?: boolean;
 }
 
 export interface PaginatedResponse<T> {
@@ -68,5 +87,5 @@ export interface ApiResponse<T> {
 }
 
 export interface ProductsResponse extends PaginatedResponse<ProductSummary> {}
-export interface CategoriesResponse extends PaginatedResponse<Category> {}
+export interface CategoriesResponse extends ApiResponse<Category[]> {}
 export interface ProductResponse extends ApiResponse<Product> {}

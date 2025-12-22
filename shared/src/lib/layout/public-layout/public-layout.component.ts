@@ -1,41 +1,39 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { APP_ENV, TenantConfigService } from '@pwa/core';
+import {
+  FooterComponent,
+  HeaderComponent,
+  WhatsappButtonComponent,
+} from '../../ui';
 
 @Component({
   selector: 'lib-public-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    HeaderComponent,
+    FooterComponent,
+    WhatsappButtonComponent,
+  ],
   template: `
-    <a class="skip-link" href="#main" i18n="@@layout.skipToContent"
-      >Skip to content</a
-    >
-    <header role="banner">
-      <nav role="navigation" aria-label="Main navigation" class="navbar">
-        <a class="brand" routerLink="/">
-          {{ cfg.config?.tenant?.displayName || 'eCommerce' }}
-        </a>
-        <span class="tenant-pill" *ngIf="cfg.tenantSlug">{{
-          cfg.tenantSlug
-        }}</span>
-      </nav>
-      <!-- Dev-only tenant info (visible when mockApi in non-production) -->
-      <div class="tenant-info" *ngIf="!env.production && env.mockApi">
-        <span class="text-sm text-gray-500"
-          >Mock API: Use ?tenant=YOUR_TENANT</span
-        >
-      </div>
-    </header>
+    <a class="skip-link" href="#main">Ir al contenido</a>
+    <app-header />
     <main id="main" role="main" tabindex="-1">
       <router-outlet />
     </main>
-    <footer role="contentinfo" class="footer">
-      <span i18n="@@footer.text">© 2025 My Shop</span>
-    </footer>
+    <app-footer />
+    <app-whatsapp-button />
   `,
   styles: [
     `
+      :host {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
       .skip-link {
         position: absolute;
         left: -9999px;
@@ -43,51 +41,25 @@ import { APP_ENV, TenantConfigService } from '@pwa/core';
         width: 1px;
         height: 1px;
         overflow: hidden;
+        z-index: 9999;
+        background: var(--primary-color, #3b82f6);
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
       }
+
       .skip-link:focus {
-        position: static;
+        position: fixed;
+        left: 1rem;
+        top: 1rem;
         width: auto;
         height: auto;
       }
-      .navbar {
-        display: flex;
-        gap: 1rem;
-        padding: 0.5rem 1rem;
-      }
-      .brand {
-        font-weight: 600;
-      }
-      .tenant-pill {
-        margin-left: 0.5rem;
-        padding: 0.1rem 0.4rem;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        background: #eef;
-      }
-      .tenant-switch {
-        padding: 0 0.75rem 0.5rem;
-        font-size: 0.9rem;
-        color: #666;
-      }
+
       main {
-        min-height: 60vh;
-        padding: 1rem;
-      }
-      .footer {
-        padding: 1rem;
-        border-top: 1px solid #eee;
+        flex: 1;
       }
     `,
   ],
 })
-export class PublicLayoutComponent {
-  readonly cfg = inject(TenantConfigService);
-  readonly env = inject(APP_ENV);
-  async switch(slug: string) {
-    if (!slug || slug.trim() === '') {
-      console.warn('⚠️ Switch tenant: slug vacío');
-      return;
-    }
-    await this.cfg.switchTenant(slug);
-  }
-}
+export class PublicLayoutComponent {}

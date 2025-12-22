@@ -22,7 +22,15 @@ export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((e) => {
       if (e?.status === 401 || e?.status === 403) {
         auth.clear();
-        router.navigateByUrl('/login');
+
+        // Determinar la ruta de login según el contexto
+        const claims = auth.claims;
+        const hasTenantInToken = !!claims?.tenant_slug;
+
+        // Si el usuario tenía tenant, redirigir a login del tenant
+        // Si no, redirigir a login general
+        const loginRoute = hasTenantInToken ? '/login' : '/admin/login';
+        router.navigateByUrl(loginRoute);
       }
       return throwError(() => e);
     })

@@ -28,22 +28,16 @@ export class AccountService {
 
   readonly state = this._state.asReadonly();
 
-  /**
-   * Login del usuario
-   * Usa CoreAuthService que detecta automáticamente si es admin o tenant
-   */
   async login(request: LoginRequest): Promise<void> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
     try {
-      // Usar CoreAuthService.login() que auto-detecta admin vs tenant
       await this.coreAuth.login({
         email: request.email,
         password: request.password,
         rememberMe: request.rememberMe,
       });
 
-      // Obtener el perfil del usuario después del login
       const profile = await this.coreAuth.getProfile();
       const claims = this.coreAuth.claims;
 
@@ -51,8 +45,9 @@ export class AccountService {
         ...s,
         user: {
           ...profile,
-          role: claims?.role || '',
-          permissions: claims?.permissions || [],
+          id: profile.userId, // Mapear userId a id
+          role: claims?.roles?.[0] || '',
+          permissions: claims?.modules || [],
         } as User,
         isAuthenticated: true,
         isLoading: false,
@@ -69,9 +64,6 @@ export class AccountService {
     }
   }
 
-  /**
-   * Registro de nuevo usuario (solo para tenants)
-   */
   async register(request: RegisterRequest): Promise<void> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
@@ -84,7 +76,6 @@ export class AccountService {
         throw new Error('Debes aceptar los términos y condiciones');
       }
 
-      // Usar CoreAuthService.register() que valida tenant
       await this.coreAuth.register({
         email: request.email,
         password: request.password,
@@ -93,7 +84,6 @@ export class AccountService {
         phoneNumber: request.phoneNumber,
       });
 
-      // Obtener el perfil del usuario después del registro
       const profile = await this.coreAuth.getProfile();
       const claims = this.coreAuth.claims;
 
@@ -101,8 +91,9 @@ export class AccountService {
         ...s,
         user: {
           ...profile,
-          role: claims?.role || '',
-          permissions: claims?.permissions || [],
+          id: profile.userId, // Mapear userId a id
+          role: claims?.roles?.[0] || '',
+          permissions: claims?.modules || [],
         } as User,
         isAuthenticated: true,
         isLoading: false,
@@ -119,16 +110,10 @@ export class AccountService {
     }
   }
 
-  /**
-   * Logout del usuario
-   */
   async logout(): Promise<void> {
     try {
-      // Opcional: llamar al backend para invalidar token
       await firstValueFrom(this.apiClient.post<void>('/auth/logout', {})).catch(
-        () => {
-          // Ignorar errores del backend en logout
-        }
+        () => {}
       );
     } finally {
       this.coreAuth.clear();
@@ -143,9 +128,6 @@ export class AccountService {
     }
   }
 
-  /**
-   * Recuperación de contraseña
-   */
   async forgotPassword(request: ForgotPasswordRequest): Promise<void> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
@@ -171,9 +153,6 @@ export class AccountService {
     }
   }
 
-  /**
-   * Reset de contraseña con token
-   */
   async resetPassword(request: ResetPasswordRequest): Promise<void> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
@@ -204,9 +183,6 @@ export class AccountService {
     }
   }
 
-  /**
-   * Cambio de contraseña (usuario autenticado)
-   */
   async changePassword(request: ChangePasswordRequest): Promise<void> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
@@ -235,9 +211,6 @@ export class AccountService {
     }
   }
 
-  /**
-   * Obtener perfil del usuario actual
-   */
   async getProfile(): Promise<User> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
@@ -266,9 +239,6 @@ export class AccountService {
     }
   }
 
-  /**
-   * Actualizar perfil del usuario
-   */
   async updateProfile(request: UpdateProfileRequest): Promise<User> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
@@ -296,9 +266,6 @@ export class AccountService {
     }
   }
 
-  /**
-   * Refrescar token
-   */
   async refreshToken(): Promise<boolean> {
     try {
       const refreshToken = this.getRefreshToken();
@@ -307,9 +274,7 @@ export class AccountService {
       const response = await firstValueFrom(
         this.apiClient.post<{ token: string; refreshToken: string }>(
           '/auth/refresh',
-          {
-            refreshToken,
-          }
+          { refreshToken }
         )
       );
 
@@ -323,21 +288,16 @@ export class AccountService {
     }
   }
 
-  /**
-   * Inicializar estado desde token existente
-   */
   async initializeFromToken(): Promise<void> {
     if (this.coreAuth.isAuthenticated()) {
       try {
         await this.getProfile();
       } catch {
-        // Token inválido, limpiar
         this.coreAuth.clear();
       }
     }
   }
 
-  // Métodos privados para refresh token
   private saveRefreshToken(token: string): void {
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('refresh_token', token);

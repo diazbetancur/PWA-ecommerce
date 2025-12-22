@@ -3,8 +3,8 @@ export * from './lib/models/types';
 // pwa-branding.types ya está incluido en types.ts
 
 // PWA Services
-export * from './lib/pwa/pwa-install.service';
 export * from './lib/pwa/dynamic-pwa-assets.service';
+export * from './lib/pwa/pwa-install.service';
 
 // Services
 export * from './lib/logging/logger.service';
@@ -13,8 +13,10 @@ export * from './lib/services/api-client.service';
 export * from './lib/services/app-env.service';
 export * from './lib/services/manifest.service';
 export * from './lib/services/seo.service';
+export * from './lib/services/tenant-admin-menu.service';
 export * from './lib/services/tenant-bootstrap.service';
 export * from './lib/services/tenant-config.service';
+export * from './lib/services/user-mode.service';
 
 // Configuration
 export * from './lib/config/app-env-initializer';
@@ -36,6 +38,7 @@ export * from './lib/providers/tenant-interceptor.provider';
 
 export * from './lib/components/api-test-demo/api-test-demo.component';
 export * from './lib/components/currency-demo/currency-demo.component';
+export * from './lib/components/mode-selector/mode-selector-dialog.component';
 export * from './lib/components/tenant-debug/tenant-debug.component';
 export * from './lib/components/tenant-not-found/tenant-not-found.component';
 
@@ -45,6 +48,8 @@ export * from './lib/routes';
 // Auth
 export * from './lib/auth/auth.service';
 export * from './lib/auth/guards/auth.guard';
+export * from './lib/auth/guards/mode-selector.guard';
+export * from './lib/auth/guards/module-permission.guard';
 export * from './lib/auth/guards/plan.guard';
 export * from './lib/auth/guards/role.guard';
 

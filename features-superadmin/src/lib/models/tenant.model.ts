@@ -1,11 +1,3 @@
-/**
- * 🏢 Modelos de Tenant para SuperAdmin
- * Basados en la API del backend
- */
-
-/**
- * Status de un tenant
- */
 export enum TenantStatus {
   Pending = 'Pending',
   Seeding = 'Seeding',
@@ -14,26 +6,17 @@ export enum TenantStatus {
   Failed = 'Failed',
 }
 
-/**
- * Plan del tenant
- */
 export enum TenantPlan {
   Basic = 'Basic',
   Premium = 'Premium',
 }
 
-/**
- * Límite de un plan
- */
 export interface PlanLimit {
   limitCode: string;
   limitValue: number;
   description: string;
 }
 
-/**
- * Plan completo con límites
- */
 export interface Plan {
   id: string;
   code: string;
@@ -41,9 +24,6 @@ export interface Plan {
   limits: PlanLimit[];
 }
 
-/**
- * Tenant en lista (resumen)
- */
 export interface TenantListItem {
   id: string;
   slug: string;
@@ -54,9 +34,6 @@ export interface TenantListItem {
   updatedAt: string;
 }
 
-/**
- * Tenant detallado
- */
 export interface TenantDetail {
   id: string;
   slug: string;
@@ -73,9 +50,6 @@ export interface TenantDetail {
   recentProvisioningSteps: ProvisioningStep[];
 }
 
-/**
- * Paso de provisionamiento
- */
 export interface ProvisioningStep {
   step: string;
   status: string;
@@ -83,9 +57,6 @@ export interface ProvisioningStep {
   details?: string;
 }
 
-/**
- * Respuesta paginada de tenants
- */
 export interface TenantListResponse {
   items: TenantListItem[];
   totalCount: number;
@@ -94,9 +65,6 @@ export interface TenantListResponse {
   totalPages: number;
 }
 
-/**
- * Parámetros para listar tenants
- */
 export interface TenantListParams {
   page?: number;
   pageSize?: number;
@@ -105,27 +73,33 @@ export interface TenantListParams {
   planId?: string;
 }
 
-/**
- * Request para crear tenant
- */
 export interface CreateTenantRequest {
   slug: string;
   name: string;
   planCode: TenantPlan;
+  adminEmail: string;
 }
 
 /**
- * Respuesta al crear tenant
+ * Respuesta exitosa del backend al crear un tenant
+ * El backend devuelve los campos directamente sin anidar
  */
 export interface CreateTenantResponse {
   slug: string;
   status: string;
-  adminPassword?: string; // Solo se muestra una vez
+  adminEmail: string;
+  temporaryPassword: string;
+  message: string;
 }
 
 /**
- * Request para actualizar tenant
+ * Respuesta de error del backend al crear un tenant
  */
+export interface CreateTenantError {
+  error: string;
+  suggestion?: string;
+}
+
 export interface UpdateTenantRequest {
   name?: string;
   planId?: string;
@@ -134,23 +108,14 @@ export interface UpdateTenantRequest {
   isActive?: boolean;
 }
 
-/**
- * Request para cambiar status
- */
 export interface UpdateTenantStatusRequest {
   status: TenantStatus;
 }
 
-/**
- * Request para reparar tenant
- */
 export interface RepairTenantRequest {
-  tenant: string; // slug
+  tenant: string;
 }
 
-/**
- * Respuesta al reparar tenant
- */
 export interface RepairTenantResponse {
   tenant: string;
   status: string;

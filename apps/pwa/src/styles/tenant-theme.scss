@@ -31,8 +31,7 @@
   --tenant-outline: rgba(51, 51, 51, 0.3); /* fallback */
 
   /* Animaciones para transiciones de tema */
-  transition:
-    --tenant-primary-color 0.3s ease-in-out,
+  transition: --tenant-primary-color 0.3s ease-in-out,
     --tenant-accent-color 0.3s ease-in-out,
     --tenant-background-color 0.3s ease-in-out,
     --tenant-text-color 0.3s ease-in-out;
@@ -287,8 +286,6 @@
 
 /* ===== ANIMACIONES PARA TRANSICIONES ===== */
 * {
-  transition:
-    background-color 0.3s ease-in-out,
-    color 0.3s ease-in-out,
+  transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out,
     border-color 0.3s ease-in-out;
 }

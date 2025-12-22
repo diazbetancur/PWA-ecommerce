@@ -42,6 +42,7 @@ import {
   TenantConfigService,
   ThemeService,
   TranslocoHttpLoader,
+  UserModeService,
 } from '@pwa/core';
 
 export const appConfig: ApplicationConfig = {
@@ -92,6 +93,7 @@ export const appConfig: ApplicationConfig = {
           const i18n = inject(TranslocoService);
           const seo = inject(SeoService);
           const platformId = inject(PLATFORM_ID);
+          const userMode = inject(UserModeService);
           const c = cfg.config;
           if (c) {
             if (isPlatformBrowser(platformId)) {
@@ -101,6 +103,7 @@ export const appConfig: ApplicationConfig = {
             seo.apply(c);
             logger.setContext({ tenant: c.tenant.slug });
             auth.init(c.tenant.slug);
+            userMode.init(); // Inicializar modo de usuario
             i18n.setActiveLang(c.locale || 'es-CO');
             // Initialize PushService only in the browser to avoid SSR DI issues with SwPush
             if (isPlatformBrowser(platformId)) {

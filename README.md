@@ -101,14 +101,14 @@ npm run start:real
 
 ### Variables Disponibles
 
-| Variable | Descripción | Requerida |
-|----------|-------------|-----------|
-| `NG_APP_API_BASE_URL` | URL base del backend API | ✅ Sí |
-| `NG_APP_VAPID_PUBLIC_KEY` | Clave VAPID para push notifications | ⚠️  Solo con FCM |
-| `NG_APP_GA_TRACKING_ID` | Google Analytics ID | ❌ No |
-| `NG_APP_ENABLE_ANALYTICS` | Habilitar analytics (true/false) | ❌ No |
-| `NG_APP_LOG_LEVEL` | Nivel de logs (debug/info/warn/error) | ❌ No |
-| `NG_APP_ENABLE_CONSOLE` | Habilitar console logs (true/false) | ❌ No |
+| Variable                  | Descripción                           | Requerida       |
+| ------------------------- | ------------------------------------- | --------------- |
+| `NG_APP_API_BASE_URL`     | URL base del backend API              | ✅ Sí           |
+| `NG_APP_VAPID_PUBLIC_KEY` | Clave VAPID para push notifications   | ⚠️ Solo con FCM |
+| `NG_APP_GA_TRACKING_ID`   | Google Analytics ID                   | ❌ No           |
+| `NG_APP_ENABLE_ANALYTICS` | Habilitar analytics (true/false)      | ❌ No           |
+| `NG_APP_LOG_LEVEL`        | Nivel de logs (debug/info/warn/error) | ❌ No           |
+| `NG_APP_ENABLE_CONSOLE`   | Habilitar console logs (true/false)   | ❌ No           |
 
 ## Troubleshooting
 

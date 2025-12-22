@@ -33,8 +33,8 @@ graph TD
 ```typescript
 export interface TenantConfig {
   // ... propiedades existentes
-  locale: string;    // ej: 'en-US', 'es-ES', 'es-MX'
-  currency: string;  // ej: 'USD', 'EUR', 'MXN'
+  locale: string; // ej: 'en-US', 'es-ES', 'es-MX'
+  currency: string; // ej: 'USD', 'EUR', 'MXN'
 }
 ```
 
@@ -42,11 +42,11 @@ export interface TenantConfig {
 
 ```typescript
 // Nuevas propiedades agregadas
-readonly currency = computed(() => 
+readonly currency = computed(() =>
   this.tenantBootstrap.currentTenant()?.currency ?? 'USD'
 );
 
-readonly locale = computed(() => 
+readonly locale = computed(() =>
   this.tenantBootstrap.currentTenant()?.locale ?? 'en-US'
 );
 ```
@@ -58,30 +58,31 @@ readonly locale = computed(() =>
 **Propósito:** Formatear precios según la moneda y locale del tenant actual.
 
 **Uso:**
+
 ```html
 <!-- Formato básico -->
 {{ price | tenantCurrency }}
 
 <!-- Con opciones personalizadas -->
-{{ price | tenantCurrency:'symbol':'1.2-2' }}
-{{ price | tenantCurrency:'code' }}
-{{ price | tenantCurrency:'symbol-narrow':'1.0-0' }}
+{{ price | tenantCurrency:'symbol':'1.2-2' }} {{ price | tenantCurrency:'code' }} {{ price | tenantCurrency:'symbol-narrow':'1.0-0' }}
 ```
 
 **Características:**
+
 - ✅ **Reactividad automática** - Se actualiza cuando cambia el tenant
 - ✅ **Configuración por moneda** - Decimales apropiados según tipo de moneda
 - ✅ **Fallback seguro** - Manejo de errores con formato básico
 - ✅ **Tipado completo** - Support para TypeScript
 
 **Configuración automática de decimales:**
+
 ```typescript
 const currencyDefaults: Record<string, string> = {
-  'JPY': '1.0-0',  // Sin decimales
-  'KRW': '1.0-0',  // Sin decimales
-  'USD': '1.2-2',  // 2 decimales
-  'EUR': '1.2-2',  // 2 decimales
-  'BHD': '1.3-3',  // 3 decimales
+  JPY: '1.0-0', // Sin decimales
+  KRW: '1.0-0', // Sin decimales
+  USD: '1.2-2', // 2 decimales
+  EUR: '1.2-2', // 2 decimales
+  BHD: '1.3-3', // 3 decimales
   // ... más configuraciones
 };
 ```
@@ -91,11 +92,13 @@ const currencyDefaults: Record<string, string> = {
 **Propósito:** Obtener solo el símbolo de la moneda del tenant.
 
 **Uso:**
+
 ```html
 <span class="currency-symbol">{{ '' | tenantCurrencySymbol }}</span>
 ```
 
 **Resultados por tenant:**
+
 - USD → $
 - EUR → €
 - GBP → £
@@ -106,17 +109,18 @@ const currencyDefaults: Record<string, string> = {
 **Propósito:** Formatear números según el locale del tenant.
 
 **Uso:**
+
 ```html
-{{ stockCount | tenantNumber }}
-{{ percentage | tenantNumber:'1.1-1' }}
+{{ stockCount | tenantNumber }} {{ percentage | tenantNumber:'1.1-1' }}
 ```
 
 **Ejemplos de formateo:**
+
 ```typescript
 // Locale: en-US
 1234567.89 → "1,234,567.89"
 
-// Locale: es-ES  
+// Locale: es-ES
 1234567.89 → "1.234.567,89"
 
 // Locale: es-MX
@@ -128,6 +132,7 @@ const currencyDefaults: Record<string, string> = {
 ### ProductCardComponent
 
 **Antes:**
+
 ```typescript
 readonly formattedPrice = computed(() => {
   // Lógica manual de formateo
@@ -139,14 +144,14 @@ readonly formattedPrice = computed(() => {
 ```
 
 **Después:**
+
 ```html
 <!-- Template simplificado -->
-<span class="product-price">
-  {{ product().price | tenantCurrency }}
-</span>
+<span class="product-price"> {{ product().price | tenantCurrency }} </span>
 ```
 
 **Beneficios:**
+
 - ✅ Menos código en el componente
 - ✅ Reactividad automática
 - ✅ Consistencia en toda la aplicación
@@ -158,38 +163,45 @@ El `CatalogPageComponent` se beneficia automáticamente al usar `ProductCardComp
 
 ```html
 <!-- Los precios se formatean automáticamente -->
-<app-product-card 
-  *ngFor="let product of products()"
-  [product]="product">
-</app-product-card>
+<app-product-card *ngFor="let product of products()" [product]="product"> </app-product-card>
 ```
 
 ## Ejemplos por Locale/Moneda
 
 ### Configuraciones Soportadas
 
-| Tenant | Locale | Currency | Ejemplo Precio | Resultado |
-|--------|--------|----------|----------------|-----------|
-| US Store | en-US | USD | 29.99 | $29.99 |
-| EU Store | es-ES | EUR | 29.99 | 29,99 € |
-| Mexico Store | es-MX | MXN | 599.50 | $599.50 MXN |
-| Japan Store | ja-JP | JPY | 2999 | ¥2,999 |
-| UK Store | en-GB | GBP | 24.99 | £24.99 |
-| Brazil Store | pt-BR | BRL | 149.90 | R$ 149,90 |
+| Tenant       | Locale | Currency | Ejemplo Precio | Resultado   |
+| ------------ | ------ | -------- | -------------- | ----------- |
+| US Store     | en-US  | USD      | 29.99          | $29.99      |
+| EU Store     | es-ES  | EUR      | 29.99          | 29,99 €     |
+| Mexico Store | es-MX  | MXN      | 599.50         | $599.50 MXN |
+| Japan Store  | ja-JP  | JPY      | 2999           | ¥2,999      |
+| UK Store     | en-GB  | GBP      | 24.99          | £24.99      |
+| Brazil Store | pt-BR  | BRL      | 149.90         | R$ 149,90   |
 
 ### Características Especiales
 
 **Monedas sin decimales:**
+
 ```typescript
 // JPY, KRW, VND, CLP automáticamente sin decimales
-{{ 1500 | tenantCurrency }} 
+{
+  {
+    1500 | tenantCurrency;
+  }
+}
 // Resultado con JPY: ¥1,500 (no ¥1,500.00)
 ```
 
 **Monedas con 3 decimales:**
+
 ```typescript
 // BHD, JOD, KWD automáticamente con 3 decimales
-{{ 29.999 | tenantCurrency }}
+{
+  {
+    29.999 | tenantCurrency;
+  }
+}
 // Resultado con BHD: BD 29.999
 ```
 
@@ -202,7 +214,7 @@ El `CatalogPageComponent` se beneficia automáticamente al usar `ProductCardComp
 it('debe formatear precio USD correctamente', () => {
   mockTenant.locale.and.returnValue('en-US');
   mockTenant.currency.and.returnValue('USD');
-  
+
   const result = pipe.transform(29.99);
   expect(result).toBe('$29.99');
 });
@@ -213,7 +225,7 @@ it('debe actualizar formato cuando cambia tenant', () => {
   mockTenant.locale.and.returnValue('en-US');
   mockTenant.currency.and.returnValue('USD');
   expect(pipe.transform(99.99)).toBe('$99.99');
-  
+
   // Cambio a EU
   mockTenant.locale.and.returnValue('es-ES');
   mockTenant.currency.and.returnValue('EUR');
@@ -226,6 +238,7 @@ it('debe actualizar formato cuando cambia tenant', () => {
 **Ruta:** `/tenant/currency-demo`
 
 La demo incluye:
+
 - 🏢 Configuración actual del tenant
 - 🌍 Simulador de diferentes tenants
 - 🧪 Prueba interactiva con input personalizable
@@ -253,6 +266,7 @@ La demo incluye:
 ### Agregar Nueva Moneda
 
 1. **Configurar tenant:**
+
 ```typescript
 {
   locale: 'hi-IN',
@@ -261,11 +275,12 @@ La demo incluye:
 ```
 
 2. **Opcional - Configurar decimales:**
+
 ```typescript
 // En tenant-currency.pipe.ts
 const currencyDefaults: Record<string, string> = {
   // ... existentes
-  'INR': '1.2-2'  // Rupias indias con 2 decimales
+  INR: '1.2-2', // Rupias indias con 2 decimales
 };
 ```
 
@@ -284,10 +299,12 @@ const currencyDefaults: Record<string, string> = {
 ### Errores Comunes
 
 1. **Pipe no actualiza al cambiar tenant**
+
    - ✅ Verificar que el pipe tenga `pure: false`
    - ✅ Confirmar que TenantContextService use signals
 
 2. **Formato incorrecto**
+
    - ✅ Validar configuración `locale` y `currency` en tenant
    - ✅ Revisar que los valores sean códigos válidos (ISO)
 
@@ -303,7 +320,7 @@ testCurrencyPipes(); // Ejecuta tests manuales
 
 // Verificar configuración actual
 tenantContext.getCurrency(); // Moneda actual
-tenantContext.getLocale();   // Locale actual
+tenantContext.getLocale(); // Locale actual
 ```
 
 ## Próximas Mejoras

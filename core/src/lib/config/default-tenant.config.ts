@@ -1,19 +1,13 @@
 import { TenantConfig } from '../models/types';
 
-/**
- * Configuración por defecto cuando no se puede resolver un tenant
- * Se usa principalmente para páginas de login/registro y errores
- */
 export const DEFAULT_TENANT_CONFIG: TenantConfig = {
   tenant: {
     id: 'default',
     slug: 'default',
     displayName: 'eCommerce Platform',
     description: 'Plataforma de comercio electrónico multi-tenant',
-    contact: {
-      email: 'soporte@ecommerce.com',
-      phone: '+57 300 123 4567',
-    },
+    status: 'Ready',
+    plan: 'basic',
     branding: {
       primaryColor: '#6366f1',
       secondaryColor: '#8b5cf6',
@@ -44,7 +38,12 @@ export const DEFAULT_TENANT_CONFIG: TenantConfig = {
   },
   locale: 'es-CO',
   currency: 'COP',
-  cdnBaseUrl: '',
+  currencySymbol: '$',
+  taxRate: 0.19,
+  contact: {
+    email: 'soporte@ecommerce.com',
+    phone: '+57 300 123 4567',
+  },
   seo: {
     title: 'eCommerce Platform',
     description: 'Plataforma de comercio electrónico multi-tenant',

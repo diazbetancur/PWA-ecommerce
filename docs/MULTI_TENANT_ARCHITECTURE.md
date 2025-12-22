@@ -50,15 +50,15 @@ export interface TenantConfig {
 }
 
 export interface TenantInfo {
-  id: string;        // ID interno para el backend
-  slug: string;      // Slug público del tenant
+  id: string; // ID interno para el backend
+  slug: string; // Slug público del tenant
   displayName: string; // Nombre para mostrar
 }
 
 export interface ThemeConfig {
-  primary: string;    // Color primario
-  accent: string;     // Color de acento
-  logoUrl: string;    // URL del logo
+  primary: string; // Color primario
+  accent: string; // Color de acento
+  logoUrl: string; // URL del logo
   faviconUrl?: string; // URL del favicon
   cssVars?: Record<string, string>; // Variables CSS personalizadas
   enableDark?: boolean;
@@ -99,25 +99,22 @@ await tenantBootstrapService.reloadTenant();
 En `app.config.ts`, se configura el `APP_INITIALIZER`:
 
 ```typescript
-import { 
-  TenantBootstrapService, 
-  provideTenantBootstrap 
-} from '@pwa/core';
+import { TenantBootstrapService, provideTenantBootstrap } from '@pwa/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     // ... otros providers
-    
+
     // Opción 1: Usar el provider directo
     provideTenantBootstrap(),
-    
+
     // Opción 2: Integración personalizada con servicios existentes
     {
       provide: APP_INITIALIZER,
       multi: true,
       useFactory: enhancedTenantBootstrapFactory,
-    }
-  ]
+    },
+  ],
 };
 ```
 
@@ -135,16 +132,16 @@ export class CatalogService {
   getProducts(): Observable<Product[]> {
     // Obtener headers con información del tenant
     const headers = this.getTenantHeaders();
-    
+
     return this.http.get<Product[]>('/api/catalog/products', { headers });
   }
 
   private getTenantHeaders(): HttpHeaders {
     const tenantId = this.tenantBootstrap.getTenantId();
-    
+
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'X-Tenant-ID': tenantId || 'default'
+      'X-Tenant-ID': tenantId || 'default',
     });
   }
 }
@@ -168,9 +165,15 @@ El sistema aplica automáticamente variables CSS que pueden ser usadas en compon
 ### Clases Utilitarias
 
 ```scss
-.tenant-bg-primary { background-color: var(--tenant-primary-color); }
-.tenant-text-primary { color: var(--tenant-primary-color); }
-.tenant-btn-primary { /* Botón con estilo del tenant */ }
+.tenant-bg-primary {
+  background-color: var(--tenant-primary-color);
+}
+.tenant-text-primary {
+  color: var(--tenant-primary-color);
+}
+.tenant-btn-primary {
+  /* Botón con estilo del tenant */
+}
 ```
 
 ### Uso en Componentes
@@ -180,13 +183,11 @@ El sistema aplica automáticamente variables CSS que pueden ser usadas en compon
   template: `
     <header class="tenant-header">
       <img [src]="logoUrl" class="logo" />
-      <h1 class="tenant-text-primary">{{tenantName}}</h1>
+      <h1 class="tenant-text-primary">{{ tenantName }}</h1>
     </header>
-    
-    <button class="tenant-btn-primary">
-      Comprar Ahora
-    </button>
-  `
+
+    <button class="tenant-btn-primary">Comprar Ahora</button>
+  `,
 })
 export class HeaderComponent {
   private readonly tenantBootstrap = inject(TenantBootstrapService);
@@ -206,18 +207,20 @@ export class HeaderComponent {
 El servicio espera un endpoint público que retorne la configuración del tenant:
 
 ### Request
+
 ```
 GET /api/public/tenant/resolve?tenant=demo-a
 ```
 
 ### Response
+
 ```json
 {
   "success": true,
   "data": {
     "tenant": {
       "id": "tenant-123",
-      "slug": "demo-a", 
+      "slug": "demo-a",
       "displayName": "Demo Store A"
     },
     "theme": {
@@ -311,11 +314,10 @@ Para debug, el servicio incluye logs detallados:
 ```javascript
 // En consola del navegador
 console.log('Tenant actual:', tenantBootstrapService.getTenantConfig());
-console.log('Estrategias probadas:', /* logs internos */);
+console.log('Estrategias probadas:' /* logs internos */);
 
 // Variables CSS aplicadas
-console.log(getComputedStyle(document.documentElement)
-  .getPropertyValue('--tenant-primary-color'));
+console.log(getComputedStyle(document.documentElement).getPropertyValue('--tenant-primary-color'));
 ```
 
 ## 🚀 Próximos Pasos

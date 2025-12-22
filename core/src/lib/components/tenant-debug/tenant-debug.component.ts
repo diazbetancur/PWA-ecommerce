@@ -22,7 +22,6 @@ interface ApiTestResult {
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
     <div class="tenant-debug-container">
-      <!-- Header -->
       <div class="debug-header">
         <div class="container">
           <h1 class="debug-title">
@@ -50,7 +49,6 @@ interface ApiTestResult {
 
       <div class="container">
         <div class="debug-grid">
-          <!-- Tenant Information Panel -->
           <div class="debug-card">
             <h2 class="card-title">
               📋 Información del Tenant
@@ -85,7 +83,6 @@ interface ApiTestResult {
               </div>
 
               @if (tenantConfig(); as config) {
-              <!-- Branding Information -->
               <div class="info-group">
                 <h3>Branding</h3>
                 <div class="info-grid">
@@ -141,7 +138,6 @@ interface ApiTestResult {
                 </div>
               </div>
 
-              <!-- Configuration Details -->
               <div class="info-group">
                 <h3>Configuración</h3>
                 <div class="info-grid">
@@ -160,7 +156,6 @@ interface ApiTestResult {
                 </div>
               </div>
 
-              <!-- Features -->
               @if (config.features && Object.keys(config.features).length > 0) {
               <div class="info-group">
                 <h3>Features Habilitadas</h3>
@@ -180,7 +175,6 @@ interface ApiTestResult {
             </div>
           </div>
 
-          <!-- API Testing Panel -->
           <div class="debug-card">
             <h2 class="card-title">🧪 API Testing</h2>
 
@@ -229,7 +223,6 @@ interface ApiTestResult {
                 </button>
               </div>
 
-              <!-- Headers Preview -->
               <div class="headers-preview">
                 <h4>Headers que se enviarán:</h4>
                 <div class="headers-list">
@@ -245,7 +238,6 @@ interface ApiTestResult {
                 </div>
               </div>
 
-              <!-- Test Results -->
               @if (lastTestResult(); as result) {
               <div class="test-results">
                 <h4>
@@ -287,10 +279,7 @@ interface ApiTestResult {
                   }
                 </div>
               </div>
-              }
-
-              <!-- Test History -->
-              @if (testHistory().length > 0) {
+              } @if (testHistory().length > 0) {
               <div class="test-history">
                 <h4>Historial de Tests (últimos 5)</h4>
                 <div class="history-list">
@@ -322,7 +311,6 @@ interface ApiTestResult {
             </div>
           </div>
 
-          <!-- Raw Configuration -->
           <div class="debug-card full-width">
             <h2 class="card-title">⚙️ Configuración Completa (Raw JSON)</h2>
 
@@ -365,20 +353,17 @@ interface ApiTestResult {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
           sans-serif;
       }
-
       .debug-header {
         background: white;
         border-bottom: 2px solid #e5e7eb;
         padding: 2rem 0;
         margin-bottom: 2rem;
       }
-
       .container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 0 1rem;
       }
-
       .debug-title {
         font-size: 2rem;
         font-weight: 700;
@@ -389,7 +374,6 @@ interface ApiTestResult {
         gap: 1rem;
         flex-wrap: wrap;
       }
-
       .tenant-badge {
         background: #3b82f6;
         color: white;
@@ -398,29 +382,24 @@ interface ApiTestResult {
         font-size: 1rem;
         font-weight: 600;
       }
-
       .debug-actions {
         display: flex;
         gap: 1rem;
         margin-top: 1rem;
       }
-
       .debug-grid {
         display: grid;
         grid-template-columns: 1fr;
         gap: 2rem;
       }
-
       @media (min-width: 1024px) {
         .debug-grid {
           grid-template-columns: 1fr 1fr;
         }
-
         .full-width {
           grid-column: 1 / -1;
         }
       }
-
       .debug-card {
         background: white;
         border-radius: 12px;
@@ -428,7 +407,6 @@ interface ApiTestResult {
         padding: 2rem;
         border: 1px solid #e5e7eb;
       }
-
       .card-title {
         font-size: 1.5rem;
         font-weight: 600;
@@ -439,7 +417,6 @@ interface ApiTestResult {
         gap: 1rem;
         flex-wrap: wrap;
       }
-
       .status-indicator {
         font-size: 0.75rem;
         padding: 0.25rem 0.75rem;
@@ -447,28 +424,23 @@ interface ApiTestResult {
         font-weight: 600;
         text-transform: uppercase;
       }
-
       .status-indicator.loading {
         background: #fef3c7;
         color: #92400e;
       }
-
       .status-indicator.ok {
         background: #d1fae5;
         color: #065f46;
       }
-
       .status-indicator.error {
         background: #fee2e2;
         color: #991b1b;
       }
-
       .info-section {
         display: flex;
         flex-direction: column;
         gap: 2rem;
       }
-
       .info-group h3 {
         font-size: 1.125rem;
         font-weight: 600;
@@ -477,25 +449,21 @@ interface ApiTestResult {
         padding-bottom: 0.5rem;
         border-bottom: 2px solid #f3f4f6;
       }
-
       .info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1rem;
       }
-
       .info-item {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
       }
-
       .info-item label {
         font-weight: 600;
         color: #6b7280;
         font-size: 0.875rem;
       }
-
       .info-item code {
         background: #f3f4f6;
         padding: 0.5rem;
@@ -504,35 +472,29 @@ interface ApiTestResult {
         font-size: 0.875rem;
         word-break: break-all;
       }
-
       .status-badge {
         padding: 0.25rem 0.75rem;
         border-radius: 1rem;
         font-size: 0.75rem;
         font-weight: 600;
       }
-
       .status-badge.loading {
         background: #fef3c7;
         color: #92400e;
       }
-
       .status-badge.ok {
         background: #d1fae5;
         color: #065f46;
       }
-
       .status-badge.error {
         background: #fee2e2;
         color: #991b1b;
       }
-
       .logo-preview {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
       }
-
       .logo-img {
         max-width: 120px;
         max-height: 40px;
@@ -542,17 +504,14 @@ interface ApiTestResult {
         padding: 0.5rem;
         background: white;
       }
-
       .logo-url {
         word-break: break-all;
       }
-
       .color-preview {
         display: flex;
         align-items: center;
         gap: 0.75rem;
       }
-
       .color-swatch {
         width: 2rem;
         height: 2rem;
@@ -560,13 +519,11 @@ interface ApiTestResult {
         border: 2px solid #e5e7eb;
         flex-shrink: 0;
       }
-
       .features-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 0.5rem;
       }
-
       .feature-item {
         display: flex;
         justify-content: space-between;
@@ -576,39 +533,31 @@ interface ApiTestResult {
         background: #f9fafb;
         border: 1px solid #e5e7eb;
       }
-
       .feature-item.enabled {
         background: #f0fdf4;
         border-color: #bbf7d0;
       }
-
       .feature-name {
         font-weight: 500;
         color: #374151;
       }
-
-      /* API Testing Styles */
       .test-form {
         margin-bottom: 2rem;
       }
-
       .form-group {
         margin-bottom: 1rem;
       }
-
       .form-group label {
         display: block;
         font-weight: 600;
         color: #374151;
         margin-bottom: 0.5rem;
       }
-
       .input-with-button {
         display: flex;
         gap: 0.5rem;
         flex-wrap: wrap;
       }
-
       .endpoint-select,
       .custom-endpoint-input {
         padding: 0.75rem;
@@ -617,22 +566,18 @@ interface ApiTestResult {
         font-family: 'Monaco', 'Consolas', monospace;
         font-size: 0.875rem;
       }
-
       .endpoint-select {
         flex: 1;
         min-width: 200px;
       }
-
       .custom-endpoint-input {
         flex: 1;
         min-width: 250px;
       }
-
       .test-button {
         width: 100%;
         justify-content: center;
       }
-
       .headers-preview {
         background: #f9fafb;
         border: 1px solid #e5e7eb;
@@ -640,20 +585,17 @@ interface ApiTestResult {
         padding: 1rem;
         margin-bottom: 2rem;
       }
-
       .headers-preview h4 {
         margin: 0 0 0.75rem 0;
         color: #374151;
         font-size: 0.875rem;
         font-weight: 600;
       }
-
       .headers-list {
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
       }
-
       .header-item code {
         background: #1f2937;
         color: #f9fafb;
@@ -661,14 +603,12 @@ interface ApiTestResult {
         border-radius: 0.25rem;
         font-size: 0.75rem;
       }
-
       .test-results {
         border: 2px solid #e5e7eb;
         border-radius: 0.5rem;
         padding: 1.5rem;
         margin-bottom: 2rem;
       }
-
       .test-results h4 {
         margin: 0 0 1rem 0;
         display: flex;
@@ -676,59 +616,48 @@ interface ApiTestResult {
         gap: 1rem;
         flex-wrap: wrap;
       }
-
       .result-badge {
         padding: 0.25rem 0.75rem;
         border-radius: 1rem;
         font-size: 0.75rem;
         font-weight: 600;
       }
-
       .result-badge.success {
         background: #d1fae5;
         color: #065f46;
       }
-
       .result-badge.error {
         background: #fee2e2;
         color: #991b1b;
       }
-
       .test-timestamp {
         color: #6b7280;
         font-weight: normal;
       }
-
       .status-info {
         margin-bottom: 1rem;
         font-size: 0.875rem;
       }
-
       .status-info code {
         padding: 0.25rem 0.5rem;
         border-radius: 0.25rem;
         font-weight: 600;
       }
-
       .status-info code.status-2xx {
         background: #d1fae5;
         color: #065f46;
       }
-
       .status-info code.status-4xx {
         background: #fef3c7;
         color: #92400e;
       }
-
       .status-info code.status-5xx {
         background: #fee2e2;
         color: #991b1b;
       }
-
       .response-headers {
         margin-bottom: 1rem;
       }
-
       .response-headers summary {
         cursor: pointer;
         font-weight: 600;
@@ -737,13 +666,11 @@ interface ApiTestResult {
         background: #f9fafb;
         border-radius: 0.25rem;
       }
-
       .response-data h5 {
         margin: 0 0 0.5rem 0;
         color: #374151;
         font-weight: 600;
       }
-
       .json-response {
         background: #1f2937;
         color: #f9fafb;
@@ -757,84 +684,68 @@ interface ApiTestResult {
         white-space: pre-wrap;
         word-break: break-word;
       }
-
       .json-response.success {
         border-left: 4px solid #10b981;
       }
-
       .json-response.error {
         border-left: 4px solid #ef4444;
         background: #7f1d1d;
         color: #fecaca;
       }
-
-      /* Test History */
       .test-history {
         border-top: 1px solid #e5e7eb;
         padding-top: 1.5rem;
       }
-
       .test-history h4 {
         margin: 0 0 1rem 0;
         color: #374151;
         font-weight: 600;
       }
-
       .history-list {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
       }
-
       .history-item {
         padding: 0.75rem;
         border-radius: 0.375rem;
         border: 1px solid #e5e7eb;
       }
-
       .history-item.success {
         background: #f0fdf4;
         border-color: #bbf7d0;
       }
-
       .history-item.error {
         background: #fef2f2;
         border-color: #fecaca;
       }
-
       .history-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 1rem;
       }
-
       .history-endpoint {
         font-family: 'Monaco', 'Consolas', monospace;
         font-size: 0.875rem;
         font-weight: 600;
       }
-
       .history-time {
         font-size: 0.75rem;
         color: #6b7280;
       }
-
       .history-error {
         margin-top: 0.5rem;
         font-size: 0.875rem;
         color: #dc2626;
         font-family: 'Monaco', 'Consolas', monospace;
       }
-
-      /* JSON Viewer */
       .json-viewer {
         background: #1f2937;
         border-radius: 0.5rem;
         overflow: hidden;
         margin-bottom: 1rem;
       }
-
       .json-content {
         background: #1f2937;
         color: #f9fafb;
@@ -848,21 +759,17 @@ interface ApiTestResult {
         word-break: break-word;
         max-height: 500px;
       }
-
       .no-data {
         padding: 2rem;
         text-align: center;
         color: #6b7280;
         font-style: italic;
       }
-
       .json-actions {
         display: flex;
         gap: 1rem;
         flex-wrap: wrap;
       }
-
-      /* Buttons */
       .btn {
         display: inline-flex;
         align-items: center;
@@ -876,45 +783,37 @@ interface ApiTestResult {
         text-decoration: none;
         border: 1px solid transparent;
       }
-
       .btn:disabled {
         opacity: 0.6;
         cursor: not-allowed;
       }
-
       .btn-primary {
         background: #3b82f6;
         color: white;
         border-color: #3b82f6;
       }
-
       .btn-primary:hover:not(:disabled) {
         background: #2563eb;
         border-color: #2563eb;
       }
-
       .btn-secondary {
         background: #6b7280;
         color: white;
         border-color: #6b7280;
       }
-
       .btn-secondary:hover:not(:disabled) {
         background: #4b5563;
         border-color: #4b5563;
       }
-
       .btn-outline {
         background: transparent;
         color: #374151;
         border-color: #d1d5db;
       }
-
       .btn-outline:hover:not(:disabled) {
         background: #f3f4f6;
         border-color: #9ca3af;
       }
-
       .loading-spinner {
         display: inline-block;
         width: 14px;
@@ -924,31 +823,24 @@ interface ApiTestResult {
         border-radius: 50%;
         animation: spin 1s linear infinite;
       }
-
       @keyframes spin {
         to {
           transform: rotate(360deg);
         }
       }
-
-      /* Responsive */
       @media (max-width: 768px) {
         .debug-title {
           font-size: 1.5rem;
         }
-
         .debug-actions {
           flex-direction: column;
         }
-
         .debug-card {
           padding: 1.5rem;
         }
-
         .info-grid {
           grid-template-columns: 1fr;
         }
-
         .history-header {
           flex-direction: column;
           align-items: flex-start;
@@ -962,7 +854,6 @@ export class TenantDebugComponent {
   private readonly tenantContext = inject(TenantContextService);
   private readonly apiClient = inject(ApiClientService);
 
-  // Reactive state
   selectedEndpoint = signal('/api/catalog/products');
   customEndpoint = signal('');
   isTestRunning = signal(false);
@@ -970,7 +861,6 @@ export class TenantDebugComponent {
   lastTestResult = signal<ApiTestResult | null>(null);
   testHistory = signal<ApiTestResult[]>([]);
 
-  // Computed properties from tenant context
   tenantConfig = computed(() => this.tenantContext.getCurrentTenantConfig());
   tenantSlug = computed(() => this.tenantContext.getTenantSlug());
   tenantKey = computed(() => this.tenantContext.getTenantKey());
@@ -989,25 +879,17 @@ export class TenantDebugComponent {
     };
   });
 
-  /**
-   * Refresh tenant information
-   */
   async refreshTenantInfo(): Promise<void> {
     this.isRefreshing.set(true);
-
     try {
       await this.tenantBootstrap.initialize();
-      console.log('✅ Tenant info refreshed');
     } catch (error) {
-      console.error('❌ Error refreshing tenant info:', error);
+      console.error('Error refreshing tenant info:', error);
     } finally {
       this.isRefreshing.set(false);
     }
   }
 
-  /**
-   * Execute API test
-   */
   async runApiTest(): Promise<void> {
     const endpoint =
       this.selectedEndpoint() === 'custom'
@@ -1023,8 +905,6 @@ export class TenantDebugComponent {
     const startTime = Date.now();
 
     try {
-      console.log(`🧪 Testing API endpoint: ${endpoint}`);
-
       const response = await this.apiClient.get(endpoint).toPromise();
       const duration = Date.now() - startTime;
 
@@ -1043,8 +923,6 @@ export class TenantDebugComponent {
 
       this.lastTestResult.set(result);
       this.addToHistory(result);
-
-      console.log('✅ API test successful:', result);
     } catch (error: any) {
       const duration = Date.now() - startTime;
 
@@ -1058,28 +936,19 @@ export class TenantDebugComponent {
 
       this.lastTestResult.set(result);
       this.addToHistory(result);
-
-      console.error('❌ API test failed:', result);
     } finally {
       this.isTestRunning.set(false);
     }
   }
 
-  /**
-   * Add test result to history
-   */
   private addToHistory(result: ApiTestResult): void {
     const history = [...this.testHistory(), result];
-    // Keep only last 10 results
     if (history.length > 10) {
       history.shift();
     }
     this.testHistory.set(history);
   }
 
-  /**
-   * Format error for display
-   */
   private formatError(error: any): string {
     if (error?.error?.message) {
       return `${error.status} ${error.statusText}: ${error.error.message}`;
@@ -1093,9 +962,6 @@ export class TenantDebugComponent {
     return JSON.stringify(error, null, 2);
   }
 
-  /**
-   * Format JSON for display
-   */
   formatJson(data: any): string {
     try {
       return JSON.stringify(data, null, 2);
@@ -1104,18 +970,12 @@ export class TenantDebugComponent {
     }
   }
 
-  /**
-   * Format headers for display
-   */
   formatHeaders(headers: Record<string, string>): string {
     return Object.entries(headers)
       .map(([key, value]) => `${key}: ${value}`)
       .join('\n');
   }
 
-  /**
-   * Get CSS class for HTTP status
-   */
   getStatusClass(status: number): string {
     if (status >= 200 && status < 300) return 'status-2xx';
     if (status >= 400 && status < 500) return 'status-4xx';
@@ -1123,25 +983,17 @@ export class TenantDebugComponent {
     return '';
   }
 
-  /**
-   * Get endpoint from test result
-   */
   getEndpointFromTest(test: ApiTestResult): string {
-    // Extract endpoint from test metadata or use a default
     return this.selectedEndpoint() === 'custom'
       ? this.customEndpoint()
       : this.selectedEndpoint();
   }
 
-  /**
-   * Copy text to clipboard
-   */
   async copyToClipboard(text: string): Promise<void> {
     try {
       await navigator.clipboard.writeText(text);
       alert('📋 JSON copiado al portapapeles');
     } catch {
-      // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = text;
       document.body.appendChild(textArea);
@@ -1152,9 +1004,6 @@ export class TenantDebugComponent {
     }
   }
 
-  /**
-   * Download configuration as JSON file
-   */
   downloadJson(): void {
     const config = this.tenantConfig();
     if (!config) {
@@ -1177,8 +1026,5 @@ export class TenantDebugComponent {
     URL.revokeObjectURL(url);
   }
 
-  /**
-   * Utility method to get Object.entries for template
-   */
   Object = Object;
 }

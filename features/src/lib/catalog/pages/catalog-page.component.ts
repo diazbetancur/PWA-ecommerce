@@ -9,27 +9,23 @@ import {
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { EMPTY, firstValueFrom, of } from 'rxjs';
-import {
-  catchError,
-  debounceTime,
-  distinctUntilChanged,
-  startWith,
-  switchMap,
-} from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { TenantContextService } from '@pwa/core';
 import {
+  Banner,
+  BannerCarouselComponent,
   ProductCardComponent,
   ProductCardData,
   ProductsGridSkeletonComponent,
 } from '@pwa/shared';
 import {
   CatalogFilters,
-  ProductsResponse,
+  Category,
   ProductSummary,
 } from '../models/catalog.models';
 import { CatalogService } from '../services/catalog.service';
+import { StoreService } from '../services/store.service';
 
 @Component({
   selector: 'app-catalog-page',
@@ -38,108 +34,120 @@ import { CatalogService } from '../services/catalog.service';
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+    BannerCarouselComponent,
     ProductCardComponent,
     ProductsGridSkeletonComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="catalog-page">
-      <!-- Header del catálogo -->
-      <header class="catalog-header tenant-bg-primary">
+    <div class="home-page">
+      <!-- Banner Section -->
+      @if (banners().length > 0) {
+      <section class="banner-section">
+        <app-banner-carousel [banners]="banners()" [autoPlayInterval]="5000" />
+      </section>
+      }
+
+      <!-- Categories Section -->
+      @if (categories().length > 0) {
+      <section class="categories-section">
         <div class="container">
-          <h1 class="catalog-title">{{ tenantDisplayName() }}</h1>
-          <p class="catalog-subtitle">Explora nuestros productos</p>
+          <h2 class="section-title">Categorías</h2>
+          <div class="categories-scroll">
+            <button
+              class="category-chip"
+              [class.active]="!selectedCategory()"
+              (click)="selectCategory(null)"
+            >
+              Todos
+            </button>
+            @for (category of categories(); track category.id) {
+            <button
+              class="category-chip"
+              [class.active]="selectedCategory() === category.slug"
+              (click)="selectCategory(category.slug)"
+            >
+              {{ category.name }}
+            </button>
+            }
+          </div>
         </div>
-      </header>
+      </section>
+      }
 
-      <!-- Filtros y búsqueda -->
-      <section class="filters-section">
+      <!-- Search Section -->
+      <section class="search-section">
         <div class="container">
-          <div class="filters-bar">
-            <!-- Búsqueda -->
-            <div class="search-box">
-              <input
-                [formControl]="searchControl"
-                type="text"
-                placeholder="Buscar productos..."
-                class="search-input"
-              />
+          <div class="search-wrapper">
+            <svg
+              class="search-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input
+              [formControl]="searchControl"
+              type="text"
+              placeholder="Buscar productos..."
+              class="search-input"
+            />
+            @if (searchControl.value) {
+            <button
+              class="clear-search"
+              (click)="clearSearch()"
+              aria-label="Limpiar búsqueda"
+            >
               <svg
-                class="search-icon"
-                width="20"
-                height="20"
                 viewBox="0 0 24 24"
-                fill="currentColor"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
               >
-                <path
-                  d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-                />
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
-            </div>
-
-            <!-- Filtros adicionales -->
-            <div class="filter-controls">
-              <select
-                class="filter-select"
-                [value]="currentFilters().categoryId || ''"
-                (change)="onCategoryChange($event)"
-              >
-                <option value="">Todas las categorías</option>
-                @for (category of availableCategories(); track category.id) {
-                <option [value]="category.id">{{ category.name }}</option>
-                }
-              </select>
-
-              <button
-                class="filter-toggle-btn"
-                [class.active]="currentFilters().inStock"
-                (click)="toggleInStockFilter()"
-              >
-                Solo en stock
-              </button>
-
-              @if (hasActiveFilters()) {
-              <button class="clear-filters-btn" (click)="clearFilters()">
-                Limpiar filtros
-              </button>
-              }
-            </div>
+            </button>
+            }
           </div>
         </div>
       </section>
 
-      <!-- Grid de productos -->
+      <!-- Products Section -->
       <main class="products-section">
         <div class="container">
-          <!-- Estado de carga -->
+          <!-- Results Info -->
+          @if (!isLoading() && products().length > 0) {
+          <div class="results-info">
+            <span class="results-count"
+              >{{ pagination().total }} productos</span
+            >
+            @if (hasActiveFilters()) {
+            <button class="clear-filters" (click)="clearFilters()">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+              Limpiar filtros
+            </button>
+            }
+          </div>
+          }
+
+          <!-- Loading State -->
           @if (isLoading()) {
           <app-products-grid-skeleton />
           }
 
-          <!-- Estado de error -->
-          @else if (error()) {
-          <div class="error-state">
-            <div class="error-content">
-              <svg
-                width="64"
-                height="64"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path
-                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
-                />
-              </svg>
-              <h3>Error al cargar productos</h3>
-              <p>{{ error() }}</p>
-              <button class="tenant-btn-primary" (click)="retryLoad()">
-                Reintentar
-              </button>
-            </div>
-          </div>
-          }
-
-          <!-- Lista de productos -->
+          <!-- Products Grid -->
           @else if (products().length > 0) {
           <div class="products-grid">
             @for (product of products(); track product.id) {
@@ -152,55 +160,39 @@ import { CatalogService } from '../services/catalog.service';
             }
           </div>
 
-          <!-- Paginación -->
+          <!-- Load More -->
           @if (showLoadMore()) {
-          <div class="pagination-section">
+          <div class="load-more-wrapper">
             <button
-              class="load-more-btn tenant-btn-secondary"
+              class="load-more-btn"
               [disabled]="isLoadingMore()"
               (click)="loadMore()"
             >
               @if (isLoadingMore()) {
-              <svg class="spinner" width="20" height="20" viewBox="0 0 24 24">
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                  fill="none"
-                  opacity="0.25"
-                />
-                <path
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  fill="currentColor"
-                />
-              </svg>
-              Cargando... } @else { Cargar más productos }
+              <span class="spinner"></span>
+              Cargando... } @else { Ver más productos }
             </button>
           </div>
           } }
 
-          <!-- Estado vacío -->
-          @else {
+          <!-- Empty State -->
+          @else if (!isLoading()) {
           <div class="empty-state">
-            <div class="empty-content">
-              <svg
-                width="96"
-                height="96"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path
-                  d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                />
-              </svg>
-              <h3>No se encontraron productos</h3>
-              <p>Intenta ajustar los filtros o realiza una nueva búsqueda</p>
-              <button class="tenant-btn-primary" (click)="clearFilters()">
-                Ver todos los productos
-              </button>
-            </div>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+              <line x1="8" y1="11" x2="14" y2="11" />
+            </svg>
+            <h3>No se encontraron productos</h3>
+            <p>Intenta con otros términos o limpia los filtros</p>
+            <button class="retry-btn" (click)="clearFilters()">
+              Ver todos los productos
+            </button>
           </div>
           }
         </div>
@@ -209,237 +201,316 @@ import { CatalogService } from '../services/catalog.service';
   `,
   styles: [
     `
-      .catalog-page {
+      .home-page {
         min-height: 100vh;
+        background: var(--bg-color, #fff);
       }
 
       .container {
-        max-width: 1200px;
+        max-width: 1280px;
         margin: 0 auto;
         padding: 0 1rem;
       }
 
-      .catalog-header {
-        padding: 3rem 0;
-        text-align: center;
-        color: white;
+      /* Banner Section */
+      .banner-section {
+        padding: 1rem;
       }
 
-      .catalog-title {
-        margin: 0 0 0.5rem 0;
-        font-size: 2.5rem;
-        font-weight: 700;
-      }
-
-      .catalog-subtitle {
-        margin: 0;
-        font-size: 1.125rem;
-        opacity: 0.9;
-      }
-
-      .filters-section {
-        padding: 2rem 0;
-        background: var(--tenant-surface-variant, #f8f9fa);
-        border-bottom: 1px solid var(--tenant-outline, rgba(0, 0, 0, 0.1));
-      }
-
-      .filters-bar {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
-      .search-box {
-        position: relative;
-        flex: 1;
-        min-width: 280px;
-      }
-
-      .search-input {
-        width: 100%;
-        padding: 12px 16px 12px 44px;
-        border: 1px solid var(--tenant-outline, #d1d5db);
-        border-radius: 8px;
-        font-size: 1rem;
-        background: white;
-
-        &:focus {
-          outline: none;
-          border-color: var(--tenant-primary-color, #1976d2);
-          box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+      @media (min-width: 768px) {
+        .banner-section {
+          padding: 1.5rem;
         }
+      }
+
+      /* Categories Section */
+      .categories-section {
+        padding: 1.5rem 0;
+        background: var(--bg-color, #fff);
+      }
+
+      .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 1rem;
+        color: var(--text-color, #1f2937);
+      }
+
+      .categories-scroll {
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      .categories-scroll::-webkit-scrollbar {
+        display: none;
+      }
+
+      .category-chip {
+        flex-shrink: 0;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 2rem;
+        background: #fff;
+        color: var(--text-color, #374151);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+
+      .category-chip:hover {
+        border-color: var(--primary-color, #3b82f6);
+        color: var(--primary-color, #3b82f6);
+      }
+
+      .category-chip.active {
+        background: var(--primary-color, #3b82f6);
+        border-color: var(--primary-color, #3b82f6);
+        color: #fff;
+      }
+
+      /* Search Section */
+      .search-section {
+        padding: 1rem 0 1.5rem;
+        background: var(--hover-bg, #f9fafb);
+        border-bottom: 1px solid var(--border-color, #e5e7eb);
+      }
+
+      .search-wrapper {
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto;
       }
 
       .search-icon {
         position: absolute;
-        left: 12px;
+        left: 1rem;
         top: 50%;
         transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        color: #9ca3af;
+        pointer-events: none;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 0.875rem 3rem 0.875rem 3rem;
+        border: 1px solid var(--border-color, #e5e7eb);
+        border-radius: 0.75rem;
+        font-size: 1rem;
+        background: #fff;
+        transition: all 0.2s;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color, #3b82f6);
+        box-shadow: 0 0 0 3px var(--primary-light, rgba(59, 130, 246, 0.1));
+      }
+
+      .search-input::placeholder {
+        color: #9ca3af;
+      }
+
+      .clear-search {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        border: none;
+        background: var(--hover-bg, #f3f4f6);
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        transition: all 0.2s;
+      }
+
+      .clear-search:hover {
+        background: #e5e7eb;
+        color: #374151;
+      }
+
+      .clear-search svg {
+        width: 14px;
+        height: 14px;
+      }
+
+      /* Products Section */
+      .products-section {
+        padding: 1.5rem 0 3rem;
+      }
+
+      .results-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+
+      .results-count {
+        font-size: 0.875rem;
         color: #6b7280;
       }
 
-      .filter-controls {
+      .clear-filters {
         display: flex;
-        gap: 1rem;
         align-items: center;
-        flex-wrap: wrap;
-      }
-
-      .filter-select {
-        padding: 8px 12px;
-        border: 1px solid var(--tenant-outline, #d1d5db);
-        border-radius: 8px;
-        background: white;
-        font-size: 0.875rem;
-
-        &:focus {
-          outline: none;
-          border-color: var(--tenant-primary-color, #1976d2);
-        }
-      }
-
-      .filter-toggle-btn {
-        padding: 8px 16px;
-        border: 1px solid var(--tenant-outline, #d1d5db);
-        border-radius: 8px;
-        background: white;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background: #f8f9fa;
-        }
-
-        &.active {
-          background: var(--tenant-primary-color, #1976d2);
-          color: white;
-          border-color: var(--tenant-primary-color, #1976d2);
-        }
-      }
-
-      .clear-filters-btn {
-        padding: 8px 16px;
+        gap: 0.375rem;
+        padding: 0.375rem 0.75rem;
         border: none;
-        background: #ef4444;
-        color: white;
-        border-radius: 8px;
+        background: none;
+        color: var(--primary-color, #3b82f6);
         font-size: 0.875rem;
+        font-weight: 500;
         cursor: pointer;
-
-        &:hover {
-          background: #dc2626;
-        }
+        transition: opacity 0.2s;
       }
 
-      .products-section {
-        padding: 2rem 0;
+      .clear-filters:hover {
+        opacity: 0.8;
+      }
+
+      .clear-filters svg {
+        width: 14px;
+        height: 14px;
       }
 
       .products-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 3rem;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
       }
 
-      .pagination-section {
+      @media (min-width: 640px) {
+        .products-grid {
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.25rem;
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .products-grid {
+          grid-template-columns: repeat(4, 1fr);
+          gap: 1.5rem;
+        }
+      }
+
+      /* Load More */
+      .load-more-wrapper {
         text-align: center;
+        margin-top: 2rem;
       }
 
       .load-more-btn {
-        padding: 12px 24px;
-        font-size: 1rem;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
+        gap: 0.5rem;
+        padding: 0.75rem 2rem;
+        border: 1px solid var(--primary-color, #3b82f6);
+        border-radius: 0.5rem;
+        background: #fff;
+        color: var(--primary-color, #3b82f6);
+        font-size: 0.9375rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .load-more-btn:hover:not(:disabled) {
+        background: var(--primary-color, #3b82f6);
+        color: #fff;
+      }
+
+      .load-more-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
       }
 
       .spinner {
-        animation: spin 1s linear infinite;
+        width: 18px;
+        height: 18px;
+        border: 2px solid currentColor;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
       }
 
       @keyframes spin {
-        from {
-          transform: rotate(0deg);
-        }
         to {
           transform: rotate(360deg);
         }
       }
 
-      .error-state,
+      /* Empty State */
       .empty-state {
-        padding: 4rem 0;
         text-align: center;
+        padding: 4rem 1rem;
       }
 
-      .error-content,
-      .empty-content {
-        max-width: 400px;
-        margin: 0 auto;
+      .empty-state svg {
+        width: 80px;
+        height: 80px;
+        color: #d1d5db;
+        margin-bottom: 1.5rem;
       }
 
-      .error-content svg,
-      .empty-content svg {
-        color: #9ca3af;
-        margin-bottom: 1rem;
-      }
-
-      .error-content h3,
-      .empty-content h3 {
-        margin: 0 0 0.5rem 0;
+      .empty-state h3 {
         font-size: 1.25rem;
-        color: var(--tenant-text-color, #333);
+        font-weight: 600;
+        color: var(--text-color, #1f2937);
+        margin: 0 0 0.5rem;
       }
 
-      .error-content p,
-      .empty-content p {
-        margin: 0 0 1.5rem 0;
+      .empty-state p {
         color: #6b7280;
+        margin: 0 0 1.5rem;
       }
 
-      /* Responsive */
-      @media (max-width: 768px) {
-        .catalog-title {
-          font-size: 2rem;
-        }
+      .retry-btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 0.5rem;
+        background: var(--primary-color, #3b82f6);
+        color: #fff;
+        font-size: 0.9375rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
 
-        .filters-bar {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .search-box {
-          min-width: auto;
-        }
-
-        .filter-controls {
-          justify-content: center;
-        }
-
-        .products-grid {
-          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-          gap: 1rem;
-        }
+      .retry-btn:hover {
+        background: var(--primary-hover, #2563eb);
       }
     `,
   ],
 })
 export class CatalogPageComponent implements OnInit {
   private readonly catalogService = inject(CatalogService);
+  private readonly storeService = inject(StoreService);
   private readonly tenantContext = inject(TenantContextService);
 
-  // Form controls
   readonly searchControl = new FormControl<string>('');
 
-  // Signals
+  readonly banners = signal<Banner[]>([]);
+  readonly categories = signal<Category[]>([]);
   readonly products = signal<ProductSummary[]>([]);
-  readonly availableCategories = signal<any[]>([]);
-  readonly isLoading = signal<boolean>(true);
-  readonly isLoadingMore = signal<boolean>(false);
-  readonly error = signal<string | null>(null);
+  readonly selectedCategory = signal<string | null>(null);
+  readonly isLoading = signal(true);
+  readonly isLoadingMore = signal(false);
   readonly currentFilters = signal<CatalogFilters>({});
   readonly pagination = signal({
     page: 1,
@@ -448,158 +519,127 @@ export class CatalogPageComponent implements OnInit {
     totalPages: 0,
   });
 
-  // Computed properties
-  readonly tenantDisplayName = computed(
-    () =>
-      this.tenantContext.getCurrentTenantConfig()?.tenant.displayName ??
-      'Catálogo'
-  );
-
   readonly hasActiveFilters = computed(() => {
     const filters = this.currentFilters();
-    return !!(filters.search || filters.categoryId || filters.inStock);
+    return !!(filters.search || filters.categorySlug);
   });
 
   readonly showLoadMore = computed(() => {
-    const pag = this.pagination();
-    return pag.page < pag.totalPages && !this.isLoading();
+    const p = this.pagination();
+    return p.page < p.totalPages && !this.isLoading();
   });
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.loadBanners();
+    this.loadCategories();
+    this.loadProducts(true);
     this.setupSearch();
-    this.loadInitialData();
   }
 
-  private setupSearch() {
+  private setupSearch(): void {
     this.searchControl.valueChanges
-      .pipe(
-        startWith(''),
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap((query) => {
-          this.updateFilters({ search: query || undefined });
-          // Retornar observable en lugar de Subscription para evitar error de tipos
-          return this.catalogService.getProducts(1, 20, this.currentFilters());
-        }),
-        catchError((error) => {
-          this.error.set('Error en la búsqueda: ' + error.message);
-          return EMPTY;
-        })
-      )
-      .subscribe();
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe((value) => {
+        this.currentFilters.update((f) => ({
+          ...f,
+          search: value || undefined,
+        }));
+        this.loadProducts(true);
+      });
   }
 
-  private async loadInitialData() {
-    try {
-      this.isLoading.set(true);
-      this.error.set(null);
-      const categoriesResult = await firstValueFrom(
-        this.catalogService.getCategories()
-      );
-      if (categoriesResult?.success) {
-        this.availableCategories.set(categoriesResult.data);
-      }
-      // Cargar productos iniciales usando método existente
-      this.loadProducts(true);
-    } catch (error: any) {
-      this.error.set('Error cargando el catálogo: ' + error.message);
-    } finally {
-      this.isLoading.set(false);
-    }
+  private loadBanners(): void {
+    this.storeService.getBanners('hero').subscribe((banners) => {
+      const mapped: Banner[] = banners.map((b) => ({
+        id: b.id,
+        title: b.title,
+        subtitle: b.subtitle,
+        imageUrlDesktop: b.imageUrlDesktop,
+        imageUrlMobile: b.imageUrlMobile,
+        targetUrl: b.targetUrl,
+        buttonText: b.buttonText,
+      }));
+      this.banners.set(mapped);
+    });
   }
 
-  private loadProducts(reset = false) {
-    const filters = this.currentFilters();
-    const currentPage = reset ? 1 : this.pagination().page;
+  private loadCategories(): void {
+    this.storeService.getFlatCategories().subscribe((categories) => {
+      this.categories.set(categories);
+    });
+  }
 
+  private loadProducts(reset: boolean): void {
     if (reset) {
       this.isLoading.set(true);
+      this.pagination.update((p) => ({ ...p, page: 1 }));
     } else {
       this.isLoadingMore.set(true);
     }
 
-    return this.catalogService
-      .getProducts(currentPage, 20, filters)
-      .pipe(
-        catchError((error) => {
-          this.error.set('Error cargando productos: ' + error.message);
-          return of({
-            success: false,
-            data: [],
-            total: 0,
-            page: 1,
-            pageSize: 20,
-            totalPages: 0,
-          } as ProductsResponse);
-        })
-      )
-      .subscribe((response) => {
+    const page = reset ? 1 : this.pagination().page;
+    const filters = this.currentFilters();
+
+    this.catalogService.getProducts(page, 20, filters).subscribe({
+      next: (response) => {
         if (response.success) {
           if (reset) {
             this.products.set(response.data);
           } else {
-            this.products.update((current) => [...current, ...response.data]);
+            this.products.update((p) => [...p, ...response.data]);
           }
-
           this.pagination.set({
             page: response.page,
             pageSize: response.pageSize,
             total: response.total,
             totalPages: response.totalPages,
           });
-
-          this.error.set(null);
         }
-
         this.isLoading.set(false);
         this.isLoadingMore.set(false);
-      });
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.isLoadingMore.set(false);
+      },
+    });
   }
 
-  // Event handlers
-  onCategoryChange(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    const categoryId = select.value || undefined;
-    this.updateFilters({ categoryId });
+  selectCategory(categorySlug: string | null): void {
+    this.selectedCategory.set(categorySlug);
+    this.currentFilters.update((f) => ({
+      ...f,
+      categorySlug: categorySlug || undefined,
+    }));
     this.loadProducts(true);
   }
 
-  toggleInStockFilter() {
-    const current = this.currentFilters();
-    this.updateFilters({ inStock: !current.inStock });
-    this.loadProducts(true);
+  clearSearch(): void {
+    this.searchControl.setValue('');
   }
 
-  clearFilters() {
+  clearFilters(): void {
     this.searchControl.setValue('', { emitEvent: false });
+    this.selectedCategory.set(null);
     this.currentFilters.set({});
     this.loadProducts(true);
   }
 
-  loadMore() {
+  loadMore(): void {
     if (this.showLoadMore() && !this.isLoadingMore()) {
       this.pagination.update((p) => ({ ...p, page: p.page + 1 }));
       this.loadProducts(false);
     }
   }
 
-  retryLoad() {
-    this.loadProducts(true);
-  }
-
-  onAddToCart(product: ProductCardData) {
+  onAddToCart(product: ProductCardData): void {
     console.log('Agregar al carrito:', product);
-    // Placeholder: integrar con CartService cuando esté disponible
-    alert(`${product.name} agregado al carrito`);
   }
 
-  onQuickView(product: ProductCardData) {
-    console.log('Vista rápida:', product);
-    // Placeholder: abrir modal o navegar a detalle
-    window.open(`/product/${product.id}`, '_blank');
+  onQuickView(product: ProductCardData): void {
+    console.log('Ver producto:', product);
   }
 
-  // Utilities
   mapToCardData(product: ProductSummary): ProductCardData {
     return {
       id: product.id,
@@ -608,9 +648,5 @@ export class CatalogPageComponent implements OnInit {
       imageUrl: product.imageUrl,
       stock: product.stock,
     };
-  }
-
-  private updateFilters(newFilters: Partial<CatalogFilters>) {
-    this.currentFilters.update((current) => ({ ...current, ...newFilters }));
   }
 }

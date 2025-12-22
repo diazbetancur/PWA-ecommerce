@@ -9,7 +9,7 @@ import { TenantHeaderInterceptor } from '../interceptors/tenant-header.intercept
 export const provideTenantHeaderInterceptor = (): Provider => ({
   provide: HTTP_INTERCEPTORS,
   useClass: TenantHeaderInterceptor,
-  multi: true
+  multi: true,
 });
 
 /**
@@ -17,7 +17,7 @@ export const provideTenantHeaderInterceptor = (): Provider => ({
  * Útil para futuras extensiones (autenticación, logging, etc.)
  */
 export const provideTenantInterceptors = (): Provider[] => [
-  provideTenantHeaderInterceptor()
+  provideTenantHeaderInterceptor(),
   // Aquí se pueden agregar más interceptors en el futuro:
   // provideTenantAuthInterceptor(),
   // provideTenantLoggingInterceptor(),
