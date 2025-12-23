@@ -7,18 +7,6 @@
             <mat-icon>category</mat-icon>
             <h1>Categorías</h1>
           </div>
-
-          @if (canCreate()) {
-          <button
-            mat-raised-button
-            color="primary"
-            (click)="createCategory()"
-            class="create-button"
-          >
-            <mat-icon>add</mat-icon>
-            Nueva Categoría
-          </button>
-          }
         </div>
       </mat-card-title>
     </mat-card-header>
@@ -45,14 +33,17 @@
           }
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="status-filter">
-          <mat-label>Estado</mat-label>
-          <mat-select [formControl]="statusFilter">
-            <mat-option value="all">Todas</mat-option>
-            <mat-option value="active">Activas</mat-option>
-            <mat-option value="inactive">Inactivas</mat-option>
-          </mat-select>
-        </mat-form-field>
+        @if (canCreate()) {
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="createCategory()"
+          class="create-button"
+        >
+          <mat-icon>add</mat-icon>
+          Nueva Categoría
+        </button>
+        }
       </div>
 
       <!-- Loading spinner -->
@@ -76,7 +67,7 @@
           </ng-container>
 
           <!-- Slug -->
-          <ng-container matColumnDef="slug">
+          <ng-container matColumnDef="slug" dysplay="none">
             <th mat-header-cell *matHeaderCellDef>Slug</th>
             <td mat-cell *matCellDef="let category">
               <code class="slug">{{ category.slug }}</code>
@@ -84,7 +75,7 @@
           </ng-container>
 
           <!-- Descripción -->
-          <ng-container matColumnDef="description">
+          <ng-container matColumnDef="description" display="none">
             <th mat-header-cell *matHeaderCellDef>Descripción</th>
             <td mat-cell *matCellDef="let category">
               <span class="description">
@@ -173,20 +164,15 @@
         showFirstLastButtons
       >
       </mat-paginator>
-      }
-
-      <!-- Empty state -->
-      @if (!loading() && categories().length === 0) {
+      } @if (!loading() && categories().length === 0) {
       <div class="empty-state">
         <mat-icon>category</mat-icon>
         <h2>No hay categorías</h2>
         <p>
-          @if (searchControl.value || statusFilter.value !== 'all') { No se
-          encontraron categorías con los filtros aplicados. } @else { Aún no has
-          creado ninguna categoría. }
+          @if (searchControl.value) { No se encontraron categorías con los
+          filtros aplicados. } @else { Aún no has creado ninguna categoría. }
         </p>
-        @if (canCreate() && !searchControl.value && statusFilter.value ===
-        'all') {
+        @if (canCreate() && !searchControl.value) {
         <button mat-raised-button color="primary" (click)="createCategory()">
           <mat-icon>add</mat-icon>
           Crear Primera Categoría

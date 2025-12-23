@@ -33,8 +33,8 @@ import {
   CategoryResponse,
   CreateCategoryRequest,
   UpdateCategoryRequest,
-} from '../../models/category.model';
-import { CategoryService } from '../../services/category.service';
+} from '../../../models/category.model';
+import { CategoryService } from '../../../services/category.service';
 
 @Component({
   selector: 'lib-category-form',

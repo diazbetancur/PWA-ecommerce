@@ -1,13 +1,3 @@
-/**
- * 📋 Componente de Listado de Categorías
- *
- * Lista todas las categorías del tenant con:
- * - Paginación
- * - Búsqueda por nombre
- * - Filtro de estado (activas/inactivas)
- * - Acciones CRUD con validación de permisos
- */
-
 import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
@@ -37,8 +27,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 import {
   CategoryListItem,
   CategoryListParams,
-} from '../../models/category.model';
-import { CategoryService } from '../../services/category.service';
+} from '../../../models/category.model';
+import { CategoryService } from '../../../services/category.service';
 
 @Component({
   selector: 'lib-categories-list',
@@ -71,31 +61,25 @@ export class CategoriesListComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
 
-  // Estado de la lista
   readonly categories = signal<CategoryListItem[]>([]);
   readonly loading = signal(false);
   readonly totalCount = signal(0);
 
-  // Paginación
   readonly page = signal(1);
   readonly pageSize = signal(20);
   readonly pageSizeOptions = [10, 20, 50, 100];
 
-  // Filtros
   readonly searchControl = new FormControl('');
-  readonly statusFilter = new FormControl<'all' | 'active' | 'inactive'>('all');
 
-  // Columnas de la tabla
   readonly displayedColumns = computed(() => {
     const baseColumns = [
       'name',
-      'slug',
-      'description',
+      // 'slug',
+      // 'description',
       'status',
       'productCount',
     ];
 
-    // Solo agregar columna de acciones si tiene algún permiso
     if (this.canUpdate() || this.canDelete()) {
       return [...baseColumns, 'actions'];
     }
@@ -103,7 +87,6 @@ export class CategoriesListComponent implements OnInit {
     return baseColumns;
   });
 
-  // Permisos - Todos los permisos son equivalentes al acceso del módulo catalog
   readonly canCreate = computed(() =>
     this.menuService.canPerformAction('catalog')
   );
@@ -122,19 +105,12 @@ export class CategoriesListComponent implements OnInit {
   }
 
   private setupFilters(): void {
-    // Búsqueda con debounce
     this.searchControl.valueChanges
       .pipe(debounceTime(400), distinctUntilChanged())
       .subscribe(() => {
-        this.page.set(1); // Resetear a página 1 al buscar
+        this.page.set(1);
         this.loadCategories();
       });
-
-    // Filtro de estado
-    this.statusFilter.valueChanges.subscribe(() => {
-      this.page.set(1);
-      this.loadCategories();
-    });
   }
 
   loadCategories(): void {
@@ -145,14 +121,6 @@ export class CategoriesListComponent implements OnInit {
       pageSize: this.pageSize(),
       search: this.searchControl.value || undefined,
     };
-
-    // Aplicar filtro de estado
-    const status = this.statusFilter.value;
-    if (status === 'active') {
-      params.isActive = true;
-    } else if (status === 'inactive') {
-      params.isActive = false;
-    }
 
     this.categoryService.list(params).subscribe({
       next: (response) => {

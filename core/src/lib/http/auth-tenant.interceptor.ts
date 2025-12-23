@@ -8,30 +8,65 @@ import { TenantConfigService } from '../services/tenant-config.service';
 
 export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
-  const tenant = inject(TenantConfigService).tenantSlug;
+  const tenantConfigService = inject(TenantConfigService);
   const env = inject<AppEnv>(APP_ENV);
   const router = inject(Router);
 
   let headers = req.headers;
-  if (auth.token)
+
+  // Agregar Authorization header si existe token
+  if (auth.token) {
     headers = headers.set('Authorization', `Bearer ${auth.token}`);
-  if (env.useTenantHeader && tenant)
-    headers = headers.set('X-Tenant-Slug', tenant);
+  }
+
+  // Agregar X-Tenant-Slug header
+  if (env.useTenantHeader) {
+    // Primero intentar obtener de TenantConfigService
+    let tenantSlug = tenantConfigService.tenantSlug;
+
+    // Si no hay tenant en el servicio, intentar leer del query parameter
+    if (!tenantSlug) {
+      const search = globalThis.location?.search ?? '';
+      const qp = new URLSearchParams(search);
+      const t = qp.get('tenant');
+      if (t && t.trim() !== '') {
+        tenantSlug = t;
+      }
+    }
+
+    // Si finalmente tenemos un tenant, agregarlo al header
+    if (tenantSlug) {
+      headers = headers.set('X-Tenant-Slug', tenantSlug);
+      console.log('[authTenantInterceptor] Adding X-Tenant-Slug:', tenantSlug);
+    }
+  }
 
   return next(req.clone({ headers })).pipe(
     catchError((e) => {
+      console.error('[authTenantInterceptor] Error:', e?.status, e?.message);
+
       // 401 = No autenticado (token inválido/expirado) -> Desloguear
       if (e?.status === 401) {
         auth.clear();
 
-        // Determinar la ruta de login según el contexto
-        const claims = auth.claims;
-        const hasTenantInToken = !!claims?.tenant_slug;
+        // Obtener tenant del query parameter o del servicio
+        let tenantSlug = tenantConfigService.tenantSlug;
+        if (!tenantSlug) {
+          const search = globalThis.location?.search ?? '';
+          const qp = new URLSearchParams(search);
+          const t = qp.get('tenant');
+          if (t && t.trim() !== '') {
+            tenantSlug = t;
+          }
+        }
 
-        // Si el usuario tenía tenant, redirigir a login del tenant
-        // Si no, redirigir a login general
-        const loginRoute = hasTenantInToken ? '/login' : '/admin/login';
-        router.navigateByUrl(loginRoute);
+        // Si hay tenant, redirigir al login del tenant preservando el query param
+        // Si no hay tenant, redirigir al login admin
+        if (tenantSlug) {
+          router.navigateByUrl(`/login?tenant=${tenantSlug}`);
+        } else {
+          router.navigateByUrl('/admin/login');
+        }
       }
 
       // 403 = No autorizado (sin permisos) -> NO desloguear, dejar que el componente maneje el error

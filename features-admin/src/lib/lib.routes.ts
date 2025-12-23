@@ -30,9 +30,9 @@ export const featuresAdminRoutes: Route[] = [
       {
         path: 'categories',
         loadComponent: () =>
-          import('./pages/categories/categories-list.component').then(
-            (m) => m.CategoriesListComponent
-          ),
+          import(
+            './pages/categories/categories-list/categories-list.component'
+          ).then((m) => m.CategoriesListComponent),
         canActivate: [modulePermissionGuard('catalog')],
         data: {
           title: 'Categorías',
@@ -41,9 +41,9 @@ export const featuresAdminRoutes: Route[] = [
       {
         path: 'categories/create',
         loadComponent: () =>
-          import('./pages/categories/category-form.component').then(
-            (m) => m.CategoryFormComponent
-          ),
+          import(
+            './pages/categories/categories-form/category-form.component'
+          ).then((m) => m.CategoryFormComponent),
         canActivate: [modulePermissionGuard('catalog')],
         data: {
           title: 'Nueva Categoría',
@@ -52,9 +52,9 @@ export const featuresAdminRoutes: Route[] = [
       {
         path: 'categories/:id/edit',
         loadComponent: () =>
-          import('./pages/categories/category-form.component').then(
-            (m) => m.CategoryFormComponent
-          ),
+          import(
+            './pages/categories/categories-form/category-form.component'
+          ).then((m) => m.CategoryFormComponent),
         canActivate: [modulePermissionGuard('catalog')],
         data: {
           title: 'Editar Categoría',

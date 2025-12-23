@@ -28,6 +28,7 @@ export interface TenantAdminMenuItem {
  * Configuración de cada módulo del menú
  */
 interface ModuleConfig {
+  module: string; // Código del módulo para validar permisos
   label: string;
   icon: string;
   route?: string;
@@ -45,30 +46,42 @@ export class TenantAdminMenuService {
    */
   private readonly moduleConfigMap: Record<string, ModuleConfig> = {
     dashboard: {
+      module: 'dashboard',
       label: 'Dashboard',
       icon: 'dashboard',
       route: '/tenant-admin/dashboard',
       order: 1,
     },
     catalog: {
+      module: 'catalog',
       label: 'Categorías',
       icon: 'inventory_2',
       route: '/tenant-admin/catalog',
       order: 2,
     },
+    product: {
+      module: 'catalog',
+      label: 'Productos',
+      icon: 'inventory_2',
+      route: '/tenant-admin/catalog',
+      order: 2,
+    },
     orders: {
+      module: 'orders',
       label: 'Pedidos',
       icon: 'shopping_cart',
       route: '/tenant-admin/orders',
       order: 3,
     },
     customers: {
+      module: 'customers',
       label: 'Clientes',
       icon: 'people',
       route: '/tenant-admin/customers',
       order: 4,
     },
     loyalty: {
+      module: 'loyalty',
       label: 'Programa de Lealtad',
       icon: 'star',
       route: '/tenant-admin/loyalty',
@@ -76,6 +89,7 @@ export class TenantAdminMenuService {
     },
     // Settings es el módulo padre
     settings: {
+      module: 'settings',
       label: 'Configuración',
       icon: 'settings',
       order: 6,
@@ -83,6 +97,7 @@ export class TenantAdminMenuService {
     },
     // Submódulos de settings
     'settings.general': {
+      module: 'settings.general',
       label: 'General',
       icon: 'settings_applications',
       route: '/tenant-admin/settings/general',
@@ -90,6 +105,7 @@ export class TenantAdminMenuService {
       parentModule: 'settings',
     },
     'settings.branding': {
+      module: 'settings.branding',
       label: 'Marca',
       icon: 'palette',
       route: '/tenant-admin/settings/branding',
@@ -97,6 +113,7 @@ export class TenantAdminMenuService {
       parentModule: 'settings',
     },
     'settings.payments': {
+      module: 'settings.payments',
       label: 'Pagos',
       icon: 'payment',
       route: '/tenant-admin/settings/payments',
@@ -104,6 +121,7 @@ export class TenantAdminMenuService {
       parentModule: 'settings',
     },
     'settings.shipping': {
+      module: 'settings.shipping',
       label: 'Envíos',
       icon: 'local_shipping',
       route: '/tenant-admin/settings/shipping',
@@ -111,6 +129,7 @@ export class TenantAdminMenuService {
       parentModule: 'settings',
     },
     permissions: {
+      module: 'permissions',
       label: 'Permisos',
       icon: 'security',
       route: '/tenant-admin/permissions',
