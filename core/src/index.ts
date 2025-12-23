@@ -12,6 +12,7 @@ export * from './lib/push/push.service';
 export * from './lib/services/api-client.service';
 export * from './lib/services/app-env.service';
 export * from './lib/services/manifest.service';
+export * from './lib/services/product.service';
 export * from './lib/services/seo.service';
 export * from './lib/services/tenant-admin-menu.service';
 export * from './lib/services/tenant-bootstrap.service';

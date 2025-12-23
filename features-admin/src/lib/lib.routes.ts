@@ -27,6 +27,7 @@ export const featuresAdminRoutes: Route[] = [
         redirectTo: 'categories',
         pathMatch: 'full',
       },
+      // Categorías
       {
         path: 'categories',
         loadComponent: () =>
@@ -58,6 +59,40 @@ export const featuresAdminRoutes: Route[] = [
         canActivate: [modulePermissionGuard('catalog')],
         data: {
           title: 'Editar Categoría',
+        },
+      },
+      // Productos
+      {
+        path: 'products',
+        loadComponent: () =>
+          import('./pages/products/products-list/products-list.component').then(
+            (m) => m.ProductsListComponent
+          ),
+        canActivate: [modulePermissionGuard('catalog')],
+        data: {
+          title: 'Productos',
+        },
+      },
+      {
+        path: 'products/create',
+        loadComponent: () =>
+          import('./pages/products/products-form/product-form.component').then(
+            (m) => m.ProductFormComponent
+          ),
+        canActivate: [modulePermissionGuard('catalog')],
+        data: {
+          title: 'Nuevo Producto',
+        },
+      },
+      {
+        path: 'products/edit/:id',
+        loadComponent: () =>
+          import('./pages/products/products-form/product-form.component').then(
+            (m) => m.ProductFormComponent
+          ),
+        canActivate: [modulePermissionGuard('catalog')],
+        data: {
+          title: 'Editar Producto',
         },
       },
     ],

@@ -11,5 +11,6 @@ export * from './lib/models/category.model';
 export * from './lib/services/category.service';
 
 // Components
+export * from './lib/components/category-selector-dialog/category-selector-dialog.component';
 export * from './lib/pages/categories/categories-form/category-form.component';
 export * from './lib/pages/categories/categories-list/categories-list.component';

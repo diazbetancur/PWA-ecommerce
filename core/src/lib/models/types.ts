@@ -221,3 +221,108 @@ export interface TenantBranding {
   backgroundColor?: string;
   themeColor?: string;
 }
+
+// ============= Products Module Types =============
+
+/**
+ * Producto del catálogo (respuesta del backend)
+ */
+export interface ProductResponse {
+  id: string;
+  name: string;
+  slug: string;
+  sku: string | null;
+  description: string | null;
+  shortDescription: string | null;
+  price: number;
+  compareAtPrice: number | null;
+  stock: number;
+  trackInventory: boolean;
+  isActive: boolean;
+  isFeatured: boolean;
+  tags: string | null;
+  brand: string | null;
+  mainImageUrl: string | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+/**
+ * DTO para crear un producto
+ */
+export interface CreateProductDto {
+  name: string;
+  price: number;
+  sku?: string;
+  description?: string;
+  shortDescription?: string;
+  compareAtPrice?: number;
+  stock?: number;
+  trackInventory?: boolean;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  tags?: string;
+  brand?: string;
+  mainImageUrl?: string;
+  categoryId?: string; // ID de categoría (opcional)
+  metaTitle?: string;
+  metaDescription?: string;
+}
+
+/**
+ * DTO para actualizar un producto
+ */
+export interface UpdateProductDto {
+  name?: string;
+  sku?: string;
+  description?: string;
+  shortDescription?: string;
+  price?: number;
+  compareAtPrice?: number;
+  stock?: number;
+  trackInventory?: boolean;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  tags?: string;
+  brand?: string;
+  mainImageUrl?: string;
+  categoryId?: string; // ID de categoría (opcional)
+  metaTitle?: string;
+  metaDescription?: string;
+}
+
+/**
+ * Filtros para listar productos
+ */
+export interface ProductFilterDto {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  categoryId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  sortBy?: 'name' | 'price' | 'stock' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * DTO para actualizar stock
+ */
+export interface UpdateStockDto {
+  quantity: number;
+}
+
+/**
+ * Resultado paginado genérico
+ */
+export interface PagedResult<T> {
+  items: T[];
+  totalItems: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}

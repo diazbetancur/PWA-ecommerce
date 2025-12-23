@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, TenantAdminMenuService } from '@pwa/core';
 
@@ -36,10 +36,18 @@ import { AuthService, TenantAdminMenuService } from '@pwa/core';
         item.children.length > 0) {
         <!-- Item con hijos (grupo expandible) -->
         <div class="menu-group">
-          <div class="menu-group-header">
+          <div
+            class="menu-group-header"
+            (click)="toggleGroup(item.id)"
+            [class.collapsed]="!isGroupExpanded(item.id)"
+          >
             <span class="material-icons">{{ item.icon }}</span>
             <span class="menu-label">{{ item.label }}</span>
+            <span class="material-icons expand-icon">
+              {{ isGroupExpanded(item.id) ? 'expand_more' : 'chevron_right' }}
+            </span>
           </div>
+          @if (isGroupExpanded(item.id)) {
           <div class="menu-group-children">
             @for (child of item.children; track child.id) {
             <a
@@ -57,6 +65,7 @@ import { AuthService, TenantAdminMenuService } from '@pwa/core';
             </a>
             }
           </div>
+          }
         </div>
         } @else {
         <!-- Item simple -->
@@ -229,16 +238,43 @@ import { AuthService, TenantAdminMenuService } from '@pwa/core';
         color: #6b7280;
         font-weight: 600;
         font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .menu-group-header:hover {
+        background: #f3f4f6;
+        color: #1f2937;
       }
 
       .menu-group-header .material-icons {
         font-size: 18px;
       }
 
+      .menu-group-header .expand-icon {
+        margin-left: auto;
+        font-size: 20px;
+        transition: transform 0.2s;
+      }
+
+      .menu-group-header.collapsed .expand-icon {
+        transform: rotate(0deg);
+      }
+
       .menu-group-children {
         padding-left: 1rem;
+        animation: slideDown 0.2s ease-out;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .submenu-item {
@@ -290,6 +326,11 @@ export class TenantAdminMenuComponent {
   private readonly menuService = inject(TenantAdminMenuService);
   private readonly router = inject(Router);
 
+  // Signal para controlar qué grupos están expandidos
+  private readonly expandedGroups = signal<Set<string>>(
+    new Set(['catalog', 'settings'])
+  );
+
   constructor() {
     console.log('🎯 [TenantAdminMenuComponent] Component initialized');
     console.log('🎯 [TenantAdminMenuComponent] MenuService:', this.menuService);
@@ -321,6 +362,24 @@ export class TenantAdminMenuComponent {
     }
     return name.substring(0, 2).toUpperCase();
   });
+
+  // Métodos para manejar el estado de expansión
+  toggleGroup(groupId: string): void {
+    const expanded = this.expandedGroups();
+    const newExpanded = new Set(expanded);
+
+    if (newExpanded.has(groupId)) {
+      newExpanded.delete(groupId);
+    } else {
+      newExpanded.add(groupId);
+    }
+
+    this.expandedGroups.set(newExpanded);
+  }
+
+  isGroupExpanded(groupId: string): boolean {
+    return this.expandedGroups().has(groupId);
+  }
 
   logout(): void {
     this.authService.clear();

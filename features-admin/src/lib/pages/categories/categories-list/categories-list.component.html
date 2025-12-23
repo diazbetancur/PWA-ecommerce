@@ -172,12 +172,6 @@
           @if (searchControl.value) { No se encontraron categorías con los
           filtros aplicados. } @else { Aún no has creado ninguna categoría. }
         </p>
-        @if (canCreate() && !searchControl.value) {
-        <button mat-raised-button color="primary" (click)="createCategory()">
-          <mat-icon>add</mat-icon>
-          Crear Primera Categoría
-        </button>
-        }
       </div>
       }
     </mat-card-content>
