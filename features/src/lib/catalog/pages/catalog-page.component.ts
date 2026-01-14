@@ -15,6 +15,7 @@ import { TenantContextService } from '@pwa/core';
 import {
   Banner,
   BannerCarouselComponent,
+  mapProductToCard,
   ProductCardComponent,
   ProductCardData,
   ProductsGridSkeletonComponent,
@@ -47,6 +48,47 @@ import { StoreService } from '../services/store.service';
         <app-banner-carousel [banners]="banners()" [autoPlayInterval]="5000" />
       </section>
       }
+
+      <!-- Search Section -->
+      <section class="search-section">
+        <div class="container">
+          <div class="search-wrapper">
+            <svg
+              class="search-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+            <input
+              [formControl]="searchControl"
+              type="text"
+              placeholder="Buscar productos..."
+              class="search-input"
+            />
+            @if (searchControl.value) {
+            <button
+              class="clear-search"
+              (click)="clearSearch()"
+              aria-label="Limpiar búsqueda"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            }
+          </div>
+        </div>
+      </section>
 
       <!-- Categories Section -->
       @if (shouldShowCategories()) {
@@ -107,47 +149,6 @@ import { StoreService } from '../services/store.service';
         </div>
       </section>
       }
-
-      <!-- Search Section -->
-      <section class="search-section">
-        <div class="container">
-          <div class="search-wrapper">
-            <svg
-              class="search-icon"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="M21 21l-4.35-4.35" />
-            </svg>
-            <input
-              [formControl]="searchControl"
-              type="text"
-              placeholder="Buscar productos..."
-              class="search-input"
-            />
-            @if (searchControl.value) {
-            <button
-              class="clear-search"
-              (click)="clearSearch()"
-              aria-label="Limpiar búsqueda"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-            }
-          </div>
-        </div>
-      </section>
 
       <!-- Products Section -->
       <main class="products-section">
@@ -747,12 +748,7 @@ export class CatalogPageComponent implements OnInit {
   }
 
   mapToCardData(product: ProductSummary): ProductCardData {
-    return {
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      imageUrl: product.imageUrl,
-      stock: product.stock,
-    };
+    // Usa el helper de mapeo que maneja mainImageUrl correctamente
+    return mapProductToCard(product as any);
   }
 }

@@ -32,8 +32,6 @@ export class UserModeService {
    */
   readonly isCustomerOnly = computed(() => {
     const claims = this.authService.claims;
-    console.log('[UserModeService] Claims:', claims);
-    console.log('[UserModeService] Roles:', claims?.roles);
     if (!claims?.roles || claims.roles.length === 0) return false;
 
     return (
@@ -86,15 +84,6 @@ export class UserModeService {
    * Modo efectivo actual (considerando auto-selección)
    */
   readonly effectiveMode = computed(() => {
-    console.log('[UserModeService] Computing effectiveMode');
-    console.log('[UserModeService] - selectedMode:', this._selectedMode());
-    console.log('[UserModeService] - isCustomerOnly:', this.isCustomerOnly());
-    console.log('[UserModeService] - hasCustomerRole:', this.hasCustomerRole());
-    console.log(
-      '[UserModeService] - hasMultipleRoles:',
-      this.hasMultipleRoles()
-    );
-
     // Si ya seleccionó explícitamente
     if (this._selectedMode()) {
       return this._selectedMode();

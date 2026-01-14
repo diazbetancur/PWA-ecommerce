@@ -87,8 +87,7 @@ export class ProductGridComponent implements OnInit {
           this.total.set(response.totalItems);
           this.loading.set(false);
         },
-        error: (error: unknown) => {
-          console.error('Error loading products:', error);
+        error: () => {
           this.loading.set(false);
         },
       });

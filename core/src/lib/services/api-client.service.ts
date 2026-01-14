@@ -232,18 +232,7 @@ export class ApiClientService {
     relativePath: string,
     body?: unknown
   ): void {
-    // Solo log en desarrollo y para endpoints específicos que necesiten debug
-    if (
-      this.envService.isConsoleLoggingEnabled &&
-      this.shouldLogEndpoint(relativePath)
-    ) {
-      console.group(
-        `%c🚀 API ${method} ${relativePath}`,
-        'color: #0070f3; font-weight: bold'
-      );
-      if (body) console.log('%cBody:', 'color: #0070f3', body);
-      console.groupEnd();
-    }
+    // Logging disabled for production
   }
 
   private logResponse(
@@ -252,19 +241,7 @@ export class ApiClientService {
     startTime: number,
     response: unknown
   ): void {
-    // Solo log en desarrollo y para endpoints específicos que necesiten debug
-    if (
-      this.envService.isConsoleLoggingEnabled &&
-      this.shouldLogEndpoint(relativePath)
-    ) {
-      const duration = Math.round(performance.now() - startTime);
-      console.group(
-        `%c✅ API ${method} ${relativePath} - ${duration}ms`,
-        'color: #22c55e; font-weight: bold'
-      );
-      console.log('%cResponse:', 'color: #22c55e', response);
-      console.groupEnd();
-    }
+    // Logging disabled for production
   }
 
   /**
@@ -292,12 +269,7 @@ export class ApiClientService {
   ): Observable<never> {
     const duration = Math.round(performance.now() - startTime);
     if (this.envService.isConsoleLoggingEnabled) {
-      console.group(
-        `%c❌ API ${method} ${relativePath} - ${duration}ms`,
-        'color: #ef4444; font-weight: bold'
-      );
-      console.error('%cError:', 'color: #ef4444', error);
-      console.groupEnd();
+      console.error('API Error:', error);
     }
     return throwError(() => error);
   }

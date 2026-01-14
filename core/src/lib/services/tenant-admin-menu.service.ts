@@ -155,40 +155,26 @@ export class TenantAdminMenuService {
   readonly menu = computed(() => {
     const claims = this.authService.claims;
 
-    console.log('[TenantAdminMenuService] Computing menu');
-    console.log('[TenantAdminMenuService] Claims:', claims);
-
     if (!claims) {
-      console.log('[TenantAdminMenuService] No claims - returning empty menu');
       return [];
     }
 
     // Obtener módulos desde el array del JWT
     const modules = claims.modules || [];
-    console.log('[TenantAdminMenuService] Modules:', modules);
 
     // Si no hay módulos definidos, mostrar todos los módulos disponibles
     if (modules.length === 0) {
-      console.log(
-        '[TenantAdminMenuService] No modules restriction - showing all modules'
-      );
       // Incluir tanto módulos principales como submódulos
       const allModules = Object.keys(this.moduleConfigMap);
       return this.buildMenuFromModules(allModules);
     }
 
     const menu = this.buildMenuFromModules(modules);
-    console.log('[TenantAdminMenuService] Built menu:', menu);
 
     return menu;
   });
 
   private buildMenuFromModules(modules: string[]): TenantAdminMenuItem[] {
-    console.log(
-      '[TenantAdminMenuService] Building menu from modules:',
-      modules
-    );
-
     const mainModules = modules.filter((m) => !m.includes('.'));
     const subModules = modules.filter((m) => m.includes('.'));
 

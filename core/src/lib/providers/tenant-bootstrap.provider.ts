@@ -1,5 +1,5 @@
 import { APP_INITIALIZER, Provider, inject } from '@angular/core';
-import { TenantBootstrapService } from '@pwa/core';
+import { TenantBootstrapService } from '../services/tenant-bootstrap.service';
 
 /**
  * Factory function para el APP_INITIALIZER

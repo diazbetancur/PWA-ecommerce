@@ -87,13 +87,10 @@ export class RegisterComponent {
     // Verificar si hay tenant activo en el contexto
     const tenantSlug = this.tenantContext.tenantSlug();
     const hasTenant = !!tenantSlug;
-    console.log('[RegisterComponent] Tenant slug:', tenantSlug);
-    console.log('[RegisterComponent] Has active tenant:', hasTenant);
 
     // Obtener roles del token
     const claims = this.authService.claims;
     const roles = claims?.roles || [];
-    console.log('[RegisterComponent] User roles from token:', roles);
 
     // Normalizar roles para comparación
     const normalizedRoles = roles.map((r) =>
@@ -103,18 +100,12 @@ export class RegisterComponent {
 
     // 1️⃣ Si es SuperAdmin SIN tenant activo → Admin General
     if (isSuperAdmin && !hasTenant) {
-      console.log(
-        '[RegisterComponent] → Path: SuperAdmin without tenant - navigating to /admin'
-      );
       await this.router.navigate(['/admin']);
       return;
     }
 
     // 2️⃣ Si es SuperAdmin CON tenant activo → Admin del Tenant
     if (isSuperAdmin && hasTenant) {
-      console.log(
-        '[RegisterComponent] → Path: SuperAdmin with tenant - navigating to /tenant-admin'
-      );
       await this.router.navigate(['/tenant-admin']);
       return;
     }

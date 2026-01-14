@@ -166,11 +166,7 @@ export class AdminMenuService {
   readonly filteredMenu = computed(() => {
     const claims = this.authService.claims;
 
-    console.log('[AdminMenuService] Computing filtered menu');
-    console.log('[AdminMenuService] Claims:', claims);
-
     if (!claims) {
-      console.log('[AdminMenuService] No claims - returning empty menu');
       return []; // Usuario no autenticado
     }
 
@@ -179,21 +175,12 @@ export class AdminMenuService {
     const modules = claims.modules || [];
     const isAdminFlag = claims.admin === 'true' || claims.admin === true;
 
-    console.log('[AdminMenuService] Roles:', roles);
-    console.log('[AdminMenuService] Modules:', modules);
-    console.log('[AdminMenuService] Admin flag:', isAdminFlag);
-
     // Caso especial: usuarios con rol SUPER_ADMIN o admin flag tienen acceso completo al menú
     if (this.isSuperAdmin(roles, modules, isAdminFlag)) {
-      console.log(
-        '[AdminMenuService] SuperAdmin/Admin detected - returning full menu'
-      );
       const fullMenu = this.sortMenuItems(this.baseMenuItems);
-      console.log('[AdminMenuService] Full menu:', fullMenu);
       return fullMenu;
     }
 
-    console.log('[AdminMenuService] Not SuperAdmin - filtering menu');
     // Filtrar recursivamente según permisos
     return this.sortMenuItems(
       this.filterMenuItems(this.baseMenuItems, roles, modules)

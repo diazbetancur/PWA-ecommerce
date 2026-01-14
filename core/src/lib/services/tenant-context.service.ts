@@ -1,7 +1,8 @@
 import { Injectable, computed, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DEFAULT_TENANT_CONFIG } from '../config/default-tenant.config';
-import { TenantConfig, type TenantBranding } from '../models/types';
+import { type TenantBranding } from '../models/pwa-branding.types';
+import { TenantConfig } from '../models/types';
 import { TenantBootstrapService } from './tenant-bootstrap.service';
 
 @Injectable({

@@ -1,9 +1,9 @@
-import { Routes, Router, CanActivateFn } from '@angular/router';
 import { inject } from '@angular/core';
-import { TenantNotFoundComponent } from '../components/tenant-not-found/tenant-not-found.component';
-import { TenantDebugComponent } from '../components/tenant-debug/tenant-debug.component';
+import { CanActivateFn, Router, Routes } from '@angular/router';
 import { ApiTestDemoComponent } from '../components/api-test-demo/api-test-demo.component';
 import { CurrencyDemoComponent } from '../components/currency-demo/currency-demo.component';
+import { TenantDebugComponent } from '../components/tenant-debug/tenant-debug.component';
+import { TenantNotFoundComponent } from '../components/tenant-not-found/tenant-not-found.component';
 import { TenantConfigService } from '../services/tenant-config.service';
 
 /**
@@ -63,11 +63,9 @@ export const tenantGuard: CanActivateFn = () => {
 
   // Verificar si hay tenant cargado
   if (!tenantConfig.config || !tenantConfig.tenantSlug) {
-    console.log('🚫 [tenantGuard] No hay tenant - redirigiendo a /admin');
     // Redirigir al login administrativo cuando no hay tenant
     return router.createUrlTree(['/admin']);
   }
 
-  console.log('✅ [tenantGuard] Tenant activo:', tenantConfig.tenantSlug);
   return true;
 };

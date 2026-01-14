@@ -332,14 +332,12 @@ export class TenantAdminMenuComponent {
   );
 
   constructor() {
-    console.log('🎯 [TenantAdminMenuComponent] Component initialized');
-    console.log('🎯 [TenantAdminMenuComponent] MenuService:', this.menuService);
+    // Component initialized
   }
 
   // Computed signals
   readonly menuItems = computed(() => {
     const items = this.menuService.menu();
-    console.log('🎯 [TenantAdminMenuComponent] Menu items computed:', items);
     return items;
   });
 

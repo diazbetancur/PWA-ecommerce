@@ -189,7 +189,7 @@ export class AppEnvService {
 
     // En desarrollo, mostrar warnings
     if (this.isDevelopment && errors.length > 0) {
-      console.warn('🚨 Environment validation errors:', errors);
+      // Validation errors present
     }
 
     return {
@@ -205,27 +205,11 @@ export class AppEnvService {
     if (this.isConsoleLoggingEnabled) {
       const info = this.getEnvironmentInfo();
 
-      console.group('🚀 App Environment Configuration');
-      console.log('📱 Mode:', info.mode);
-      console.log('🌐 API:', info.api);
-      console.log('🔗 Base URL:', info.baseUrl);
-      console.log('📦 Version:', info.version);
-      console.log(
-        '🏢 Tenant Headers:',
-        this.useTenantHeader ? 'Enabled' : 'Disabled'
-      );
-
-      if (this.isDevelopment) {
-        console.log('⚠️ Development mode - Full logging enabled');
-      }
-
-      console.groupEnd();
+      // Environment info logged (removed for production)
 
       // Validar configuración
       const validation = this.validateEnvironment();
-      if (validation.isValid) {
-        console.info('✅ Environment configuration is valid');
-      } else {
+      if (!validation.isValid) {
         console.error('❌ Environment validation failed:', validation.errors);
       }
     }

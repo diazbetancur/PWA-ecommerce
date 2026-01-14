@@ -1,5 +1,5 @@
-import { Pipe, PipeTransform, inject, computed } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
+import { Pipe, PipeTransform, computed, inject } from '@angular/core';
 import { TenantContextService } from '../services/tenant-context.service';
 
 /**
@@ -73,12 +73,6 @@ export class TenantCurrencyPipe implements PipeTransform {
       return formatted;
     } catch (error) {
       // Fallback en caso de error
-      console.warn(`[TenantCurrencyPipe] Error formatting currency:`, {
-        value,
-        currency: tenantCurrency,
-        locale: tenantLocale,
-        error,
-      });
 
       // Formato básico como fallback
       return this.basicCurrencyFormat(Number(value), tenantCurrency);

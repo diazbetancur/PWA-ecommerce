@@ -1,16 +1,19 @@
+/**
+ * 📦 Features Admin Module
+ * Main barrel export for admin feature modules
+ */
+
 // Routes
 export * from './lib/lib.routes';
 
-// Legacy component (puede removerse en el futuro)
-export * from './lib/features-admin/features-admin';
-
 // Models
-export * from './lib/models/category.model';
+export * from './lib/models';
 
 // Services
-export * from './lib/services/category.service';
+export * from './lib/services';
 
 // Components
-export * from './lib/components/category-selector-dialog/category-selector-dialog.component';
-export * from './lib/pages/categories/categories-form/category-form.component';
-export * from './lib/pages/categories/categories-list/categories-list.component';
+export * from './lib/components';
+
+// Pages
+export * from './lib/pages';

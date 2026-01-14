@@ -204,24 +204,6 @@ export interface JwtPayload {
   userType?: 'tenant_user' | 'customer' | 'super_admin';
 }
 
-/**
- * Interfaz de branding PWA para multi-tenant
- * Exportada desde types.ts para facilitar importación
- */
-export interface TenantBranding {
-  name: string;
-  shortName?: string;
-  description?: string;
-  logoUrl?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  pwaIconUrl?: string;
-  faviconUrl?: string;
-  manifestUrl?: string;
-  backgroundColor?: string;
-  themeColor?: string;
-}
-
 // ============= Products Module Types =============
 
 /**
@@ -247,6 +229,8 @@ export interface ProductResponse {
   metaDescription: string | null;
   createdAt: string;
   updatedAt: string | null;
+  categories: any[]; // Array de categorías del producto
+  images: string[]; // Array de URLs de imágenes adicionales
 }
 
 /**

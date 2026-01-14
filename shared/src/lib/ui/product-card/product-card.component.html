@@ -1,0 +1,77 @@
+<article class="product-card" [style.--primary-color]="primaryColor()">
+  <!-- Imagen del producto -->
+  <div class="product-image-container">
+    <img
+      [src]="productImageUrl()"
+      [alt]="product().name"
+      class="product-image"
+      loading="lazy"
+      (error)="onImageError($event)"
+    />
+
+    <!-- Badge de stock -->
+    @if (showStockBadge() && !isInStock()) {
+    <div class="stock-badge out-of-stock">Sin Stock</div>
+    }
+
+    <!-- Overlay de acciones al hover -->
+    <div class="product-overlay">
+      <button
+        class="quick-view-btn"
+        (click)="onQuickView()"
+        [attr.aria-label]="'Vista rápida de ' + product().name"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 4.5C7.305 4.5 3.336 7.364 1.5 11.5c1.836 4.136 5.805 7 10.5 7s8.664-2.864 10.5-7c-1.836-4.136-5.805-7-10.5-7zm0 11.5c-2.485 0-4.5-2.015-4.5-4.5S9.515 7 12 7s4.5 2.015 4.5 4.5S14.485 16 12 16zm0-7c-1.38 0-2.5 1.12-2.5 2.5S10.62 14.5 12 14.5s2.5-1.12 2.5-2.5S13.38 9 12 9z"
+          />
+        </svg>
+        Vista Rápida
+      </button>
+    </div>
+  </div>
+
+  <!-- Información del producto -->
+  <div class="product-info">
+    <h3 class="product-name" [title]="product().name">
+      {{ product().name }}
+    </h3>
+
+    <div class="product-price-section">
+      <span class="product-price">
+        {{ product().price | tenantCurrency }}
+      </span>
+
+      <!-- @if (showStock() && isInStock()) {
+      <span class="stock-info"> {{ product().stock }} disponibles </span>
+      } -->
+    </div>
+
+    <!-- Botón de acción principal -->
+    <div class="product-actions">
+      @if (isInStock() || !product().stock) {
+      <button
+        class="add-to-cart-btn"
+        (click)="onAddToCart()"
+        [attr.aria-label]="'Agregar ' + product().name + ' al carrito'"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12L8.1 13h7.45c.75 0 1.41-.41 1.75-1.03L21.7 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+          />
+        </svg>
+        Agregar
+      </button>
+      } @else {
+      <button class="out-of-stock-btn" disabled>Sin Stock</button>
+      }
+    </div>
+  </div>
+
+  <!-- Link invisible para navegación -->
+  <a
+    [routerLink]="['/product', product().id]"
+    class="product-link"
+    [attr.aria-label]="'Ver detalles de ' + product().name"
+  ></a>
+</article>

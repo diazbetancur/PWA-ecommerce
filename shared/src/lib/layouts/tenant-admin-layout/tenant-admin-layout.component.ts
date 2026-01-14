@@ -245,17 +245,6 @@ export class TenantAdminLayoutComponent {
 
   // Para desarrollo: verificar que el usuario es admin
   constructor() {
-    console.log('🏗️ [TenantAdminLayoutComponent] Layout initialized');
-    console.log(
-      '🏗️ [TenantAdminLayoutComponent] Tenant slug:',
-      this.tenantSlug()
-    );
-    console.log('🏗️ [TenantAdminLayoutComponent] Using TenantAdminMenuService');
-
-    if (!this.menuService.isTenantAdmin()) {
-      console.warn(
-        '⚠️ [TenantAdminLayoutComponent] Usuario no es administrador del tenant'
-      );
-    }
+    // Layout initialized
   }
 }

@@ -1,17 +1,19 @@
+/**
+ * 📦 Catalog Module
+ * Main barrel export for the catalog feature module
+ */
+
 // Models
-export * from './models/catalog.models';
+export * from './models';
 
 // Services
-export * from './services/catalog.service';
-export * from './services/store.service';
+export * from './services';
 
 // Components
-export * from './components/banner-carousel/banner-carousel.component';
-export * from './components/category-carousel/category-carousel.component';
-export * from './components/product-grid/product-grid.component';
-export * from './components/public-header/public-header.component';
-export * from './pages/catalog-page.component';
-export * from './pages/product-details.component';
+export * from './components';
+
+// Pages
+export * from './pages';
 
 // Routes
 export * from './catalog.routes';
