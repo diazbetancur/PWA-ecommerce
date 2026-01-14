@@ -1,0 +1,81 @@
+<section class="category-carousel">
+  @if (loading()) {
+  <div class="loading-state">
+    <div class="skeleton-circle"></div>
+    <div class="skeleton-circle"></div>
+    <div class="skeleton-circle"></div>
+    <div class="skeleton-circle"></div>
+  </div>
+  } @else if (categories().length > 1) {
+  <!-- Solo mostrar si hay más de 1 categoría -->
+  <div class="carousel-wrapper">
+    <!-- Scroll Buttons -->
+    <button
+      mat-icon-button
+      class="scroll-btn scroll-left"
+      (click)="scrollLeft()"
+      aria-label="Desplazar izquierda"
+    >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+
+    <!-- Categories Container -->
+    <div
+      #scrollContainer
+      class="categories-container"
+      (scroll)="onScroll($event)"
+    >
+      <!-- Botón "Todas" -->
+      <button
+        class="category-item"
+        [class.selected]="selectedCategoryId() === null"
+        (click)="selectCategory(null)"
+      >
+        <div class="category-circle all-categories">
+          <mat-icon>apps</mat-icon>
+        </div>
+        <span class="category-name">Todas</span>
+      </button>
+
+      <!-- Categorías -->
+      @for (category of categories(); track category.id) {
+      <button
+        class="category-item"
+        [class.selected]="selectedCategoryId() === category.id"
+        (click)="selectCategory(category.id)"
+      >
+        <div class="category-circle">
+          @if (category.imageUrl) {
+          <img
+            [src]="category.imageUrl"
+            [alt]="category.name"
+            class="category-image"
+          />
+          } @else {
+          <mat-icon>category</mat-icon>
+          }
+        </div>
+        <span class="category-name">{{ category.name }}</span>
+      </button>
+      }
+
+      <!-- Loading More Indicator -->
+      @if (loadingMore()) {
+      <div class="loading-more">
+        <div class="skeleton-circle"></div>
+      </div>
+      }
+    </div>
+
+    <!-- Scroll Right Button -->
+    <button
+      mat-icon-button
+      class="scroll-btn scroll-right"
+      (click)="scrollRight()"
+      aria-label="Desplazar derecha"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+  }
+</section>

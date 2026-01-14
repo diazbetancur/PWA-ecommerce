@@ -49,25 +49,58 @@ import { StoreService } from '../services/store.service';
       }
 
       <!-- Categories Section -->
-      @if (categories().length > 0) {
+      @if (shouldShowCategories()) {
       <section class="categories-section">
         <div class="container">
           <h2 class="section-title">Categorías</h2>
           <div class="categories-scroll">
             <button
-              class="category-chip"
+              class="category-item"
               [class.active]="!selectedCategory()"
               (click)="selectCategory(null)"
+              title="Ver todos los productos"
             >
-              Todos
+              <div class="category-circle">
+                <svg
+                  class="category-icon"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"
+                  />
+                </svg>
+              </div>
+              <span class="category-name">Todos</span>
             </button>
             @for (category of categories(); track category.id) {
             <button
-              class="category-chip"
+              class="category-item"
               [class.active]="selectedCategory() === category.slug"
               (click)="selectCategory(category.slug)"
+              [title]="category.name"
             >
-              {{ category.name }}
+              <div class="category-circle">
+                @if (category.imageUrl) {
+                <img
+                  [src]="category.imageUrl"
+                  [alt]="category.name"
+                  class="category-image"
+                  loading="lazy"
+                />
+                } @else {
+                <svg
+                  class="category-icon"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM9 9H5V5h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 6h-4V5h4v4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6H5v-4h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6h-4v-4h4v4z"
+                  />
+                </svg>
+                }
+              </div>
+              <span class="category-name">{{ category.name }}</span>
             </button>
             }
           </div>
@@ -214,33 +247,34 @@ import { StoreService } from '../services/store.service';
 
       /* Banner Section */
       .banner-section {
-        padding: 1rem;
+        padding: 0.75rem;
       }
 
       @media (min-width: 768px) {
         .banner-section {
-          padding: 1.5rem;
+          padding: 1rem;
         }
       }
 
       /* Categories Section */
       .categories-section {
-        padding: 1.5rem 0;
-        background: var(--bg-color, #fff);
+        padding: 0.75rem 0;
+        background: var(--bg-color, #fafafa);
       }
 
       .section-title {
-        font-size: 1.25rem;
+        font-size: 1.125rem;
         font-weight: 600;
-        margin: 0 0 1rem;
+        margin: 0 0 0.875rem;
         color: var(--text-color, #1f2937);
+        padding: 0 0.5rem;
       }
 
       .categories-scroll {
         display: flex;
-        gap: 0.5rem;
+        gap: 1rem;
         overflow-x: auto;
-        padding-bottom: 0.5rem;
+        padding: 0.5rem;
         scrollbar-width: none;
         -ms-overflow-style: none;
       }
@@ -249,41 +283,95 @@ import { StoreService } from '../services/store.service';
         display: none;
       }
 
-      .category-chip {
+      .category-item {
         flex-shrink: 0;
-        padding: 0.5rem 1rem;
-        border: 1px solid var(--border-color, #e5e7eb);
-        border-radius: 2rem;
-        background: #fff;
-        color: var(--text-color, #374151);
-        font-size: 0.875rem;
-        font-weight: 500;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        background: none;
+        border: none;
         cursor: pointer;
         transition: all 0.2s;
-        white-space: nowrap;
+        padding: 0;
+        width: 80px;
       }
 
-      .category-chip:hover {
+      .category-circle {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        overflow: hidden;
+        background: #fff;
+        border: 2px solid var(--border-color, #e5e7eb);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.25s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+
+      .category-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .category-icon {
+        width: 28px;
+        height: 28px;
+        color: #9ca3af;
+        transition: color 0.2s;
+      }
+
+      .category-item:hover .category-circle {
         border-color: var(--primary-color, #3b82f6);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        transform: translateY(-2px);
+      }
+
+      .category-item:hover .category-icon {
         color: var(--primary-color, #3b82f6);
       }
 
-      .category-chip.active {
-        background: var(--primary-color, #3b82f6);
+      .category-item.active .category-circle {
         border-color: var(--primary-color, #3b82f6);
-        color: #fff;
+        border-width: 3px;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+      }
+
+      .category-item.active .category-icon {
+        color: var(--primary-color, #3b82f6);
+      }
+
+      .category-name {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-color, #374151);
+        text-align: center;
+        line-height: 1.2;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        transition: color 0.2s;
+      }
+
+      .category-item:hover .category-name,
+      .category-item.active .category-name {
+        color: var(--primary-color, #3b82f6);
       }
 
       /* Search Section */
       .search-section {
-        padding: 1rem 0 1.5rem;
-        background: var(--hover-bg, #f9fafb);
+        padding: 0.75rem 0;
+        background: var(--bg-color, #fff);
         border-bottom: 1px solid var(--border-color, #e5e7eb);
       }
 
       .search-wrapper {
         position: relative;
-        max-width: 600px;
+        max-width: 650px;
         margin: 0 auto;
       }
 
@@ -292,18 +380,18 @@ import { StoreService } from '../services/store.service';
         left: 1rem;
         top: 50%;
         transform: translateY(-50%);
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         color: #9ca3af;
         pointer-events: none;
       }
 
       .search-input {
         width: 100%;
-        padding: 0.875rem 3rem 0.875rem 3rem;
+        padding: 0.75rem 2.75rem;
         border: 1px solid var(--border-color, #e5e7eb);
-        border-radius: 0.75rem;
-        font-size: 1rem;
+        border-radius: 50px;
+        font-size: 0.9375rem;
         background: #fff;
         transition: all 0.2s;
       }
@@ -311,7 +399,7 @@ import { StoreService } from '../services/store.service';
       .search-input:focus {
         outline: none;
         border-color: var(--primary-color, #3b82f6);
-        box-shadow: 0 0 0 3px var(--primary-light, rgba(59, 130, 246, 0.1));
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
       }
 
       .search-input::placeholder {
@@ -320,14 +408,14 @@ import { StoreService } from '../services/store.service';
 
       .clear-search {
         position: absolute;
-        right: 0.75rem;
+        right: 0.5rem;
         top: 50%;
         transform: translateY(-50%);
         width: 28px;
         height: 28px;
         padding: 0;
         border: none;
-        background: var(--hover-bg, #f3f4f6);
+        background: #f3f4f6;
         border-radius: 50%;
         cursor: pointer;
         display: flex;
@@ -349,7 +437,7 @@ import { StoreService } from '../services/store.service';
 
       /* Products Section */
       .products-section {
-        padding: 1.5rem 0 3rem;
+        padding: 1rem 0 2.5rem;
       }
 
       .results-info {
@@ -392,20 +480,26 @@ import { StoreService } from '../services/store.service';
       .products-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
+        gap: 0.875rem;
       }
 
       @media (min-width: 640px) {
         .products-grid {
           grid-template-columns: repeat(3, 1fr);
-          gap: 1.25rem;
+          gap: 1rem;
         }
       }
 
       @media (min-width: 1024px) {
         .products-grid {
           grid-template-columns: repeat(4, 1fr);
-          gap: 1.5rem;
+          gap: 1.25rem;
+        }
+      }
+
+      @media (min-width: 1280px) {
+        .products-grid {
+          grid-template-columns: repeat(5, 1fr);
         }
       }
 
@@ -517,6 +611,18 @@ export class CatalogPageComponent implements OnInit {
     pageSize: 20,
     total: 0,
     totalPages: 0,
+  });
+
+  /**
+   * Computed para determinar si se deben mostrar las categorías
+   * Reglas:
+   * - Si no hay categorías: NO mostrar
+   * - Si hay solo 1 categoría: NO mostrar (regla de negocio)
+   * - Si hay más de 1 categoría: SÍ mostrar
+   */
+  readonly shouldShowCategories = computed(() => {
+    const cats = this.categories();
+    return cats.length > 1;
   });
 
   readonly hasActiveFilters = computed(() => {

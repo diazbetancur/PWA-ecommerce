@@ -107,15 +107,15 @@ export interface ProductCardData {
       .product-card {
         position: relative;
         background: var(--tenant-background-color, #ffffff);
-        border: 1px solid var(--tenant-outline, rgba(0, 0, 0, 0.1));
-        border-radius: 12px;
+        border: 1px solid var(--tenant-outline, #f0f0f0);
+        border-radius: 16px;
         overflow: hidden;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
 
         &:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          transform: translateY(-6px);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
           border-color: var(
             --primary-color,
             var(--tenant-primary-color, #1976d2)
@@ -127,32 +127,33 @@ export interface ProductCardData {
         position: relative;
         aspect-ratio: 1;
         overflow: hidden;
-        background: #f5f5f5;
+        background: #fafafa;
       }
 
       .product-image {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        transition: transform 0.3s ease;
+        transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .product-card:hover .product-image {
-        transform: scale(1.05);
+        transform: scale(1.08);
       }
 
       .stock-badge {
         position: absolute;
-        top: 12px;
-        right: 12px;
-        padding: 4px 8px;
-        border-radius: 16px;
-        font-size: 0.75rem;
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.7rem;
         font-weight: 600;
         color: white;
+        backdrop-filter: blur(8px);
 
         &.out-of-stock {
-          background: #ef4444;
+          background: rgba(239, 68, 68, 0.9);
         }
       }
 
@@ -162,7 +163,11 @@ export interface ProductCardData {
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0, 0, 0, 0.4);
+        background: linear-gradient(
+          180deg,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0.5) 100%
+        );
         display: flex;
         align-items: center;
         justify-content: center;
@@ -177,53 +182,59 @@ export interface ProductCardData {
       .quick-view-btn {
         background: white;
         border: none;
-        padding: 12px 16px;
-        border-radius: 8px;
-        font-weight: 500;
+        padding: 10px 18px;
+        border-radius: 24px;
+        font-weight: 600;
+        font-size: 0.875rem;
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
         cursor: pointer;
         transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
         &:hover {
           background: #f8f9fa;
-          transform: translateY(-1px);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
         }
       }
 
       .product-info {
-        padding: 16px;
+        padding: 14px;
       }
 
       .product-name {
         margin: 0 0 8px 0;
-        font-size: 1rem;
+        font-size: 0.9375rem;
         font-weight: 600;
-        line-height: 1.4;
-        color: var(--tenant-text-color, #333);
+        line-height: 1.3;
+        color: var(--tenant-text-color, #1f2937);
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+        min-height: 2.6em;
       }
 
       .product-price-section {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
+        align-items: baseline;
+        margin-bottom: 10px;
       }
 
       .product-price {
-        font-size: 1.25rem;
+        font-size: 1.375rem;
         font-weight: 700;
         color: var(--primary-color, var(--tenant-primary-color, #1976d2));
+        letter-spacing: -0.02em;
       }
 
       .stock-info {
-        font-size: 0.75rem;
-        color: #6b7280;
+        font-size: 0.7rem;
+        color: #9ca3af;
+        font-weight: 500;
       }
 
       .product-actions {
@@ -235,23 +246,24 @@ export interface ProductCardData {
         background: var(--primary-color, var(--tenant-primary-color, #1976d2));
         color: white;
         border: none;
-        padding: 12px;
-        border-radius: 8px;
+        padding: 11px;
+        border-radius: 12px;
         font-weight: 600;
+        font-size: 0.875rem;
         cursor: pointer;
         transition: all 0.2s ease;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 8px;
+        gap: 6px;
 
         &:hover {
           background: var(
             --primary-color,
-            var(--tenant-primary-color, #1976d2)
+            var(--tenant-primary-color, #1565c0)
           );
-          opacity: 0.9;
-          transform: translateY(-1px);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
         }
 
         &:active {
@@ -261,12 +273,13 @@ export interface ProductCardData {
 
       .out-of-stock-btn {
         width: 100%;
-        background: #9ca3af;
-        color: white;
+        background: #e5e7eb;
+        color: #9ca3af;
         border: none;
-        padding: 12px;
-        border-radius: 8px;
+        padding: 11px;
+        border-radius: 12px;
         font-weight: 600;
+        font-size: 0.875rem;
         cursor: not-allowed;
       }
 
@@ -297,12 +310,12 @@ export interface ProductCardData {
         }
 
         .product-price {
-          font-size: 1.125rem;
+          font-size: 1.25rem;
         }
 
         .add-to-cart-btn {
-          padding: 10px;
-          font-size: 0.875rem;
+          padding: 9px;
+          font-size: 0.8125rem;
         }
       }
     `,

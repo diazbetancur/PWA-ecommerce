@@ -232,12 +232,18 @@ export class ApiClientService {
     relativePath: string,
     body?: unknown
   ): void {
-    console.group(
-      `%c🚀 API ${method} ${relativePath}`,
-      'color: #0070f3; font-weight: bold'
-    );
-    if (body) console.log('%cBody:', 'color: #0070f3', body);
-    console.groupEnd();
+    // Solo log en desarrollo y para endpoints específicos que necesiten debug
+    if (
+      this.envService.isConsoleLoggingEnabled &&
+      this.shouldLogEndpoint(relativePath)
+    ) {
+      console.group(
+        `%c🚀 API ${method} ${relativePath}`,
+        'color: #0070f3; font-weight: bold'
+      );
+      if (body) console.log('%cBody:', 'color: #0070f3', body);
+      console.groupEnd();
+    }
   }
 
   private logResponse(
@@ -246,13 +252,36 @@ export class ApiClientService {
     startTime: number,
     response: unknown
   ): void {
-    const duration = Math.round(performance.now() - startTime);
-    console.group(
-      `%c✅ API ${method} ${relativePath} - ${duration}ms`,
-      'color: #22c55e; font-weight: bold'
-    );
-    console.log('%cResponse:', 'color: #22c55e', response);
-    console.groupEnd();
+    // Solo log en desarrollo y para endpoints específicos que necesiten debug
+    if (
+      this.envService.isConsoleLoggingEnabled &&
+      this.shouldLogEndpoint(relativePath)
+    ) {
+      const duration = Math.round(performance.now() - startTime);
+      console.group(
+        `%c✅ API ${method} ${relativePath} - ${duration}ms`,
+        'color: #22c55e; font-weight: bold'
+      );
+      console.log('%cResponse:', 'color: #22c55e', response);
+      console.groupEnd();
+    }
+  }
+
+  /**
+   * Determina si un endpoint debe ser loggeado
+   * Puedes personalizar esto para filtrar logs innecesarios
+   */
+  private shouldLogEndpoint(path: string): boolean {
+    // Lista de endpoints que NO queremos loggear (muy frecuentes o no críticos)
+    const excludedPaths = [
+      '/api/products',
+      '/api/categories',
+      '/api/banners',
+      '/api/public/tenant',
+    ];
+
+    // No loggear si está en la lista de excluidos
+    return !excludedPaths.some((excluded) => path.includes(excluded));
   }
 
   private handleError(

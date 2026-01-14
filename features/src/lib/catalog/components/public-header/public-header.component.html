@@ -1,0 +1,84 @@
+<header class="public-header">
+  <div class="header-container">
+    <!-- Logo (if exists) -->
+    @if (tenantLogo()) {
+    <div class="logo-section">
+      <a routerLink="/" class="logo-link">
+        <img [src]="tenantLogo()" [alt]="tenantName()" class="logo" />
+      </a>
+    </div>
+    }
+
+    <!-- Search Bar -->
+    <div class="search-section">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matIconPrefix>search</mat-icon>
+        <input
+          matInput
+          [formControl]="searchControl"
+          placeholder="Buscar productos..."
+          (keypress)="onSearchKeyPress($event)"
+        />
+        @if (searchControl.value) {
+        <button
+          matIconSuffix
+          mat-icon-button
+          (click)="searchControl.setValue('')"
+          aria-label="Limpiar búsqueda"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions-section">
+      <!-- Cart -->
+      <button
+        mat-icon-button
+        class="cart-button"
+        (click)="goToCart()"
+        aria-label="Ver carrito"
+      >
+        <mat-icon [matBadge]="cartItemCount()" matBadgeColor="accent"
+          >shopping_cart</mat-icon
+        >
+      </button>
+
+      <!-- Auth -->
+      @if (isLoggedIn()) {
+      <button
+        mat-button
+        class="profile-button"
+        [matMenuTriggerFor]="profileMenu"
+      >
+        <mat-icon>account_circle</mat-icon>
+        <span class="user-name">{{ userName() }}</span>
+      </button>
+      } @else {
+      <button mat-button class="login-button" (click)="goToLogin()">
+        <mat-icon>login</mat-icon>
+        <span>Iniciar sesión</span>
+      </button>
+      }
+    </div>
+  </div>
+</header>
+
+<!-- Profile Menu (cuando está logueado) -->
+<mat-menu #profileMenu="matMenu">
+  <button mat-menu-item (click)="goToProfile()">
+    <mat-icon>person</mat-icon>
+    <span>Mi perfil</span>
+  </button>
+  <button mat-menu-item routerLink="/orders">
+    <mat-icon>receipt_long</mat-icon>
+    <span>Mis pedidos</span>
+  </button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    <span>Cerrar sesión</span>
+  </button>
+</mat-menu>

@@ -37,13 +37,17 @@ export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
     // Si finalmente tenemos un tenant, agregarlo al header
     if (tenantSlug) {
       headers = headers.set('X-Tenant-Slug', tenantSlug);
-      console.log('[authTenantInterceptor] Adding X-Tenant-Slug:', tenantSlug);
+      // Log solo en modo desarrollo y si es necesario
+      // console.log('[authTenantInterceptor] Adding X-Tenant-Slug:', tenantSlug);
     }
   }
 
   return next(req.clone({ headers })).pipe(
     catchError((e) => {
-      console.error('[authTenantInterceptor] Error:', e?.status, e?.message);
+      // Solo log de errores críticos (401, 403, 500)
+      if (e?.status === 401 || e?.status === 403 || e?.status >= 500) {
+        console.error('[authTenantInterceptor] Error:', e?.status, e?.message);
+      }
 
       // 401 = No autenticado (token inválido/expirado) -> Desloguear
       if (e?.status === 401) {

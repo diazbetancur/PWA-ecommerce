@@ -1,0 +1,132 @@
+<section class="product-grid-section">
+  <!-- Toolbar: Count + Sort -->
+  <div class="toolbar">
+    <div class="product-count">
+      @if (loading()) {
+      <span>Cargando...</span>
+      } @else {
+      <span>{{ total() }} productos</span>
+      }
+    </div>
+
+    <mat-form-field appearance="outline" class="sort-select">
+      <mat-label>Ordenar por</mat-label>
+      <mat-select
+        [value]="sortBy()"
+        (selectionChange)="onSortChange($event.value)"
+      >
+        <mat-option value="name_asc">Nombre: A-Z</mat-option>
+        <mat-option value="name_desc">Nombre: Z-A</mat-option>
+        <mat-option value="price_asc">Precio: Menor a mayor</mat-option>
+        <mat-option value="price_desc">Precio: Mayor a menor</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Products Grid -->
+  @if (loading()) {
+  <div class="loading-grid">
+    @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+    <div class="skeleton-card"></div>
+    }
+  </div>
+  } @else if (products().length > 0) {
+  <div class="products-grid">
+    @for (product of products(); track product.id) {
+    <mat-card class="product-card">
+      <!-- Discount Badge -->
+      @if (hasDiscount(product)) {
+      <div class="discount-badge">-{{ getDiscountPercent(product) }}%</div>
+      }
+
+      <!-- Product Image -->
+      <div class="product-image">
+        <img
+          [src]="product.mainImageUrl || '/icons/icon-192x192.png'"
+          [alt]="product.name"
+          loading="lazy"
+        />
+      </div>
+
+      <!-- Product Info -->
+      <mat-card-content class="product-info">
+        <h3 class="product-name">{{ product.name }}</h3>
+
+        <!-- Prices -->
+        <div class="prices">
+          @if (hasDiscount(product)) {
+          <span class="compare-price">${{ product.compareAtPrice }}</span>
+          }
+          <span class="current-price">${{ product.price }}</span>
+        </div>
+
+        <!-- Stock Info -->
+        @if (product.trackInventory && product.stock !== undefined) {
+        <div class="stock-info">
+          @if (product.stock > 0) {
+          <span class="in-stock">{{ product.stock }} disponibles</span>
+          } @else {
+          <span class="out-of-stock">Agotado</span>
+          }
+        </div>
+        }
+
+        <!-- Quantity Selector -->
+        <div class="quantity-selector">
+          <button
+            mat-icon-button
+            (click)="decrementQuantity(product.id)"
+            [disabled]="getQuantity(product.id) <= 1"
+            aria-label="Reducir cantidad"
+          >
+            <mat-icon>remove</mat-icon>
+          </button>
+          <span class="quantity">{{ getQuantity(product.id) }}</span>
+          <button
+            mat-icon-button
+            (click)="incrementQuantity(product.id)"
+            aria-label="Aumentar cantidad"
+          >
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+
+        <!-- Add to Cart Button -->
+        <button
+          mat-raised-button
+          class="add-to-cart-btn"
+          (click)="addToCart(product)"
+          [disabled]="
+            product.trackInventory &&
+            (product.stock === undefined || product.stock <= 0)
+          "
+        >
+          <mat-icon>shopping_cart</mat-icon>
+          <span>Agregar al carrito</span>
+        </button>
+      </mat-card-content>
+    </mat-card>
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (totalPages > 1) {
+  <div class="pagination">
+    <button mat-button (click)="previousPage()" [disabled]="!hasPreviousPage">
+      <mat-icon>chevron_left</mat-icon>
+      Anterior
+    </button>
+    <span class="page-info">Página {{ page() }} de {{ totalPages }}</span>
+    <button mat-button (click)="nextPage()" [disabled]="!hasNextPage">
+      Siguiente
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+  } } @else {
+  <div class="empty-state">
+    <mat-icon>inventory_2</mat-icon>
+    <h3>No se encontraron productos</h3>
+    <p>Intenta ajustar los filtros de búsqueda</p>
+  </div>
+  }
+</section>

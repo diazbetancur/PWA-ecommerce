@@ -167,24 +167,6 @@ function generateReport(results) {
     `${colors.bold}${colors.cyan}=== REPORTE DE USO DE HTTPCLIENT VS APICLIENTSERVICE ===${colors.reset}\n`
   );
 
-  // Estadísticas generales
-  console.log(`${colors.bold}📊 Estadísticas:${colors.reset}`);
-  console.log(
-    `  • Total de archivos TypeScript escaneados: ${colors.cyan}${results.stats.totalFiles}${colors.reset}`
-  );
-  console.log(
-    `  • Archivos con violaciones: ${colors.red}${results.stats.violationFiles}${colors.reset}`
-  );
-  console.log(
-    `  • Archivos usando ApiClientService correctamente: ${colors.green}${results.stats.compliantFiles}${colors.reset}`
-  );
-  console.log(
-    `  • Usos de HttpClient directo: ${colors.yellow}${results.stats.httpclientUsages}${colors.reset}`
-  );
-  console.log(
-    `  • Usos de ApiClientService: ${colors.green}${results.stats.apiclientUsages}${colors.reset}\n`
-  );
-
   // Violaciones críticas (archivos de features)
   const featureViolations = results.violations.filter((v) => v.isFeature);
   if (featureViolations.length > 0) {

@@ -47,7 +47,7 @@ export class CatalogService {
 
     return this.apiClient
       .getWithParams<PaginatedResponseDto<ProductSummaryDto>>(
-        '/api/catalog/products',
+        '/api/products',
         params
       )
       .pipe(
@@ -62,21 +62,19 @@ export class CatalogService {
   }
 
   getProduct(productId: string): Observable<ProductResponse> {
-    return this.apiClient
-      .get<ProductDto>(`/api/catalog/products/${productId}`)
-      .pipe(
-        map((dto: ProductDto) => ({
-          data: this.mapProductDto(dto),
-          success: true,
-        })),
-        catchError((error: unknown) => {
-          console.error(
-            `[CatalogService] Error getting product ${productId}:`,
-            error
-          );
-          throw error;
-        })
-      );
+    return this.apiClient.get<ProductDto>(`/api/products/${productId}`).pipe(
+      map((dto: ProductDto) => ({
+        data: this.mapProductDto(dto),
+        success: true,
+      })),
+      catchError((error: unknown) => {
+        console.error(
+          `[CatalogService] Error getting product ${productId}:`,
+          error
+        );
+        throw error;
+      })
+    );
   }
 
   getCategories(): Observable<CategoriesResponse> {
@@ -103,7 +101,7 @@ export class CatalogService {
   getFeaturedProducts(limit = 12): Observable<ProductsResponse> {
     return this.apiClient
       .getWithParams<PaginatedResponseDto<ProductSummaryDto>>(
-        '/api/catalog/products/featured',
+        '/api/products/featured',
         { limit }
       )
       .pipe(
