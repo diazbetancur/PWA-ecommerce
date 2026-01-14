@@ -4,9 +4,13 @@
       <mat-card-title>
         <div class="header-content">
           <div class="title-section">
-            <button mat-icon-button (click)="cancel()" matTooltip="Volver">
-              <mat-icon>arrow_back</mat-icon>
-            </button>
+            <app-button
+              variant="ghost"
+              icon="arrow_back"
+              size="sm"
+              (clicked)="cancel()"
+            >
+            </app-button>
             <mat-icon>{{ isEditMode() ? 'edit' : 'add' }}</mat-icon>
             <h1>{{ pageTitle() }}</h1>
           </div>
@@ -31,7 +35,6 @@
             placeholder="Ej: Electrónica"
             required
           />
-          <mat-icon matPrefix>label</mat-icon>
           @if (form.get('name')?.invalid && form.get('name')?.touched) {
           <mat-error>{{ getErrorMessage('name') }}</mat-error>
           }
@@ -48,7 +51,6 @@
             rows="4"
             maxlength="500"
           ></textarea>
-          <mat-icon matPrefix>description</mat-icon>
           @if (form.get('description')?.invalid &&
           form.get('description')?.touched) {
           <mat-error>{{ getErrorMessage('description') }}</mat-error>
@@ -67,7 +69,6 @@
             placeholder="https://ejemplo.com/imagen.jpg"
             type="url"
           />
-          <mat-icon matPrefix>image</mat-icon>
           <mat-hint>URL completa de la imagen de la categoría</mat-hint>
         </mat-form-field>
 

@@ -41,8 +41,31 @@
   display: grid;
   grid-template-columns: minmax(280px, 1fr) auto;
   gap: 1rem;
-  align-items: top;
+  align-items: center;
   margin-bottom: 1.5rem;
+}
+
+.simple-search {
+  width: 100%;
+  max-width: 400px;
+  height: 38px;
+  padding: 0 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  color: #1e293b;
+  background: white;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--tenant-primary, #6366f1);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
 }
 
 .search-field {

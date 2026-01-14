@@ -14,12 +14,12 @@
     <mat-card-content>
       <!-- Filtros -->
       <div class="filters-section">
-        <app-search-input
-          [(value)]="searchValue"
-          placeholder="Buscar por nombre, SKU o descripción..."
-          label="Buscar"
-          (searched)="onSearchChanged($event)"
-          (cleared)="onSearchChanged('')"
+        <input
+          type="text"
+          class="simple-search"
+          [(ngModel)]="searchValue"
+          (input)="onSearchChanged(searchValue())"
+          placeholder="Buscar productos..."
         />
 
         @if (canCreate()) {

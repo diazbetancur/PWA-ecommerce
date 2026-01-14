@@ -3,9 +3,13 @@
     <mat-card-header>
       <mat-card-title>
         <div class="header-content">
-          <button mat-icon-button (click)="cancel()" matTooltip="Volver">
-            <mat-icon>arrow_back</mat-icon>
-          </button>
+          <app-button
+            variant="ghost"
+            icon="arrow_back"
+            size="sm"
+            (clicked)="cancel()"
+          >
+          </app-button>
           <h1>{{ pageTitle() }}</h1>
         </div>
       </mat-card-title>
@@ -116,7 +120,6 @@
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>URL de Imagen Principal</mat-label>
             <input matInput formControlName="mainImageUrl" />
-            <mat-icon matPrefix>image</mat-icon>
           </mat-form-field>
 
           <!-- Selector de Categoría -->
@@ -129,25 +132,25 @@
                   selectedCategory()!.name
                 }}</span>
               </div>
-              <button
+              <app-button
                 type="button"
-                mat-icon-button
-                (click)="clearCategory()"
-                matTooltip="Quitar categoría"
+                variant="ghost"
+                icon="close"
+                size="sm"
+                (clicked)="clearCategory()"
               >
-                <mat-icon>close</mat-icon>
-              </button>
+              </app-button>
             </div>
             } @else {
-            <button
+            <app-button
               type="button"
-              mat-stroked-button
-              (click)="openCategorySelector()"
+              variant="secondary"
+              icon="category"
+              (clicked)="openCategorySelector()"
               class="select-category-btn"
             >
-              <mat-icon>category</mat-icon>
               Seleccionar Categoría
-            </button>
+            </app-button>
             }
           </div>
 

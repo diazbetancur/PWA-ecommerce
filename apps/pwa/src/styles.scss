@@ -282,7 +282,7 @@ select:focus {
 
 /* ===== ANGULAR MATERIAL OVERRIDES ===== */
 
-/* Material Form Fields - Inputs más limpios */
+/* Material Form Fields - Inputs más limpios y compactos */
 .mat-mdc-form-field {
   &.mat-form-field-appearance-outline {
     .mat-mdc-text-field-wrapper {
@@ -290,13 +290,14 @@ select:focus {
     }
 
     .mat-mdc-form-field-infix {
-      padding-top: 0.75rem;
-      padding-bottom: 0.75rem;
+      padding-top: 0.625rem;
+      padding-bottom: 0.625rem;
       min-height: auto;
     }
 
-    .mat-mdc-input-element {
-      padding: 0.5rem 0.75rem;
+    .mat-mdc-input-element,
+    .mat-mdc-select {
+      padding: 0.625rem 0.875rem;
       font-size: 0.9375rem;
     }
 
@@ -304,8 +305,9 @@ select:focus {
       .mdc-notched-outline__leading,
       .mdc-notched-outline__notch,
       .mdc-notched-outline__trailing {
-        border-radius: 8px;
+        border-radius: 6px;
         border-color: #e2e8f0;
+        border-width: 1px;
       }
     }
 
@@ -318,6 +320,16 @@ select:focus {
           border-width: 2px;
         }
       }
+    }
+
+    // Labels más pequeños y sutiles
+    .mat-mdc-floating-label {
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    &.mat-focused .mat-mdc-floating-label {
+      color: var(--tenant-primary, #6366f1);
     }
   }
 }
