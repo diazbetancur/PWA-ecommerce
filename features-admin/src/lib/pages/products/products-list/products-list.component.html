@@ -201,9 +201,9 @@
       <div class="empty-state">
         <mat-icon>inventory</mat-icon>
         <h2>No hay productos</h2>
-        @if (searchControl.value) {
-        <p>No se encontraron productos con "{{ searchControl.value }}"</p>
-        <button mat-button (click)="searchControl.setValue('')">
+        @if (searchValue()) {
+        <p>No se encontraron productos con "{{ searchValue() }}"</p>
+        <button mat-button (click)="onSearchChanged('')">
           Limpiar búsqueda
         </button>
         } @else {

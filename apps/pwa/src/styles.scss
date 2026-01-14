@@ -282,6 +282,46 @@ select:focus {
 
 /* ===== ANGULAR MATERIAL OVERRIDES ===== */
 
+/* Material Form Fields - Inputs más limpios */
+.mat-mdc-form-field {
+  &.mat-form-field-appearance-outline {
+    .mat-mdc-text-field-wrapper {
+      padding-bottom: 0;
+    }
+
+    .mat-mdc-form-field-infix {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+      min-height: auto;
+    }
+
+    .mat-mdc-input-element {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.9375rem;
+    }
+
+    .mdc-notched-outline {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-radius: 8px;
+        border-color: #e2e8f0;
+      }
+    }
+
+    &.mat-focused {
+      .mdc-notched-outline {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: var(--tenant-primary, #6366f1);
+          border-width: 2px;
+        }
+      }
+    }
+  }
+}
+
 /* Material Paginator - Modern & Clean */
 .mat-mdc-paginator {
   background-color: transparent !important;

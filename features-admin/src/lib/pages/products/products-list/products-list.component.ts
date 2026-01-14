@@ -185,7 +185,7 @@ export class ProductsListComponent implements OnInit {
       });
   }
 
-  private performDelete(productId: number): void {
+  private performDelete(productId: string): void {
     this.productService.delete(productId).subscribe({
       next: () => {
         this.snackBar.open('Producto eliminado exitosamente', 'Cerrar', {

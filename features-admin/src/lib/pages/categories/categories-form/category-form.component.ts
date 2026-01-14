@@ -35,6 +35,7 @@ import {
   UpdateCategoryRequest,
 } from '../../../models/category.model';
 import { CategoryService } from '../../../services/category.service';
+import { AppButtonComponent } from '@pwa/shared';
 
 @Component({
   selector: 'lib-category-form',
@@ -50,6 +51,7 @@ import { CategoryService } from '../../../services/category.service';
     MatCheckboxModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
+    AppButtonComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './category-form.component.html',

@@ -11,7 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -28,7 +28,6 @@ import {
   ConfirmationDialogService,
   SearchInputComponent,
 } from '@pwa/shared';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
 import {
   CategoryListItem,
   CategoryListParams,
@@ -176,7 +175,7 @@ export class CategoriesListComponent implements OnInit {
       });
   }
 
-  private performDelete(categoryId: number): void {
+  private performDelete(categoryId: string): void {
     this.loading.set(true);
 
     this.categoryService.delete(categoryId).subscribe({

@@ -65,7 +65,11 @@
   // Variantes de color
   &--primary {
     background-color: var(--tenant-primary, var(--primary-color));
-    color: white;
+    color: white !important;
+
+    mat-icon {
+      color: white !important;
+    }
 
     &:hover:not(:disabled) {
       background-color: var(--tenant-primary-hover, var(--primary-hover));
@@ -81,7 +85,11 @@
 
   &--secondary {
     background-color: var(--secondary-color);
-    color: white;
+    color: white !important;
+
+    mat-icon {
+      color: white !important;
+    }
 
     &:hover:not(:disabled) {
       background-color: var(--secondary-hover);
@@ -92,7 +100,11 @@
 
   &--danger {
     background-color: var(--danger-color);
-    color: white;
+    color: white !important;
+
+    mat-icon {
+      color: white !important;
+    }
 
     &:hover:not(:disabled) {
       background-color: var(--danger-hover);

@@ -38,6 +38,7 @@ import {
 } from '@pwa/core';
 import { CategorySelectorDialogComponent } from '../../../components/category-selector-dialog/category-selector-dialog.component';
 import { CategoryListItem } from '../../../models/category.model';
+import { AppButtonComponent } from '@pwa/shared';
 
 @Component({
   selector: 'lib-product-form',
@@ -54,6 +55,7 @@ import { CategoryListItem } from '../../../models/category.model';
     MatCheckboxModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
+    AppButtonComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './product-form.component.html',

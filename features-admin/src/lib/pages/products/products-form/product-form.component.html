@@ -206,25 +206,25 @@
 
         <!-- Acciones -->
         <div class="form-actions">
-          <button
+          <app-button
             type="button"
-            mat-stroked-button
-            (click)="cancel()"
+            variant="ghost"
+            icon="close"
+            (clicked)="cancel()"
             [disabled]="loading()"
           >
-            <mat-icon>close</mat-icon>
             Cancelar
-          </button>
+          </app-button>
 
-          <button
+          <app-button
             type="submit"
-            mat-raised-button
-            color="primary"
+            variant="primary"
+            icon="save"
             [disabled]="loading() || form.invalid"
+            [loading]="loading()"
           >
-            <mat-icon>save</mat-icon>
             {{ submitButtonText() }}
-          </button>
+          </app-button>
         </div>
       </form>
       }
