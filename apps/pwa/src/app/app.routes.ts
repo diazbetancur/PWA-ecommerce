@@ -19,19 +19,6 @@ export const appRoutes: Route[] = [
         loadChildren: () => import('@pwa/catalog').then((m) => m.catalogRoutes),
       },
       {
-        path: 'cart',
-        loadChildren: () =>
-          import('@pwa/features-cart').then((m) => m.featuresCartRoutes),
-      },
-      {
-        path: 'checkout',
-        canActivate: [AuthGuard],
-        loadChildren: () =>
-          import('@pwa/features-checkout').then(
-            (m) => m.featuresCheckoutRoutes
-          ),
-      },
-      {
         path: 'account',
         loadChildren: () =>
           import('@pwa/features-account').then((m) => m.featuresAccountRoutes),

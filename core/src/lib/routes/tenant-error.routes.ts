@@ -1,7 +1,5 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, Routes } from '@angular/router';
-import { ApiTestDemoComponent } from '../components/api-test-demo/api-test-demo.component';
-import { CurrencyDemoComponent } from '../components/currency-demo/currency-demo.component';
 import { TenantDebugComponent } from '../components/tenant-debug/tenant-debug.component';
 import { TenantNotFoundComponent } from '../components/tenant-not-found/tenant-not-found.component';
 import { TenantConfigService } from '../services/tenant-config.service';
@@ -26,24 +24,6 @@ export const TENANT_ERROR_ROUTES: Routes = [
     data: {
       description: 'Panel de debug para inspeccionar información del tenant',
       noLayout: true, // No usar layout principal para tener control completo
-    },
-  },
-  {
-    path: 'tenant/api-test',
-    component: ApiTestDemoComponent,
-    title: 'API Client Test',
-    data: {
-      description: 'Demo del ApiClientService con headers multi-tenant',
-      noLayout: false, // Usar layout normal
-    },
-  },
-  {
-    path: 'tenant/currency-demo',
-    component: CurrencyDemoComponent,
-    title: 'Currency Multi-tenant Demo',
-    data: {
-      description: 'Demostración de formateo de monedas multi-tenant',
-      noLayout: false,
     },
   },
   {

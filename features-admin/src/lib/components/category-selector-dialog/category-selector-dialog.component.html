@@ -1,0 +1,70 @@
+<h2 mat-dialog-title>Seleccionar Categoría</h2>
+
+<mat-dialog-content>
+  <!-- Búsqueda -->
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Buscar categoría</mat-label>
+    <input
+      matInput
+      [formControl]="searchControl"
+      placeholder="Escribe para buscar..."
+      (keydown.enter)="$event.preventDefault()"
+    />
+    <mat-icon matPrefix>search</mat-icon>
+    @if (searchControl.value) {
+    <button matSuffix mat-icon-button (click)="searchControl.setValue('')">
+      <mat-icon>close</mat-icon>
+    </button>
+    }
+  </mat-form-field>
+
+  <!-- Lista de categorías con scroll infinito -->
+  <div class="categories-list-container" #scrollContainer>
+    @if (loading() && categories().length === 0) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando categorías...</p>
+    </div>
+    } @else if (categories().length > 0) {
+    <mat-selection-list [multiple]="false" class="categories-list">
+      @for (category of categories(); track category.id) {
+      <mat-list-option
+        [value]="category"
+        (click)="selectCategory(category)"
+        class="category-option"
+      >
+        <div class="category-item">
+          <div class="category-info">
+            <span class="category-name">{{ category.name }}</span>
+          </div>
+          @if (!category.isActive) {
+          <span class="inactive-badge">Inactiva</span>
+          }
+        </div>
+      </mat-list-option>
+      }
+    </mat-selection-list>
+
+    <!-- Loading más items -->
+    @if (loadingMore()) {
+    <div class="loading-more">
+      <mat-spinner diameter="30"></mat-spinner>
+      <p>Cargando más...</p>
+    </div>
+    } } @else {
+    <div class="empty-state">
+      <mat-icon>category</mat-icon>
+      <p>No se encontraron categorías</p>
+      @if (searchControl.value) {
+      <button mat-button (click)="searchControl.setValue('')">
+        Limpiar búsqueda
+      </button>
+      }
+    </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancelar</button>
+</mat-dialog-actions>

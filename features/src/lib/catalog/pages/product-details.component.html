@@ -1,0 +1,92 @@
+<div class="product-details-page">
+  @if (isLoading()) {
+  <div class="loading-container">
+    <div class="product-skeleton">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-content">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-subtitle"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-button"></div>
+      </div>
+    </div>
+  </div>
+  } @else if (error()) {
+  <div class="error-container">
+    <h2>Error al cargar el producto</h2>
+    <p>{{ error() }}</p>
+    <button class="tenant-btn-primary" (click)="retry()">Reintentar</button>
+    <button class="tenant-btn-secondary" (click)="goBack()">
+      Volver al catálogo
+    </button>
+  </div>
+  } @else if (product()) {
+  <div class="product-container">
+    <div class="breadcrumb">
+      <a routerLink="/catalog" class="tenant-link">Catálogo</a>
+      <span> / {{ product()!.name }}</span>
+    </div>
+
+    <div class="product-layout">
+      <!-- Imagen principal -->
+      <div class="product-image-section">
+        <img
+          [src]="productImageUrl()"
+          [alt]="product()!.name"
+          class="main-image"
+        />
+      </div>
+
+      <!-- Información del producto -->
+      <div class="product-info-section">
+        <h1 class="product-title">{{ product()!.name }}</h1>
+
+        <div class="product-price">
+          {{ formattedPrice() }}
+        </div>
+
+        @if (product()!.stock !== undefined) {
+        <div class="stock-info" [class.out-of-stock]="!isInStock()">
+          @if (isInStock()) { ✅ {{ product()!.stock }} disponibles } @else { ❌
+          Sin stock }
+        </div>
+        }
+
+        <div class="product-description">
+          <p>{{ product()!.description }}</p>
+        </div>
+
+        @if (product()!.sku) {
+        <div class="product-sku">SKU: {{ product()!.sku }}</div>
+        }
+
+        <!-- Botones de acción -->
+        <div class="product-actions">
+          @if (isInStock() || !product()!.stock) {
+          <button
+            class="add-to-cart-btn tenant-btn-primary"
+            (click)="addToCart()"
+          >
+            Agregar al carrito
+          </button>
+          } @else {
+          <button class="out-of-stock-btn" disabled>Sin stock</button>
+          }
+
+          <button class="back-btn tenant-btn-secondary" (click)="goBack()">
+            Volver al catálogo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  } @else {
+  <div class="not-found-container">
+    <h2>Producto no encontrado</h2>
+    <p>El producto que buscas no existe o ha sido eliminado.</p>
+    <button class="tenant-btn-primary" routerLink="/catalog">
+      Ver catálogo
+    </button>
+  </div>
+  }
+</div>

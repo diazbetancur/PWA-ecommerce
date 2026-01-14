@@ -1,0 +1,130 @@
+mat-dialog-content {
+  min-width: 500px;
+  max-width: 600px;
+  min-height: 400px;
+  max-height: 70vh;
+  padding: 1rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.search-field {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.categories-list-container {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.categories-list {
+  padding: 0;
+}
+
+.category-option {
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.category-option:hover {
+  background: #f5f5f5;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.category-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.category-name {
+  font-weight: 500;
+  color: #000;
+}
+
+.category-description {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.inactive-badge {
+  padding: 4px 8px;
+  background: #f8d7da;
+  color: #721c24;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.loading-state,
+.loading-more,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+  text-align: center;
+}
+
+.empty-state mat-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
+  color: rgba(0, 0, 0, 0.3);
+}
+
+.empty-state p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.loading-more {
+  padding: 1rem;
+}
+
+.loading-more p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Scrollbar */
+.categories-list-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.categories-list-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.categories-list-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.categories-list-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@media (max-width: 768px) {
+  mat-dialog-content {
+    min-width: 100%;
+    max-width: 100%;
+  }
+}

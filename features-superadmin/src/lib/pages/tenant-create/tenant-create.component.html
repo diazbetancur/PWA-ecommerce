@@ -1,0 +1,338 @@
+<div class="create-container">
+  <!-- Header -->
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">
+      <span class="material-icons">arrow_back</span>
+    </button>
+    <div class="header-content">
+      <h1 class="page-title">Crear Nuevo Comercio</h1>
+      <p class="page-subtitle">
+        Registra un nuevo comercio con su base de datos y configuración inicial
+      </p>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="form-card">
+    <form [formGroup]="tenantForm" (ngSubmit)="onSubmit()">
+      <!-- Nombre del Comercio -->
+      <div class="form-group">
+        <label class="form-label" for="name">
+          Nombre del Comercio <span class="required">*</span>
+        </label>
+        <input
+          id="name"
+          type="text"
+          class="form-input"
+          formControlName="name"
+          placeholder="Ej: Mi Tienda Online"
+          [class.error]="isFieldInvalid('name')"
+          (input)="onNameChange()"
+        />
+        <p class="form-hint">
+          <span class="material-icons hint-icon">info</span>
+          Nombre visible de la tienda que verán los clientes
+        </p>
+        @if (isFieldInvalid('name')) {
+        <p class="form-error">
+          <span class="material-icons">error</span>
+          @if (tenantForm.get('name')?.hasError('required')) { El nombre del
+          comercio es requerido } @else if
+          (tenantForm.get('name')?.hasError('minlength')) { Mínimo 3 caracteres
+          } @else if (tenantForm.get('name')?.hasError('maxlength')) { Máximo
+          100 caracteres }
+        </p>
+        }
+      </div>
+
+      <!-- Identificador (Slug) - Solo lectura, generado automáticamente -->
+      <div class="form-group">
+        <label class="form-label" for="slug">
+          Identificador del Comercio
+          <span class="badge-auto">Automático</span>
+        </label>
+        <div class="slug-preview">
+          <span class="slug-prefix">URL:</span>
+          <code class="slug-value">{{
+            tenantForm.get('slug')?.value || 'nombre-del-comercio'
+          }}</code>
+        </div>
+        <p class="form-hint">
+          <span class="material-icons hint-icon">link</span>
+          Este identificador se usa en la URL para acceder a tu comercio. Se
+          genera automáticamente del nombre.
+        </p>
+      </div>
+
+      <!-- Email del Administrador -->
+      <div class="form-group">
+        <label class="form-label" for="adminEmail">
+          Email del Administrador <span class="required">*</span>
+        </label>
+        <input
+          id="adminEmail"
+          type="email"
+          class="form-input"
+          formControlName="adminEmail"
+          placeholder="admin@micomercio.com"
+          [class.error]="isFieldInvalid('adminEmail')"
+        />
+        <p class="form-hint">
+          <span class="material-icons hint-icon">person</span>
+          Este email se usará para el acceso del administrador del comercio
+        </p>
+        @if (isFieldInvalid('adminEmail')) {
+        <p class="form-error">
+          <span class="material-icons">error</span>
+          @if (tenantForm.get('adminEmail')?.hasError('required')) { El email
+          del administrador es requerido } @else if
+          (tenantForm.get('adminEmail')?.hasError('invalidEmailFormat')) {
+          Ingresa un email válido (ej: usuario&#64;dominio.com) }
+        </p>
+        }
+      </div>
+
+      <!-- Plan -->
+      <div class="form-group">
+        <label class="form-label">
+          Plan del Comercio <span class="required">*</span>
+        </label>
+
+        @if (isLoadingPlans()) {
+        <div class="loading-plans">
+          <span class="spinner"></span>
+          <p>Cargando planes disponibles...</p>
+        </div>
+        } @else if (plans().length === 0) {
+        <div class="alert alert-warning">
+          <span class="material-icons">warning</span>
+          No se encontraron planes disponibles
+        </div>
+        } @else {
+        <div class="plan-cards">
+          @for (plan of plans(); track plan.id) {
+          <label
+            class="plan-card"
+            [class.selected]="tenantForm.get('planCode')?.value === plan.code"
+            [class.premium]="plan.code === 'Premium'"
+          >
+            <input
+              type="radio"
+              formControlName="planCode"
+              [value]="plan.code"
+              class="plan-radio"
+            />
+            <div class="plan-content">
+              <span class="material-icons plan-icon">
+                {{
+                  plan.code === 'Premium' ? 'workspace_premium' : 'storefront'
+                }}
+              </span>
+              <h3 class="plan-name">{{ plan.name }}</h3>
+              <ul class="plan-features">
+                @for (limit of plan.limits.slice(0, 6); track limit.limitCode) {
+                <li>
+                  <span class="material-icons">check</span>
+                  {{ limit.description }}
+                </li>
+                } @if (plan.limits.length > 6) {
+                <li class="more-features">
+                  <span class="material-icons">add</span>
+                  Y {{ plan.limits.length - 6 }} características más
+                </li>
+                }
+              </ul>
+            </div>
+          </label>
+          }
+        </div>
+        } @if (isFieldInvalid('planCode')) {
+        <p class="form-error">
+          <span class="material-icons">error</span>
+          Selecciona un plan para el comercio
+        </p>
+        }
+      </div>
+
+      <!-- Error general -->
+      @if (error()) {
+      <div class="alert alert-error">
+        <span class="material-icons">error</span>
+        <div class="alert-content">
+          <strong>Error al crear comercio</strong>
+          <p>{{ error() }}</p>
+          @if (errorSuggestion()) {
+          <p class="error-suggestion">
+            <span class="material-icons">lightbulb</span>
+            {{ errorSuggestion() }}
+          </p>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="goBack()"
+          [disabled]="isLoading()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading() || tenantForm.invalid"
+        >
+          @if (isLoading()) {
+          <span class="spinner-small"></span>
+          Creando... } @else {
+          <span class="material-icons">add_business</span>
+          Crear Comercio }
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Success Modal -->
+  @if (showSuccessModal()) {
+  <div class="modal-overlay" (click)="closeSuccessModal()">
+    <div class="modal-content success-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header success">
+        <span class="material-icons modal-icon">check_circle</span>
+        <h2>¡Comercio Creado Exitosamente!</h2>
+      </div>
+      <div class="modal-body">
+        <!-- Mensaje del backend -->
+        @if (createdTenant()?.message) {
+        <div class="success-message">
+          <span class="material-icons">info</span>
+          <p>{{ createdTenant()?.message }}</p>
+        </div>
+        }
+
+        <!-- Datos del Comercio -->
+        <div class="info-section">
+          <h4>
+            <span class="material-icons">storefront</span>
+            Datos del Comercio
+          </h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>Identificador</label>
+              <code>{{ createdTenant()?.slug }}</code>
+            </div>
+            <div class="info-item">
+              <label>Estado</label>
+              <span class="badge-status">{{ createdTenant()?.status }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Credenciales del Administrador -->
+        @if (createdTenant()?.temporaryPassword) {
+        <div class="credentials-section">
+          <h4>
+            <span class="material-icons">vpn_key</span>
+            Credenciales del Administrador
+          </h4>
+
+          <div class="credential-item">
+            <label>Email</label>
+            <div class="credential-value">
+              <code>{{ createdTenant()?.adminEmail }}</code>
+              <button
+                class="btn-copy"
+                (click)="copyToClipboard(createdTenant()?.adminEmail!)"
+                title="Copiar"
+              >
+                <span class="material-icons">content_copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="credential-item">
+            <label>Contraseña Temporal</label>
+            <div class="credential-value">
+              <code class="password">{{
+                createdTenant()?.temporaryPassword
+              }}</code>
+              <button
+                class="btn-copy"
+                (click)="copyToClipboard(createdTenant()?.temporaryPassword!)"
+                title="Copiar"
+              >
+                <span class="material-icons">content_copy</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="credentials-warning">
+            <span class="material-icons">warning</span>
+            <div>
+              <strong>¡Importante!</strong>
+              <p>
+                Guarda estas credenciales en un lugar seguro. La contraseña
+                temporal solo se muestra una vez y debe ser cambiada en el
+                primer inicio de sesión.
+              </p>
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- Acceso Directo -->
+        <div class="access-section">
+          <h4>
+            <span class="material-icons">link</span>
+            Acceso al Comercio
+          </h4>
+          <div class="access-url">
+            <code>{{ getAccessUrl() }}</code>
+            <button
+              class="btn-copy"
+              (click)="copyToClipboard(getAccessUrl())"
+              title="Copiar URL"
+            >
+              <span class="material-icons">content_copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Próximos Pasos -->
+        <div class="next-steps">
+          <h4>
+            <span class="material-icons">checklist</span>
+            Próximos pasos
+          </h4>
+          <ol>
+            <li>Guarda las credenciales del administrador</li>
+            <li>Accede usando la URL del comercio</li>
+            <li>Inicia sesión con el email y contraseña proporcionados</li>
+            <li>Cambia la contraseña temporal por una segura</li>
+          </ol>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeSuccessModal()">
+          Cerrar
+        </button>
+        <button class="btn btn-primary" (click)="openAccessUrl()">
+          <span class="material-icons">open_in_new</span>
+          Ir al Comercio
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Copied Toast -->
+  @if (showCopiedToast()) {
+  <div class="toast-copied">
+    <span class="material-icons">check</span>
+    Copiado al portapapeles
+  </div>
+  }
+</div>

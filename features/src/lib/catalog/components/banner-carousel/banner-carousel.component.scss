@@ -1,0 +1,34 @@
+.banner-carousel {
+  width: 100%;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.banner-container {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.banner-slide {
+  width: 100%;
+}
+
+.banner-link {
+  display: block;
+  line-height: 0;
+}
+
+.banner-image {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+
+  @media (max-width: 768px) {
+    max-height: 200px;
+    border-radius: 0;
+  }
+}

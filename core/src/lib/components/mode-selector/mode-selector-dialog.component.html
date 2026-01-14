@@ -1,0 +1,57 @@
+<div class="mode-selector-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>swap_horiz</mat-icon>
+    ¿Cómo deseas continuar?
+  </h2>
+
+  <mat-dialog-content>
+    <p class="subtitle">
+      Tu cuenta tiene acceso a múltiples áreas. Selecciona cómo quieres navegar:
+    </p>
+
+    <div class="mode-cards">
+      <!-- Opción Cliente -->
+      <mat-card
+        class="mode-card customer-card"
+        (click)="selectMode('customer')"
+      >
+        <mat-card-header>
+          <mat-icon class="mode-icon">shopping_bag</mat-icon>
+          <mat-card-title>Como Cliente</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <ul>
+            <li>Explorar productos</li>
+            <li>Ver categorías</li>
+            <li>Realizar compras</li>
+            <li>Gestionar pedidos</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Opción Empleado -->
+      <mat-card
+        class="mode-card employee-card"
+        (click)="selectMode('employee')"
+      >
+        <mat-card-header>
+          <mat-icon class="mode-icon">work</mat-icon>
+          <mat-card-title>Como Empleado</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <ul>
+            <li>Administrar productos</li>
+            <li>Gestionar categorías</li>
+            <li>Configurar banners</li>
+            <li>Acceso administrativo</li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <p class="hint">
+      <mat-icon>info</mat-icon>
+      Podrás cambiar de modo más tarde desde tu perfil
+    </p>
+  </mat-dialog-content>
+</div>

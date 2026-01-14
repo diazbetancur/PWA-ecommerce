@@ -1,0 +1,75 @@
+<div class="admin-menu">
+  <!-- Header del Usuario -->
+  <div class="menu-header">
+    <div class="user-info">
+      <div class="avatar">
+        {{ userInitials() }}
+      </div>
+      <div class="user-details">
+        <p class="user-name">{{ userName() }}</p>
+        <p class="user-role">{{ userRole() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items del Menú -->
+  <nav class="menu-items">
+    @for (item of menuItems(); track item.id) { @if (item.children &&
+    item.children.length > 0) {
+    <!-- Item con hijos (grupo expandible) -->
+    <div class="menu-group">
+      <div
+        class="menu-group-header"
+        (click)="toggleGroup(item.id)"
+        [class.collapsed]="!isGroupExpanded(item.id)"
+      >
+        <span class="material-icons">{{ item.icon }}</span>
+        <span class="menu-label">{{ item.label }}</span>
+        <span class="material-icons expand-icon">
+          {{ isGroupExpanded(item.id) ? 'expand_more' : 'chevron_right' }}
+        </span>
+      </div>
+      @if (isGroupExpanded(item.id)) {
+      <div class="menu-group-children">
+        @for (child of item.children; track child.id) {
+        <a
+          [routerLink]="child.route"
+          routerLinkActive="active"
+          class="menu-item submenu-item"
+        >
+          <span class="material-icons">{{ child.icon }}</span>
+          <span class="menu-label">{{ child.label }}</span>
+          @if (child.badge) {
+          <span class="menu-badge" [class]="'badge-' + child.badge.color">
+            {{ child.badge.text }}
+          </span>
+          }
+        </a>
+        }
+      </div>
+      }
+    </div>
+    } @else {
+    <!-- Item simple -->
+    <a [routerLink]="item.route" routerLinkActive="active" class="menu-item">
+      <span class="material-icons">{{ item.icon }}</span>
+      <span class="menu-label">{{ item.label }}</span>
+      @if (item.badge) {
+      <span class="menu-badge" [class]="'badge-' + item.badge.color">
+        {{ item.badge.text }}
+      </span>
+      }
+    </a>
+    } @if (item.divider) {
+    <div class="menu-divider"></div>
+    } }
+  </nav>
+
+  <!-- Footer con acciones -->
+  <div class="menu-footer">
+    <button type="button" class="menu-item" (click)="logout()">
+      <span class="material-icons">logout</span>
+      <span class="menu-label">Cerrar Sesión</span>
+    </button>
+  </div>
+</div>

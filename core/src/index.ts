@@ -38,8 +38,6 @@ export * from './lib/providers/tenant-bootstrap.provider';
 export * from './lib/providers/tenant-interceptor.provider';
 
 // Components
-export * from './lib/components/api-test-demo/api-test-demo.component';
-export * from './lib/components/currency-demo/currency-demo.component';
 export * from './lib/components/mode-selector/mode-selector-dialog.component';
 export * from './lib/components/tenant-debug/tenant-debug.component';
 export * from './lib/components/tenant-not-found/tenant-not-found.component';

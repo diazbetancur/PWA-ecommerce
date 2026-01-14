@@ -1,0 +1,76 @@
+@if (shouldShow()) {
+<div class="ios-install-banner" [@slideUp]>
+  <div class="banner-container">
+    <!-- Logo del tenant -->
+    <div class="banner-logo">
+      @if (logoUrl(); as logo) {
+      <img
+        [src]="logo"
+        [alt]="tenantName() + ' logo'"
+        class="logo-image"
+        (error)="onLogoError()"
+      />
+      } @else {
+      <div class="logo-placeholder">
+        <span class="material-icons">store</span>
+      </div>
+      }
+    </div>
+
+    <!-- Contenido del banner -->
+    <div class="banner-content">
+      <div class="banner-header">
+        <h3 class="banner-title">
+          Instala <strong>{{ tenantName() }}</strong>
+        </h3>
+        <button
+          class="banner-close"
+          (click)="dismiss()"
+          aria-label="Cerrar"
+          type="button"
+        >
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="banner-instructions">
+        <p class="instruction-text">
+          Para una mejor experiencia, añade esta app a tu pantalla de inicio:
+        </p>
+        <ol class="instruction-list">
+          <li>
+            <span class="step-icon">1️⃣</span>
+            Toca el botón
+            <span class="ios-icon"
+              ><span class="material-icons">ios_share</span></span
+            >
+            en la barra del navegador
+          </li>
+          <li>
+            <span class="step-icon">2️⃣</span>
+            Desplázate y selecciona
+            <strong>"Añadir a pantalla de inicio"</strong>
+          </li>
+        </ol>
+      </div>
+
+      <div class="banner-actions">
+        <button
+          class="action-btn action-primary"
+          (click)="dismissPermanently()"
+          type="button"
+        >
+          Entendido
+        </button>
+        <button
+          class="action-btn action-secondary"
+          (click)="dismiss()"
+          type="button"
+        >
+          Más tarde
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}

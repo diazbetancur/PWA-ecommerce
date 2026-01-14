@@ -5,13 +5,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   selector: 'lib-loader',
   standalone: true,
   imports: [MatProgressBarModule],
-  template: `
-    <mat-progress-bar
-      *ngIf="active"
-      mode="indeterminate"
-      aria-label="Loading"
-    ></mat-progress-bar>
-  `,
+  templateUrl: './loader.component.html',
+  styleUrl: './loader.component.scss',
 })
 export class LoaderComponent {
   @Input() active = false;

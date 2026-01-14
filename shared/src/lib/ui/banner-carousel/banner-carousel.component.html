@@ -1,0 +1,107 @@
+@if (banners().length > 0) {
+<div class="carousel" [class.single]="banners().length === 1">
+  <div
+    class="carousel-track"
+    [style.transform]="'translateX(-' + currentIndex() * 100 + '%)'"
+  >
+    @for (banner of banners(); track banner.id) {
+    <div class="carousel-slide">
+      @if (getBannerLink(banner)) {
+      <a
+        [href]="getBannerLink(banner)"
+        [target]="banner.linkTarget || '_self'"
+        class="banner-link"
+      >
+        <picture>
+          @if (getBannerMobileImage(banner)) {
+          <source
+            media="(max-width: 640px)"
+            [srcset]="getBannerMobileImage(banner)"
+          />
+          }
+          <img
+            [src]="getBannerDesktopImage(banner)"
+            [alt]="banner.title || 'Banner'"
+            class="banner-image"
+          />
+        </picture>
+        @if (banner.title || banner.subtitle) {
+        <div class="banner-content">
+          @if (banner.title) {
+          <h2 class="banner-title">{{ banner.title }}</h2>
+          } @if (banner.subtitle) {
+          <p class="banner-subtitle">{{ banner.subtitle }}</p>
+          } @if (banner.buttonText) {
+          <span class="banner-button">{{ banner.buttonText }}</span>
+          }
+        </div>
+        }
+      </a>
+      } @else {
+      <div class="banner-wrapper">
+        <picture>
+          @if (getBannerMobileImage(banner)) {
+          <source
+            media="(max-width: 640px)"
+            [srcset]="getBannerMobileImage(banner)"
+          />
+          }
+          <img
+            [src]="getBannerDesktopImage(banner)"
+            [alt]="banner.title || 'Banner'"
+            class="banner-image"
+          />
+        </picture>
+        @if (banner.title || banner.subtitle) {
+        <div class="banner-content">
+          @if (banner.title) {
+          <h2 class="banner-title">{{ banner.title }}</h2>
+          } @if (banner.subtitle) {
+          <p class="banner-subtitle">{{ banner.subtitle }}</p>
+          }
+        </div>
+        }
+      </div>
+      }
+    </div>
+    }
+  </div>
+
+  <!-- Indicators -->
+  @if (banners().length > 1) {
+  <div class="carousel-indicators">
+    @for (banner of banners(); track banner.id; let i = $index) {
+    <button
+      type="button"
+      class="indicator"
+      [class.active]="currentIndex() === i"
+      (click)="goTo(i)"
+      [attr.aria-label]="'Ir a banner ' + (i + 1)"
+    ></button>
+    }
+  </div>
+
+  <!-- Navigation Arrows -->
+  <button
+    type="button"
+    class="nav-arrow prev"
+    (click)="prev()"
+    aria-label="Anterior"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </button>
+  <button
+    type="button"
+    class="nav-arrow next"
+    (click)="next()"
+    aria-label="Siguiente"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M9 18l6-6-6-6" />
+    </svg>
+  </button>
+  }
+</div>
+}

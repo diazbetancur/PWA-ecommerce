@@ -1,0 +1,181 @@
+<div class="home-page">
+  <!-- Banner Section -->
+  @if (banners().length > 0) {
+  <section class="banner-section">
+    <app-banner-carousel [banners]="banners()" [autoPlayInterval]="5000" />
+  </section>
+  }
+
+  <!-- Search Section -->
+  <section class="search-section">
+    <div class="container">
+      <div class="search-wrapper">
+        <svg
+          class="search-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="M21 21l-4.35-4.35" />
+        </svg>
+        <input
+          [formControl]="searchControl"
+          type="text"
+          placeholder="Buscar productos..."
+          class="search-input"
+        />
+        @if (searchControl.value) {
+        <button
+          class="clear-search"
+          (click)="clearSearch()"
+          aria-label="Limpiar búsqueda"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  @if (shouldShowCategories()) {
+  <section class="categories-section">
+    <div class="container">
+      <h2 class="section-title">Categorías</h2>
+      <div class="categories-scroll">
+        <button
+          class="category-item"
+          [class.active]="!selectedCategory()"
+          (click)="selectCategory(null)"
+          title="Ver todos los productos"
+        >
+          <div class="category-circle">
+            <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"
+              />
+            </svg>
+          </div>
+          <span class="category-name">Todos</span>
+        </button>
+        @for (category of categories(); track category.id) {
+        <button
+          class="category-item"
+          [class.active]="selectedCategory() === category.slug"
+          (click)="selectCategory(category.slug)"
+          [title]="category.name"
+        >
+          <div class="category-circle">
+            @if (category.imageUrl) {
+            <img
+              [src]="category.imageUrl"
+              [alt]="category.name"
+              class="category-image"
+              loading="lazy"
+            />
+            } @else {
+            <svg class="category-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM9 9H5V5h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 6h-4V5h4v4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6H5v-4h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6h-4v-4h4v4z"
+              />
+            </svg>
+            }
+          </div>
+          <span class="category-name">{{ category.name }}</span>
+        </button>
+        }
+      </div>
+    </div>
+  </section>
+  }
+
+  <!-- Products Section -->
+  <main class="products-section">
+    <div class="container">
+      <!-- Results Info -->
+      @if (!isLoading() && products().length > 0) {
+      <div class="results-info">
+        <span class="results-count">{{ pagination().total }} productos</span>
+        @if (hasActiveFilters()) {
+        <button class="clear-filters" (click)="clearFilters()">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+          Limpiar filtros
+        </button>
+        }
+      </div>
+      }
+
+      <!-- Loading State -->
+      @if (isLoading()) {
+      <app-products-grid-skeleton />
+      }
+
+      <!-- Products Grid -->
+      @else if (products().length > 0) {
+      <div class="products-grid">
+        @for (product of products(); track product.id) {
+        <app-product-card
+          [product]="mapToCardData(product)"
+          [showStock]="true"
+          (addToCart)="onAddToCart($event)"
+          (quickView)="onQuickView($event)"
+        />
+        }
+      </div>
+
+      <!-- Load More -->
+      @if (showLoadMore()) {
+      <div class="load-more-wrapper">
+        <button
+          class="load-more-btn"
+          [disabled]="isLoadingMore()"
+          (click)="loadMore()"
+        >
+          @if (isLoadingMore()) {
+          <span class="spinner"></span>
+          Cargando... } @else { Ver más productos }
+        </button>
+      </div>
+      } }
+
+      <!-- Empty State -->
+      @else if (!isLoading()) {
+      <div class="empty-state">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="M21 21l-4.35-4.35" />
+          <line x1="8" y1="11" x2="14" y2="11" />
+        </svg>
+        <h3>No se encontraron productos</h3>
+        <p>Intenta con otros términos o limpia los filtros</p>
+        <button class="retry-btn" (click)="clearFilters()">
+          Ver todos los productos
+        </button>
+      </div>
+      }
+    </div>
+  </main>
+</div>

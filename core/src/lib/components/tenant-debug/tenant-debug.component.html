@@ -1,0 +1,321 @@
+<div class="tenant-debug-container">
+  <div class="debug-header">
+    <div class="container">
+      <h1 class="debug-title">
+        🔧 Tenant Debug Panel @if (tenantSlug(); as slug) {
+        <span class="tenant-badge">{{ slug }}</span>
+        }
+      </h1>
+
+      <div class="debug-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="refreshTenantInfo()"
+          [disabled]="isRefreshing()"
+        >
+          @if (isRefreshing()) {
+          <span class="loading-spinner"></span>
+          Actualizando... } @else { 🔄 Refresh }
+        </button>
+
+        <a routerLink="/" class="btn btn-outline"> ← Volver a App </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="debug-grid">
+      <div class="debug-card">
+        <h2 class="card-title">
+          📋 Información del Tenant
+          <span class="status-indicator" [class]="tenantStatusClass()">
+            {{ tenantStatus() }}
+          </span>
+        </h2>
+
+        <div class="info-section">
+          <div class="info-group">
+            <h3>Identificación</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Slug:</label>
+                <code>{{ tenantSlug() || 'N/A' }}</code>
+              </div>
+              <div class="info-item">
+                <label>Key/ID:</label>
+                <code>{{ tenantKey() || 'N/A' }}</code>
+              </div>
+              <div class="info-item">
+                <label>Display Name:</label>
+                <span>{{ displayName() || 'N/A' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Status:</label>
+                <span class="status-badge" [class]="tenantStatusClass()">
+                  {{ tenantStatus() }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          @if (tenantConfig(); as config) {
+          <div class="info-group">
+            <h3>Branding</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Logo URL:</label>
+                @if (config.tenant.branding?.logoUrl; as logoUrl) {
+                <div class="logo-preview">
+                  <img
+                    [src]="logoUrl"
+                    alt="Logo"
+                    class="logo-img"
+                    loading="lazy"
+                  />
+                  <code class="logo-url">{{ logoUrl }}</code>
+                </div>
+                } @else {
+                <code>No logo configured</code>
+                }
+              </div>
+
+              @if (config.tenant.branding; as branding) {
+              <div class="info-item">
+                <label>Primary Color:</label>
+                <div class="color-preview">
+                  <div
+                    class="color-swatch"
+                    [style.backgroundColor]="branding.primaryColor"
+                  ></div>
+                  <code>{{ branding.primaryColor }}</code>
+                </div>
+              </div>
+              <div class="info-item">
+                <label>Secondary Color:</label>
+                <div class="color-preview">
+                  <div
+                    class="color-swatch"
+                    [style.backgroundColor]="branding.secondaryColor"
+                  ></div>
+                  <code>{{ branding.secondaryColor || 'N/A' }}</code>
+                </div>
+              </div>
+              <div class="info-item">
+                <label>Accent Color:</label>
+                <div class="color-preview">
+                  <div
+                    class="color-swatch"
+                    [style.backgroundColor]="branding.accentColor"
+                  ></div>
+                  <code>{{ branding.accentColor || 'N/A' }}</code>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+
+          <div class="info-group">
+            <h3>Configuración</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Locale:</label>
+                <code>{{ config.locale }}</code>
+              </div>
+              <div class="info-item">
+                <label>Currency:</label>
+                <code>{{ config.currency }}</code>
+              </div>
+              <div class="info-item">
+                <label>CDN Base URL:</label>
+                <code>{{ config.cdnBaseUrl || 'N/A' }}</code>
+              </div>
+            </div>
+          </div>
+
+          @if (config.features && Object.keys(config.features).length > 0) {
+          <div class="info-group">
+            <h3>Features Habilitadas</h3>
+            <div class="features-grid">
+              @for (feature of Object.entries(config.features); track
+              feature[0]) {
+              <div class="feature-item" [class.enabled]="feature[1]">
+                <span class="feature-name">{{ feature[0] }}</span>
+                <span class="feature-status">{{
+                  feature[1] ? '✅' : '❌'
+                }}</span>
+              </div>
+              }
+            </div>
+          </div>
+          } }
+        </div>
+      </div>
+
+      <div class="debug-card">
+        <h2 class="card-title">🧪 API Testing</h2>
+
+        <div class="api-test-section">
+          <div class="test-form">
+            <div class="form-group">
+              <label for="api-endpoint">Endpoint:</label>
+              <div class="input-with-button">
+                <select
+                  id="api-endpoint"
+                  [(ngModel)]="selectedEndpoint"
+                  class="endpoint-select"
+                >
+                  <option value="/api/catalog/products">
+                    GET /api/catalog/products
+                  </option>
+                  <option value="/api/catalog/categories">
+                    GET /api/catalog/categories
+                  </option>
+                  <option value="/api/public/health">
+                    GET /api/public/health
+                  </option>
+                  <option value="custom">Custom endpoint...</option>
+                </select>
+
+                @if (selectedEndpoint() === 'custom') {
+                <input
+                  type="text"
+                  [(ngModel)]="customEndpoint"
+                  placeholder="/api/custom/endpoint"
+                  class="custom-endpoint-input"
+                />
+                }
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="btn btn-primary test-button"
+              (click)="runApiTest()"
+              [disabled]="isTestRunning()"
+            >
+              @if (isTestRunning()) {
+              <span class="loading-spinner"></span>
+              Ejecutando Test... } @else { 🚀 Ejecutar Test }
+            </button>
+          </div>
+
+          <div class="headers-preview">
+            <h4>Headers que se enviarán:</h4>
+            <div class="headers-list">
+              <div class="header-item">
+                <code>X-Tenant-Slug: {{ tenantSlug() || 'null' }}</code>
+              </div>
+              <div class="header-item">
+                <code>X-Tenant-Key: {{ tenantKey() || 'null' }}</code>
+              </div>
+              <div class="header-item">
+                <code>Content-Type: application/json</code>
+              </div>
+            </div>
+          </div>
+
+          @if (lastTestResult(); as result) {
+          <div class="test-results">
+            <h4>
+              Resultado del Test
+              <span
+                class="result-badge"
+                [class]="result.success ? 'success' : 'error'"
+              >
+                {{ result.success ? '✅ Success' : '❌ Error' }}
+              </span>
+              <small class="test-timestamp">
+                {{ result.timestamp | date : 'medium' }}
+                ({{ result.duration }}ms)
+              </small>
+            </h4>
+
+            @if (result.status) {
+            <div class="status-info">
+              <strong>HTTP Status:</strong>
+              <code [class]="getStatusClass(result.status)">{{
+                result.status
+              }}</code>
+            </div>
+            } @if (result.headers) {
+            <details class="response-headers">
+              <summary>Response Headers</summary>
+              <pre>{{ formatHeaders(result.headers) }}</pre>
+            </details>
+            }
+
+            <div class="response-data">
+              <h5>Response Data:</h5>
+              @if (result.success && result.data) {
+              <pre class="json-response success">{{
+                formatJson(result.data)
+              }}</pre>
+              } @else if (result.error) {
+              <pre class="json-response error">{{ result.error }}</pre>
+              }
+            </div>
+          </div>
+          } @if (testHistory().length > 0) {
+          <div class="test-history">
+            <h4>Historial de Tests (últimos 5)</h4>
+            <div class="history-list">
+              @for (test of testHistory().slice(-5).reverse(); track
+              test.timestamp) {
+              <div
+                class="history-item"
+                [class]="test.success ? 'success' : 'error'"
+              >
+                <div class="history-header">
+                  <span class="history-endpoint">{{
+                    getEndpointFromTest(test)
+                  }}</span>
+                  <span class="history-status">{{
+                    test.success ? '✅' : '❌'
+                  }}</span>
+                  <span class="history-time">{{
+                    test.timestamp | date : 'shortTime'
+                  }}</span>
+                </div>
+                @if (!test.success) {
+                <div class="history-error">{{ test.error }}</div>
+                }
+              </div>
+              }
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <div class="debug-card full-width">
+        <h2 class="card-title">⚙️ Configuración Completa (Raw JSON)</h2>
+
+        <div class="json-viewer">
+          @if (tenantConfig(); as config) {
+          <pre class="json-content">{{ formatJson(config) }}</pre>
+          } @else {
+          <div class="no-data">No hay configuración de tenant disponible</div>
+          }
+        </div>
+
+        <div class="json-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="copyToClipboard(formatJson(tenantConfig()))"
+          >
+            📋 Copiar JSON
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="downloadJson()"
+          >
+            💾 Descargar JSON
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

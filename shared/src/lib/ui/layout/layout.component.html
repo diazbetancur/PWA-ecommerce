@@ -1,0 +1,73 @@
+<div class="app-layout" [attr.data-tenant]="tenantSlug()">
+  <!-- Global Loading Indicator -->
+  @if (isLoading()) {
+  <div class="global-loading">
+    <div class="loading-spinner">
+      <svg class="spinner" viewBox="0 0 50 50">
+        <circle
+          class="path"
+          cx="25"
+          cy="25"
+          r="20"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-miterlimit="10"
+        />
+      </svg>
+    </div>
+    <p>Cargando {{ displayName() }}...</p>
+  </div>
+  }
+
+  <!-- Header -->
+  <app-header></app-header>
+
+  <!-- Main Content Area -->
+  <main class="main-content" role="main">
+    <!-- Breadcrumb Area (optional) -->
+    <div class="breadcrumb-area">
+      <div class="container">
+        <!-- Breadcrumbs can be added here -->
+      </div>
+    </div>
+
+    <!-- Page Content -->
+    <div class="page-content">
+      <router-outlet></router-outlet>
+    </div>
+
+    <!-- Back to Top Button -->
+    @if (showBackToTop()) {
+    <button
+      class="back-to-top"
+      (click)="scrollToTop()"
+      aria-label="Volver arriba"
+      type="button"
+    >
+      <svg
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+      >
+        <path d="M18 15l-6-6-6 6" />
+      </svg>
+    </button>
+    }
+  </main>
+
+  <!-- Footer -->
+  <app-footer></app-footer>
+
+  <!-- Tenant Debug Info (only in development) -->
+  @if (isDebugMode() && currentTenant()) {
+  <div class="tenant-debug">
+    <details>
+      <summary>🔧 Tenant Debug Info</summary>
+      <pre>{{ tenantDebugInfo() | json }}</pre>
+    </details>
+  </div>
+  }
+</div>

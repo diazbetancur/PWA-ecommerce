@@ -1,0 +1,63 @@
+<div class="dashboard-welcome">
+  <div class="welcome-header">
+    <h1>¡Bienvenido al Panel de Administración!</h1>
+    <p class="subtitle">{{ tenantName() }}</p>
+  </div>
+
+  <div class="welcome-cards">
+    <!-- Card de Usuario -->
+    <div class="welcome-card">
+      <div class="card-icon">
+        <span class="material-icons">person</span>
+      </div>
+      <div class="card-content">
+        <h3>{{ userName() }}</h3>
+        <p>{{ userRoles() }}</p>
+      </div>
+    </div>
+
+    <!-- Card de Tenant -->
+    <div class="welcome-card">
+      <div class="card-icon">
+        <span class="material-icons">storefront</span>
+      </div>
+      <div class="card-content">
+        <h3>Tenant Activo</h3>
+        <p>{{ tenantSlug() }}</p>
+      </div>
+    </div>
+
+    <!-- Card de Módulos -->
+    <div class="welcome-card">
+      <div class="card-icon">
+        <span class="material-icons">apps</span>
+      </div>
+      <div class="card-content">
+        <h3>Módulos Disponibles</h3>
+        <p>{{ modulesCount() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <h2>Acciones Rápidas</h2>
+    <div class="actions-grid">
+      <button type="button" class="action-button">
+        <span class="material-icons">inventory_2</span>
+        <span>Gestionar Productos</span>
+      </button>
+      <button type="button" class="action-button">
+        <span class="material-icons">shopping_cart</span>
+        <span>Ver Ventas</span>
+      </button>
+      <button type="button" class="action-button">
+        <span class="material-icons">analytics</span>
+        <span>Ver Métricas</span>
+      </button>
+      <button type="button" class="action-button">
+        <span class="material-icons">settings</span>
+        <span>Configuración</span>
+      </button>
+    </div>
+  </div>
+</div>

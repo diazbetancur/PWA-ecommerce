@@ -19,8 +19,6 @@
       "@pwa/core": ["core/src/index.ts"],
       "@pwa/shared": ["shared/src/index.ts"],
       "@pwa/catalog": ["features/src/index.ts"],
-      "@pwa/features-cart": ["features-cart/src/index.ts"],
-      "@pwa/features-checkout": ["features-checkout/src/index.ts"],
       "@pwa/features-account": ["features-account/src/index.ts"],
       "@pwa/features-orders": ["features-orders/src/index.ts"],
       "@pwa/features-admin": ["features-admin/src/index.ts"],

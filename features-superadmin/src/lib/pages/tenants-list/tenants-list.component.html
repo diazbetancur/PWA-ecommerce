@@ -1,0 +1,246 @@
+<div class="tenants-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Gestión de Tenants</h1>
+      <p class="page-subtitle">
+        {{ totalCount() }} tenant{{
+          totalCount() !== 1 ? 's' : ''
+        }}
+        registrado{{ totalCount() !== 1 ? 's' : '' }}
+      </p>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-primary" (click)="navigateToCreate()">
+        <span class="material-icons">add</span>
+        Crear Tenant
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-card">
+    <div class="filters-grid">
+      <div class="filter-item">
+        <span class="filter-label">Buscar</span>
+        <div class="search-input-wrapper">
+          <span class="material-icons search-icon">search</span>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Buscar por nombre o slug..."
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+          />
+          @if (searchQuery()) {
+          <button
+            class="clear-search"
+            (click)="clearSearch()"
+            aria-label="Limpiar búsqueda"
+          >
+            <span class="material-icons">close</span>
+          </button>
+          }
+        </div>
+      </div>
+
+      <div class="filter-item">
+        <span class="filter-label">Estado</span>
+        <select
+          class="filter-select"
+          [(ngModel)]="statusFilter"
+          (ngModelChange)="onFilterChange()"
+        >
+          <option [value]="null">Todos</option>
+          <option [value]="TenantStatus.Ready">Ready</option>
+          <option [value]="TenantStatus.Pending">Pending</option>
+          <option [value]="TenantStatus.Seeding">Seeding</option>
+          <option [value]="TenantStatus.Suspended">Suspended</option>
+          <option [value]="TenantStatus.Failed">Failed</option>
+        </select>
+      </div>
+
+      <div class="filter-item">
+        <span class="filter-label">Plan</span>
+        <select
+          class="filter-select"
+          [(ngModel)]="planFilter"
+          (ngModelChange)="onFilterChange()"
+        >
+          <option [value]="null">Todos</option>
+          <option value="Basic">Basic</option>
+          <option value="Premium">Premium</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando tenants...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !isLoading()) {
+  <div class="error-card">
+    <span class="material-icons error-icon">error</span>
+    <h3>Error al cargar tenants</h3>
+    <p>{{ error() }}</p>
+    <button class="btn btn-secondary" (click)="loadTenants()">
+      <span class="material-icons">refresh</span>
+      Reintentar
+    </button>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && !error() && tenants().length === 0) {
+  <div class="empty-state">
+    <span class="material-icons empty-icon">store</span>
+    <h3>No hay tenants</h3>
+    @if (hasActiveFilters()) {
+    <p>No se encontraron tenants con los filtros aplicados</p>
+    <button class="btn btn-secondary" (click)="clearFilters()">
+      Limpiar filtros
+    </button>
+    } @else {
+    <p>Comienza creando tu primer tenant</p>
+    <button class="btn btn-primary" (click)="navigateToCreate()">
+      <span class="material-icons">add</span>
+      Crear Tenant
+    </button>
+    }
+  </div>
+  }
+
+  <!-- Tenants Table -->
+  @if (!isLoading() && !error() && tenants().length > 0) {
+  <div class="table-container">
+    <table class="tenants-table">
+      <thead>
+        <tr>
+          <th>Tenant</th>
+          <th>Plan</th>
+          <th>Estado</th>
+          <th>Creado</th>
+          <th>Actualizado</th>
+          <th class="actions-column">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tenant of tenants(); track tenant.id) {
+        <tr class="tenant-row">
+          <td>
+            <div class="tenant-info">
+              <div class="tenant-name">{{ tenant.name }}</div>
+              <div class="tenant-slug">{{ tenant.slug }}</div>
+            </div>
+          </td>
+          <td>
+            <span class="plan-badge" [class]="'plan-' + tenant.planName">
+              {{ tenant.planName }}
+            </span>
+          </td>
+          <td>
+            <span
+              class="status-badge"
+              [class]="'status-' + tenant.status.toLowerCase()"
+            >
+              <span class="status-dot"></span>
+              {{ tenant.status }}
+            </span>
+          </td>
+          <td class="date-cell">{{ formatDate(tenant.createdAt) }}</td>
+          <td class="date-cell">{{ formatDate(tenant.updatedAt) }}</td>
+          <td class="actions-cell">
+            <div class="actions-buttons">
+              <button
+                class="btn-icon"
+                (click)="viewTenant(tenant.id)"
+                title="Ver detalles"
+              >
+                <span class="material-icons">visibility</span>
+              </button>
+              <button
+                class="btn-icon"
+                (click)="editTenant(tenant.id)"
+                title="Editar"
+              >
+                <span class="material-icons">edit</span>
+              </button>
+              <button
+                class="btn-icon btn-danger"
+                (click)="deleteTenant(tenant)"
+                title="Eliminar"
+              >
+                <span class="material-icons">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination-container">
+    <div class="pagination-info">
+      Mostrando {{ startIndex() }} - {{ endIndex() }} de
+      {{ totalCount() }}
+    </div>
+    <div class="pagination-controls">
+      <button
+        class="btn-pagination"
+        [disabled]="currentPage() === 1"
+        (click)="goToPage(1)"
+        title="Primera página"
+      >
+        <span class="material-icons">first_page</span>
+      </button>
+      <button
+        class="btn-pagination"
+        [disabled]="currentPage() === 1"
+        (click)="previousPage()"
+        title="Página anterior"
+      >
+        <span class="material-icons">chevron_left</span>
+      </button>
+      <span class="page-numbers">
+        Página {{ currentPage() }} de {{ totalPages() }}
+      </span>
+      <button
+        class="btn-pagination"
+        [disabled]="currentPage() === totalPages()"
+        (click)="nextPage()"
+        title="Página siguiente"
+      >
+        <span class="material-icons">chevron_right</span>
+      </button>
+      <button
+        class="btn-pagination"
+        [disabled]="currentPage() === totalPages()"
+        (click)="goToPage(totalPages())"
+        title="Última página"
+      >
+        <span class="material-icons">last_page</span>
+      </button>
+    </div>
+    <div class="pagination-size">
+      <label>
+        Mostrar
+        <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+        </select>
+        por página
+      </label>
+    </div>
+  </div>
+  }
+</div>

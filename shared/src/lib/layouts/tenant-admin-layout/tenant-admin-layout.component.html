@@ -1,0 +1,45 @@
+<div class="admin-layout">
+  <!-- Menú Lateral -->
+  <aside class="admin-sidebar">
+    <app-tenant-admin-menu></app-tenant-admin-menu>
+  </aside>
+
+  <!-- Contenido Principal -->
+  <div class="admin-main">
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="header-left">
+        <h1 class="page-title">Panel Administrativo</h1>
+        <p class="tenant-name">{{ tenantName() }}</p>
+      </div>
+
+      <div class="header-right">
+        <!-- Indicador de Tenant Activo -->
+        <div class="tenant-badge">
+          <span class="material-icons">storefront</span>
+          <span>{{ tenantSlug() }}</span>
+        </div>
+
+        <!-- Notificaciones (placeholder) -->
+        <button type="button" class="icon-button" title="Notificaciones">
+          <span class="material-icons">notifications</span>
+        </button>
+
+        <!-- Perfil (placeholder) -->
+        <button type="button" class="icon-button" title="Perfil">
+          <span class="material-icons">account_circle</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Contenido de las Rutas -->
+    <main class="admin-content">
+      <router-outlet></router-outlet>
+    </main>
+
+    <!-- Footer -->
+    <footer class="admin-footer">
+      <p>PWA eCommerce Admin Panel - {{ tenantName() }} © {{ currentYear }}</p>
+    </footer>
+  </div>
+</div>

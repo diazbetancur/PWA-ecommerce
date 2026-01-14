@@ -1,0 +1,124 @@
+<div class="admin-layout" [class.menu-collapsed]="isMenuCollapsed()">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <button
+        class="menu-toggle"
+        (click)="toggleMenu()"
+        aria-label="Toggle menu"
+      >
+        <span class="material-icons">{{
+          isMenuCollapsed() ? 'menu' : 'menu_open'
+        }}</span>
+      </button>
+      @if (!isMenuCollapsed()) {
+      <h1 class="admin-title">Admin Panel</h1>
+      }
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems(); track item.id) {
+      <div class="nav-item" [class.active]="isRouteActive(item.route)">
+        @if (item.route && !item.children) {
+        <a [routerLink]="item.route" class="nav-link">
+          @if (item.icon) {
+          <span class="material-icons">{{ item.icon }}</span>
+          } @if (!isMenuCollapsed()) {
+          <span class="nav-label">{{ item.label }}</span>
+          } @if (item.badge && !isMenuCollapsed()) {
+          <span class="badge" [class]="'badge-' + item.badge.color">{{
+            item.badge.text
+          }}</span>
+          }
+        </a>
+        } @else if (item.children) {
+        <div class="nav-group" [class.expanded]="isItemExpanded(item.id)">
+          <button
+            class="nav-link nav-group-toggle"
+            (click)="toggleMenuItem(item.id)"
+          >
+            @if (item.icon) {
+            <span class="material-icons">{{ item.icon }}</span>
+            } @if (!isMenuCollapsed()) {
+            <span class="nav-label">{{ item.label }}</span>
+            <span class="material-icons expand-icon">expand_more</span>
+            }
+          </button>
+          @if (!isMenuCollapsed() && isItemExpanded(item.id)) {
+          <div class="nav-children">
+            @for (child of item.children; track child.id) { @if (child.route) {
+            <a
+              [routerLink]="child.route"
+              class="nav-link nav-child"
+              [class.active]="isRouteActive(child.route)"
+            >
+              @if (child.icon) {
+              <span class="material-icons">{{ child.icon }}</span>
+              }
+              <span class="nav-label">{{ child.label }}</span>
+            </a>
+            } }
+          </div>
+          }
+        </div>
+        } @if (item.showDivider) {
+        <hr class="nav-divider" />
+        }
+      </div>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="admin-main">
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="header-left">
+        <h2 class="page-title">Administrador General</h2>
+      </div>
+      <div class="header-right">
+        <div class="user-menu">
+          <button class="user-button" (click)="toggleUserMenu()">
+            <span class="user-avatar">{{ userName()[0] }}</span>
+            <span class="user-name">{{ userName() }}</span>
+            <span class="material-icons">expand_more</span>
+          </button>
+          @if (showUserMenu()) {
+          <div class="user-dropdown">
+            <div class="dropdown-header">
+              <div class="dropdown-user-name">{{ userName() }}</div>
+              <div class="dropdown-user-email">{{ userEmail() }}</div>
+              <div class="dropdown-user-role">{{ userRole() }}</div>
+            </div>
+            <hr />
+            <button
+              class="dropdown-item"
+              (click)="navigateTo('/admin/profile')"
+            >
+              <span class="material-icons">person</span>
+              Mi Perfil
+            </button>
+            <button
+              class="dropdown-item"
+              (click)="navigateTo('/admin/settings')"
+            >
+              <span class="material-icons">settings</span>
+              Configuración
+            </button>
+            <hr />
+            <button class="dropdown-item danger" (click)="logout()">
+              <span class="material-icons">logout</span>
+              Cerrar Sesión
+            </button>
+          </div>
+          }
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Area -->
+    <main class="admin-content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

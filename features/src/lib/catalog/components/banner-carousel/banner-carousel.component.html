@@ -1,0 +1,26 @@
+<!-- TODO: Implementar servicio de banners y carrusel funcional -->
+@if (banners().length > 0) {
+<section class="banner-carousel">
+  <div class="banner-container">
+    @for (banner of banners(); track banner.id) {
+    <div class="banner-slide">
+      @if (banner.link) {
+      <a [href]="banner.link" class="banner-link">
+        <img
+          [src]="banner.imageUrl"
+          [alt]="banner.title || 'Banner'"
+          class="banner-image"
+        />
+      </a>
+      } @else {
+      <img
+        [src]="banner.imageUrl"
+        [alt]="banner.title || 'Banner'"
+        class="banner-image"
+      />
+      }
+    </div>
+    }
+  </div>
+</section>
+}

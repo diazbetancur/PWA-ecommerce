@@ -18,40 +18,8 @@ import { TenantConfigService } from '@pwa/core';
     MatIconModule,
     MatButtonModule,
   ],
-  template: `
-    <mat-sidenav-container class="container">
-      <mat-sidenav
-        mode="side"
-        opened
-        role="navigation"
-        aria-label="Admin sidenav"
-      >
-        <mat-nav-list>
-          <a mat-list-item routerLink="/admin" i18n="@@admin.title"
-            >Administración</a
-          >
-        </mat-nav-list>
-      </mat-sidenav>
-      <mat-sidenav-content>
-        <mat-toolbar color="primary" role="banner">
-          <span i18n="@@admin.breadcrumb">Admin</span>
-        </mat-toolbar>
-        <main id="main" role="main" tabindex="-1">
-          <router-outlet />
-        </main>
-      </mat-sidenav-content>
-    </mat-sidenav-container>
-  `,
-  styles: [
-    `
-      .container {
-        height: 100vh;
-      }
-      main {
-        padding: 1rem;
-      }
-    `,
-  ],
+  templateUrl: './admin-layout.component.html',
+  styleUrl: './admin-layout.component.scss',
 })
 export class AdminLayoutComponent {
   readonly cfg = inject(TenantConfigService);
