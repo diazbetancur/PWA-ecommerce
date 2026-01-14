@@ -7,7 +7,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -23,6 +23,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { TenantAdminMenuService } from '@pwa/core';
+import {
+  AppButtonComponent,
+  ConfirmationDialogService,
+  SearchInputComponent,
+} from '@pwa/shared';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import {
   CategoryListItem,
@@ -35,6 +40,7 @@ import { CategoryService } from '../../../services/category.service';
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     MatTableModule,
     MatPaginatorModule,
@@ -49,6 +55,8 @@ import { CategoryService } from '../../../services/category.service';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    AppButtonComponent,
+    SearchInputComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './categories-list.component.html',
@@ -59,7 +67,7 @@ export class CategoriesListComponent implements OnInit {
   private readonly menuService = inject(TenantAdminMenuService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
-  private readonly dialog = inject(MatDialog);
+  private readonly confirmDialog = inject(ConfirmationDialogService);
 
   readonly categories = signal<CategoryListItem[]>([]);
   readonly loading = signal(false);
@@ -69,7 +77,7 @@ export class CategoriesListComponent implements OnInit {
   readonly pageSize = signal(20);
   readonly pageSizeOptions = [10, 20, 50, 100];
 
-  readonly searchControl = new FormControl('');
+  readonly searchValue = signal('');
 
   readonly displayedColumns = computed(() => {
     const baseColumns = [
@@ -101,16 +109,12 @@ export class CategoriesListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCategories();
-    this.setupFilters();
   }
 
-  private setupFilters(): void {
-    this.searchControl.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(() => {
-        this.page.set(1);
-        this.loadCategories();
-      });
+  onSearchChanged(value: string): void {
+    this.searchValue.set(value);
+    this.page.set(1);
+    this.loadCategories();
   }
 
   loadCategories(): void {
@@ -119,7 +123,7 @@ export class CategoriesListComponent implements OnInit {
     const params: CategoryListParams = {
       page: this.page(),
       pageSize: this.pageSize(),
-      search: this.searchControl.value || undefined,
+      search: this.searchValue() || undefined,
     };
 
     this.categoryService.list(params).subscribe({
@@ -156,17 +160,26 @@ export class CategoriesListComponent implements OnInit {
     ]);
   }
 
-  async deleteCategory(category: CategoryListItem): Promise<void> {
-    const confirmed = confirm(
-      `¿Estás seguro de eliminar la categoría "${category.name}"?\n\n` +
-        `Los ${category.productCount} productos asociados NO se eliminarán, solo se desvincularán.`
-    );
+  deleteCategory(category: CategoryListItem): void {
+    this.confirmDialog
+      .confirm({
+        title: 'Eliminar categoría',
+        message: `¿Estás seguro de eliminar la categoría "${category.name}"?\n\nLos ${category.productCount} productos asociados NO se eliminarán, solo se desvincularán.`,
+        type: 'danger',
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar',
+      })
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.performDelete(category.id);
+        }
+      });
+  }
 
-    if (!confirmed) return;
-
+  private performDelete(categoryId: number): void {
     this.loading.set(true);
 
-    this.categoryService.delete(category.id).subscribe({
+    this.categoryService.delete(categoryId).subscribe({
       next: () => {
         this.snackBar.open('Categoría eliminada exitosamente', 'Cerrar', {
           duration: 3000,

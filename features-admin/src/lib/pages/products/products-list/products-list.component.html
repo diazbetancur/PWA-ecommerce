@@ -14,35 +14,23 @@
     <mat-card-content>
       <!-- Filtros -->
       <div class="filters-section">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar</mat-label>
-          <input
-            matInput
-            [formControl]="searchControl"
-            placeholder="Buscar por nombre, SKU o descripción..."
-          />
-          <mat-icon matPrefix>search</mat-icon>
-          @if (searchControl.value) {
-          <button
-            matSuffix
-            mat-icon-button
-            (click)="searchControl.setValue('')"
-          >
-            <mat-icon>close</mat-icon>
-          </button>
-          }
-        </mat-form-field>
+        <app-search-input
+          [(value)]="searchValue"
+          placeholder="Buscar por nombre, SKU o descripción..."
+          label="Buscar"
+          (searched)="onSearchChanged($event)"
+          (cleared)="onSearchChanged('')"
+        />
 
         @if (canCreate()) {
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="createProduct()"
+        <app-button
+          variant="primary"
+          icon="add"
+          (clicked)="createProduct()"
           class="create-button"
         >
-          <mat-icon>add</mat-icon>
           Nuevo Producto
-        </button>
+        </app-button>
         }
       </div>
 

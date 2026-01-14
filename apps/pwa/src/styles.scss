@@ -280,5 +280,105 @@ select:focus {
   border: 0;
 }
 
+/* ===== ANGULAR MATERIAL OVERRIDES ===== */
+
+/* Material Paginator - Modern & Clean */
+.mat-mdc-paginator {
+  background-color: transparent !important;
+  color: var(--tenant-text-color) !important;
+  border-radius: 8px;
+  padding: 0.5rem 0;
+
+  .mat-mdc-paginator-container {
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    min-height: auto;
+  }
+
+  .mat-mdc-paginator-page-size {
+    align-items: center;
+
+    .mat-mdc-paginator-page-size-label {
+      color: var(--tenant-secondary-color);
+      margin: 0 0.5rem 0 0;
+      font-size: 0.875rem;
+    }
+
+    .mat-mdc-form-field {
+      margin: 0 0.5rem;
+    }
+  }
+
+  .mat-mdc-paginator-range-label {
+    color: var(--tenant-secondary-color);
+    margin: 0 2rem;
+    font-size: 0.875rem;
+  }
+
+  .mat-mdc-icon-button {
+    color: var(--tenant-primary-color);
+    transition: all 0.2s ease;
+
+    &:hover:not([disabled]) {
+      background-color: var(--tenant-primary-light);
+      transform: scale(1.1);
+    }
+
+    &[disabled] {
+      color: #cbd5e1;
+      opacity: 0.5;
+    }
+
+    .mat-mdc-button-persistent-ripple {
+      border-radius: 50%;
+    }
+  }
+}
+
+/* Material Table - Clean & Modern */
+.mat-mdc-table {
+  background-color: transparent;
+
+  .mat-mdc-header-row {
+    background-color: #f8fafc;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .mat-mdc-header-cell {
+    color: var(--tenant-secondary-color);
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-bottom-color: #e2e8f0;
+  }
+
+  .mat-mdc-row {
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+  }
+
+  .mat-mdc-cell {
+    color: var(--tenant-text-color);
+    font-size: 0.875rem;
+    border-bottom-color: #f1f5f9;
+  }
+}
+
+/* Material Dialog - Modern Overlay */
+.cdk-overlay-backdrop {
+  &.cdk-overlay-backdrop-showing {
+    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
+.mat-mdc-dialog-container {
+  --mdc-dialog-container-elevation: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+}
+
 /* Importar los estilos del sistema multi-tenant */
 @import './styles/tenant-theme.scss';

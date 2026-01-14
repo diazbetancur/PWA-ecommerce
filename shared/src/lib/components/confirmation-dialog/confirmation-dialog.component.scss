@@ -1,0 +1,131 @@
+.confirmation-dialog {
+  max-width: 440px;
+  padding: 1.5rem;
+}
+
+.dialog-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+
+  mat-icon {
+    font-size: 3.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    color: var(--dialog-icon-color, #f59e0b);
+    transition: color 0.2s ease;
+  }
+}
+
+// Colores según tipo
+[data-type='danger'] .dialog-icon mat-icon {
+  --dialog-icon-color: #ef4444;
+}
+
+[data-type='warning'] .dialog-icon mat-icon {
+  --dialog-icon-color: #f59e0b;
+}
+
+[data-type='info'] .dialog-icon mat-icon {
+  --dialog-icon-color: #3b82f6;
+}
+
+.dialog-title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  padding: 0;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.dialog-content {
+  padding: 0;
+  margin: 0 0 1.5rem 0;
+  max-height: none;
+  overflow: visible;
+}
+
+.dialog-message {
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0;
+  white-space: pre-line;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  min-height: 0;
+
+  button {
+    min-width: 100px;
+    height: 40px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    transition: all 0.2s ease;
+  }
+}
+
+.cancel-button {
+  color: rgba(0, 0, 0, 0.6);
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+}
+
+.confirm-button {
+  color: white;
+
+  &--danger {
+    background-color: #ef4444;
+
+    &:hover:not(:disabled) {
+      background-color: #dc2626;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    }
+  }
+
+  &--warning {
+    background-color: #f59e0b;
+
+    &:hover:not(:disabled) {
+      background-color: #d97706;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    }
+  }
+
+  &--info {
+    background-color: #3b82f6;
+
+    &:hover:not(:disabled) {
+      background-color: #2563eb;
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    }
+  }
+}
+
+// Animación de entrada
+:host {
+  display: block;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

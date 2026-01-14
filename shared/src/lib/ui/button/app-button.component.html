@@ -1,0 +1,23 @@
+<button
+  [type]="type()"
+  [class]="buttonClasses()"
+  [disabled]="isDisabled()"
+  (click)="onClick($event)"
+  mat-flat-button
+>
+  @if (loading()) {
+  <div class="button-loader">
+    <mat-spinner diameter="18"></mat-spinner>
+  </div>
+  } @if (showIcon() && iconPosition() === 'left') {
+  <mat-icon class="button-icon button-icon--left">{{ icon() }}</mat-icon>
+  }
+
+  <span class="button-content">
+    <ng-content></ng-content>
+  </span>
+
+  @if (showIcon() && iconPosition() === 'right') {
+  <mat-icon class="button-icon button-icon--right">{{ icon() }}</mat-icon>
+  }
+</button>

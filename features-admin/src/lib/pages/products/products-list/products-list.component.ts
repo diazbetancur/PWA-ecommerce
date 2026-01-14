@@ -7,7 +7,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -28,13 +28,18 @@ import {
   ProductService,
   TenantAdminMenuService,
 } from '@pwa/core';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
+import {
+  AppButtonComponent,
+  ConfirmationDialogService,
+  SearchInputComponent,
+} from '@pwa/shared';
 
 @Component({
   selector: 'lib-products-list',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     ReactiveFormsModule,
     MatTableModule,
     MatPaginatorModule,
@@ -49,6 +54,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    AppButtonComponent,
+    SearchInputComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './products-list.component.html',
@@ -59,7 +66,7 @@ export class ProductsListComponent implements OnInit {
   private readonly menuService = inject(TenantAdminMenuService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
-  private readonly dialog = inject(MatDialog);
+  private readonly confirmDialog = inject(ConfirmationDialogService);
 
   readonly products = signal<ProductResponse[]>([]);
   readonly loading = signal(false);
@@ -69,7 +76,7 @@ export class ProductsListComponent implements OnInit {
   readonly pageSize = signal(20);
   readonly pageSizeOptions = [10, 20, 50, 100];
 
-  readonly searchControl = new FormControl('');
+  readonly searchValue = signal('');
 
   readonly displayedColumns = computed(() => {
     const baseColumns = ['name', 'sku', 'price', 'stock', 'featured', 'active'];
@@ -95,16 +102,12 @@ export class ProductsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
-    this.setupFilters();
   }
 
-  private setupFilters(): void {
-    this.searchControl.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(() => {
-        this.page.set(1);
-        this.loadProducts();
-      });
+  onSearchChanged(value: string): void {
+    this.searchValue.set(value);
+    this.page.set(1);
+    this.loadProducts();
   }
 
   loadProducts(): void {
@@ -113,7 +116,7 @@ export class ProductsListComponent implements OnInit {
     const filters: ProductFilterDto = {
       page: this.page(),
       pageSize: this.pageSize(),
-      search: this.searchControl.value || undefined,
+      search: this.searchValue() || undefined,
       sortBy: 'createdAt',
       sortOrder: 'desc',
     };
@@ -167,11 +170,23 @@ export class ProductsListComponent implements OnInit {
   }
 
   deleteProduct(product: ProductResponse): void {
-    if (!confirm(`¿Estás seguro de eliminar el producto "${product.name}"?`)) {
-      return;
-    }
+    this.confirmDialog
+      .confirm({
+        title: 'Eliminar producto',
+        message: `¿Estás seguro de eliminar el producto "${product.name}"?\n\nEsta acción no se puede deshacer.`,
+        type: 'danger',
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar',
+      })
+      .subscribe((confirmed) => {
+        if (confirmed) {
+          this.performDelete(product.id);
+        }
+      });
+  }
 
-    this.productService.delete(product.id).subscribe({
+  private performDelete(productId: number): void {
+    this.productService.delete(productId).subscribe({
       next: () => {
         this.snackBar.open('Producto eliminado exitosamente', 'Cerrar', {
           duration: 2000,

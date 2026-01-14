@@ -14,35 +14,23 @@
     <mat-card-content>
       <!-- Filtros -->
       <div class="filters-section">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar</mat-label>
-          <input
-            matInput
-            [formControl]="searchControl"
-            placeholder="Buscar por nombre..."
-          />
-          <mat-icon matPrefix>search</mat-icon>
-          @if (searchControl.value) {
-          <button
-            matSuffix
-            mat-icon-button
-            (click)="searchControl.setValue('')"
-          >
-            <mat-icon>close</mat-icon>
-          </button>
-          }
-        </mat-form-field>
+        <app-search-input
+          [(value)]="searchValue"
+          placeholder="Buscar por nombre..."
+          label="Buscar"
+          (searched)="onSearchChanged($event)"
+          (cleared)="onSearchChanged('')"
+        />
 
         @if (canCreate()) {
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="createCategory()"
+        <app-button
+          variant="primary"
+          icon="add"
+          (clicked)="createCategory()"
           class="create-button"
         >
-          <mat-icon>add</mat-icon>
           Nueva Categoría
-        </button>
+        </app-button>
         }
       </div>
 
@@ -63,24 +51,6 @@
             <th mat-header-cell *matHeaderCellDef>Nombre</th>
             <td mat-cell *matCellDef="let category">
               <strong>{{ category.name }}</strong>
-            </td>
-          </ng-container>
-
-          <!-- Slug -->
-          <ng-container matColumnDef="slug" dysplay="none">
-            <th mat-header-cell *matHeaderCellDef>Slug</th>
-            <td mat-cell *matCellDef="let category">
-              <code class="slug">{{ category.slug }}</code>
-            </td>
-          </ng-container>
-
-          <!-- Descripción -->
-          <ng-container matColumnDef="description" display="none">
-            <th mat-header-cell *matHeaderCellDef>Descripción</th>
-            <td mat-cell *matCellDef="let category">
-              <span class="description">
-                {{ category.description || 'Sin descripción' }}
-              </span>
             </td>
           </ng-container>
 
@@ -169,8 +139,8 @@
         <mat-icon>category</mat-icon>
         <h2>No hay categorías</h2>
         <p>
-          @if (searchControl.value) { No se encontraron categorías con los
-          filtros aplicados. } @else { Aún no has creado ninguna categoría. }
+          @if (searchValue()) { No se encontraron categorías con los filtros
+          aplicados. } @else { Aún no has creado ninguna categoría. }
         </p>
       </div>
       }
