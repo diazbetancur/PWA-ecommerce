@@ -4,9 +4,8 @@ import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
   CatalogFilters,
-  CategoriesResponse,
-  Category,
   CategoryDto,
+  PaginatedResponse,
   PaginatedResponseDto,
   Product,
   ProductDto,
@@ -15,6 +14,10 @@ import {
   ProductSummaryDto,
   ProductsResponse,
 } from '../models/catalog-dto.models';
+import { Category } from '../models/catalog.models';
+
+// Type alias para respuesta de categorías
+type CategoriesResponse = PaginatedResponse<Category>;
 
 @Injectable({
   providedIn: 'root',
@@ -176,13 +179,23 @@ export class CatalogService {
     return {
       id: dto.id,
       name: dto.name,
+      slug: this.generateSlug(dto.name),
       description: dto.description,
       imageUrl: '',
       parentId: '',
       sortOrder: 0,
       active: true,
-      productsCount: dto.productCount,
+      productCount: dto.productCount,
     };
+  }
+
+  private generateSlug(name: string): string {
+    return name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   private mapPaginatedProductsResponse(

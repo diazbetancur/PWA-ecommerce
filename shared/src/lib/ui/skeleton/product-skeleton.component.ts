@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
   selector: 'app-product-card-skeleton',
@@ -20,5 +20,9 @@ export class ProductCardSkeletonComponent {}
   styleUrl: './products-grid-skeleton.component.scss',
 })
 export class ProductsGridSkeletonComponent {
-  readonly skeletonItems = new Array(12).fill(0);
+  readonly count = input<number>(12);
+
+  get skeletonItems(): number[] {
+    return new Array(this.count()).fill(0);
+  }
 }

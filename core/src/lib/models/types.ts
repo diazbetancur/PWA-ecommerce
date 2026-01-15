@@ -250,7 +250,7 @@ export interface CreateProductDto {
   tags?: string;
   brand?: string;
   mainImageUrl?: string;
-  categoryId?: string; // ID de categoría (opcional)
+  categoryIds?: string[];
   metaTitle?: string;
   metaDescription?: string;
 }
@@ -272,7 +272,7 @@ export interface UpdateProductDto {
   tags?: string;
   brand?: string;
   mainImageUrl?: string;
-  categoryId?: string; // ID de categoría (opcional)
+  categoryIds?: string[];
   metaTitle?: string;
   metaDescription?: string;
 }

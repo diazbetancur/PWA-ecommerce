@@ -18,6 +18,7 @@
         >Inicio</a
       >
       <a routerLink="/catalog" routerLinkActive="active">Productos</a>
+      <a routerLink="/categories" routerLinkActive="active">Categorías</a>
     </nav>
 
     <!-- Actions -->
@@ -129,6 +130,21 @@
         <rect x="3" y="14" width="7" height="7" />
       </svg>
       Productos
+    </a>
+    <a
+      routerLink="/categories"
+      (click)="closeMobileMenu()"
+      routerLinkActive="active"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
+      </svg>
+      Categorías
     </a>
     <a routerLink="/cart" (click)="closeMobileMenu()" routerLinkActive="active">
       <svg

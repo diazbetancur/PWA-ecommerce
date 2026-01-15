@@ -105,7 +105,9 @@
       <!-- Results Info -->
       @if (!isLoading() && products().length > 0) {
       <div class="results-info">
-        <span class="results-count">{{ pagination().total }} productos</span>
+        <span class="results-count"
+          >{{ pagination().totalItems }} productos</span
+        >
         @if (hasActiveFilters()) {
         <button class="clear-filters" (click)="clearFilters()">
           <svg

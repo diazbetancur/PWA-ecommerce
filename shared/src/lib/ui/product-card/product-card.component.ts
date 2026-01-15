@@ -16,6 +16,11 @@ export interface ProductCardData {
   price: number;
   imageUrl: string;
   stock?: number;
+  slug?: string;
+  compareAtPrice?: number;
+  brand?: string;
+  shortDescription?: string;
+  isFeatured?: boolean;
 }
 
 @Component({

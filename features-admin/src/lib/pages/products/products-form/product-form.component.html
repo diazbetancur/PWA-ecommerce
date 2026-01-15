@@ -122,26 +122,28 @@
             <input matInput formControlName="mainImageUrl" />
           </mat-form-field>
 
-          <!-- Selector de Categoría -->
+          <!-- Selector de Categorías -->
           <div class="category-selector-wrapper">
-            <label class="category-label">Categoría</label>
-            @if (selectedCategory()) {
-            <div class="selected-category">
-              <div class="category-info">
-                <span class="category-name">{{
-                  selectedCategory()!.name
-                }}</span>
+            <label class="category-label">Categorías</label>
+
+            @if (selectedCategories().length > 0) {
+            <div class="selected-categories">
+              @for (category of selectedCategories(); track category.id) {
+              <div class="category-chip">
+                <span class="category-name">{{ category.name }}</span>
+                <button
+                  type="button"
+                  class="remove-category"
+                  (click)="removeCategory(category.id)"
+                  aria-label="Eliminar categoría"
+                >
+                  ×
+                </button>
               </div>
-              <app-button
-                type="button"
-                variant="ghost"
-                icon="close"
-                size="sm"
-                (clicked)="clearCategory()"
-              >
-              </app-button>
+              }
             </div>
-            } @else {
+            }
+
             <app-button
               type="button"
               variant="secondary"
@@ -149,7 +151,21 @@
               (clicked)="openCategorySelector()"
               class="select-category-btn"
             >
-              Seleccionar Categoría
+              {{
+                selectedCategories().length > 0
+                  ? 'Agregar Categoría'
+                  : 'Seleccionar Categorías'
+              }}
+            </app-button>
+
+            @if (selectedCategories().length > 0) {
+            <app-button
+              type="button"
+              variant="ghost"
+              (clicked)="clearCategories()"
+              class="clear-categories-btn"
+            >
+              Limpiar todas
             </app-button>
             }
           </div>

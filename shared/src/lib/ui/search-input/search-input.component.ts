@@ -1,45 +1,26 @@
-import { Component, input, output, model } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, effect, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-search-input',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
-    MatButtonModule,
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './search-input.component.html',
   styleUrl: './search-input.component.scss',
 })
 export class SearchInputComponent {
-  // Two-way binding con model signal
-  value = model<string>('');
-
-  // Inputs
   placeholder = input<string>('Buscar...');
-  label = input<string>('Buscar');
-  disabled = input<boolean>(false);
-  autofocus = input<boolean>(false);
+  value = signal('');
+  searchChanged = output<string>();
 
-  // Outputs
-  searched = output<string>();
-  cleared = output<void>();
-
-  onClear(): void {
-    this.value.set('');
-    this.cleared.emit();
+  constructor() {
+    effect(() => {
+      this.searchChanged.emit(this.value());
+    });
   }
 
-  onSearch(): void {
-    this.searched.emit(this.value());
+  clearSearch() {
+    this.value.set('');
   }
 }

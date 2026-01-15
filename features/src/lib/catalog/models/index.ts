@@ -3,5 +3,6 @@
  * Barrel export for all catalog-related models
  */
 
-// Only export from catalog-dto.models to avoid duplicate exports
+// Export all model types
 export * from './catalog-dto.models';
+export * from './storefront-api.models';

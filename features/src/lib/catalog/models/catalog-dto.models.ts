@@ -39,9 +39,7 @@ export interface CategorySummaryDto {
  * Nota: La API devuelve ProductDto completo en listados, no una versión simplificada
  * ✅ ALINEADO CON API DOCUMENTATION v1
  */
-export interface ProductSummaryDto extends ProductDto {
-  // ProductSummaryDto es igual a ProductDto según la API
-}
+export type ProductSummaryDto = ProductDto;
 
 /**
  * DTO de Categoría del backend
@@ -157,20 +155,6 @@ export interface ProductSummary {
 }
 
 /**
- * Modelo interno de categoría
- */
-export interface Category {
-  id: string;
-  name: string;
-  description?: string;
-  imageUrl?: string;
-  parentId?: string;
-  sortOrder?: number;
-  active: boolean;
-  productsCount?: number;
-}
-
-/**
  * Filtros internos del frontend
  */
 export interface CatalogFilters {
@@ -209,5 +193,4 @@ export interface ApiResponse<T> {
 
 // Type aliases para respuestas específicas
 export type ProductsResponse = PaginatedResponse<ProductSummary>;
-export type CategoriesResponse = PaginatedResponse<Category>;
 export type ProductResponse = ApiResponse<Product>;

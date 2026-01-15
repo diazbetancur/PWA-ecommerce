@@ -11,8 +11,8 @@ import {
 import { Router, RouterModule } from '@angular/router';
 
 import { TenantContextService } from '@pwa/core';
-import { Product } from '../models/catalog.models';
-import { CatalogService } from '../services/catalog.service';
+import { Product } from '../../models/catalog.models';
+import { CatalogService } from '../../services/catalog.service';
 
 @Component({
   selector: 'app-product-details',

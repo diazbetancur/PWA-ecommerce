@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 
+/* Import tenant theme styles - MUST be first */
+@use './styles/tenant-theme.scss';
+
 /* ===== MULTI-TENANT GLOBAL STYLES ===== */
 
 /* CSS Custom Properties Base (fallbacks) */
@@ -354,6 +357,16 @@ select:focus {
       color: var(--tenant-secondary-color);
       margin: 0 0.5rem 0 0;
       font-size: 0.875rem;
+
+      // Traducir al español
+      &::before {
+        content: 'Elementos por página:';
+        display: inline;
+      }
+
+      &::after {
+        content: '';
+      }
     }
 
     .mat-mdc-form-field {
@@ -431,6 +444,3 @@ select:focus {
     0 4px 6px -4px rgba(0, 0, 0, 0.1);
   border-radius: 16px;
 }
-
-/* Importar los estilos del sistema multi-tenant */
-@import './styles/tenant-theme.scss';

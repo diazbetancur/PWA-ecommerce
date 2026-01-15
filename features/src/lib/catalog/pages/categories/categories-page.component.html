@@ -1,0 +1,110 @@
+<div class="categories-page">
+  <!-- Search Bar -->
+  <div class="search-container">
+    <div class="search-wrapper">
+      <svg
+        class="search-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="11" cy="11" r="8" />
+        <path d="M21 21l-4.35-4.35" />
+      </svg>
+      <input
+        [formControl]="searchControl"
+        type="text"
+        placeholder="Buscar categorías..."
+        class="search-input"
+      />
+      @if (searchControl.value) {
+      <button
+        class="clear-search"
+        (click)="clearSearch()"
+        aria-label="Limpiar búsqueda"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+      }
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="loading-container">
+    <div class="skeleton-grid">
+      @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+      <div class="skeleton-card">
+        <div class="skeleton-image"></div>
+        <div class="skeleton-content">
+          <div class="skeleton-title"></div>
+          <div class="skeleton-text"></div>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- Categories Grid -->
+  @if (!loading() && filteredCategories().length > 0) {
+  <div class="categories-grid">
+    @for (category of filteredCategories(); track category.id) {
+    <a
+      [routerLink]="['/catalog']"
+      [queryParams]="{ categoryId: category.id }"
+      class="category-card"
+    >
+      <div class="category-image-wrapper">
+        <img
+          [src]="category.imageUrl || getDefaultImage()"
+          [alt]="category.name"
+          class="category-image"
+          loading="lazy"
+        />
+      </div>
+      <div class="category-content">
+        <h3 class="category-name">{{ category.name }}</h3>
+        <p class="category-products">
+          {{ category.productCount || 0 }} productos
+        </p>
+      </div>
+    </a>
+    }
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!loading() && filteredCategories().length === 0) {
+  <div class="empty-state">
+    <svg
+      class="empty-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <rect x="3" y="3" width="7" height="7" />
+      <rect x="14" y="3" width="7" height="7" />
+      <rect x="14" y="14" width="7" height="7" />
+      <rect x="3" y="14" width="7" height="7" />
+    </svg>
+    @if (searchControl.value) {
+    <h3>No se encontraron categorías</h3>
+    <p>Intenta con otro término de búsqueda</p>
+    } @else {
+    <h3>No hay categorías disponibles</h3>
+    <p>Vuelve más tarde para ver las categorías</p>
+    }
+  </div>
+  }
+</div>

@@ -8,25 +8,23 @@ import {
   signal,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { TenantContextService } from '@pwa/core';
 import {
   Banner,
   BannerCarouselComponent,
-  mapProductToCard,
   ProductCardComponent,
   ProductCardData,
   ProductsGridSkeletonComponent,
 } from '@pwa/shared';
 import {
-  CatalogFilters,
-  Category,
-  ProductSummary,
-} from '../models/catalog.models';
-import { CatalogService } from '../services/catalog.service';
-import { StoreService } from '../services/store.service';
+  ProductFilters,
+  StoreCategoryDto,
+  StoreProductDto,
+} from '../../models/storefront-api.models';
+import { StorefrontApiService } from '../../services/storefront-api.service';
 
 @Component({
   selector: 'app-catalog-page',
@@ -44,23 +42,24 @@ import { StoreService } from '../services/store.service';
   styleUrl: './catalog-page.component.scss',
 })
 export class CatalogPageComponent implements OnInit {
-  private readonly catalogService = inject(CatalogService);
-  private readonly storeService = inject(StoreService);
+  private readonly storefrontApi = inject(StorefrontApiService);
   private readonly tenantContext = inject(TenantContextService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly searchControl = new FormControl<string>('');
 
+  // Estado de la aplicación
   readonly banners = signal<Banner[]>([]);
-  readonly categories = signal<Category[]>([]);
-  readonly products = signal<ProductSummary[]>([]);
+  readonly categories = signal<StoreCategoryDto[]>([]);
+  readonly products = signal<StoreProductDto[]>([]);
   readonly selectedCategory = signal<string | null>(null);
   readonly isLoading = signal(true);
   readonly isLoadingMore = signal(false);
-  readonly currentFilters = signal<CatalogFilters>({});
+  readonly currentFilters = signal<ProductFilters>({});
   readonly pagination = signal({
     page: 1,
     pageSize: 20,
-    total: 0,
+    totalItems: 0,
     totalPages: 0,
   });
 
@@ -78,7 +77,7 @@ export class CatalogPageComponent implements OnInit {
 
   readonly hasActiveFilters = computed(() => {
     const filters = this.currentFilters();
-    return !!(filters.search || filters.categorySlug);
+    return !!(filters.search || filters.category);
   });
 
   readonly showLoadMore = computed(() => {
@@ -89,8 +88,20 @@ export class CatalogPageComponent implements OnInit {
   ngOnInit(): void {
     this.loadBanners();
     this.loadCategories();
+    this.setupQueryParams();
     this.loadProducts(true);
     this.setupSearch();
+  }
+
+  private setupQueryParams(): void {
+    this.route.queryParams.subscribe((params) => {
+      if (params['category']) {
+        this.currentFilters.update((f) => ({
+          ...f,
+          category: params['category'],
+        }));
+      }
+    });
   }
 
   private setupSearch(): void {
@@ -105,27 +116,53 @@ export class CatalogPageComponent implements OnInit {
       });
   }
 
+  /**
+   * Carga los banners de la tienda
+   * Usa la nueva Storefront API: GET /api/store/banners?position=hero
+   */
   private loadBanners(): void {
-    this.storeService.getBanners('hero').subscribe((banners) => {
-      const mapped: Banner[] = banners.map((b) => ({
-        id: b.id,
-        title: b.title,
-        subtitle: b.subtitle,
-        imageUrlDesktop: b.imageUrlDesktop,
-        imageUrlMobile: b.imageUrlMobile,
-        targetUrl: b.targetUrl,
-        buttonText: b.buttonText,
-      }));
-      this.banners.set(mapped);
+    this.storefrontApi.getBanners('hero').subscribe({
+      next: (banners) => {
+        const mapped: Banner[] = banners.map((b) => ({
+          id: b.id,
+          title: b.title,
+          subtitle: b.subtitle ?? undefined,
+          imageUrlDesktop: b.imageUrlDesktop,
+          imageUrlMobile: b.imageUrlMobile ?? undefined,
+          targetUrl: b.targetUrl ?? undefined,
+          buttonText: b.buttonText ?? undefined,
+        }));
+        this.banners.set(mapped);
+      },
+      error: (error) => {
+        console.error('[CatalogPage] Error loading banners:', error);
+        this.banners.set([]);
+      },
     });
   }
 
+  /**
+   * Carga las categorías de la tienda
+   * Usa la nueva Storefront API: GET /api/store/categories
+   */
   private loadCategories(): void {
-    this.storeService.getFlatCategories().subscribe((categories) => {
-      this.categories.set(categories);
+    this.storefrontApi.getCategories(false).subscribe({
+      next: (categories) => {
+        this.categories.set(categories);
+      },
+      error: (error) => {
+        console.error('[CatalogPage] Error loading categories:', error);
+        this.categories.set([]);
+      },
     });
   }
 
+  /**
+   * Carga los productos con los filtros actuales
+   * Usa la nueva Storefront API: GET /api/store/products
+   *
+   * @param reset - Si es true, reinicia la paginación
+   */
   private loadProducts(reset: boolean): void {
     if (reset) {
       this.isLoading.set(true);
@@ -135,27 +172,32 @@ export class CatalogPageComponent implements OnInit {
     }
 
     const page = reset ? 1 : this.pagination().page;
-    const filters = this.currentFilters();
+    const filters: ProductFilters = {
+      ...this.currentFilters(),
+      page,
+      pageSize: 20,
+    };
 
-    this.catalogService.getProducts(page, 20, filters).subscribe({
+    this.storefrontApi.getProducts(filters).subscribe({
       next: (response) => {
-        if (response.success) {
-          if (reset) {
-            this.products.set(response.data);
-          } else {
-            this.products.update((p) => [...p, ...response.data]);
-          }
-          this.pagination.set({
-            page: response.page,
-            pageSize: response.pageSize,
-            total: response.total,
-            totalPages: response.totalPages,
-          });
+        if (reset) {
+          this.products.set(response.items);
+        } else {
+          this.products.update((p) => [...p, ...response.items]);
         }
+
+        this.pagination.set({
+          page: response.page,
+          pageSize: response.pageSize,
+          totalItems: response.totalItems,
+          totalPages: response.totalPages,
+        });
+
         this.isLoading.set(false);
         this.isLoadingMore.set(false);
       },
-      error: () => {
+      error: (error) => {
+        console.error('[CatalogPage] Error loading products:', error);
         this.isLoading.set(false);
         this.isLoadingMore.set(false);
       },
@@ -166,7 +208,7 @@ export class CatalogPageComponent implements OnInit {
     this.selectedCategory.set(categorySlug);
     this.currentFilters.update((f) => ({
       ...f,
-      categorySlug: categorySlug || undefined,
+      category: categorySlug || undefined,
     }));
     this.loadProducts(true);
   }
@@ -197,8 +239,21 @@ export class CatalogPageComponent implements OnInit {
     console.log('Ver producto:', product);
   }
 
-  mapToCardData(product: ProductSummary): ProductCardData {
-    // Usa el helper de mapeo que maneja mainImageUrl correctamente
-    return mapProductToCard(product as any);
+  /**
+   * Mapea un producto de la Storefront API al formato de ProductCardData
+   */
+  mapToCardData(product: StoreProductDto): ProductCardData {
+    return {
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.mainImageUrl || '',
+      stock: product.inStock ? 100 : 0,
+      slug: product.slug,
+      compareAtPrice: product.compareAtPrice || undefined,
+      brand: product.brand || undefined,
+      shortDescription: product.shortDescription || undefined,
+      isFeatured: product.isFeatured,
+    };
   }
 }

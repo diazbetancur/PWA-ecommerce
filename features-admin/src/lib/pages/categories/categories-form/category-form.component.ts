@@ -29,13 +29,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AppButtonComponent } from '@pwa/shared';
 import {
   CategoryResponse,
   CreateCategoryRequest,
   UpdateCategoryRequest,
 } from '../../../models/category.model';
 import { CategoryService } from '../../../services/category.service';
-import { AppButtonComponent } from '@pwa/shared';
 
 @Component({
   selector: 'lib-category-form',

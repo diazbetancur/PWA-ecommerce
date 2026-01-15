@@ -14,12 +14,9 @@
     <mat-card-content>
       <!-- Filtros -->
       <div class="filters-section">
-        <input
-          type="text"
-          class="simple-search"
-          [(ngModel)]="searchValue"
-          (input)="onSearchChanged(searchValue())"
+        <app-search-input
           placeholder="Buscar categorías..."
+          (searchChanged)="onSearchChanged($event)"
         />
 
         @if (canCreate()) {
@@ -90,8 +87,8 @@
               <div class="actions">
                 <button
                   mat-icon-button
-                  matTooltip="Ver detalles"
                   (click)="viewDetails(category)"
+                  matTooltip="Ver productos"
                 >
                   <mat-icon>visibility</mat-icon>
                 </button>
@@ -99,18 +96,16 @@
                 @if (canUpdate()) {
                 <button
                   mat-icon-button
-                  color="primary"
-                  matTooltip="Editar"
                   (click)="editCategory(category)"
+                  matTooltip="Editar"
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
                 } @if (canDelete()) {
                 <button
                   mat-icon-button
-                  color="warn"
-                  matTooltip="Eliminar"
                   (click)="deleteCategory(category)"
+                  matTooltip="Eliminar"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>

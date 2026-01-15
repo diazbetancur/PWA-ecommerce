@@ -5,3 +5,4 @@
 
 export * from './catalog.service';
 export * from './store.service';
+export * from './storefront-api.service';

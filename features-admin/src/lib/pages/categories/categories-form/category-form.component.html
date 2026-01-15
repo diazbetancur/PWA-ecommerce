@@ -4,15 +4,8 @@
       <mat-card-title>
         <div class="header-content">
           <div class="title-section">
-            <app-button
-              variant="ghost"
-              icon="arrow_back"
-              size="sm"
-              (clicked)="cancel()"
-            >
-            </app-button>
             <mat-icon>{{ isEditMode() ? 'edit' : 'add' }}</mat-icon>
-            <h1>{{ pageTitle() }}</h1>
+            <h3>{{ pageTitle() }}</h3>
           </div>
         </div>
       </mat-card-title>
@@ -38,7 +31,6 @@
           @if (form.get('name')?.invalid && form.get('name')?.touched) {
           <mat-error>{{ getErrorMessage('name') }}</mat-error>
           }
-          <mat-hint>El slug se generará automáticamente</mat-hint>
         </mat-form-field>
 
         <!-- Descripción -->

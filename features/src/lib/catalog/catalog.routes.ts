@@ -4,7 +4,15 @@ export const catalogRoutes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./pages/catalog-page.component').then(
+      import('./pages/home/home-page.component').then(
+        (m) => m.HomePageComponent
+      ),
+    title: 'Inicio',
+  },
+  {
+    path: 'catalog',
+    loadComponent: () =>
+      import('./pages/catalog/catalog-page.component').then(
         (m) => m.CatalogPageComponent
       ),
     title: 'Catálogo de Productos',
@@ -12,7 +20,16 @@ export const catalogRoutes: Routes = [
   {
     path: 'product/:id',
     loadComponent: () =>
-      import('./pages/product-details.component').then(
+      import('./pages/product-details/product-details.component').then(
+        (m) => m.ProductDetailsComponent
+      ),
+    title: 'Detalle del Producto',
+    data: { prerender: false },
+  },
+  {
+    path: 'products/:slug',
+    loadComponent: () =>
+      import('./pages/product-details/product-details.component').then(
         (m) => m.ProductDetailsComponent
       ),
     title: 'Detalle del Producto',

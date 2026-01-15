@@ -1,0 +1,185 @@
+<div class="home-page">
+  <!-- Banner Hero Section -->
+  @if (banners().length > 0) {
+  <section class="banner-section">
+    <app-banner-carousel [banners]="banners()" [autoPlayInterval]="5000" />
+  </section>
+  }
+
+  <div class="container">
+    <!-- Search Section -->
+    <section class="search-section">
+      <div class="search-wrapper">
+        <svg
+          class="search-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="M21 21l-4.35-4.35" />
+        </svg>
+        <input
+          [formControl]="searchControl"
+          type="text"
+          placeholder="Buscar productos..."
+          class="search-input"
+          (keyup.enter)="performSearch()"
+        />
+        @if (searchControl.value) {
+        <button
+          class="clear-search"
+          (click)="clearSearch()"
+          aria-label="Limpiar búsqueda"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+        }
+
+        <!-- Search Autocomplete Results -->
+        @if (showSearchResults() && searchResults().length > 0) {
+        <div class="search-results">
+          @for (result of searchResults(); track result.id) {
+          <button class="search-result-item" (click)="goToProduct(result.slug)">
+            @if (result.imageUrl) {
+            <img
+              [src]="result.imageUrl"
+              [alt]="result.name"
+              class="result-image"
+            />
+            }
+            <div class="result-info">
+              <span class="result-name">{{ result.name }}</span>
+              @if (result.sku) {
+              <span class="result-sku">SKU: {{ result.sku }}</span>
+              }
+            </div>
+            <span class="result-price">${{ result.price }}</span>
+          </button>
+          }
+        </div>
+        } @if (isSearching()) {
+        <div class="search-loading">Buscando...</div>
+        }
+      </div>
+    </section>
+
+    <!-- Categories Section -->
+    @if (shouldShowCategories()) {
+    <section class="categories-section">
+      <div class="section-header">
+        <h2 class="section-title">Categorías</h2>
+        <button class="see-all-btn" (click)="goToCatalog()">
+          Ver todas
+          <svg
+            class="arrow-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+      <div class="categories-grid">
+        @for (category of categories(); track category.id) {
+        <button
+          class="category-card"
+          (click)="goToCategory(category.slug)"
+          [title]="category.name"
+        >
+          <div class="category-image-wrapper">
+            @if (category.imageUrl) {
+            <img
+              [src]="category.imageUrl"
+              [alt]="category.name"
+              class="category-image"
+              loading="lazy"
+            />
+            } @else {
+            <div class="category-placeholder">
+              <svg
+                class="category-icon"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM9 9H5V5h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 6h-4V5h4v4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6H5v-4h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6h-4v-4h4v4z"
+                />
+              </svg>
+            </div>
+            }
+          </div>
+          <div class="category-info">
+            <span class="category-name">{{ category.name }}</span>
+            @if (category.productCount > 0) {
+            <span class="category-count"
+              >{{ category.productCount }} productos</span
+            >
+            }
+          </div>
+        </button>
+        }
+      </div>
+    </section>
+    }
+
+    <!-- Featured Products Section -->
+    <section class="featured-section">
+      <div class="section-header">
+        <h2 class="section-title">Productos Destacados</h2>
+        <button class="see-all-btn" (click)="goToCatalog()">
+          Ver todos
+          <svg
+            class="arrow-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      @if (isLoadingProducts()) {
+      <app-products-grid-skeleton [count]="8" />
+      } @else if (featuredProducts().length > 0) {
+      <div class="products-grid">
+        @for (product of featuredProducts(); track product.id) {
+        <app-product-card
+          [product]="mapProductToCard(product)"
+          (addToCart)="onAddToCart($event)"
+          (quickView)="onQuickView($event)"
+        />
+        }
+      </div>
+      } @else {
+      <div class="empty-state">
+        <svg
+          class="empty-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M8 15s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" />
+        </svg>
+        <h3>No hay productos destacados</h3>
+        <p>Pronto tendremos productos disponibles</p>
+      </div>
+      }
+    </section>
+  </div>
+</div>

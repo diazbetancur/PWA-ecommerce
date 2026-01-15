@@ -36,9 +36,9 @@ import {
   ProductService,
   UpdateProductDto,
 } from '@pwa/core';
+import { AppButtonComponent } from '@pwa/shared';
 import { CategorySelectorDialogComponent } from '../../../components/category-selector-dialog/category-selector-dialog.component';
 import { CategoryListItem } from '../../../models/category.model';
-import { AppButtonComponent } from '@pwa/shared';
 
 @Component({
   selector: 'lib-product-form',
@@ -74,7 +74,7 @@ export class ProductFormComponent implements OnInit {
   readonly isEditMode = signal(false);
   readonly productId = signal<string | null>(null);
   readonly product = signal<ProductResponse | null>(null);
-  readonly selectedCategory = signal<CategoryListItem | null>(null);
+  readonly selectedCategories = signal<CategoryListItem[]>([]);
 
   // Formulario
   readonly form: FormGroup;
@@ -109,7 +109,7 @@ export class ProductFormComponent implements OnInit {
       tags: [''],
       brand: ['', [Validators.maxLength(100)]],
       mainImageUrl: [''],
-      categoryId: [null], // ID de categoría (opcional)
+      categoryIds: [[] as string[]],
       metaTitle: ['', [Validators.maxLength(200)]],
       metaDescription: ['', [Validators.maxLength(500)]],
     });
@@ -126,15 +126,27 @@ export class ProductFormComponent implements OnInit {
       .afterClosed()
       .subscribe((category: CategoryListItem | undefined) => {
         if (category) {
-          this.selectedCategory.set(category);
-          this.form.patchValue({ categoryId: category.id });
+          const current = this.selectedCategories();
+          if (!current.some((c) => c.id === category.id)) {
+            const updated = [...current, category];
+            this.selectedCategories.set(updated);
+            this.form.patchValue({ categoryIds: updated.map((c) => c.id) });
+          }
         }
       });
   }
 
-  clearCategory(): void {
-    this.selectedCategory.set(null);
-    this.form.patchValue({ categoryId: null });
+  removeCategory(categoryId: string): void {
+    const updated = this.selectedCategories().filter(
+      (c) => c.id !== categoryId
+    );
+    this.selectedCategories.set(updated);
+    this.form.patchValue({ categoryIds: updated.map((c) => c.id) });
+  }
+
+  clearCategories(): void {
+    this.selectedCategories.set([]);
+    this.form.patchValue({ categoryIds: [] });
   }
 
   ngOnInit(): void {
@@ -154,6 +166,21 @@ export class ProductFormComponent implements OnInit {
     this.productService.getById(id).subscribe({
       next: (product) => {
         this.product.set(product);
+
+        // Cargar categorías si existen
+        if (product.categories && product.categories.length > 0) {
+          const categories = product.categories.map((cat: any) => ({
+            id: cat.id,
+            name: cat.name,
+            slug: cat.slug,
+            description: cat.description,
+            imageUrl: cat.imageUrl,
+            isActive: cat.isActive,
+            productCount: 0,
+          }));
+          this.selectedCategories.set(categories);
+        }
+
         this.form.patchValue({
           name: product.name,
           sku: product.sku || '',
@@ -168,6 +195,7 @@ export class ProductFormComponent implements OnInit {
           tags: product.tags || '',
           brand: product.brand || '',
           mainImageUrl: product.mainImageUrl || '',
+          categoryIds: product.categories?.map((cat: any) => cat.id) || [],
           metaTitle: product.metaTitle || '',
           metaDescription: product.metaDescription || '',
         });

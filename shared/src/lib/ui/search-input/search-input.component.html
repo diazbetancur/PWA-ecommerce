@@ -1,25 +1,30 @@
-<mat-form-field appearance="outline" class="search-input">
-  <mat-label>{{ label() }}</mat-label>
-
+<div class="search-wrapper">
+  <svg
+    class="search-icon"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <circle cx="11" cy="11" r="8" />
+    <path d="M21 21l-4.35-4.35" />
+  </svg>
   <input
-    matInput
     [(ngModel)]="value"
+    type="text"
     [placeholder]="placeholder()"
-    [disabled]="disabled()"
-    (keyup.enter)="onSearch()"
+    class="search-input"
   />
-
-  <mat-icon matPrefix class="search-icon">search</mat-icon>
-
   @if (value()) {
   <button
-    matSuffix
-    mat-icon-button
-    (click)="onClear()"
-    type="button"
-    class="clear-button"
+    class="clear-search"
+    (click)="clearSearch()"
+    aria-label="Limpiar búsqueda"
   >
-    <mat-icon>close</mat-icon>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
   </button>
   }
-</mat-form-field>
+</div>

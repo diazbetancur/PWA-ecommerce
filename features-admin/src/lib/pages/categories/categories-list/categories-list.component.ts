@@ -11,7 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -28,6 +28,7 @@ import {
   ConfirmationDialogService,
   SearchInputComponent,
 } from '@pwa/shared';
+import { CategoryProductsModalComponent } from '../../../components/category-products-modal/category-products-modal.component';
 import {
   CategoryListItem,
   CategoryListParams,
@@ -67,6 +68,7 @@ export class CategoriesListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly confirmDialog = inject(ConfirmationDialogService);
+  private readonly dialog = inject(MatDialog);
 
   readonly categories = signal<CategoryListItem[]>([]);
   readonly loading = signal(false);
@@ -198,6 +200,13 @@ export class CategoriesListComponent implements OnInit {
   }
 
   viewDetails(category: CategoryListItem): void {
-    this.router.navigate(['/tenant-admin/catalog/categories', category.id]);
+    this.dialog.open(CategoryProductsModalComponent, {
+      width: '800px',
+      maxWidth: '90vw',
+      data: {
+        categoryId: category.id,
+        categoryName: category.name,
+      },
+    });
   }
 }
