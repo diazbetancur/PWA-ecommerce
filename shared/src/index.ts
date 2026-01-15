@@ -26,5 +26,9 @@ export * from './lib/components/ios-install-banner/ios-install-banner.component'
 // Tenant Admin Components
 export * from './lib/components/tenant-admin-menu/tenant-admin-menu.component';
 
+// Toast Notifications
+export * from './lib/services/toast.service';
+export * from './lib/ui/toast-container/toast-container.component';
+
 // Utilities
 export * from './lib/utils/product-mappers';

@@ -3,6 +3,9 @@
 /* Import tenant theme styles - MUST be first */
 @use './styles/tenant-theme.scss';
 
+/* Import loyalty program theme */
+@use './styles/loyalty-theme.scss';
+
 /* ===== MULTI-TENANT GLOBAL STYLES ===== */
 
 /* CSS Custom Properties Base (fallbacks) */

@@ -1,0 +1,425 @@
+/* ========================================
+   🎨 LOYALTY PROGRAM - GLOBAL STYLES
+   Variables CSS, animaciones y utilidades
+   ======================================== */
+
+/* ===== LOYALTY THEME VARIABLES ===== */
+:root {
+  /* Tier Colors - Distinctive palette for loyalty tiers */
+  --loyalty-tier-bronze: #cd7f32;
+  --loyalty-tier-bronze-light: rgba(205, 127, 50, 0.1);
+  --loyalty-tier-bronze-shadow: rgba(205, 127, 50, 0.3);
+
+  --loyalty-tier-silver: #c0c0c0;
+  --loyalty-tier-silver-light: rgba(192, 192, 192, 0.1);
+  --loyalty-tier-silver-shadow: rgba(192, 192, 192, 0.3);
+
+  --loyalty-tier-gold: #ffd700;
+  --loyalty-tier-gold-light: rgba(255, 215, 0, 0.1);
+  --loyalty-tier-gold-shadow: rgba(255, 215, 0, 0.3);
+
+  --loyalty-tier-platinum: #e5e4e2;
+  --loyalty-tier-platinum-light: rgba(229, 228, 226, 0.1);
+  --loyalty-tier-platinum-shadow: rgba(229, 228, 226, 0.3);
+
+  /* Points & Rewards Gradient */
+  --loyalty-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --loyalty-gradient-success: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  --loyalty-gradient-danger: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+  --loyalty-gradient-warning: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+  --loyalty-gradient-info: linear-gradient(135deg, #17a2b8 0%, #007bff 100%);
+
+  /* Status Colors */
+  --loyalty-status-pending: #ffc107;
+  --loyalty-status-approved: #28a745;
+  --loyalty-status-delivered: #17a2b8;
+  --loyalty-status-cancelled: #dc3545;
+  --loyalty-status-expired: #6c757d;
+
+  /* UI Colors */
+  --loyalty-background: #f8f9fa;
+  --loyalty-card-bg: #ffffff;
+  --loyalty-border: #e9ecef;
+  --loyalty-text-primary: #333333;
+  --loyalty-text-secondary: #6c757d;
+  --loyalty-text-muted: #adb5bd;
+
+  /* Spacing */
+  --loyalty-spacing-xs: 4px;
+  --loyalty-spacing-sm: 8px;
+  --loyalty-spacing-md: 16px;
+  --loyalty-spacing-lg: 24px;
+  --loyalty-spacing-xl: 32px;
+
+  /* Border Radius */
+  --loyalty-radius-sm: 8px;
+  --loyalty-radius-md: 12px;
+  --loyalty-radius-lg: 16px;
+  --loyalty-radius-full: 9999px;
+
+  /* Shadows */
+  --loyalty-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --loyalty-shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --loyalty-shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --loyalty-shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.18);
+
+  /* Transitions */
+  --loyalty-transition-fast: 0.15s ease;
+  --loyalty-transition-base: 0.2s ease;
+  --loyalty-transition-slow: 0.3s ease;
+}
+
+/* ===== ANIMATIONS ===== */
+
+/* Fade In Animation */
+@keyframes loyaltyFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale Up Animation */
+@keyframes loyaltyScaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Slide In From Right */
+@keyframes loyaltySlideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Pulse Animation for Points */
+@keyframes loyaltyPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Shimmer Loading Animation */
+@keyframes loyaltyShimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Bounce Animation for Badges */
+@keyframes loyaltyBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Rotate Animation for Icons */
+@keyframes loyaltyRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== UTILITY CLASSES ===== */
+
+/* Animation Classes */
+.loyalty-fade-in {
+  animation: loyaltyFadeIn var(--loyalty-transition-base) ease-out;
+}
+
+.loyalty-scale-up {
+  animation: loyaltyScaleUp var(--loyalty-transition-base) ease-out;
+}
+
+.loyalty-slide-in {
+  animation: loyaltySlideInRight var(--loyalty-transition-base) ease-out;
+}
+
+.loyalty-pulse {
+  animation: loyaltyPulse 2s infinite;
+}
+
+/* Loading Skeleton */
+.loyalty-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--loyalty-border) 0%,
+    #f0f0f0 50%,
+    var(--loyalty-border) 100%
+  );
+  background-size: 200% 100%;
+  animation: loyaltyShimmer 1.5s infinite;
+  border-radius: var(--loyalty-radius-sm);
+}
+
+.loyalty-skeleton-text {
+  height: 16px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+}
+
+.loyalty-skeleton-title {
+  height: 24px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+}
+
+.loyalty-skeleton-circle {
+  border-radius: 50%;
+}
+
+/* Card Styles */
+.loyalty-card {
+  background: var(--loyalty-card-bg);
+  border-radius: var(--loyalty-radius-md);
+  box-shadow: var(--loyalty-shadow-sm);
+  padding: var(--loyalty-spacing-lg);
+  transition: all var(--loyalty-transition-base);
+}
+
+.loyalty-card:hover {
+  box-shadow: var(--loyalty-shadow-md);
+  transform: translateY(-2px);
+}
+
+.loyalty-card-elevated {
+  box-shadow: var(--loyalty-shadow-lg);
+}
+
+/* Gradient Backgrounds */
+.loyalty-bg-gradient-primary {
+  background: var(--loyalty-gradient-primary);
+  color: white;
+}
+
+.loyalty-bg-gradient-success {
+  background: var(--loyalty-gradient-success);
+  color: white;
+}
+
+.loyalty-bg-gradient-danger {
+  background: var(--loyalty-gradient-danger);
+  color: white;
+}
+
+/* Tier Background Classes */
+.loyalty-tier-bronze-bg {
+  background: var(--loyalty-tier-bronze);
+  color: white;
+}
+
+.loyalty-tier-silver-bg {
+  background: var(--loyalty-tier-silver);
+  color: #333;
+}
+
+.loyalty-tier-gold-bg {
+  background: var(--loyalty-tier-gold);
+  color: #333;
+}
+
+.loyalty-tier-platinum-bg {
+  background: var(--loyalty-tier-platinum);
+  color: #333;
+}
+
+/* Status Badge Classes */
+.loyalty-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: var(--loyalty-radius-full);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: transform var(--loyalty-transition-fast);
+}
+
+.loyalty-status-badge:hover {
+  transform: scale(1.05);
+}
+
+.loyalty-status-pending {
+  background: var(--loyalty-status-pending);
+  color: #000;
+}
+
+.loyalty-status-approved {
+  background: var(--loyalty-status-approved);
+  color: white;
+}
+
+.loyalty-status-delivered {
+  background: var(--loyalty-status-delivered);
+  color: white;
+}
+
+.loyalty-status-cancelled {
+  background: var(--loyalty-status-cancelled);
+  color: white;
+}
+
+.loyalty-status-expired {
+  background: var(--loyalty-status-expired);
+  color: white;
+}
+
+/* Points Display */
+.loyalty-points {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.loyalty-points-positive {
+  color: #28a745;
+}
+
+.loyalty-points-negative {
+  color: #dc3545;
+}
+
+/* Icon Animations */
+.loyalty-icon-spin {
+  animation: loyaltyRotate 2s linear infinite;
+}
+
+.loyalty-icon-bounce {
+  animation: loyaltyBounce 1s infinite;
+}
+
+/* Hover Effects */
+.loyalty-hover-lift {
+  transition: all var(--loyalty-transition-base);
+}
+
+.loyalty-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--loyalty-shadow-lg);
+}
+
+.loyalty-hover-scale {
+  transition: transform var(--loyalty-transition-base);
+}
+
+.loyalty-hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Empty States */
+.loyalty-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--loyalty-spacing-xl);
+  text-align: center;
+  color: var(--loyalty-text-secondary);
+}
+
+.loyalty-empty-icon {
+  font-size: 4rem;
+  margin-bottom: var(--loyalty-spacing-md);
+  opacity: 0.5;
+}
+
+.loyalty-empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--loyalty-spacing-sm);
+  color: var(--loyalty-text-primary);
+}
+
+.loyalty-empty-description {
+  margin-bottom: var(--loyalty-spacing-lg);
+  max-width: 400px;
+}
+
+/* Loading States */
+.loyalty-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--loyalty-spacing-xl);
+}
+
+.loyalty-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--loyalty-border);
+  border-top-color: #667eea;
+  border-radius: 50%;
+  animation: loyaltyRotate 0.8s linear infinite;
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  :root {
+    --loyalty-spacing-lg: 16px;
+    --loyalty-spacing-xl: 24px;
+  }
+
+  .loyalty-card {
+    padding: var(--loyalty-spacing-md);
+  }
+
+  .loyalty-empty-icon {
+    font-size: 3rem;
+  }
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --loyalty-background: #1a1a1a;
+    --loyalty-card-bg: #2d2d2d;
+    --loyalty-border: #404040;
+    --loyalty-text-primary: #ffffff;
+    --loyalty-text-secondary: #b0b0b0;
+    --loyalty-text-muted: #808080;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .loyalty-card {
+    box-shadow: none;
+    border: 1px solid var(--loyalty-border);
+  }
+
+  .loyalty-hover-lift,
+  .loyalty-hover-scale {
+    transform: none !important;
+  }
+}

@@ -6,6 +6,7 @@ import {
   HeaderComponent,
   WhatsappButtonComponent,
 } from '../../ui';
+import { ToastContainerComponent } from '../../ui/toast-container/toast-container.component';
 
 @Component({
   selector: 'lib-public-layout',
@@ -16,6 +17,7 @@ import {
     HeaderComponent,
     FooterComponent,
     WhatsappButtonComponent,
+    ToastContainerComponent,
   ],
   templateUrl: './public-layout.component.html',
   styleUrl: './public-layout.component.scss',
