@@ -4,3 +4,4 @@
  */
 
 export * from './category.service';
+export * from './loyalty-admin.service';
