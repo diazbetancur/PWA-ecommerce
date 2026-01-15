@@ -1,11 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 import {
   AdjustPointsRequest,
   AdjustPointsResponse,
 } from '../../../models/loyalty.models';
+import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 
 /**
  * ⚙️ Ajuste Manual de Puntos

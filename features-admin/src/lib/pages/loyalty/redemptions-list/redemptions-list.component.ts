@@ -1,14 +1,14 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 import {
   LoyaltyRedemptionDto,
-  REDEMPTION_STATUS_LABELS,
-  REDEMPTION_STATUS_COLORS,
   PagedLoyaltyRedemptionsResponse,
+  REDEMPTION_STATUS_COLORS,
+  REDEMPTION_STATUS_LABELS,
   RedemptionStatus,
 } from '../../../models/loyalty.models';
+import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 
 /**
  * 🎟️ Lista de Canjes (Admin)

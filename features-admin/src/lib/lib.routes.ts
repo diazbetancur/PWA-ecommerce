@@ -174,6 +174,16 @@ export const featuresAdminRoutes: Route[] = [
           title: 'Ajustar Puntos',
         },
       },
+      {
+        path: 'config',
+        loadComponent: () =>
+          import(
+            './pages/loyalty/program-config/program-config.component'
+          ).then((m) => m.ProgramConfigComponent),
+        data: {
+          title: 'Configuración del Programa',
+        },
+      },
     ],
   },
 

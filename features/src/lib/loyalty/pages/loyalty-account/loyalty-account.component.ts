@@ -1,12 +1,12 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoyaltyService } from '../../services/loyalty.service';
 import {
   LoyaltyAccountSummaryDto,
-  TIER_LABELS,
   TIER_COLORS,
+  TIER_LABELS,
 } from '../../models/loyalty.models';
+import { LoyaltyService } from '../../services/loyalty.service';
 
 /**
  * 🎁 Página de Resumen de Cuenta de Lealtad

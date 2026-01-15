@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 import {
-  REDEMPTION_STATUS_LABELS,
   REDEMPTION_STATUS_COLORS,
+  REDEMPTION_STATUS_LABELS,
 } from '../../models/loyalty.models';
 
 /**

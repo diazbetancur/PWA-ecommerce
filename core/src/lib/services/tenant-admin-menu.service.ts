@@ -131,6 +131,14 @@ export class TenantAdminMenuService {
       order: 4,
       parentModule: 'loyalty',
     },
+    'loyalty.config': {
+      module: 'loyalty',
+      label: 'Configuración',
+      icon: 'settings',
+      route: '/tenant-admin/loyalty/config',
+      order: 5,
+      parentModule: 'loyalty',
+    },
     // Settings es el módulo padre
     settings: {
       module: 'settings',

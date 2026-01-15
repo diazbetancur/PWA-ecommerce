@@ -1,9 +1,8 @@
 import { Route } from '@angular/router';
-import { Catalog } from './catalog/catalog';
-import { CategoriesPageComponent } from './catalog/pages';
+import { CatalogPageComponent, CategoriesPageComponent } from './catalog/pages';
 
 export const catalogRoutes: Route[] = [
-  { path: '', component: Catalog },
+  { path: '', component: CatalogPageComponent },
   { path: 'categories', component: CategoriesPageComponent },
 ];
 

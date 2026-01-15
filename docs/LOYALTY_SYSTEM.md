@@ -32,6 +32,7 @@ Permite a los administradores:
 - Gestionar premios (crear, editar, activar/desactivar)
 - Revisar y aprobar/rechazar canjes
 - Realizar ajustes manuales de puntos
+- **Configurar el programa** (factor de conversión, tiers, reglas)
 
 ## 📦 Módulos
 
@@ -76,6 +77,8 @@ listAllRedemptions(query): Observable<PagedResult<LoyaltyRedemptionDto>>
 updateRedemptionStatus(id, request): Observable<LoyaltyRedemptionDto>
 adjustPoints(request): Observable<LoyaltyTransactionDto>
 getStatistics(query): Observable<LoyaltyStatisticsDto>
+getProgramConfig(): Observable<LoyaltyProgramConfigDto>
+updateProgramConfig(request): Observable<LoyaltyProgramConfigDto>
 ```
 
 ## 🧩 Componentes
@@ -153,6 +156,7 @@ Navegación entre secciones del programa de lealtad.
 2. **RewardsListComponent** - Gestión de premios
 3. **RedemptionsListComponent** - Gestión de canjes
 4. **PointsAdjustmentComponent** - Ajuste de puntos
+5. **ProgramConfigComponent** - Configuración del programa
 
 ## 🛣️ Rutas
 
@@ -174,6 +178,7 @@ Navegación entre secciones del programa de lealtad.
   /rewards              - Gestión de premios
   /redemptions          - Canjes de usuarios
   /points-adjustment    - Ajustar puntos
+  /config               - Configuración del programa
 ```
 
 ## 🎨 Estilos
@@ -328,6 +333,8 @@ El sistema consume los siguientes endpoints:
 - `PUT /admin/loyalty/redemptions/{id}/status`
 - `POST /admin/loyalty/adjust-points`
 - `GET /admin/loyalty/statistics`
+- `GET /admin/loyalty/config`
+- `PUT /admin/loyalty/config`
 
 ## 🧪 Testing
 
@@ -355,6 +362,58 @@ Todos los componentes y servicios están preparados para testing:
 5. Admin revisa y aprueba (`APPROVED`)
 6. Admin marca como entregado (`DELIVERED`)
 7. Usuario ve canje completado en su historial
+
+## ⚙️ Configuración del Programa
+
+La página de **Configuración del Programa** permite a los administradores personalizar completamente el comportamiento del sistema de lealtad.
+
+### Factor de Conversión
+
+Define cuántos puntos se otorgan por cada compra:
+
+**Ejemplo de configuración:**
+
+- **Monto en COP**: 1000 (mil pesos)
+- **Puntos Otorgados**: 0.001 (calculado automáticamente)
+- **Resultado**: 1 punto por cada 1000 pesos gastados
+
+Si un cliente compra por $50,000, recibirá **50 puntos**.
+
+### Umbrales de Tiers
+
+Configura los puntos lifetime necesarios para cada nivel:
+
+- **🥉 Bronce**: 0 puntos (nivel inicial)
+- **🥈 Plata**: 500 puntos
+- **🥇 Oro**: 2000 puntos
+- **💎 Platino**: 5000 puntos
+
+### Reglas del Programa
+
+- **Puntos Mínimos para Canjear**: Cantidad mínima necesaria para comenzar a canjear premios
+- **Días de Expiración**: Después de cuántos días expiran los puntos (vacío = nunca expiran)
+- **Estado del Programa**: Activar/desactivar el programa completo
+- **Términos y Condiciones**: Texto legal mostrado a los usuarios
+
+### Ejemplo de Uso
+
+```typescript
+// Obtener configuración actual
+this.loyaltyAdminService.getProgramConfig().subscribe((config) => {
+  console.log(`Factor: 1 punto cada ${1 / config.pointsPerCurrencyUnit} ${config.currency}`);
+});
+
+// Actualizar factor de conversión (1 punto cada 1500 pesos)
+const update: UpdateLoyaltyConfigRequest = {
+  pointsPerCurrencyUnit: 1 / 1500,
+  goldTierThreshold: 3000,
+};
+
+this.loyaltyAdminService.updateProgramConfig(update).subscribe({
+  next: () => console.log('Configuración actualizada'),
+  error: (err) => console.error('Error:', err),
+});
+```
 
 ## 📈 Métricas del Dashboard
 

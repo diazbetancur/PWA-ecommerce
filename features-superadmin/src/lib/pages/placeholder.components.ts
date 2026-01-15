@@ -1,8 +1,8 @@
 /**
  * Placeholder component - Estos componentes se crearán según las necesidades específicas
  */
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 
 const createPlaceholder = (title: string) => {
   @Component({

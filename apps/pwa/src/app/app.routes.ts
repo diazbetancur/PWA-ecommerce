@@ -32,8 +32,7 @@ export const appRoutes: Route[] = [
       {
         path: 'loyalty',
         canActivate: [AuthGuard],
-        loadChildren: () =>
-          import('@pwa/features').then((m) => m.loyaltyRoutes),
+        loadChildren: () => import('@pwa/catalog').then((m) => m.loyaltyRoutes),
       },
     ],
   },

@@ -1,13 +1,13 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 import {
   LoyaltyRewardDto,
-  REWARD_TYPE_LABELS,
   PagedLoyaltyRewardsResponse,
+  REWARD_TYPE_LABELS,
 } from '../../../models/loyalty.models';
+import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 
 /**
  * 📋 Lista de Premios (Admin)

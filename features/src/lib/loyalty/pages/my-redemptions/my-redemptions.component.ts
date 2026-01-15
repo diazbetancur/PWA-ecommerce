@@ -1,13 +1,13 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoyaltyService } from '../../services/loyalty.service';
 import {
   LoyaltyRedemptionDto,
-  REDEMPTION_STATUS_LABELS,
-  REDEMPTION_STATUS_COLORS,
   PagedLoyaltyRedemptionsResponse,
+  REDEMPTION_STATUS_COLORS,
+  REDEMPTION_STATUS_LABELS,
 } from '../../models/loyalty.models';
+import { LoyaltyService } from '../../services/loyalty.service';
 
 /**
  * 🎟️ Mis Canjes de Premios

@@ -416,7 +416,63 @@ export const REDEMPTION_STATUS_LABELS: Record<string, string> = {
   CANCELLED: 'Cancelado',
   EXPIRED: 'Expirado',
 };
+// ==================== CONFIGURACIÓN DEL PROGRAMA ====================
 
+/**
+ * Configuración general del programa de lealtad
+ */
+export interface LoyaltyProgramConfigDto {
+  /** ID de la configuración */
+  id: string;
+  /** Factor de conversión: puntos por cada unidad monetaria gastada */
+  pointsPerCurrencyUnit: number;
+  /** Unidad monetaria (ej: 'COP', 'USD') */
+  currency: string;
+  /** Días de expiración de puntos (null = no expiran) */
+  pointsExpirationDays?: number | null;
+  /** Puntos mínimos para poder canjear */
+  minimumPointsToRedeem: number;
+  /** Umbral de puntos para tier Bronze */
+  bronzeTierThreshold: number;
+  /** Umbral de puntos para tier Silver */
+  silverTierThreshold: number;
+  /** Umbral de puntos para tier Gold */
+  goldTierThreshold: number;
+  /** Umbral de puntos para tier Platinum */
+  platinumTierThreshold: number;
+  /** Si el programa está activo */
+  isActive: boolean;
+  /** Términos y condiciones del programa */
+  termsAndConditions?: string;
+  /** Fecha de última actualización */
+  updatedAt: string;
+  /** Usuario que realizó la última actualización */
+  updatedBy?: string;
+}
+
+/**
+ * Request para actualizar la configuración del programa
+ */
+export interface UpdateLoyaltyConfigRequest {
+  /** Factor de conversión: puntos por cada unidad monetaria gastada */
+  pointsPerCurrencyUnit?: number;
+  /** Días de expiración de puntos (null = no expiran) */
+  pointsExpirationDays?: number | null;
+  /** Puntos mínimos para poder canjear */
+  minimumPointsToRedeem?: number;
+  /** Umbral de puntos para tier Bronze */
+  bronzeTierThreshold?: number;
+  /** Umbral de puntos para tier Silver */
+  silverTierThreshold?: number;
+  /** Umbral de puntos para tier Gold */
+  goldTierThreshold?: number;
+  /** Umbral de puntos para tier Platinum */
+  platinumTierThreshold?: number;
+  /** Si el programa está activo */
+  isActive?: boolean;
+  /** Términos y condiciones del programa */
+  termsAndConditions?: string;
+}
 /**
  * Colores para estados de canjes
  */

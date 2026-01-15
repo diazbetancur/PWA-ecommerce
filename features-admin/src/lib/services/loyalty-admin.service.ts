@@ -12,6 +12,8 @@ import {
   UpdateRedemptionStatusRequest,
   AdjustPointsRequest,
   AdjustPointsResponse,
+  LoyaltyProgramConfigDto,
+  UpdateLoyaltyConfigRequest,
 } from '../models/loyalty.models';
 
 /**
@@ -420,6 +422,69 @@ omer(redemptionId);
   adjustPoints(request: AdjustPointsRequest): Observable<AdjustPointsResponse> {
     return this.http.post<AdjustPointsResponse>(
       `${this.baseUrl}/points/adjust`,
+      request
+    );
+  }
+
+  // ==================== CONFIGURACIÓN DEL PROGRAMA ====================
+
+  /**
+   * Obtiene la configuración actual del programa de lealtad
+   *
+   * Incluye:
+   * - Factor de conversión de puntos
+   * - Configuración de tiers
+   * - Reglas de expiración
+   * - Términos y condiciones
+   *
+   * @returns Observable con la configuración del programa
+   *
+   * @example
+   * ```typescript
+   * this.loyaltyAdminService.getProgramConfig().subscribe({
+   *   next: (config) => {
+   *     console.log(`1 ${config.currency} = ${config.pointsPerCurrencyUnit} puntos`);
+   *     console.log(`Tier Oro: ${config.goldTierThreshold} puntos`);
+   *   }
+   * });
+   * ```
+   */
+  getProgramConfig(): Observable<LoyaltyProgramConfigDto> {
+    return this.http.get<LoyaltyProgramConfigDto>(`${this.baseUrl}/config`);
+  }
+
+  /**
+   * Actualiza la configuración del programa de lealtad
+   *
+   * Permite modificar:
+   * - Factor de conversión (ej: 1 punto por cada 1000 pesos)
+   * - Umbrales de tiers
+   * - Días de expiración de puntos
+   * - Mínimo de puntos para canjear
+   * - Estado activo/inactivo del programa
+   *
+   * @param request - Configuración a actualizar (solo campos modificados)
+   * @returns Observable con la configuración actualizada
+   *
+   * @example
+   * ```typescript
+   * // Cambiar factor de conversión: 1 punto cada 1500 pesos
+   * const update: UpdateLoyaltyConfigRequest = {
+   *   pointsPerCurrencyUnit: 1 / 1500,
+   *   goldTierThreshold: 5000
+   * };
+   *
+   * this.loyaltyAdminService.updateProgramConfig(update).subscribe({
+   *   next: (config) => alert('Configuración actualizada'),
+   *   error: (err) => console.error('Error al actualizar', err)
+   * });
+   * ```
+   */
+  updateProgramConfig(
+    request: UpdateLoyaltyConfigRequest
+  ): Observable<LoyaltyProgramConfigDto> {
+    return this.http.put<LoyaltyProgramConfigDto>(
+      `${this.baseUrl}/config`,
       request
     );
   }

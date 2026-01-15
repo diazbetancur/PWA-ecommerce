@@ -1,12 +1,12 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoyaltyService } from '../../services/loyalty.service';
 import {
   LoyaltyRewardDto,
-  REWARD_TYPE_LABELS,
   PagedLoyaltyRewardsResponse,
+  REWARD_TYPE_LABELS,
 } from '../../models/loyalty.models';
+import { LoyaltyService } from '../../services/loyalty.service';
 
 /**
  * 🎁 Catálogo de Premios de Lealtad

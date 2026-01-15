@@ -1,11 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoyaltyService } from '../../services/loyalty.service';
 import {
   LoyaltyTransactionDto,
   PagedLoyaltyTransactionsResponse,
 } from '../../models/loyalty.models';
+import { LoyaltyService } from '../../services/loyalty.service';
 
 /**
  * 📊 Historial de Transacciones de Puntos

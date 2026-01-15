@@ -1,5 +1,5 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 /**
@@ -79,6 +79,12 @@ import { Router } from '@angular/router';
           <button class="action-card" (click)="navigateToPointsAdjustment()">
             <span class="action-icon">⚙️</span>
             <span class="action-label">Ajustar Puntos</span>
+            <span class="action-arrow">→</span>
+          </button>
+
+          <button class="action-card" (click)="navigateToConfig()">
+            <span class="action-icon">🛠️</span>
+            <span class="action-label">Configuración</span>
             <span class="action-arrow">→</span>
           </button>
         </div>
@@ -584,5 +590,8 @@ export class LoyaltyDashboardComponent implements OnInit {
 
   navigateToPointsAdjustment(): void {
     this.router.navigate(['/admin/loyalty/points-adjustment']);
+  }
+  navigateToConfig(): void {
+    this.router.navigate(['/tenant-admin/loyalty/config']);
   }
 }

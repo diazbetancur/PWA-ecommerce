@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 import { TIER_COLORS, TIER_LABELS } from '../../models/loyalty.models';
 
 /**
