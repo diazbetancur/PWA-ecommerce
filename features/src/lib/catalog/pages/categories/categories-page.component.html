@@ -56,35 +56,51 @@
   }
 
   <!-- Categories Grid -->
-  @if (!loading() && filteredCategories().length > 0) {
+  @if (!loading() && displayedCategories().length > 0) {
   <div class="categories-grid">
-    @for (category of filteredCategories(); track category.id) {
-    <a
-      [routerLink]="['/catalog']"
-      [queryParams]="{ categoryId: category.id }"
+    @for (category of displayedCategories(); track category.id) {
+    <button
       class="category-card"
+      (click)="goToCategory(category.slug)"
+      [title]="category.name"
     >
       <div class="category-image-wrapper">
+        @if (category.imageUrl) {
         <img
-          [src]="category.imageUrl || getDefaultImage()"
-          [alt]="category.name"
+          [src]="category.imageUrl"
+          [alt]="category.name + ' - ' + category.productCount + ' productos'"
+          [title]="category.name"
           class="category-image"
           loading="lazy"
         />
+        } @else {
+        <div class="category-placeholder">
+          <svg class="placeholder-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM9 9H5V5h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 6h-4V5h4v4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6H5v-4h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6h-4v-4h4v4z"
+            />
+          </svg>
+        </div>
+        }
       </div>
       <div class="category-content">
         <h3 class="category-name">{{ category.name }}</h3>
-        <p class="category-products">
-          {{ category.productCount || 0 }} productos
-        </p>
+        <p class="category-count">{{ category.productCount }} productos</p>
       </div>
-    </a>
+    </button>
     }
   </div>
-  }
+
+  <!-- Loading More Indicator -->
+  @if (loadingMore()) {
+  <div class="loading-more">
+    <div class="spinner"></div>
+    <p>Cargando más categorías...</p>
+  </div>
+  } }
 
   <!-- Empty State -->
-  @if (!loading() && filteredCategories().length === 0) {
+  @if (!loading() && displayedCategories().length === 0) {
   <div class="empty-state">
     <svg
       class="empty-icon"
@@ -100,10 +116,11 @@
     </svg>
     @if (searchControl.value) {
     <h3>No se encontraron categorías</h3>
-    <p>Intenta con otro término de búsqueda</p>
+    <p>Intenta con otros términos de búsqueda</p>
+    <button class="retry-btn" (click)="clearSearch()">Limpiar búsqueda</button>
     } @else {
     <h3>No hay categorías disponibles</h3>
-    <p>Vuelve más tarde para ver las categorías</p>
+    <p>No hay categorías disponibles en este momento</p>
     }
   </div>
   }
