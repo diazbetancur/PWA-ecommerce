@@ -10,3 +10,6 @@ export * from './categories/categories-list/categories-list.component';
 // Products
 export * from './products/products-form/product-form.component';
 export * from './products/products-list/products-list.component';
+
+// Loyalty
+export * from './loyalty/index';
