@@ -2,9 +2,9 @@
   <!-- Header -->
   <div class="page-header">
     <div class="header-left">
-      <h1 class="page-title">Gestión de Tenants</h1>
+      <h1 class="page-title">Gestión de Comercios</h1>
       <p class="page-subtitle">
-        {{ totalCount() }} tenant{{
+        {{ totalCount() }} comercio{{
           totalCount() !== 1 ? 's' : ''
         }}
         registrado{{ totalCount() !== 1 ? 's' : '' }}
@@ -13,7 +13,7 @@
     <div class="header-right">
       <button class="btn btn-primary" (click)="navigateToCreate()">
         <span class="material-icons">add</span>
-        Crear Tenant
+        Crear Comercio
       </button>
     </div>
   </div>
@@ -79,7 +79,7 @@
   @if (isLoading()) {
   <div class="loading-container">
     <div class="spinner"></div>
-    <p>Cargando tenants...</p>
+    <p>Cargando comercios...</p>
   </div>
   }
 
@@ -87,7 +87,7 @@
   @if (error() && !isLoading()) {
   <div class="error-card">
     <span class="material-icons error-icon">error</span>
-    <h3>Error al cargar tenants</h3>
+    <h3>Error al cargar comercios</h3>
     <p>{{ error() }}</p>
     <button class="btn btn-secondary" (click)="loadTenants()">
       <span class="material-icons">refresh</span>
@@ -100,17 +100,17 @@
   @if (!isLoading() && !error() && tenants().length === 0) {
   <div class="empty-state">
     <span class="material-icons empty-icon">store</span>
-    <h3>No hay tenants</h3>
+    <h3>No hay comercios</h3>
     @if (hasActiveFilters()) {
-    <p>No se encontraron tenants con los filtros aplicados</p>
+    <p>No se encontraron comercios con los filtros aplicados</p>
     <button class="btn btn-secondary" (click)="clearFilters()">
       Limpiar filtros
     </button>
     } @else {
-    <p>Comienza creando tu primer tenant</p>
+    <p>Comienza creando tu primer comercio</p>
     <button class="btn btn-primary" (click)="navigateToCreate()">
       <span class="material-icons">add</span>
-      Crear Tenant
+      Crear Comercio
     </button>
     }
   </div>
@@ -122,7 +122,7 @@
     <table class="tenants-table">
       <thead>
         <tr>
-          <th>Tenant</th>
+          <th>Comercio</th>
           <th>Plan</th>
           <th>Estado</th>
           <th>Creado</th>

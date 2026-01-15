@@ -236,7 +236,7 @@ export class TenantBootstrapService {
       if (error instanceof HttpErrorResponse) {
         if (error.status === 404) {
           throw new HttpErrorResponse({
-            error: { message: `Tenant "${tenantSlug}" no encontrado` },
+            error: { message: `Comercio "${tenantSlug}" no encontrado` },
             status: 404,
             statusText: 'Not Found',
             url: `/api/public/tenant/${tenantSlug}`,
@@ -244,7 +244,9 @@ export class TenantBootstrapService {
         }
         if (error.status === 409) {
           throw new HttpErrorResponse({
-            error: { message: `Tenant "${tenantSlug}" conflict (not ready)` },
+            error: {
+              message: `Comercio "${tenantSlug}" en conflicto (no está listo)`,
+            },
             status: 409,
             statusText: 'Conflict',
             url: `/api/public/tenant/${tenantSlug}`,
@@ -252,7 +254,7 @@ export class TenantBootstrapService {
         }
         throw error;
       }
-      throw new Error(`Error cargando tenant: ${error}`);
+      throw new Error(`Error cargando comercio: ${error}`);
     }
   }
 
@@ -299,7 +301,7 @@ export class TenantBootstrapService {
         case 404:
           tenantError = {
             code: 'NOT_FOUND',
-            message: `El tenant "${attemptedSlug}" no fue encontrado en el sistema`,
+            message: `El comercio "${attemptedSlug}" no fue encontrado en el sistema`,
             slug: attemptedSlug || undefined,
             statusCode: 404,
             timestamp: new Date(),
@@ -338,7 +340,7 @@ export class TenantBootstrapService {
         case 403:
           tenantError = {
             code: 'UNAUTHORIZED',
-            message: 'No tienes permisos para acceder a este tenant.',
+            message: 'No tienes permisos para acceder a este comercio.',
             slug: attemptedSlug || undefined,
             statusCode: error.status,
             timestamp: new Date(),
@@ -360,7 +362,7 @@ export class TenantBootstrapService {
     } else {
       tenantError = {
         code: 'UNKNOWN',
-        message: error.message || 'Error desconocido al cargar el tenant',
+        message: error.message || 'Error desconocido al cargar el comercio',
         slug: attemptedSlug || undefined,
         timestamp: new Date(),
         retryable: false,

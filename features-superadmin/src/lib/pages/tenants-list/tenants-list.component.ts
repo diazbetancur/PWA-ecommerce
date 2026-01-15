@@ -66,7 +66,7 @@ export class TenantsListComponent {
       this.totalCount.set(response.totalCount);
     } catch (err) {
       this.error.set(
-        err instanceof Error ? err.message : 'Error al cargar tenants'
+        err instanceof Error ? err.message : 'Error al cargar comercios'
       );
     } finally {
       this.isLoading.set(false);
@@ -151,7 +151,7 @@ export class TenantsListComponent {
 
   async deleteTenant(tenant: TenantListItem): Promise<void> {
     const confirmed = confirm(
-      `¿Estás seguro de eliminar el tenant "${tenant.name}"? Esta acción no se puede deshacer.`
+      `¿Estás seguro de eliminar el comercio "${tenant.name}"? Esta acción no se puede deshacer.`
     );
 
     if (!confirmed) return;
@@ -163,7 +163,7 @@ export class TenantsListComponent {
       alert(
         err instanceof Error
           ? err.message
-          : 'Error al eliminar el tenant. Inténtalo de nuevo.'
+          : 'Error al eliminar el comercio. Inténtalo de nuevo.'
       );
     }
   }

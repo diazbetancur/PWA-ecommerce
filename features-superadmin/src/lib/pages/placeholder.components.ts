@@ -35,12 +35,12 @@ const createPlaceholder = (title: string) => {
   return PlaceholderComponent;
 };
 
-export const TenantListComponent = createPlaceholder('Lista de Tenants');
-export const TenantCreateComponent = createPlaceholder('Crear Tenant');
-export const TenantDetailComponent = createPlaceholder('Detalle del Tenant');
-export const TenantEditComponent = createPlaceholder('Editar Tenant');
+export const TenantListComponent = createPlaceholder('Lista de Comercios');
+export const TenantCreateComponent = createPlaceholder('Crear Comercio');
+export const TenantDetailComponent = createPlaceholder('Detalle del Comercio');
+export const TenantEditComponent = createPlaceholder('Editar Comercio');
 export const TenantConfigComponent = createPlaceholder(
-  'Configuración de Tenants'
+  'Configuración de Comercios'
 );
 export const UserListComponent = createPlaceholder('Lista de Usuarios');
 export const UserRolesComponent = createPlaceholder('Roles y Permisos');

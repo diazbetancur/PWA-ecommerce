@@ -11,9 +11,9 @@ export const TENANT_ERROR_ROUTES: Routes = [
   {
     path: 'tenant/not-found',
     component: TenantNotFoundComponent,
-    title: 'Tenant No Encontrado',
+    title: 'Comercio No Encontrado',
     data: {
-      description: 'El tenant solicitado no pudo ser cargado',
+      description: 'El comercio solicitado no pudo ser cargado',
       noLayout: true, // Indica que no debe usar el layout principal
     },
   },

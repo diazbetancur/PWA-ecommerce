@@ -76,7 +76,7 @@ export const ADMIN_ROUTES: Routes = [
                 (m) => m.TenantsListComponent
               ),
             data: {
-              title: 'Lista de Tenants',
+              title: 'Lista de Comercios',
             },
           },
           {
@@ -87,7 +87,7 @@ export const ADMIN_ROUTES: Routes = [
               ),
             canActivate: [adminPermissionGuard],
             data: {
-              title: 'Crear Tenant',
+              title: 'Crear Comercio',
               requiredPermissions: [ADMIN_PERMISSIONS.TENANTS.CREATE],
             },
           },
@@ -95,7 +95,7 @@ export const ADMIN_ROUTES: Routes = [
             path: ':id',
             component: TenantDetailComponent,
             data: {
-              title: 'Detalle del Tenant',
+              title: 'Detalle del Comercio',
             },
           },
           {
@@ -103,7 +103,7 @@ export const ADMIN_ROUTES: Routes = [
             component: TenantEditComponent,
             canActivate: [adminPermissionGuard],
             data: {
-              title: 'Editar Tenant',
+              title: 'Editar Comercio',
               requiredPermissions: [ADMIN_PERMISSIONS.TENANTS.EDIT],
             },
           },
@@ -112,7 +112,7 @@ export const ADMIN_ROUTES: Routes = [
             component: TenantConfigComponent,
             canActivate: [adminPermissionGuard],
             data: {
-              title: 'Configuración de Tenants',
+              title: 'Configuración de Comercios',
               requiredPermissions: [ADMIN_PERMISSIONS.TENANTS.CONFIGURE],
             },
           },

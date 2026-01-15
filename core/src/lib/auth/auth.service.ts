@@ -171,7 +171,7 @@ export class AuthService {
     phoneNumber?: string;
   }): Promise<void> {
     if (!this._tenantSlug) {
-      throw new Error('El registro requiere un tenant activo');
+      throw new Error('El registro requiere un comercio activo');
     }
 
     const response = await firstValueFrom(
