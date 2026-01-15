@@ -10,3 +10,4 @@ export * from './lib/catalog';
 export * from './lib/loyalty/models/loyalty.models';
 export * from './lib/loyalty/services/loyalty.service';
 export * from './lib/loyalty/pages/index';
+export * from './lib/loyalty/components/index';
