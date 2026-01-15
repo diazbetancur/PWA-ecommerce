@@ -29,6 +29,12 @@ export const appRoutes: Route[] = [
         loadChildren: () =>
           import('@pwa/features-orders').then((m) => m.featuresOrdersRoutes),
       },
+      {
+        path: 'loyalty',
+        canActivate: [AuthGuard],
+        loadChildren: () =>
+          import('@pwa/features').then((m) => m.loyaltyRoutes),
+      },
     ],
   },
   // Módulo de Administración General (Superadmin)

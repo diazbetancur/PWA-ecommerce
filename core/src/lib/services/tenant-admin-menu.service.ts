@@ -90,12 +90,46 @@ export class TenantAdminMenuService {
       route: '/tenant-admin/customers',
       order: 4,
     },
+    // Loyalty es el módulo padre
     loyalty: {
       module: 'loyalty',
       label: 'Programa de Lealtad',
       icon: 'star',
-      route: '/tenant-admin/loyalty',
       order: 5,
+      // No tiene route porque es un padre con hijos
+    },
+    // Submódulos de loyalty
+    'loyalty.dashboard': {
+      module: 'loyalty',
+      label: 'Dashboard',
+      icon: 'dashboard',
+      route: '/tenant-admin/loyalty/dashboard',
+      order: 1,
+      parentModule: 'loyalty',
+    },
+    'loyalty.rewards': {
+      module: 'loyalty',
+      label: 'Premios',
+      icon: 'card_giftcard',
+      route: '/tenant-admin/loyalty/rewards',
+      order: 2,
+      parentModule: 'loyalty',
+    },
+    'loyalty.redemptions': {
+      module: 'loyalty',
+      label: 'Canjes',
+      icon: 'redeem',
+      route: '/tenant-admin/loyalty/redemptions',
+      order: 3,
+      parentModule: 'loyalty',
+    },
+    'loyalty.adjustment': {
+      module: 'loyalty',
+      label: 'Ajustar Puntos',
+      icon: 'tune',
+      route: '/tenant-admin/loyalty/points-adjustment',
+      order: 4,
+      parentModule: 'loyalty',
     },
     // Settings es el módulo padre
     settings: {
@@ -216,6 +250,32 @@ export class TenantAdminMenuService {
 
         if (catalogSubModules.length > 0) {
           menuItem.children = catalogSubModules;
+          menuItems.push(menuItem);
+        }
+      }
+      // Si es "loyalty", incluir automáticamente sus submódulos
+      else if (moduleCode.toLowerCase() === 'loyalty') {
+        // Buscar todos los submódulos de loyalty definidos en moduleConfigMap
+        const loyaltySubModules = Object.keys(this.moduleConfigMap)
+          .filter((key) => key.startsWith('loyalty.'))
+          .map((key) => {
+            const subConfig = this.moduleConfigMap[key];
+            return {
+              id: key,
+              label: subConfig.label,
+              icon: subConfig.icon,
+              route: subConfig.route,
+              visible: true,
+            } as TenantAdminMenuItem;
+          })
+          .sort((a, b) => {
+            const orderA = this.moduleConfigMap[a.id]?.order ?? 999;
+            const orderB = this.moduleConfigMap[b.id]?.order ?? 999;
+            return orderA - orderB;
+          });
+
+        if (loyaltySubModules.length > 0) {
+          menuItem.children = loyaltySubModules;
           menuItems.push(menuItem);
         }
       }

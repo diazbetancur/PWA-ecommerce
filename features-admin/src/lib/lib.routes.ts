@@ -128,13 +128,53 @@ export const featuresAdminRoutes: Route[] = [
   {
     path: 'loyalty',
     canActivate: [modulePermissionGuard('loyalty')],
-    loadComponent: () =>
-      import('./components/dashboard-welcome/dashboard-welcome.component').then(
-        (m) => m.DashboardWelcomeComponent
-      ),
-    data: {
-      title: 'Programa de Lealtad',
-    },
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import(
+            './pages/loyalty/loyalty-dashboard/loyalty-dashboard.component'
+          ).then((m) => m.LoyaltyDashboardComponent),
+        data: {
+          title: 'Dashboard de Lealtad',
+        },
+      },
+      {
+        path: 'rewards',
+        loadComponent: () =>
+          import('./pages/loyalty/rewards-list/rewards-list.component').then(
+            (m) => m.RewardsListComponent
+          ),
+        data: {
+          title: 'Gestión de Premios',
+        },
+      },
+      {
+        path: 'redemptions',
+        loadComponent: () =>
+          import(
+            './pages/loyalty/redemptions-list/redemptions-list.component'
+          ).then((m) => m.RedemptionsListComponent),
+        data: {
+          title: 'Canjes de Usuarios',
+        },
+      },
+      {
+        path: 'points-adjustment',
+        loadComponent: () =>
+          import(
+            './pages/loyalty/points-adjustment/points-adjustment.component'
+          ).then((m) => m.PointsAdjustmentComponent),
+        data: {
+          title: 'Ajustar Puntos',
+        },
+      },
+    ],
   },
 
   // === CONFIGURACIÓN ===

@@ -6,6 +6,9 @@
 // Catalog Feature
 export * from './lib/catalog';
 
+// Routes
+export { catalogRoutes, loyaltyRoutes } from './lib/lib.routes';
+
 // Loyalty Feature
 export * from './lib/loyalty/models/loyalty.models';
 export * from './lib/loyalty/services/loyalty.service';

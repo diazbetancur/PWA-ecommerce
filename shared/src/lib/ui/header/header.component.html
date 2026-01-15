@@ -62,6 +62,7 @@
         <div class="user-dropdown" (click)="closeUserMenu()">
           <a routerLink="/account/profile">Mi Perfil</a>
           <a routerLink="/orders">Mis Pedidos</a>
+          <a routerLink="/loyalty/account">💎 Programa de Lealtad</a>
           <button class="logout-btn" (click)="logout()">Cerrar Sesión</button>
         </div>
         }
@@ -173,6 +174,40 @@
         <circle cx="12" cy="7" r="4" />
       </svg>
       Mi Cuenta
+    </a>
+    <a
+      routerLink="/orders"
+      (click)="closeMobileMenu()"
+      routerLinkActive="active"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M3 3h18l-2 13H5L3 3z M16 21a1 1 0 100-2 1 1 0 000 2z M8 21a1 1 0 100-2 1 1 0 000 2z"
+        />
+      </svg>
+      Mis Pedidos
+    </a>
+    <a
+      routerLink="/loyalty/account"
+      (click)="closeMobileMenu()"
+      routerLinkActive="active"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"
+        />
+      </svg>
+      💎 Programa de Lealtad
     </a>
     <button class="mobile-logout" (click)="logout(); closeMobileMenu()">
       <svg
