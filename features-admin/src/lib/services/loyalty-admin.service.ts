@@ -1,19 +1,20 @@
+import { HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { ApiClientService } from '@pwa/core';
 import { Observable } from 'rxjs';
 import {
-  LoyaltyRewardDto,
-  CreateLoyaltyRewardRequest,
-  UpdateLoyaltyRewardRequest,
-  GetLoyaltyRewardsQuery,
-  PagedLoyaltyRewardsResponse,
-  GetLoyaltyRedemptionsQuery,
-  PagedLoyaltyRedemptionsResponse,
-  UpdateRedemptionStatusRequest,
   AdjustPointsRequest,
   AdjustPointsResponse,
+  CreateLoyaltyRewardRequest,
+  GetLoyaltyRedemptionsQuery,
+  GetLoyaltyRewardsQuery,
   LoyaltyProgramConfigDto,
+  LoyaltyRewardDto,
+  PagedLoyaltyRedemptionsResponse,
+  PagedLoyaltyRewardsResponse,
   UpdateLoyaltyConfigRequest,
+  UpdateLoyaltyRewardRequest,
+  UpdateRedemptionStatusRequest,
 } from '../models/loyalty.models';
 
 /**
@@ -57,7 +58,7 @@ import {
   providedIn: 'root',
 })
 export class LoyaltyAdminService {
-  private readonly http = inject(HttpClient);
+  private readonly apiClient = inject(ApiClientService);
   private readonly baseUrl = '/admin/loyalty';
 
   // ==================== GESTIÓN DE PREMIOS ====================
@@ -101,7 +102,10 @@ export class LoyaltyAdminService {
   createReward(
     request: CreateLoyaltyRewardRequest
   ): Observable<LoyaltyRewardDto> {
-    return this.http.post<LoyaltyRewardDto>(`${this.baseUrl}/rewards`, request);
+    return this.apiClient.post<LoyaltyRewardDto>(
+      `${this.baseUrl}/rewards`,
+      request
+    );
   }
 
   /**
@@ -147,7 +151,7 @@ export class LoyaltyAdminService {
       params = params.set('rewardType', query.rewardType);
     }
 
-    return this.http.get<PagedLoyaltyRewardsResponse>(
+    return this.apiClient.get<PagedLoyaltyRewardsResponse>(
       `${this.baseUrl}/rewards`,
       {
         params,
@@ -177,7 +181,9 @@ export class LoyaltyAdminService {
    * ```
    */
   getRewardById(id: string): Observable<LoyaltyRewardDto> {
-    return this.http.get<LoyaltyRewardDto>(`${this.baseUrl}/rewards/${id}`);
+    return this.apiClient.get<LoyaltyRewardDto>(
+      `${this.baseUrl}/rewards/${id}`
+    );
   }
 
   /**
@@ -214,7 +220,7 @@ export class LoyaltyAdminService {
     id: string,
     request: UpdateLoyaltyRewardRequest
   ): Observable<LoyaltyRewardDto> {
-    return this.http.put<LoyaltyRewardDto>(
+    return this.apiClient.put<LoyaltyRewardDto>(
       `${this.baseUrl}/rewards/${id}`,
       request
     );
@@ -246,7 +252,7 @@ export class LoyaltyAdminService {
    * ```
    */
   deleteReward(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/rewards/${id}`);
+    return this.apiClient.delete<void>(`${this.baseUrl}/rewards/${id}`);
   }
 
   // ==================== GESTIÓN DE CANJES ====================
@@ -303,7 +309,7 @@ export class LoyaltyAdminService {
       params = params.set('toDate', query.toDate);
     }
 
-    return this.http.get<PagedLoyaltyRedemptionsResponse>(
+    return this.apiClient.get<PagedLoyaltyRedemptionsResponse>(
       `${this.baseUrl}/redemptions`,
       { params }
     );
@@ -311,17 +317,17 @@ export class LoyaltyAdminService {
 
   /**
    * Actualiza el estado de un canje
-   * 
+   *
    * Estados válidos:
    * - APPROVED - Aprobar canje (genera cupón activo)
    * - DELIVERED - Marcar como entregado (solo productos)
    * - CANCELLED - Cancelar y reembolsar puntos
    * - EXPIRED - Marcar como expirado
-   * 
+   *
    * @param id - ID del canje
    * @param request - Nuevo estado y notas opcionales
    * @returns Observable con el canje actualizado
-   * 
+   *
    * @example
    * ```typescript
    * // Aprobar canje de descuento
@@ -329,7 +335,7 @@ export class LoyaltyAdminService {
    *   status: 'APPROVED',
    *   adminNotes: 'Aprobado automáticamente'
    * };
-   * 
+   *
    * this.loyaltyAdminService.updateRedemptionStatus(redemptionId, request)
    *   .subscribe({
    *     next: () => {
@@ -338,13 +344,13 @@ export class LoyaltyAdminService {
 omer(redemptionId);
    *     }
    *   });
-   * 
+   *
    * // Cancelar canje por falta de stock
    * const cancel: UpdateRedemptionStatusRequest = {
    *   status: 'CANCELLED',
    *   adminNotes: 'Producto sin stock, puntos reembolsados'
    * };
-   * 
+   *
    * this.loyaltyAdminService.updateRedemptionStatus(redemptionId, cancel)
    *   .subscribe({
    *     next: () => alert('Canje cancelado y puntos reembolsados')
@@ -360,7 +366,7 @@ omer(redemptionId);
     approvedAt?: string;
     adminNotes?: string;
   }> {
-    return this.http.patch<{
+    return this.apiClient.patch<{
       id: string;
       status: string;
       approvedAt?: string;
@@ -420,7 +426,7 @@ omer(redemptionId);
    * ```
    */
   adjustPoints(request: AdjustPointsRequest): Observable<AdjustPointsResponse> {
-    return this.http.post<AdjustPointsResponse>(
+    return this.apiClient.post<AdjustPointsResponse>(
       `${this.baseUrl}/points/adjust`,
       request
     );
@@ -450,7 +456,9 @@ omer(redemptionId);
    * ```
    */
   getProgramConfig(): Observable<LoyaltyProgramConfigDto> {
-    return this.http.get<LoyaltyProgramConfigDto>(`${this.baseUrl}/config`);
+    return this.apiClient.get<LoyaltyProgramConfigDto>(
+      `${this.baseUrl}/config`
+    );
   }
 
   /**
@@ -483,7 +491,7 @@ omer(redemptionId);
   updateProgramConfig(
     request: UpdateLoyaltyConfigRequest
   ): Observable<LoyaltyProgramConfigDto> {
-    return this.http.put<LoyaltyProgramConfigDto>(
+    return this.apiClient.put<LoyaltyProgramConfigDto>(
       `${this.baseUrl}/config`,
       request
     );

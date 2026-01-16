@@ -58,22 +58,16 @@ export enum LoyaltyTier {
  * Resumen de la cuenta de lealtad del usuario
  */
 export interface LoyaltyAccountSummaryDto {
-  /** ID de la cuenta */
-  id: string;
-  /** ID del usuario propietario */
-  userId: string;
   /** Balance actual de puntos */
-  pointsBalance: number;
+  balance: number;
   /** Total de puntos ganados en toda la vida */
-  lifetimePointsEarned: number;
+  totalEarned: number;
   /** Total de puntos gastados en toda la vida */
-  lifetimePointsRedeemed: number;
-  /** Nivel/tier actual del usuario */
-  tier: LoyaltyTier | string;
-  /** Fecha de creación de la cuenta */
-  createdAt: string;
-  /** Fecha de última actividad */
-  lastActivityAt: string;
+  totalRedeemed: number;
+  /** Últimas transacciones recientes */
+  lastTransactions: LoyaltyTransactionDto[];
+  /** Nivel/tier actual del usuario (opcional, calculado en el frontend si no viene del backend) */
+  tier?: LoyaltyTier | string;
 }
 
 // ==================== TRANSACCIONES ====================
@@ -90,10 +84,8 @@ export interface LoyaltyTransactionDto {
   points: number;
   /** Descripción del movimiento */
   description: string;
-  /** ID de la orden relacionada (si aplica) */
-  orderId?: string;
-  /** ID del canje relacionado (si aplica) */
-  redemptionId?: string;
+  /** Número de orden relacionada (si aplica) */
+  orderNumber?: string;
   /** Fecha de la transacción */
   createdAt: string;
 }
@@ -149,7 +141,9 @@ export interface LoyaltyRewardDto {
   /** Valor del descuento (si aplica) */
   discountValue?: number;
   /** ID del producto asociado (si aplica) */
-  productId?: string;
+  productId?: string | null;
+  /** Nombre del producto (si aplica) */
+  productName?: string | null;
   /** URL de la imagen */
   imageUrl?: string;
   /** Stock disponible (null = ilimitado) */
@@ -183,7 +177,7 @@ export interface CreateLoyaltyRewardRequest {
   /** Valor del descuento (requerido para tipos DISCOUNT_*) */
   discountValue?: number;
   /** ID del producto (requerido para tipo PRODUCT) */
-  productId?: string;
+  productId?: string | null;
   /** URL de la imagen */
   imageUrl?: string;
   /** Stock disponible (null = ilimitado) */
@@ -270,6 +264,10 @@ export interface LoyaltyRedemptionDto {
   expiresAt?: string | null;
   /** Notas del administrador */
   adminNotes?: string | null;
+  /** ID de la orden asociada (si aplica) */
+  orderId?: string | null;
+  /** Número de orden asociada (si aplica) */
+  orderNumber?: string | null;
 }
 
 /**
@@ -278,20 +276,14 @@ export interface LoyaltyRedemptionDto {
 export interface RedeemRewardResponse {
   /** ID del canje generado */
   redemptionId: string;
-  /** Nombre del premio canjeado */
-  rewardName: string;
-  /** Puntos deducidos */
-  pointsDeducted: number;
-  /** Nuevo balance de puntos */
-  newBalance: number;
-  /** Código de cupón generado */
-  couponCode?: string;
-  /** Fecha de expiración del cupón */
-  expiresAt?: string;
-  /** Estado inicial del canje */
-  status: string;
-  /** Mensaje para mostrar al usuario */
+  /** Mensaje de confirmación */
   message: string;
+  /** Puntos restantes después del canje */
+  remainingPoints: number;
+  /** Código de cupón generado (si aplica) */
+  couponCode?: string;
+  /** Fecha de expiración del cupón (si aplica) */
+  expiresAt?: string;
 }
 
 /**

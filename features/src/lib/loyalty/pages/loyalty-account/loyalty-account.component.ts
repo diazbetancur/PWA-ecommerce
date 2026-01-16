@@ -54,7 +54,7 @@ import { LoyaltyService } from '../../services/loyalty.service';
             <span class="label">Puntos Disponibles</span>
           </div>
           <div class="balance">
-            {{ account()!.pointsBalance | number : '1.0-0' }}
+            {{ account()!.balance | number : '1.0-0' }}
           </div>
           <div class="tier-badge" [style.background-color]="getTierColor()">
             {{ getTierLabel() }}
@@ -66,7 +66,7 @@ import { LoyaltyService } from '../../services/loyalty.service';
           <div class="stat-card">
             <div class="stat-icon">⬆️</div>
             <div class="stat-value">
-              {{ account()!.lifetimePointsEarned | number : '1.0-0' }}
+              {{ account()!.totalEarned | number : '1.0-0' }}
             </div>
             <div class="stat-label">Puntos Ganados</div>
           </div>
@@ -74,15 +74,17 @@ import { LoyaltyService } from '../../services/loyalty.service';
           <div class="stat-card">
             <div class="stat-icon">⬇️</div>
             <div class="stat-value">
-              {{ account()!.lifetimePointsRedeemed | number : '1.0-0' }}
+              {{ account()!.totalRedeemed | number : '1.0-0' }}
             </div>
             <div class="stat-label">Puntos Canjeados</div>
           </div>
 
           <div class="stat-card">
             <div class="stat-icon">📅</div>
-            <div class="stat-value">{{ formatDate(account()!.createdAt) }}</div>
-            <div class="stat-label">Miembro Desde</div>
+            <div class="stat-value">
+              {{ account()!.lastTransactions.length || 0 }}
+            </div>
+            <div class="stat-label">Últimas Transacciones</div>
           </div>
         </div>
 

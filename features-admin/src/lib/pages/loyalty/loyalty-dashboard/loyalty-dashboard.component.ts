@@ -146,7 +146,7 @@ import { Router } from '@angular/router';
       </div>
 
       <!-- Tier Distribution -->
-      <div class="section">
+      <!-- <div class="section">
         <h2>Distribución de Niveles</h2>
         <div class="tier-distribution">
           @for (tier of mockTierDistribution; track tier.level) {
@@ -168,7 +168,7 @@ import { Router } from '@angular/router';
           </div>
           }
         </div>
-      </div>
+      </div> -->
     </div>
   `,
   styles: [

@@ -58,22 +58,16 @@ export enum LoyaltyTier {
  * Resumen de la cuenta de lealtad del usuario
  */
 export interface LoyaltyAccountSummaryDto {
-  /** ID de la cuenta */
-  id: string;
-  /** ID del usuario propietario */
-  userId: string;
   /** Balance actual de puntos */
-  pointsBalance: number;
+  balance: number;
   /** Total de puntos ganados en toda la vida */
-  lifetimePointsEarned: number;
+  totalEarned: number;
   /** Total de puntos gastados en toda la vida */
-  lifetimePointsRedeemed: number;
-  /** Nivel/tier actual del usuario */
-  tier: LoyaltyTier | string;
-  /** Fecha de creación de la cuenta */
-  createdAt: string;
-  /** Fecha de última actividad */
-  lastActivityAt: string;
+  totalRedeemed: number;
+  /** Últimas transacciones recientes */
+  lastTransactions: LoyaltyTransactionDto[];
+  /** Nivel/tier actual del usuario (opcional, calculado en el frontend si no viene del backend) */
+  tier?: LoyaltyTier | string;
 }
 
 // ==================== TRANSACCIONES ====================
@@ -90,10 +84,8 @@ export interface LoyaltyTransactionDto {
   points: number;
   /** Descripción del movimiento */
   description: string;
-  /** ID de la orden relacionada (si aplica) */
-  orderId?: string;
-  /** ID del canje relacionado (si aplica) */
-  redemptionId?: string;
+  /** Número de orden relacionada (si aplica) */
+  orderNumber?: string;
   /** Fecha de la transacción */
   createdAt: string;
 }
@@ -149,7 +141,9 @@ export interface LoyaltyRewardDto {
   /** Valor del descuento (si aplica) */
   discountValue?: number;
   /** ID del producto asociado (si aplica) */
-  productId?: string;
+  productId?: string | null;
+  /** Nombre del producto (si aplica) */
+  productName?: string | null;
   /** URL de la imagen */
   imageUrl?: string;
   /** Stock disponible (null = ilimitado) */
@@ -183,7 +177,7 @@ export interface CreateLoyaltyRewardRequest {
   /** Valor del descuento (requerido para tipos DISCOUNT_*) */
   discountValue?: number;
   /** ID del producto (requerido para tipo PRODUCT) */
-  productId?: string;
+  productId?: string | null;
   /** URL de la imagen */
   imageUrl?: string;
   /** Stock disponible (null = ilimitado) */
@@ -270,6 +264,10 @@ export interface LoyaltyRedemptionDto {
   expiresAt?: string | null;
   /** Notas del administrador */
   adminNotes?: string | null;
+  /** ID de la orden asociada (si aplica) */
+  orderId?: string | null;
+  /** Número de orden asociada (si aplica) */
+  orderNumber?: string | null;
 }
 
 /**
@@ -278,20 +276,14 @@ export interface LoyaltyRedemptionDto {
 export interface RedeemRewardResponse {
   /** ID del canje generado */
   redemptionId: string;
-  /** Nombre del premio canjeado */
-  rewardName: string;
-  /** Puntos deducidos */
-  pointsDeducted: number;
-  /** Nuevo balance de puntos */
-  newBalance: number;
-  /** Código de cupón generado */
-  couponCode?: string;
-  /** Fecha de expiración del cupón */
-  expiresAt?: string;
-  /** Estado inicial del canje */
-  status: string;
-  /** Mensaje para mostrar al usuario */
+  /** Mensaje de confirmación */
   message: string;
+  /** Puntos restantes después del canje */
+  remainingPoints: number;
+  /** Código de cupón generado (si aplica) */
+  couponCode?: string;
+  /** Fecha de expiración del cupón (si aplica) */
+  expiresAt?: string;
 }
 
 /**
@@ -420,58 +412,43 @@ export const REDEMPTION_STATUS_LABELS: Record<string, string> = {
 
 /**
  * Configuración general del programa de lealtad
+ * Respuesta del endpoint GET /admin/loyalty/config
  */
 export interface LoyaltyProgramConfigDto {
   /** ID de la configuración */
   id: string;
-  /** Factor de conversión: puntos por cada unidad monetaria gastada */
-  pointsPerCurrencyUnit: number;
-  /** Unidad monetaria (ej: 'COP', 'USD') */
-  currency: string;
-  /** Días de expiración de puntos (null = no expiran) */
+  /** Factor de conversión - Puntos que se obtienen por cada unidad de moneda gastada
+   * Ejemplos:
+   * - 0.01 = 1 punto por cada $1 gastado
+   * - 0.10 = 10 puntos por cada $1 gastado
+   * - 1.00 = 100 puntos por cada $1 gastado
+   */
+  conversionRate: number;
+  /** Días hasta que expiran los puntos (null = no expiran) */
   pointsExpirationDays?: number | null;
-  /** Puntos mínimos para poder canjear */
-  minimumPointsToRedeem: number;
-  /** Umbral de puntos para tier Bronze */
-  bronzeTierThreshold: number;
-  /** Umbral de puntos para tier Silver */
-  silverTierThreshold: number;
-  /** Umbral de puntos para tier Gold */
-  goldTierThreshold: number;
-  /** Umbral de puntos para tier Platinum */
-  platinumTierThreshold: number;
-  /** Si el programa está activo */
-  isActive: boolean;
-  /** Términos y condiciones del programa */
-  termsAndConditions?: string;
+  /** Si el programa de lealtad está activo */
+  isEnabled: boolean;
+  /** Monto mínimo de compra para obtener puntos (null = sin mínimo) */
+  minPurchaseForPoints?: number | null;
+  /** Fecha de creación */
+  createdAt: string;
   /** Fecha de última actualización */
   updatedAt: string;
-  /** Usuario que realizó la última actualización */
-  updatedBy?: string;
 }
 
 /**
  * Request para actualizar la configuración del programa
+ * Body del endpoint PUT /admin/loyalty/config
  */
 export interface UpdateLoyaltyConfigRequest {
-  /** Factor de conversión: puntos por cada unidad monetaria gastada */
-  pointsPerCurrencyUnit?: number;
+  /** Factor de conversión - Puntos por cada unidad de moneda gastada */
+  conversionRate?: number;
   /** Días de expiración de puntos (null = no expiran) */
   pointsExpirationDays?: number | null;
-  /** Puntos mínimos para poder canjear */
-  minimumPointsToRedeem?: number;
-  /** Umbral de puntos para tier Bronze */
-  bronzeTierThreshold?: number;
-  /** Umbral de puntos para tier Silver */
-  silverTierThreshold?: number;
-  /** Umbral de puntos para tier Gold */
-  goldTierThreshold?: number;
-  /** Umbral de puntos para tier Platinum */
-  platinumTierThreshold?: number;
   /** Si el programa está activo */
-  isActive?: boolean;
-  /** Términos y condiciones del programa */
-  termsAndConditions?: string;
+  isEnabled?: boolean;
+  /** Monto mínimo de compra para obtener puntos (null = sin mínimo) */
+  minPurchaseForPoints?: number | null;
 }
 /**
  * Colores para estados de canjes

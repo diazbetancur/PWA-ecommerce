@@ -6,6 +6,7 @@ import {
   LoyaltyRewardDto,
   PagedLoyaltyRewardsResponse,
   REWARD_TYPE_LABELS,
+  UpdateLoyaltyRewardRequest,
 } from '../../../models/loyalty.models';
 import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 
@@ -742,21 +743,31 @@ export class RewardsListComponent implements OnInit {
   toggleRewardStatus(reward: LoyaltyRewardDto): void {
     const newStatus = !reward.isActive;
 
-    this.loyaltyAdminService
-      .updateReward(reward.id, {
-        ...reward,
-        isActive: newStatus,
-      })
-      .subscribe({
-        next: () => {
-          reward.isActive = newStatus;
-          this.rewards.set([...this.rewards()]);
-        },
-        error: (err) => {
-          console.error('Error actualizando estado:', err);
-          alert('No se pudo actualizar el estado del premio');
-        },
-      });
+    const updateRequest: UpdateLoyaltyRewardRequest = {
+      name: reward.name,
+      description: reward.description,
+      rewardType: reward.rewardType,
+      pointsCost: reward.pointsCost,
+      discountValue: reward.discountValue,
+      productId: reward.productId,
+      imageUrl: reward.imageUrl,
+      stock: reward.stock,
+      isActive: newStatus,
+      validityDays: reward.validityDays,
+      termsAndConditions: reward.termsAndConditions,
+      displayOrder: reward.displayOrder,
+    };
+
+    this.loyaltyAdminService.updateReward(reward.id, updateRequest).subscribe({
+      next: () => {
+        reward.isActive = newStatus;
+        this.rewards.set([...this.rewards()]);
+      },
+      error: (err) => {
+        console.error('Error actualizando estado:', err);
+        alert('No se pudo actualizar el estado del premio');
+      },
+    });
   }
 
   /**

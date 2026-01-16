@@ -1,0 +1,176 @@
+<div class="program-config-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <button class="back-btn" (click)="goBack()"><span>←</span> Volver</button>
+      <div>
+        <h1>⚙️ Configuración del Programa</h1>
+        <p class="subtitle">
+          Gestiona el factor de conversión y reglas del programa de lealtad
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando configuración...</p>
+  </div>
+  }
+
+  <!-- Form -->
+  @if (!isLoading() && configForm) {
+  <form [formGroup]="configForm" (ngSubmit)="onSubmit()" class="config-form">
+    <!-- Estado del Programa -->
+    <div class="form-section">
+      <h2>📊 Estado del Programa</h2>
+      <div class="form-group">
+        <label class="toggle-label">
+          <input
+            type="checkbox"
+            formControlName="isEnabled"
+            class="toggle-checkbox"
+          />
+          <span class="toggle-slider"></span>
+          <span class="toggle-text">Programa Activo</span>
+        </label>
+        <p class="help-text">
+          Cuando está desactivado, los usuarios no pueden ganar ni canjear
+          puntos
+        </p>
+      </div>
+    </div>
+
+    <!-- Factor de Conversión -->
+    <div class="form-section">
+      <h2>💰 Factor de Conversión</h2>
+      <div class="conversion-info">
+        <p class="info-text">
+          Define cuántos puntos se otorgan por cada unidad monetaria gastada
+        </p>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="currencyAmount"> Monto en Moneda ($) </label>
+          <input
+            type="number"
+            id="currencyAmount"
+            class="form-control"
+            [value]="currencyAmount()"
+            (input)="onCurrencyAmountChange($event)"
+            min="1"
+            step="100"
+          />
+          <p class="help-text">Ej: 100 (cien pesos/dólares)</p>
+        </div>
+
+        <div class="equals-sign">=</div>
+
+        <div class="form-group flex-1">
+          <label for="conversionRate">Factor de Conversión</label>
+          <input
+            type="number"
+            id="conversionRate"
+            class="form-control"
+            formControlName="conversionRate"
+            min="0.000001"
+            step="0.01"
+            readonly
+          />
+          <p class="help-text">Calculado automáticamente</p>
+        </div>
+      </div>
+
+      <div class="conversion-examples">
+        <h4>📋 Ejemplos de conversión:</h4>
+        <ul>
+          <li>
+            Si <strong>currencyAmount = $1</strong> y
+            <strong>conversionRate = 0.01</strong>: Compra de $100 →
+            <strong>1 punto</strong>
+          </li>
+          <li>
+            Si <strong>currencyAmount = $1</strong> y
+            <strong>conversionRate = 0.10</strong>: Compra de $100 →
+            <strong>10 puntos</strong>
+          </li>
+          <li>
+            Si <strong>currencyAmount = $1</strong> y
+            <strong>conversionRate = 1.00</strong>: Compra de $100 →
+            <strong>100 puntos</strong>
+          </li>
+        </ul>
+        <div class="current-example">
+          <strong>Tu configuración actual:</strong> Una compra de $500 otorgará
+          <strong class="highlight">
+            {{
+              500 * (configForm.get('conversionRate')?.value || 0)
+                | number : '1.0-2'
+            }}
+          </strong>
+          puntos
+        </div>
+      </div>
+    </div>
+
+    <!-- Monto Mínimo de Compra -->
+    <div class="form-section">
+      <h2>🛒 Monto Mínimo de Compra</h2>
+      <div class="form-group">
+        <label for="minPurchaseForPoints">Monto Mínimo (opcional)</label>
+        <input
+          type="number"
+          id="minPurchaseForPoints"
+          class="form-control"
+          formControlName="minPurchaseForPoints"
+          min="0"
+          step="10"
+        />
+        <p class="help-text">
+          Monto mínimo de compra para obtener puntos. Deja en 0 o vacío para sin
+          mínimo.
+        </p>
+      </div>
+    </div>
+
+    <!-- Expiración de Puntos -->
+    <div class="form-section">
+      <h2>⏰ Expiración de Puntos</h2>
+      <div class="form-group">
+        <label for="pointsExpirationDays">Días de Expiración</label>
+        <input
+          type="number"
+          id="pointsExpirationDays"
+          class="form-control"
+          formControlName="pointsExpirationDays"
+          min="0"
+          step="30"
+        />
+        <p class="help-text">
+          Número de días hasta que expiran los puntos. Deja en 0 o vacío para
+          que no expiren.
+        </p>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="goBack()">
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="configForm.invalid || isSaving()"
+      >
+        @if (isSaving()) {
+        <span class="spinner-sm"></span>
+        } Guardar Configuración
+      </button>
+    </div>
+  </form>
+  }
+</div>
