@@ -1,0 +1,190 @@
+<div class="store-form-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>{{ pageTitle() }}</h1>
+      <button class="btn btn-secondary" (click)="onCancel()">
+        <i class="bi bi-x-circle"></i>
+        Cancelar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando información de la tienda...</p>
+  </div>
+  }
+
+  <!-- Form -->
+  @else {
+  <div class="form-wrapper">
+    <form [formGroup]="storeForm" (ngSubmit)="onSubmit()">
+      <!-- Error Alert -->
+      @if (error()) {
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle"></i>
+        <span>{{ error() }}</span>
+      </div>
+      }
+
+      <!-- Información Básica -->
+      <div class="form-section">
+        <h2 class="section-title">📋 Información Básica</h2>
+
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="name">
+            Nombre de la tienda
+            <span class="required">*</span>
+          </label>
+          <input
+            type="text"
+            id="name"
+            formControlName="name"
+            placeholder="Ej: Tienda Centro"
+            [class.error]="hasError('name')"
+          />
+          @if (hasError('name')) {
+          <span class="error-message">{{ getErrorMessage('name') }}</span>
+          }
+        </div>
+
+        <!-- Código -->
+        <div class="form-group">
+          <label for="code">Código (opcional)</label>
+          <input
+            type="text"
+            id="code"
+            formControlName="code"
+            placeholder="Ej: TC-001"
+          />
+          <small class="field-hint">
+            Código único de identificación. Debe ser único si se proporciona.
+          </small>
+        </div>
+      </div>
+
+      <!-- Ubicación -->
+      <div class="form-section">
+        <h2 class="section-title">📍 Ubicación</h2>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label for="address">Dirección</label>
+          <input
+            type="text"
+            id="address"
+            formControlName="address"
+            placeholder="Calle Principal 123"
+          />
+        </div>
+
+        <!-- Ciudad y País -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">Ciudad</label>
+            <input
+              type="text"
+              id="city"
+              formControlName="city"
+              placeholder="Ciudad de México"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="country">País</label>
+            <input
+              type="text"
+              id="country"
+              formControlName="country"
+              placeholder="México"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Contacto -->
+      <div class="form-section">
+        <h2 class="section-title">📞 Contacto</h2>
+
+        <!-- Teléfono -->
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <input
+            type="tel"
+            id="phone"
+            formControlName="phone"
+            placeholder="+52 55 1234 5678"
+          />
+        </div>
+      </div>
+
+      <!-- Configuración -->
+      <div class="form-section">
+        <h2 class="section-title">⚙️ Configuración</h2>
+
+        <!-- Predeterminada -->
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="isDefault" />
+            <span>
+              <strong>Establecer como tienda predeterminada</strong>
+              <small>Solo puede haber una tienda predeterminada</small>
+            </span>
+          </label>
+        </div>
+
+        <!-- Activa (solo en edición) -->
+        @if (mode() === 'edit') {
+        <div class="form-group checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              formControlName="isActive"
+              [disabled]="!canDeactivate()"
+            />
+            <span>
+              <strong>Tienda activa</strong>
+              <small>Desactivar ocultará la tienda de selecciones</small>
+            </span>
+          </label>
+
+          @if (!canDeactivate()) {
+          <div class="warning-message">
+            <i class="bi bi-info-circle"></i>
+            No se puede desactivar la tienda predeterminada
+          </div>
+          }
+        </div>
+        }
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onCancel()"
+          [disabled]="submitting()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="storeForm.invalid || submitting()"
+        >
+          @if (submitting()) {
+          <span class="spinner-sm"></span>
+          }
+          {{ submitButtonText() }}
+        </button>
+      </div>
+    </form>
+  </div>
+  }
+</div>

@@ -1,0 +1,209 @@
+<div class="migrate-stock-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <button class="btn-back" (click)="onGoBack()">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+          <h1>🔄 Migración de Stock Legacy</h1>
+          <p class="subtitle">
+            Migra el stock existente al sistema multi-ubicación
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando tiendas disponibles...</p>
+  </div>
+  }
+
+  <!-- Error State (carga inicial) -->
+  @else if (error() && !migrationResult()) {
+  <div class="error-state">
+    <i class="bi bi-exclamation-triangle"></i>
+    <p>{{ error() }}</p>
+    <button class="btn btn-secondary" (click)="loadStores()">Reintentar</button>
+  </div>
+  }
+
+  <!-- No Stores State -->
+  @else if (!hasStores()) {
+  <div class="empty-state">
+    <div class="empty-icon">🏪</div>
+    <h2>No hay tiendas disponibles</h2>
+    <p>Debes crear al menos una tienda antes de migrar stock</p>
+    <button class="btn btn-primary" (click)="onGoBack()">Crear Tienda</button>
+  </div>
+  }
+
+  <!-- Migration Result -->
+  @else if (migrationResult()) {
+  <div class="result-container">
+    @if (migrationResult()!.success) {
+    <div class="result-card success">
+      <div class="result-icon">
+        <i class="bi bi-check-circle"></i>
+      </div>
+      <div class="result-content">
+        <h2>✅ Migración Completada</h2>
+        <p class="result-message">{{ migrationResult()!.message }}</p>
+        <div class="result-stats">
+          <div class="stat-item">
+            <span class="stat-value">{{
+              migrationResult()!.migratedCount
+            }}</span>
+            <span class="stat-label">Productos migrados</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn btn-secondary" (click)="onReset()">
+        <i class="bi bi-arrow-clockwise"></i>
+        Ejecutar Otra Migración
+      </button>
+      <button class="btn btn-primary" (click)="onGoBack()">
+        <i class="bi bi-check"></i>
+        Finalizar
+      </button>
+    </div>
+    } @else {
+    <div class="result-card error">
+      <div class="result-icon">
+        <i class="bi bi-x-circle"></i>
+      </div>
+      <div class="result-content">
+        <h2>❌ Error en la Migración</h2>
+        <p class="result-message">{{ migrationResult()!.message }}</p>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn btn-secondary" (click)="onReset()">
+        <i class="bi bi-arrow-clockwise"></i>
+        Reintentar
+      </button>
+      <button class="btn btn-outline" (click)="onGoBack()">Volver</button>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Migration Form -->
+  @else {
+  <div class="migration-form">
+    <!-- Info Banner -->
+    <div class="info-banner">
+      <i class="bi bi-info-circle"></i>
+      <div class="info-content">
+        <h3>¿Qué hace esta herramienta?</h3>
+        <ul>
+          <li>
+            Copia el stock actual de productos (Product.Stock) a la tienda
+            seleccionada
+          </li>
+          <li>Solo migra productos con stock mayor a 0</li>
+          <li>No afecta productos que ya tengan stock en la tienda destino</li>
+          <li>
+            El stock original (Product.Stock) se mantiene intacto para
+            compatibilidad
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Store Selection -->
+    <div class="selection-section">
+      <h2>Selecciona la Tienda Destino</h2>
+      <p class="section-description">
+        El stock de todos los productos será asignado a esta tienda
+      </p>
+
+      <div class="stores-grid">
+        @for (store of stores(); track store.id) {
+        <div
+          class="store-card"
+          [class.selected]="selectedStoreId() === store.id"
+          (click)="onSelectStore(store.id)"
+        >
+          <div class="store-header">
+            <div class="radio-indicator">
+              @if (selectedStoreId() === store.id) {
+              <i class="bi bi-check-circle-fill"></i>
+              } @else {
+              <i class="bi bi-circle"></i>
+              }
+            </div>
+            <div class="store-info">
+              <h3>{{ store.name }}</h3>
+              @if (store.code) {
+              <span class="store-code">{{ store.code }}</span>
+              } @if (store.isDefault) {
+              <span class="badge badge-default">Predeterminada</span>
+              }
+            </div>
+          </div>
+
+          @if (store.address) {
+          <div class="store-details">
+            <i class="bi bi-geo-alt"></i>
+            <span>
+              {{ store.address }}
+              @if (store.city) {
+              <span>, {{ store.city }}</span>
+              }
+            </span>
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Warning Banner -->
+    <div class="warning-banner">
+      <i class="bi bi-exclamation-triangle"></i>
+      <div class="warning-content">
+        <h3>⚠️ Importante</h3>
+        <p>
+          Esta operación es <strong>idempotente</strong> - ejecutarla múltiples
+          veces no duplicará el stock. Solo se crearán registros nuevos donde no
+          existan.
+        </p>
+        <p>
+          Se recomienda ejecutar esta migración <strong>una sola vez</strong>
+          al configurar inicialmente el sistema de tiendas.
+        </p>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="form-actions">
+      <button class="btn btn-secondary" (click)="onGoBack()">
+        <i class="bi bi-x-circle"></i>
+        Cancelar
+      </button>
+
+      <button
+        class="btn btn-primary btn-lg"
+        (click)="onMigrate()"
+        [disabled]="!canMigrate()"
+      >
+        @if (migrating()) {
+        <span class="spinner-sm"></span>
+        Migrando Stock... } @else {
+        <i class="bi bi-arrow-right-circle"></i>
+        Iniciar Migración }
+      </button>
+    </div>
+  </div>
+  }
+</div>

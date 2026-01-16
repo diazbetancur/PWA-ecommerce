@@ -111,6 +111,64 @@ export const featuresAdminRoutes: Route[] = [
     },
   },
 
+  // === TIENDAS / INVENTARIO ===
+  {
+    path: 'stores',
+    canActivate: [modulePermissionGuard('inventory')],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./pages/stores/stores-list/stores-list.component').then(
+            (m) => m.StoresListComponent
+          ),
+        data: {
+          title: 'Gestión de Tiendas',
+        },
+      },
+      {
+        path: 'new',
+        loadComponent: () =>
+          import('./pages/stores/store-form/store-form.component').then(
+            (m) => m.StoreFormComponent
+          ),
+        data: {
+          title: 'Nueva Tienda',
+        },
+      },
+      {
+        path: ':id/edit',
+        loadComponent: () =>
+          import('./pages/stores/store-form/store-form.component').then(
+            (m) => m.StoreFormComponent
+          ),
+        data: {
+          title: 'Editar Tienda',
+        },
+      },
+      {
+        path: 'products/:productId/stock',
+        loadComponent: () =>
+          import(
+            './pages/stores/product-stock-by-stores/product-stock-by-stores.component'
+          ).then((m) => m.ProductStockByStoresComponent),
+        data: {
+          title: 'Stock por Tiendas',
+        },
+      },
+      {
+        path: 'migrate-stock',
+        loadComponent: () =>
+          import('./pages/stores/migrate-stock/migrate-stock.component').then(
+            (m) => m.MigrateStockComponent
+          ),
+        data: {
+          title: 'Migrar Stock Legacy',
+        },
+      },
+    ],
+  },
+
   // === CLIENTES ===
   {
     path: 'customers',

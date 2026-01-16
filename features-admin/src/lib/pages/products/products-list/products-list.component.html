@@ -144,6 +144,13 @@
             <th mat-header-cell *matHeaderCellDef>Acciones</th>
             <td mat-cell *matCellDef="let product">
               <div class="actions-cell">
+                <button
+                  mat-icon-button
+                  (click)="viewStockByStores(product)"
+                  matTooltip="Ver stock por tiendas"
+                >
+                  <mat-icon>store</mat-icon>
+                </button>
                 @if (canUpdate()) {
                 <button
                   mat-icon-button

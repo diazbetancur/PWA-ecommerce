@@ -1,0 +1,238 @@
+<div class="product-stock-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <button class="btn-back" (click)="onGoBack()">
+          <i class="bi bi-arrow-left"></i>
+        </button>
+        <div>
+          <h1>📦 Stock por Tienda</h1>
+          <p class="subtitle">Gestión de inventario por ubicación</p>
+        </div>
+      </div>
+      <button
+        class="btn btn-secondary"
+        (click)="loadStock(currentProductId()!)"
+      >
+        <i class="bi bi-arrow-clockwise"></i>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  @if (hasStock() && !loading()) {
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="card-icon blue">
+        <i class="bi bi-box-seam"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-label">Stock Total</span>
+        <span class="card-value">{{ totalStock() }}</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon orange">
+        <i class="bi bi-clock-history"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-label">Reservado</span>
+        <span class="card-value">{{ totalReserved() }}</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon green">
+        <i class="bi bi-check-circle"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-label">Disponible</span>
+        <span class="card-value">{{ totalAvailable() }}</span>
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <div class="card-icon purple">
+        <i class="bi bi-shop"></i>
+      </div>
+      <div class="card-content">
+        <span class="card-label">Tiendas</span>
+        <span class="card-value">{{ stockData().length }}</span>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando stock por tiendas...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @else if (error()) {
+  <div class="error-state">
+    <i class="bi bi-exclamation-triangle"></i>
+    <p>{{ error() }}</p>
+    <button class="btn btn-secondary" (click)="loadStock(currentProductId()!)">
+      Reintentar
+    </button>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @else if (!hasStock()) {
+  <div class="empty-state">
+    <div class="empty-icon">📦</div>
+    <h2>Sin stock en tiendas</h2>
+    <p>Este producto no tiene stock registrado en ninguna tienda</p>
+    <div class="empty-actions">
+      <p class="hint">
+        Usa el botón "Actualizar" en cada tienda para asignar stock
+      </p>
+    </div>
+  </div>
+  }
+
+  <!-- Stock Table -->
+  @else {
+  <div class="table-container">
+    <table class="stock-table">
+      <thead>
+        <tr>
+          <th>Tienda</th>
+          <th class="text-center">Stock Total</th>
+          <th class="text-center">Reservado</th>
+          <th class="text-center">Disponible</th>
+          <th>Última Actualización</th>
+          <th class="text-center">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of stockData(); track item.id) {
+        <tr>
+          <!-- Store Name -->
+          <td>
+            <div class="store-info">
+              <strong>{{ item.storeName }}</strong>
+            </div>
+          </td>
+
+          <!-- Stock Total (Editable) -->
+          <td class="text-center">
+            @if (isEditing(item.storeId)) {
+            <input
+              type="number"
+              [(ngModel)]="editingStock"
+              min="0"
+              class="stock-input"
+              [disabled]="savingStock()"
+            />
+            } @else {
+            <span class="stock-value">{{ item.stock }}</span>
+            }
+          </td>
+
+          <!-- Reserved Stock -->
+          <td class="text-center">
+            <span class="reserved-badge">
+              {{ item.reservedStock }}
+            </span>
+          </td>
+
+          <!-- Available Stock -->
+          <td class="text-center">
+            <span
+              class="available-badge"
+              [class]="getStockClass(item.availableStock)"
+            >
+              {{ item.availableStock }}
+            </span>
+          </td>
+
+          <!-- Updated At -->
+          <td>
+            <span class="date-text">{{ formatDate(item.updatedAt) }}</span>
+          </td>
+
+          <!-- Actions -->
+          <td class="text-center">
+            @if (isEditing(item.storeId)) {
+            <div class="action-buttons">
+              <button
+                class="btn btn-sm btn-success"
+                (click)="onSaveStock(item)"
+                [disabled]="savingStock()"
+              >
+                @if (savingStock()) {
+                <span class="spinner-sm"></span>
+                } @else {
+                <i class="bi bi-check"></i>
+                } Guardar
+              </button>
+              <button
+                class="btn btn-sm btn-secondary"
+                (click)="onCancelEdit()"
+                [disabled]="savingStock()"
+              >
+                <i class="bi bi-x"></i>
+                Cancelar
+              </button>
+            </div>
+            } @else {
+            <button class="btn btn-sm btn-primary" (click)="onEditStock(item)">
+              <i class="bi bi-pencil"></i>
+              Actualizar
+            </button>
+            }
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <h3>📖 Leyenda</h3>
+    <div class="legend-items">
+      <div class="legend-item">
+        <strong>Stock Total:</strong>
+        <span>Cantidad total de producto en la tienda</span>
+      </div>
+      <div class="legend-item">
+        <strong>Reservado:</strong>
+        <span>Stock en órdenes pendientes de procesamiento</span>
+      </div>
+      <div class="legend-item">
+        <strong>Disponible:</strong>
+        <span>Stock - Reservado (disponible para nuevas ventas)</span>
+      </div>
+    </div>
+
+    <div class="stock-indicators">
+      <span class="indicator">
+        <span class="badge-demo stock-good"></span>
+        Stock bueno (≥50)
+      </span>
+      <span class="indicator">
+        <span class="badge-demo stock-medium"></span>
+        Stock medio (10-49)
+      </span>
+      <span class="indicator">
+        <span class="badge-demo stock-low"></span>
+        Stock bajo (&lt;10)
+      </span>
+      <span class="indicator">
+        <span class="badge-demo stock-empty"></span>
+        Sin stock
+      </span>
+    </div>
+  </div>
+  }
+</div>

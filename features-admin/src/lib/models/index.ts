@@ -4,3 +4,5 @@
  */
 
 export * from './category.model';
+export * from './loyalty.models';
+export * from './store.models';

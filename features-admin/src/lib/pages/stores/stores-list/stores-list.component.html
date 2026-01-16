@@ -1,0 +1,176 @@
+<div class="stores-list-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1>🏪 Gestión de Tiendas</h1>
+        @if (hasStores()) {
+        <p class="subtitle">
+          {{ activeStoresCount() }} tienda(s) activa(s) de
+          {{ stores().length }} total
+        </p>
+        }
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="onMigrateStock()">
+          <i class="bi bi-arrow-repeat"></i>
+          Migrar Stock Legacy
+        </button>
+        <button class="btn btn-primary" (click)="onCreateStore()">
+          <i class="bi bi-plus-circle"></i>
+          Nueva Tienda
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  @if (hasStores()) {
+  <div class="filters-section">
+    <label class="checkbox-label">
+      <input
+        type="checkbox"
+        [checked]="includeInactive()"
+        (change)="onToggleInactive()"
+      />
+      <span>Incluir tiendas inactivas</span>
+    </label>
+  </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando tiendas...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @else if (error()) {
+  <div class="error-state">
+    <i class="bi bi-exclamation-triangle"></i>
+    <p>{{ error() }}</p>
+    <button class="btn btn-secondary" (click)="loadStores()">Reintentar</button>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @else if (!hasStores()) {
+  <div class="empty-state">
+    <div class="empty-icon">🏪</div>
+    <h2>No hay tiendas registradas</h2>
+    <p>
+      Comienza creando tu primera tienda para gestionar el inventario por
+      ubicación
+    </p>
+    <button class="btn btn-primary btn-lg" (click)="onCreateStore()">
+      <i class="bi bi-plus-circle"></i>
+      Crear Primera Tienda
+    </button>
+  </div>
+  }
+
+  <!-- Stores Grid -->
+  @else {
+  <div class="stores-grid">
+    @for (store of stores(); track store.id) {
+    <div
+      class="store-card"
+      [class.inactive]="!store.isActive"
+      [class.default]="store.isDefault"
+    >
+      <!-- Card Header -->
+      <div class="card-header">
+        <div class="store-title">
+          <h3>{{ store.name }}</h3>
+          @if (store.code) {
+          <span class="store-code">{{ store.code }}</span>
+          }
+        </div>
+        <div class="badges">
+          @if (store.isDefault) {
+          <span class="badge badge-primary">
+            <i class="bi bi-star-fill"></i>
+            Predeterminada
+          </span>
+          } @if (!store.isActive) {
+          <span class="badge badge-danger">
+            <i class="bi bi-x-circle"></i>
+            Inactiva
+          </span>
+          }
+        </div>
+      </div>
+
+      <!-- Card Body -->
+      <div class="card-body">
+        @if (store.address) {
+        <div class="info-row">
+          <i class="bi bi-geo-alt"></i>
+          <span>
+            {{ store.address }}
+            @if (store.city) {
+            <span>, {{ store.city }}</span>
+            } @if (store.country) {
+            <span>, {{ store.country }}</span>
+            }
+          </span>
+        </div>
+        } @if (store.phone) {
+        <div class="info-row">
+          <i class="bi bi-telephone"></i>
+          <span>{{ store.phone }}</span>
+        </div>
+        }
+
+        <div class="info-row meta">
+          <i class="bi bi-calendar"></i>
+          <span>Creada: {{ formatDate(store.createdAt) }}</span>
+        </div>
+      </div>
+
+      <!-- Card Actions -->
+      <div class="card-actions">
+        <button
+          class="btn btn-sm btn-outline"
+          (click)="onViewStock(store.id)"
+          title="Ver stock de esta tienda"
+        >
+          <i class="bi bi-box-seam"></i>
+          Stock
+        </button>
+
+        <button
+          class="btn btn-sm btn-outline"
+          (click)="onEditStore(store.id)"
+          title="Editar tienda"
+        >
+          <i class="bi bi-pencil"></i>
+          Editar
+        </button>
+
+        @if (!store.isDefault) {
+        <button
+          class="btn btn-sm btn-outline"
+          (click)="onSetDefault(store)"
+          title="Establecer como predeterminada"
+        >
+          <i class="bi bi-star"></i>
+          Predeterminar
+        </button>
+        } @if (!store.isDefault) {
+        <button
+          class="btn btn-sm btn-danger"
+          (click)="onDeleteStore(store)"
+          title="Eliminar tienda"
+        >
+          <i class="bi bi-trash"></i>
+        </button>
+        }
+      </div>
+    </div>
+    }
+  </div>
+  }
+</div>

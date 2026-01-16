@@ -146,6 +146,14 @@ export class ProductsListComponent implements OnInit {
     this.router.navigate(['/tenant-admin/catalog/products/edit', product.id]);
   }
 
+  viewStockByStores(product: ProductResponse): void {
+    this.router.navigate([
+      '/tenant-admin/stores/products',
+      product.id,
+      'stock',
+    ]);
+  }
+
   toggleFeatured(product: ProductResponse): void {
     this.productService.toggleFeatured(product.id).subscribe({
       next: () => {
