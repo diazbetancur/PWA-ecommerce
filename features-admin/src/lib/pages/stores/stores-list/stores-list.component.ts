@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { ToastService } from '@pwa/shared';
 import { StoreDto } from '../../../models/store.models';
 import { StoreAdminService } from '../../../services/store-admin.service';
 
@@ -34,6 +35,7 @@ export class StoresListComponent implements OnInit {
   private readonly storeService = inject(StoreAdminService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly toastService = inject(ToastService);
 
   // Signals
   stores = signal<StoreDto[]>([]);
@@ -87,28 +89,28 @@ export class StoresListComponent implements OnInit {
    * Navegar a crear nueva tienda
    */
   onCreateStore(): void {
-    this.router.navigate(['/admin/stores/new']);
+    this.router.navigate(['/tenant-admin/settings/stores/new']);
   }
 
   /**
    * Navegar a migración de stock
    */
   onMigrateStock(): void {
-    this.router.navigate(['/admin/stores/migrate-stock']);
+    this.router.navigate(['/tenant-admin/settings/stores/migrate-stock']);
   }
 
   /**
    * Navegar a editar tienda
    */
   onEditStore(storeId: string): void {
-    this.router.navigate(['/admin/stores', storeId, 'edit']);
+    this.router.navigate(['/tenant-admin/settings/stores', storeId, 'edit']);
   }
 
   /**
    * Navegar a stock de tienda
    */
   onViewStock(storeId: string): void {
-    this.router.navigate(['/admin/stores', storeId, 'stock']);
+    this.router.navigate(['/tenant-admin/settings/stores', storeId, 'stock']);
   }
 
   /**
@@ -126,11 +128,14 @@ export class StoresListComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.toastService.success(
+            'Tienda predeterminada establecida exitosamente'
+          );
           this.loadStores();
         },
         error: (err) => {
           console.error('Error al establecer predeterminada:', err);
-          alert(
+          this.toastService.error(
             err.error?.detail || 'Error al establecer tienda predeterminada'
           );
         },
@@ -142,7 +147,9 @@ export class StoresListComponent implements OnInit {
    */
   onDeleteStore(store: StoreDto): void {
     if (store.isDefault) {
-      alert('No se puede eliminar la tienda predeterminada');
+      this.toastService.warning(
+        'No se puede eliminar la tienda predeterminada'
+      );
       return;
     }
 
@@ -159,6 +166,7 @@ export class StoresListComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.toastService.success('Tienda eliminada exitosamente');
           this.loadStores();
         },
         error: (err) => {
@@ -166,7 +174,7 @@ export class StoresListComponent implements OnInit {
           const message =
             err.error?.detail ||
             'Error al eliminar la tienda. Puede tener stock u órdenes asociadas.';
-          alert(message);
+          this.toastService.error(message);
         },
       });
   }

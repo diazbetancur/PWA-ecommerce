@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ToastService } from '@pwa/shared';
 import {
   LoyaltyRedemptionDto,
   PagedLoyaltyRedemptionsResponse,
@@ -23,206 +24,7 @@ import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
   selector: 'lib-redemptions-list',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="redemptions-list-page">
-      <!-- Header -->
-      <div class="page-header">
-        <div class="header-content">
-          <h1>🎟️ Gestión de Canjes</h1>
-          <p>Administra todos los canjes de premios del programa</p>
-        </div>
-        @if (pendingCount() > 0) {
-        <div class="pending-alert">
-          <span class="icon">⏳</span>
-          <span
-            ><strong>{{ pendingCount() }}</strong> canjes pendientes</span
-          >
-        </div>
-        }
-      </div>
-
-      <!-- Filters -->
-      <div class="filters-section">
-        <div class="filter-group">
-          <label for="statusFilter">Estado:</label>
-          <select
-            id="statusFilter"
-            [(ngModel)]="selectedStatus"
-            (change)="onFilterChange()"
-            class="form-select"
-          >
-            <option value="">Todos</option>
-            <option value="PENDING">Pendiente</option>
-            <option value="APPROVED">Aprobado</option>
-            <option value="DELIVERED">Entregado</option>
-            <option value="CANCELLED">Cancelado</option>
-            <option value="EXPIRED">Expirado</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label for="userSearch">Usuario:</label>
-          <input
-            type="text"
-            id="userSearch"
-            [(ngModel)]="userSearch"
-            (input)="onFilterChange()"
-            placeholder="Buscar por email o nombre..."
-            class="form-input"
-          />
-        </div>
-
-        <div class="filter-group">
-          <label for="fromDate">Desde:</label>
-          <input
-            type="date"
-            id="fromDate"
-            [(ngModel)]="fromDate"
-            (change)="onFilterChange()"
-            class="form-input"
-          />
-        </div>
-      </div>
-
-      <!-- Loading State -->
-      @if (isLoading()) {
-      <div class="loading-container">
-        <div class="spinner"></div>
-        <p>Cargando canjes...</p>
-      </div>
-      }
-
-      <!-- Error State -->
-      @if (error()) {
-      <div class="alert alert-danger">
-        <strong>Error:</strong> {{ error() }}
-      </div>
-      }
-
-      <!-- Redemptions Table -->
-      @if (!isLoading() && redemptions().length > 0) {
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Usuario</th>
-              <th>Premio</th>
-              <th>Puntos</th>
-              <th>Fecha</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (redemption of redemptions(); track redemption.id) {
-            <tr>
-              <td class="user-cell">
-                <div class="user-info">
-                  <strong>{{ redemption.userName || 'Usuario' }}</strong>
-                  <span class="user-email">{{ redemption.userEmail }}</span>
-                </div>
-              </td>
-              <td class="reward-cell">
-                <div class="reward-info">
-                  <strong>{{ redemption.rewardName }}</strong>
-                  @if (redemption.couponCode) {
-                  <span class="coupon-code">
-                    <span class="icon">🎫</span>
-                    {{ redemption.couponCode }}
-                  </span>
-                  }
-                </div>
-              </td>
-              <td class="points-cell">
-                <span class="icon">💎</span>
-                {{ redemption.pointsSpent | number }}
-              </td>
-              <td class="date-cell">
-                {{ formatDate(redemption.redeemedAt) }}
-              </td>
-              <td>
-                <span
-                  class="status-badge"
-                  [attr.data-status]="getStatusColor(redemption.status)"
-                >
-                  {{ getStatusLabel(redemption.status) }}
-                </span>
-              </td>
-              <td class="actions-cell">
-                @if (redemption.status === 'PENDING') {
-                <button
-                  class="btn-sm success"
-                  (click)="approveRedemption(redemption)"
-                  title="Aprobar"
-                >
-                  ✓ Aprobar
-                </button>
-                <button
-                  class="btn-sm danger"
-                  (click)="cancelRedemption(redemption)"
-                  title="Cancelar"
-                >
-                  ✕ Cancelar
-                </button>
-                } @if (redemption.status === 'APPROVED') {
-                <button
-                  class="btn-sm info"
-                  (click)="markAsDelivered(redemption)"
-                  title="Marcar como entregado"
-                >
-                  📦 Entregar
-                </button>
-                }
-                <button
-                  class="btn-sm"
-                  (click)="viewDetails(redemption)"
-                  title="Ver detalles"
-                >
-                  👁️ Ver
-                </button>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      @if (totalPages() > 1) {
-      <div class="pagination">
-        <button
-          class="page-btn"
-          [disabled]="currentPage() === 1"
-          (click)="goToPage(currentPage() - 1)"
-        >
-          ← Anterior
-        </button>
-
-        <span class="page-info">
-          Página {{ currentPage() }} de {{ totalPages() }}
-          <span class="total-items">({{ totalItems() }} canjes)</span>
-        </span>
-
-        <button
-          class="page-btn"
-          [disabled]="currentPage() === totalPages()"
-          (click)="goToPage(currentPage() + 1)"
-        >
-          Siguiente →
-        </button>
-      </div>
-      } }
-
-      <!-- Empty State -->
-      @if (!isLoading() && redemptions().length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">🎟️</div>
-        <h3>No hay canjes</h3>
-        <p>No se encontraron canjes con los filtros seleccionados</p>
-      </div>
-      }
-    </div>
-  `,
+  templateUrl: './redemptions-list.component.html',
   styles: [
     `
       .redemptions-list-page {
@@ -584,6 +386,7 @@ import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 })
 export class RedemptionsListComponent implements OnInit {
   private readonly loyaltyAdminService = inject(LoyaltyAdminService);
+  private readonly toastService = inject(ToastService);
 
   // Signals
   redemptions = signal<LoyaltyRedemptionDto[]>([]);
@@ -701,12 +504,12 @@ export class RedemptionsListComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          alert('Canje aprobado exitosamente');
+          this.toastService.success('Canje aprobado exitosamente');
           this.loadRedemptions();
         },
         error: (err) => {
           console.error('Error aprobando canje:', err);
-          alert('No se pudo aprobar el canje');
+          this.toastService.error('No se pudo aprobar el canje');
         },
       });
   }
@@ -726,12 +529,12 @@ export class RedemptionsListComponent implements OnInit {
         })
         .subscribe({
           next: () => {
-            alert('Premio marcado como entregado');
+            this.toastService.success('Premio marcado como entregado');
             this.loadRedemptions();
           },
           error: (err) => {
             console.error('Error marcando como entregado:', err);
-            alert('No se pudo actualizar el estado');
+            this.toastService.error('No se pudo actualizar el estado');
           },
         });
     }
@@ -751,12 +554,14 @@ export class RedemptionsListComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          alert('Canje cancelado. Los puntos serán reembolsados al usuario.');
+          this.toastService.success(
+            'Canje cancelado. Los puntos serán reembolsados al usuario.'
+          );
           this.loadRedemptions();
         },
         error: (err) => {
           console.error('Error cancelando canje:', err);
-          alert('No se pudo cancelar el canje');
+          this.toastService.error('No se pudo cancelar el canje');
         },
       });
   }

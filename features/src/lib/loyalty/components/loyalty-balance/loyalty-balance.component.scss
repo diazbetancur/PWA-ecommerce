@@ -1,0 +1,76 @@
+.loyalty-balance {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.loyalty-balance.compact {
+  padding: 10px;
+  gap: 8px;
+}
+
+.loyalty-balance.large {
+  padding: 25px;
+  gap: 18px;
+}
+
+.balance-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.loyalty-balance.compact .balance-icon {
+  font-size: 1.8rem;
+}
+
+.loyalty-balance.large .balance-icon {
+  font-size: 3.5rem;
+}
+
+.balance-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.balance-label {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.loyalty-balance.large .balance-label {
+  font-size: 1rem;
+}
+
+.balance-value {
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.loyalty-balance.compact .balance-value {
+  font-size: 1.5rem;
+}
+
+.loyalty-balance.large .balance-value {
+  font-size: 3rem;
+}
+
+.balance-tier {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.loyalty-balance.large .balance-tier {
+  font-size: 1rem;
+}

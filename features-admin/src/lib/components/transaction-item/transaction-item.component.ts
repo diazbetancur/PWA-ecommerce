@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 import { LoyaltyTransactionDto } from '../../models/loyalty.models';
 
 /**
@@ -44,15 +44,10 @@ import { LoyaltyTransactionDto } from '../../models/loyalty.models';
             {{ getTypeLabel() }}
           </span>
 
-          @if (transaction.orderId) {
+          @if (transaction.orderNumber) {
           <span class="meta-item">
             <span class="meta-icon">🛒</span>
-            {{ transaction.orderId }}
-          </span>
-          } @if (transaction.redemptionId) {
-          <span class="meta-item">
-            <span class="meta-icon">🎟️</span>
-            {{ transaction.redemptionId }}
+            {{ transaction.orderNumber }}
           </span>
           }
         </div>

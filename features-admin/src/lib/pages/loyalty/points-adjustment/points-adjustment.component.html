@@ -1,0 +1,213 @@
+<div class="points-adjustment-page">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>⚙️ Ajuste de Puntos</h1>
+    <p>Gestión manual de puntos de usuarios</p>
+  </div>
+
+  <div class="content-grid">
+    <!-- Adjustment Form -->
+    <div class="form-section">
+      <h2>Realizar Ajuste</h2>
+
+      <form (ngSubmit)="submitAdjustment()" #adjustmentForm="ngForm">
+        <div class="form-group">
+          <label for="userId">ID de Usuario *</label>
+          <input
+            type="text"
+            id="userId"
+            name="userId"
+            [(ngModel)]="formData.userId"
+            required
+            placeholder="Ejemplo: user-123"
+            class="form-input"
+          />
+          <small class="help-text">El ID único del usuario en el sistema</small>
+        </div>
+
+        <div class="form-group">
+          <label for="points">Cantidad de Puntos *</label>
+          <input
+            type="number"
+            id="points"
+            name="points"
+            [(ngModel)]="formData.points"
+            required
+            placeholder="100 para agregar, -100 para deducir"
+            class="form-input"
+          />
+          <small class="help-text">
+            Número positivo para agregar, negativo para deducir
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="reason">Razón del Ajuste *</label>
+          <textarea
+            id="reason"
+            name="reason"
+            [(ngModel)]="formData.reason"
+            required
+            rows="3"
+            placeholder="Explica el motivo del ajuste..."
+            class="form-textarea"
+          ></textarea>
+          <small class="help-text"
+            >Esta razón quedará registrada en el historial</small
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="referenceId">Referencia (Opcional)</label>
+          <input
+            type="text"
+            id="referenceId"
+            name="referenceId"
+            [(ngModel)]="formData.referenceId"
+            placeholder="Ejemplo: ORDER-456, TICKET-789"
+            class="form-input"
+          />
+          <small class="help-text"
+            >ID de orden, ticket o cualquier referencia relacionada</small
+          >
+        </div>
+
+        <!-- Preview -->
+        @if (formData.points !== 0) {
+        <div class="adjustment-preview">
+          <div class="preview-header">Vista Previa</div>
+          <div class="preview-content">
+            @if (formData.points > 0) {
+            <div class="preview-action positive">
+              <span class="icon">⬆️</span>
+              <span
+                >Agregar <strong>{{ formData.points }}</strong> puntos</span
+              >
+            </div>
+            } @else {
+            <div class="preview-action negative">
+              <span class="icon">⬇️</span>
+              <span
+                >Deducir
+                <strong>{{ Math.abs(formData.points) }}</strong>
+                puntos</span
+              >
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button
+            type="submit"
+            class="btn-primary"
+            [disabled]="!adjustmentForm.form.valid || isSubmitting()"
+          >
+            @if (isSubmitting()) {
+            <span class="spinner-sm"></span>
+            Procesando... } @else { ✓ Confirmar Ajuste }
+          </button>
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="resetForm()"
+            [disabled]="isSubmitting()"
+          >
+            Limpiar
+          </button>
+        </div>
+      </form>
+
+      <!-- Success Message -->
+      @if (successMessage()) {
+      <div class="alert alert-success">
+        <strong>¡Éxito!</strong> {{ successMessage() }}
+      </div>
+      }
+
+      <!-- Error Message -->
+      @if (errorMessage()) {
+      <div class="alert alert-danger">
+        <strong>Error:</strong> {{ errorMessage() }}
+      </div>
+      }
+    </div>
+
+    <!-- Info & Guidelines -->
+    <div class="info-section">
+      <h2>Guías de Uso</h2>
+
+      <div class="info-card">
+        <h3>⚠️ Consideraciones Importantes</h3>
+        <ul>
+          <li>
+            Los ajustes manuales quedan registrados en el historial del usuario
+          </li>
+          <li>Siempre proporciona una razón clara y detallada</li>
+          <li>
+            No se puede deshacer un ajuste, solo se puede hacer un nuevo ajuste
+            contrario
+          </li>
+          <li>
+            Los usuarios verán este movimiento en su historial de transacciones
+          </li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>📋 Casos de Uso Comunes</h3>
+        <ul>
+          <li>
+            <strong>Compensación:</strong> Agregar puntos por inconvenientes o
+            errores del sistema
+          </li>
+          <li>
+            <strong>Corrección:</strong> Ajustar puntos otorgados
+            incorrectamente
+          </li>
+          <li>
+            <strong>Promoción especial:</strong> Bonificación por eventos o
+            campañas
+          </li>
+          <li>
+            <strong>Reembolso:</strong> Devolver puntos por canjes problemáticos
+          </li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3>💡 Mejores Prácticas</h3>
+        <ul>
+          <li>Verifica el ID del usuario antes de confirmar</li>
+          <li>Revisa el balance actual antes del ajuste</li>
+          <li>
+            Usa referencias cuando estén disponibles (ORDER-XXX, TICKET-XXX)
+          </li>
+          <li>Sé específico en la razón del ajuste</li>
+          <li>Documenta ajustes grandes en tu sistema de tickets</li>
+        </ul>
+      </div>
+
+      <!-- Recent Adjustments -->
+      <div class="recent-adjustments">
+        <h3>🕒 Ajustes Recientes</h3>
+        <div class="adjustments-list">
+          @for (adj of mockRecentAdjustments; track adj.id) {
+          <div class="adjustment-item">
+            <div class="adjustment-points" [class.positive]="adj.points > 0">
+              {{ adj.points > 0 ? '+' : '' }}{{ adj.points }}
+            </div>
+            <div class="adjustment-details">
+              <div class="user-id">Usuario: {{ adj.userId }}</div>
+              <div class="reason">{{ adj.reason }}</div>
+              <div class="time">{{ adj.time }}</div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

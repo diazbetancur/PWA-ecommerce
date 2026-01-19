@@ -173,7 +173,8 @@ export class StoreFormComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.router.navigate(['/admin/stores']);
+          this.toastService.success('Sucursal creada exitosamente');
+          this.router.navigate(['/tenant-admin/settings/stores']);
         },
         error: (err) => {
           console.error('Error al crear tienda:', err);
@@ -213,7 +214,8 @@ export class StoreFormComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.router.navigate(['/admin/stores']);
+          this.toastService.success('Sucursal actualizada exitosamente');
+          this.router.navigate(['/tenant-admin/settings/stores']);
         },
         error: (err) => {
           console.error('Error al actualizar tienda:', err);
@@ -231,7 +233,7 @@ export class StoreFormComponent implements OnInit {
    * Cancelar y volver
    */
   onCancel(): void {
-    this.router.navigate(['/admin/stores']);
+    this.router.navigate(['/tenant-admin/settings/stores']);
   }
 
   /**

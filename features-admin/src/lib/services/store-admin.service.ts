@@ -25,7 +25,7 @@ import {
 })
 export class StoreAdminService {
   private readonly apiClient = inject(ApiClientService);
-  private readonly baseUrl = '/admin/stores';
+  private readonly baseUrl = '/api/admin/stores';
 
   // ==================== CRUD DE TIENDAS ====================
 

@@ -1,0 +1,11 @@
+<span
+  class="redemption-status"
+  [class.large]="size === 'large'"
+  [class.small]="size === 'small'"
+  [attr.data-status]="getStatusColor()"
+>
+  @if (showIcon) {
+  <span class="status-icon">{{ getStatusIcon() }}</span>
+  }
+  <span class="status-label">{{ getStatusLabel() }}</span>
+</span>

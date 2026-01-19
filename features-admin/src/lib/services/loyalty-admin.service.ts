@@ -25,7 +25,7 @@ import {
  * - Aprobación/gestión de canjes
  * - Ajustes manuales de puntos
  *
- * Endpoints base: `/admin/loyalty`
+ * Endpoints base: `/api/admin/loyalty`
  *
  * Requiere permisos de módulo `loyalty` con acciones específicas:
  * - `loyalty:view` - Ver información
@@ -59,7 +59,7 @@ import {
 })
 export class LoyaltyAdminService {
   private readonly apiClient = inject(ApiClientService);
-  private readonly baseUrl = '/admin/loyalty';
+  private readonly baseUrl = '/api/admin/loyalty';
 
   // ==================== GESTIÓN DE PREMIOS ====================
 

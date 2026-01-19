@@ -412,7 +412,7 @@ export const REDEMPTION_STATUS_LABELS: Record<string, string> = {
 
 /**
  * Configuración general del programa de lealtad
- * Respuesta del endpoint GET /admin/loyalty/config
+ * Respuesta del endpoint GET /api/admin/loyalty/config
  */
 export interface LoyaltyProgramConfigDto {
   /** ID de la configuración */
@@ -438,7 +438,7 @@ export interface LoyaltyProgramConfigDto {
 
 /**
  * Request para actualizar la configuración del programa
- * Body del endpoint PUT /admin/loyalty/config
+ * Body del endpoint PUT /api/admin/loyalty/config
  */
 export interface UpdateLoyaltyConfigRequest {
   /** Factor de conversión - Puntos por cada unidad de moneda gastada */

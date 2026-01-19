@@ -12,20 +12,7 @@ import { TIER_COLORS, TIER_LABELS } from '../../models/loyalty.models';
   selector: 'lib-tier-badge',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div
-      class="tier-badge"
-      [class.large]="size === 'large'"
-      [class.small]="size === 'small'"
-      [style.background-color]="getTierColor()"
-      [attr.data-tier]="tier"
-    >
-      @if (showIcon) {
-      <span class="tier-icon">{{ getTierIcon() }}</span>
-      }
-      <span class="tier-label">{{ getTierLabel() }}</span>
-    </div>
-  `,
+  templateUrl: './tier-badge.component.html',
   styles: [
     `
       .tier-badge {

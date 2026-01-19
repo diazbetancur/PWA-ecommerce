@@ -180,6 +180,14 @@ export class TenantAdminMenuService {
       order: 4,
       parentModule: 'settings',
     },
+    'settings.stores': {
+      module: 'inventory',
+      label: 'Sucursales',
+      icon: 'store',
+      route: '/tenant-admin/settings/stores',
+      order: 5,
+      parentModule: 'settings',
+    },
     permissions: {
       module: 'permissions',
       label: 'Permisos',

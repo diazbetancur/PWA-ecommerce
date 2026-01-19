@@ -1,0 +1,102 @@
+<div class="loyalty-account-page">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>🎁 Programa de Lealtad</h1>
+    <p>Acumula puntos y canjea premios exclusivos</p>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando tu cuenta...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+  <div class="alert alert-danger"><strong>Error:</strong> {{ error() }}</div>
+  }
+
+  <!-- Account Summary -->
+  @if (account() && !isLoading()) {
+  <div class="account-summary">
+    <!-- Balance Card -->
+    <div class="balance-card">
+      <div class="card-header">
+        <span class="icon">💎</span>
+        <span class="label">Puntos Disponibles</span>
+      </div>
+      <div class="balance">
+        {{ account()!.balance | number : '1.0-0' }}
+      </div>
+      <div class="tier-badge" [style.background-color]="getTierColor()">
+        {{ getTierLabel() }}
+      </div>
+    </div>
+
+    <!-- Lifetime Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">⬆️</div>
+        <div class="stat-value">
+          {{ account()!.totalEarned | number : '1.0-0' }}
+        </div>
+        <div class="stat-label">Puntos Ganados</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">⬇️</div>
+        <div class="stat-value">
+          {{ account()!.totalRedeemed | number : '1.0-0' }}
+        </div>
+        <div class="stat-label">Puntos Canjeados</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-value">
+          {{ account()!.lastTransactions.length || 0 }}
+        </div>
+        <div class="stat-label">Últimas Transacciones</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>Acciones Rápidas</h2>
+      <div class="actions-grid">
+        <button class="action-btn" (click)="navigateToRewards()">
+          <span class="icon">🎁</span>
+          <span class="label">Catálogo de Premios</span>
+          <span class="arrow">→</span>
+        </button>
+
+        <button class="action-btn" (click)="navigateToRedemptions()">
+          <span class="icon">🎟️</span>
+          <span class="label">Mis Canjes</span>
+          <span class="arrow">→</span>
+        </button>
+
+        <button class="action-btn" (click)="navigateToTransactions()">
+          <span class="icon">📊</span>
+          <span class="label">Historial de Puntos</span>
+          <span class="arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- How to Earn Points -->
+    <div class="info-section">
+      <h3>¿Cómo ganar puntos?</h3>
+      <ul class="earn-list">
+        <li>🛒 Realiza compras en nuestro comercio</li>
+        <li>✅ Completa tu perfil</li>
+        <li>📧 Suscríbete a nuestro newsletter</li>
+        <li>⭐ Deja reseñas de productos</li>
+        <li>👥 Refiere a tus amigos</li>
+      </ul>
+    </div>
+  </div>
+  }
+</div>

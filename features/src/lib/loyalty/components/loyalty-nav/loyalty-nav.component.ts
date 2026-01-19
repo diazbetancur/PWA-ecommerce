@@ -11,42 +11,7 @@ import { RouterModule } from '@angular/router';
   selector: 'lib-loyalty-nav',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  template: `
-    <nav class="loyalty-nav">
-      <a
-        routerLink="/loyalty/account"
-        routerLinkActive="active"
-        class="nav-item"
-      >
-        <span class="icon">💎</span>
-        <span class="label">Mi Cuenta</span>
-      </a>
-      <a
-        routerLink="/loyalty/rewards"
-        routerLinkActive="active"
-        class="nav-item"
-      >
-        <span class="icon">🎁</span>
-        <span class="label">Premios</span>
-      </a>
-      <a
-        routerLink="/loyalty/redemptions"
-        routerLinkActive="active"
-        class="nav-item"
-      >
-        <span class="icon">🎟️</span>
-        <span class="label">Mis Canjes</span>
-      </a>
-      <a
-        routerLink="/loyalty/transactions"
-        routerLinkActive="active"
-        class="nav-item"
-      >
-        <span class="icon">📊</span>
-        <span class="label">Historial</span>
-      </a>
-    </nav>
-  `,
+  templateUrl: './loyalty-nav.component.html',
   styles: [
     `
       .loyalty-nav {

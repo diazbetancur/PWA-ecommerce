@@ -1,0 +1,166 @@
+<div class="transactions-history-page">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>📊 Historial de Puntos</h1>
+    <p>Todos los movimientos de tu cuenta de lealtad</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="typeFilter">Tipo:</label>
+      <select
+        id="typeFilter"
+        [(ngModel)]="selectedType"
+        (change)="onFilterChange()"
+        class="form-select"
+      >
+        <option value="">Todos</option>
+        <option value="EARNED">Ganados</option>
+        <option value="REDEEMED">Canjeados</option>
+        <option value="EXPIRED">Expirados</option>
+        <option value="ADJUSTED">Ajustes</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="fromDate">Desde:</label>
+      <input
+        type="date"
+        id="fromDate"
+        [(ngModel)]="fromDate"
+        (change)="onFilterChange()"
+        class="form-input"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label for="toDate">Hasta:</label>
+      <input
+        type="date"
+        id="toDate"
+        [(ngModel)]="toDate"
+        (change)="onFilterChange()"
+        class="form-input"
+      />
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  @if (!isLoading() && transactions().length > 0) {
+  <div class="summary-cards">
+    <div class="summary-card earned">
+      <div class="icon">⬆️</div>
+      <div class="value">+{{ totalEarned() | number : '1.0-0' }}</div>
+      <div class="label">Puntos Ganados</div>
+    </div>
+
+    <div class="summary-card redeemed">
+      <div class="icon">⬇️</div>
+      <div class="value">-{{ totalRedeemed() | number : '1.0-0' }}</div>
+      <div class="label">Puntos Canjeados</div>
+    </div>
+
+    <div class="summary-card net">
+      <div class="icon">💎</div>
+      <div class="value">{{ netPoints() | number : '1.0-0' }}</div>
+      <div class="label">Balance Neto</div>
+    </div>
+  </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando transacciones...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+  <div class="alert alert-danger"><strong>Error:</strong> {{ error() }}</div>
+  }
+
+  <!-- Transactions Timeline -->
+  @if (!isLoading() && transactions().length > 0) {
+  <div class="transactions-timeline">
+    @for (transaction of transactions(); track transaction.id) {
+    <div class="transaction-item" [attr.data-type]="transaction.type">
+      <div class="transaction-icon">
+        {{ getTransactionIcon(transaction.type) }}
+      </div>
+
+      <div class="transaction-content">
+        <div class="transaction-header">
+          <h3 class="transaction-description">
+            {{ transaction.description }}
+          </h3>
+          <div
+            class="transaction-points"
+            [class.positive]="transaction.points > 0"
+            [class.negative]="transaction.points < 0"
+          >
+            {{ transaction.points > 0 ? '+' : ''
+            }}{{ transaction.points | number : '1.0-0' }}
+          </div>
+        </div>
+
+        <div class="transaction-meta">
+          <span class="meta-item">
+            <span class="meta-icon">📅</span>
+            {{ formatDateTime(transaction.createdAt) }}
+          </span>
+
+          <span class="meta-item">
+            <span class="meta-icon">🏷️</span>
+            {{ getTypeLabel(transaction.type) }}
+          </span>
+
+          @if (transaction.orderNumber) {
+          <span class="meta-item">
+            <span class="meta-icon">🛒</span>
+            Orden: {{ transaction.orderNumber }}
+          </span>
+          }
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Pagination -->
+  @if (totalPages() > 1) {
+  <div class="pagination">
+    <button
+      class="page-btn"
+      [disabled]="currentPage() === 1"
+      (click)="goToPage(currentPage() - 1)"
+    >
+      ← Anterior
+    </button>
+
+    <span class="page-info">
+      Página {{ currentPage() }} de {{ totalPages() }}
+      <span class="total-items">({{ totalItems() }} transacciones)</span>
+    </span>
+
+    <button
+      class="page-btn"
+      [disabled]="currentPage() === totalPages()"
+      (click)="goToPage(currentPage() + 1)"
+    >
+      Siguiente →
+    </button>
+  </div>
+  } }
+
+  <!-- Empty State -->
+  @if (!isLoading() && transactions().length === 0) {
+  <div class="empty-state">
+    <div class="empty-icon">📊</div>
+    <h3>No hay transacciones</h3>
+    <p>Aún no tienes movimientos en tu cuenta de lealtad</p>
+  </div>
+  }
+</div>

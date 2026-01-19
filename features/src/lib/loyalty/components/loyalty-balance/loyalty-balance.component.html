@@ -1,0 +1,18 @@
+<div
+  class="loyalty-balance"
+  [class.compact]="compact"
+  [class.large]="size === 'large'"
+>
+  <div class="balance-icon">💎</div>
+  <div class="balance-content">
+    @if (showLabel) {
+    <div class="balance-label">{{ label }}</div>
+    }
+    <div class="balance-value">{{ points | number : '1.0-0' }}</div>
+    @if (showTier && tier) {
+    <div class="balance-tier" [style.color]="getTierColor()">
+      {{ getTierLabel() }}
+    </div>
+    }
+  </div>
+</div>

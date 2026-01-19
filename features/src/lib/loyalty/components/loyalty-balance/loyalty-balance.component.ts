@@ -1,5 +1,5 @@
-import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 import { TIER_COLORS, TIER_LABELS } from '../../models/loyalty.models';
 
 /**
@@ -12,26 +12,7 @@ import { TIER_COLORS, TIER_LABELS } from '../../models/loyalty.models';
   selector: 'lib-loyalty-balance',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div
-      class="loyalty-balance"
-      [class.compact]="compact"
-      [class.large]="size === 'large'"
-    >
-      <div class="balance-icon">💎</div>
-      <div class="balance-content">
-        @if (showLabel) {
-        <div class="balance-label">{{ label }}</div>
-        }
-        <div class="balance-value">{{ points | number : '1.0-0' }}</div>
-        @if (showTier && tier) {
-        <div class="balance-tier" [style.color]="getTierColor()">
-          {{ getTierLabel() }}
-        </div>
-        }
-      </div>
-    </div>
-  `,
+  templateUrl: './loyalty-balance.component.html',
   styles: [
     `
       .loyalty-balance {

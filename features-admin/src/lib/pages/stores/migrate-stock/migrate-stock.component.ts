@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastService } from '@pwa/shared';
 import {
   MigrateLegacyStockRequest,
   StoreDto,
@@ -33,6 +34,7 @@ export class MigrateStockComponent implements OnInit {
   private readonly storeService = inject(StoreAdminService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly toastService = inject(ToastService);
 
   // Signals
   stores = signal<StoreDto[]>([]);
@@ -99,7 +101,7 @@ export class MigrateStockComponent implements OnInit {
   onMigrate(): void {
     const storeId = this.selectedStoreId();
     if (!storeId) {
-      alert('Debes seleccionar una tienda destino');
+      this.toastService.warning('Debes seleccionar una tienda destino');
       return;
     }
 
@@ -154,7 +156,7 @@ export class MigrateStockComponent implements OnInit {
    * Volver a la lista de tiendas
    */
   onGoBack(): void {
-    this.router.navigate(['/admin/stores']);
+    this.router.navigate(['/tenant-admin/settings/stores']);
   }
 
   /**

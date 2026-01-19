@@ -133,7 +133,7 @@ export class ProgramConfigComponent implements OnInit {
         this.config.set(updated);
         this.toastService.success('Configuración guardada exitosamente');
         this.isSaving.set(false);
-        this.goBack();
+        // No redireccionamos, nos quedamos en la misma vista
       },
       error: (err) => {
         console.error('Error guardando configuración:', err);

@@ -12,53 +12,7 @@ import { LoyaltyTransactionDto } from '../../models/loyalty.models';
   selector: 'lib-transaction-item',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="transaction-item" [attr.data-type]="transaction.type">
-      <!-- Icon -->
-      <div class="transaction-icon">
-        {{ getTransactionIcon() }}
-      </div>
-
-      <!-- Content -->
-      <div class="transaction-content">
-        <div class="transaction-header">
-          <h4 class="transaction-description">{{ transaction.description }}</h4>
-          <div
-            class="transaction-points"
-            [class.positive]="transaction.points > 0"
-            [class.negative]="transaction.points < 0"
-          >
-            {{ transaction.points > 0 ? '+' : ''
-            }}{{ transaction.points | number : '1.0-0' }}
-          </div>
-        </div>
-
-        <div class="transaction-meta">
-          <span class="meta-item">
-            <span class="meta-icon">📅</span>
-            {{ formatDate(transaction.createdAt) }}
-          </span>
-
-          <span class="meta-item">
-            <span class="meta-icon">🏷️</span>
-            {{ getTypeLabel() }}
-          </span>
-
-          @if (transaction.orderId) {
-          <span class="meta-item">
-            <span class="meta-icon">🛒</span>
-            {{ transaction.orderId }}
-          </span>
-          } @if (transaction.redemptionId) {
-          <span class="meta-item">
-            <span class="meta-icon">🎟️</span>
-            {{ transaction.redemptionId }}
-          </span>
-          }
-        </div>
-      </div>
-    </div>
-  `,
+  templateUrl: './transaction-item.component.html',
   styles: [
     `
       .transaction-item {

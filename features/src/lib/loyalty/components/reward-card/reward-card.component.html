@@ -1,0 +1,63 @@
+<div class="reward-card" [class.disabled]="disabled">
+  <!-- Image -->
+  <div class="reward-image">
+    @if (reward.imageUrl) {
+    <img [src]="reward.imageUrl" [alt]="reward.name" />
+    } @else {
+    <div class="placeholder-image">
+      {{ getRewardIcon() }}
+    </div>
+    }
+
+    <!-- Badges -->
+    @if (!reward.isActive) {
+    <div class="status-badge inactive">Inactivo</div>
+    } @if (isOutOfStock()) {
+    <div class="status-badge out-of-stock">Agotado</div>
+    } @else if (isLowStock()) {
+    <div class="status-badge low-stock">¡Pocas unidades!</div>
+    }
+  </div>
+
+  <!-- Content -->
+  <div class="reward-content">
+    <div class="reward-type-badge">
+      {{ getRewardTypeLabel() }}
+    </div>
+
+    <h3 class="reward-name">{{ reward.name }}</h3>
+
+    <p class="reward-description">
+      {{ truncateDescription(reward.description) }}
+    </p>
+
+    <!-- Value -->
+    @if (reward.discountValue) {
+    <div class="reward-value">
+      @if (reward.rewardType === 'DISCOUNT_PERCENTAGE') {
+      <strong>{{ reward.discountValue }}%</strong> de descuento } @else {
+      <strong>{{ reward.discountValue | currency }}</strong> de descuento }
+    </div>
+    }
+
+    <!-- Points Cost -->
+    <div class="points-cost">
+      <span class="icon">💎</span>
+      <span class="cost">{{ reward.pointsCost | number : '1.0-0' }}</span>
+      <span class="label">puntos</span>
+    </div>
+
+    <!-- Actions -->
+    @if (showActions) {
+    <div class="card-actions">
+      <button
+        class="btn-primary"
+        [disabled]="disabled || isOutOfStock()"
+        (click)="onActionClick()"
+      >
+        {{ actionLabel }}
+      </button>
+    </div>
+    }
+  </div>
+</div>

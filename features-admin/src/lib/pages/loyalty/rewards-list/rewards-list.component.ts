@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { ToastService } from '@pwa/shared';
 import {
   LoyaltyRewardDto,
   PagedLoyaltyRewardsResponse,
@@ -23,212 +24,7 @@ import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
   selector: 'lib-rewards-list',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  template: `
-    <div class="rewards-list-page">
-      <!-- Header -->
-      <div class="page-header">
-        <div class="header-content">
-          <h1>🎁 Gestión de Premios</h1>
-          <p>Administra el catálogo de premios del programa de lealtad</p>
-        </div>
-        <button class="btn-primary" (click)="createReward()">
-          <span class="icon">➕</span>
-          Crear Premio
-        </button>
-      </div>
-
-      <!-- Filters -->
-      <div class="filters-section">
-        <div class="filter-group">
-          <label for="typeFilter">Tipo:</label>
-          <select
-            id="typeFilter"
-            [(ngModel)]="selectedType"
-            (change)="onFilterChange()"
-            class="form-select"
-          >
-            <option value="">Todos</option>
-            <option value="PRODUCT">Productos</option>
-            <option value="DISCOUNT_PERCENTAGE">Descuentos %</option>
-            <option value="DISCOUNT_FIXED">Descuentos Fijos</option>
-            <option value="FREE_SHIPPING">Envío Gratis</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label for="statusFilter">Estado:</label>
-          <select
-            id="statusFilter"
-            [(ngModel)]="selectedStatus"
-            (change)="onFilterChange()"
-            class="form-select"
-          >
-            <option value="">Todos</option>
-            <option value="true">Activos</option>
-            <option value="false">Inactivos</option>
-          </select>
-        </div>
-
-        <div class="filter-group search">
-          <label for="searchInput">Buscar:</label>
-          <input
-            type="text"
-            id="searchInput"
-            [(ngModel)]="searchTerm"
-            (input)="onSearchChange()"
-            placeholder="Nombre del premio..."
-            class="form-input"
-          />
-        </div>
-      </div>
-
-      <!-- Loading State -->
-      @if (isLoading()) {
-      <div class="loading-container">
-        <div class="spinner"></div>
-        <p>Cargando premios...</p>
-      </div>
-      }
-
-      <!-- Error State -->
-      @if (error()) {
-      <div class="alert alert-danger">
-        <strong>Error:</strong> {{ error() }}
-      </div>
-      }
-
-      <!-- Rewards Table -->
-      @if (!isLoading() && rewards().length > 0) {
-      <div class="table-container">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Premio</th>
-              <th>Tipo</th>
-              <th>Costo (Puntos)</th>
-              <th>Stock</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (reward of rewards(); track reward.id) {
-            <tr>
-              <td class="reward-cell">
-                <div class="reward-info">
-                  @if (reward.imageUrl) {
-                  <img
-                    [src]="reward.imageUrl"
-                    [alt]="reward.name"
-                    class="reward-thumb"
-                  />
-                  }
-                  <div class="reward-details">
-                    <strong>{{ reward.name }}</strong>
-                    <span class="reward-desc">{{
-                      truncateDescription(reward.description)
-                    }}</span>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <span class="type-badge">{{
-                  getRewardTypeLabel(reward.rewardType)
-                }}</span>
-              </td>
-              <td class="points-cell">
-                <span class="icon">💎</span>
-                {{ reward.pointsCost | number }}
-              </td>
-              <td>
-                @if (reward.stock === null || reward.stock === undefined) {
-                <span class="stock-badge unlimited">Ilimitado</span>
-                } @else if (reward.stock === 0) {
-                <span class="stock-badge out">Agotado</span>
-                } @else if (reward.stock <= 5) {
-                <span class="stock-badge low">{{ reward.stock }} unidades</span>
-                } @else {
-                <span class="stock-badge available"
-                  >{{ reward.stock }} unidades</span
-                >
-                }
-              </td>
-              <td>
-                <div class="toggle-container">
-                  <label class="toggle-switch">
-                    <input
-                      type="checkbox"
-                      [checked]="reward.isActive"
-                      (change)="toggleRewardStatus(reward)"
-                    />
-                    <span class="toggle-slider"></span>
-                  </label>
-                  <span class="toggle-label">{{
-                    reward.isActive ? 'Activo' : 'Inactivo'
-                  }}</span>
-                </div>
-              </td>
-              <td class="actions-cell">
-                <button
-                  class="btn-icon"
-                  (click)="editReward(reward)"
-                  title="Editar"
-                >
-                  ✏️
-                </button>
-                <button
-                  class="btn-icon danger"
-                  (click)="deleteReward(reward)"
-                  title="Eliminar"
-                >
-                  🗑️
-                </button>
-              </td>
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      @if (totalPages() > 1) {
-      <div class="pagination">
-        <button
-          class="page-btn"
-          [disabled]="currentPage() === 1"
-          (click)="goToPage(currentPage() - 1)"
-        >
-          ← Anterior
-        </button>
-
-        <span class="page-info">
-          Página {{ currentPage() }} de {{ totalPages() }}
-          <span class="total-items">({{ totalItems() }} premios)</span>
-        </span>
-
-        <button
-          class="page-btn"
-          [disabled]="currentPage() === totalPages()"
-          (click)="goToPage(currentPage() + 1)"
-        >
-          Siguiente →
-        </button>
-      </div>
-      } }
-
-      <!-- Empty State -->
-      @if (!isLoading() && rewards().length === 0) {
-      <div class="empty-state">
-        <div class="empty-icon">🎁</div>
-        <h3>No hay premios</h3>
-        <p>Crea el primer premio del catálogo</p>
-        <button class="btn-primary" (click)="createReward()">
-          Crear Primer Premio
-        </button>
-      </div>
-      }
-    </div>
-  `,
+  templateUrl: './rewards-list.component.html',
   styles: [
     `
       .rewards-list-page {
@@ -632,6 +428,7 @@ import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 export class RewardsListComponent implements OnInit {
   private readonly loyaltyAdminService = inject(LoyaltyAdminService);
   private readonly router = inject(Router);
+  private readonly toastService = inject(ToastService);
 
   // Signals
   rewards = signal<LoyaltyRewardDto[]>([]);
@@ -762,10 +559,15 @@ export class RewardsListComponent implements OnInit {
       next: () => {
         reward.isActive = newStatus;
         this.rewards.set([...this.rewards()]);
+        this.toastService.success(
+          newStatus
+            ? 'Premio activado exitosamente'
+            : 'Premio desactivado exitosamente'
+        );
       },
       error: (err) => {
         console.error('Error actualizando estado:', err);
-        alert('No se pudo actualizar el estado del premio');
+        this.toastService.error('No se pudo actualizar el estado del premio');
       },
     });
   }
@@ -791,11 +593,12 @@ export class RewardsListComponent implements OnInit {
     if (confirm(`¿Estás seguro de eliminar el premio "${reward.name}"?`)) {
       this.loyaltyAdminService.deleteReward(reward.id).subscribe({
         next: () => {
+          this.toastService.success('Premio eliminado exitosamente');
           this.loadRewards();
         },
         error: (err) => {
           console.error('Error eliminando premio:', err);
-          alert('No se pudo eliminar el premio');
+          this.toastService.error('No se pudo eliminar el premio');
         },
       });
     }

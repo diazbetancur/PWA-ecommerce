@@ -95,6 +95,10 @@ export class ProductsListComponent implements OnInit {
     this.menuService.canPerformAction('catalog')
   );
 
+  readonly canManageInventory = computed(() =>
+    this.menuService.canPerformAction('inventory')
+  );
+
   ngOnInit(): void {
     this.loadProducts();
   }
@@ -148,7 +152,7 @@ export class ProductsListComponent implements OnInit {
 
   viewStockByStores(product: ProductResponse): void {
     this.router.navigate([
-      '/tenant-admin/stores/products',
+      '/tenant-admin/settings/stores/products',
       product.id,
       'stock',
     ]);

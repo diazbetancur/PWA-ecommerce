@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, Input } from '@angular/core';
 import {
-  REDEMPTION_STATUS_LABELS,
   REDEMPTION_STATUS_COLORS,
+  REDEMPTION_STATUS_LABELS,
 } from '../../models/loyalty.models';
 
 /**
@@ -15,19 +15,7 @@ import {
   selector: 'lib-redemption-status',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <span
-      class="redemption-status"
-      [class.large]="size === 'large'"
-      [class.small]="size === 'small'"
-      [attr.data-status]="getStatusColor()"
-    >
-      @if (showIcon) {
-      <span class="status-icon">{{ getStatusIcon() }}</span>
-      }
-      <span class="status-label">{{ getStatusLabel() }}</span>
-    </span>
-  `,
+  templateUrl: './redemption-status.component.html',
   styles: [
     `
       .redemption-status {

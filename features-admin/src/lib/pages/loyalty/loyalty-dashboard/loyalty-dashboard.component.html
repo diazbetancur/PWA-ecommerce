@@ -1,0 +1,128 @@
+<div class="loyalty-dashboard-page">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>📊 Panel de Lealtad</h1>
+    <p>Gestión y métricas del programa de lealtad</p>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="stats-grid">
+    <div class="stat-card primary">
+      <div class="stat-icon">👥</div>
+      <div class="stat-value">{{ mockStats.totalUsers | number }}</div>
+      <div class="stat-label">Usuarios Activos</div>
+      <div class="stat-change positive">+12% este mes</div>
+    </div>
+
+    <div class="stat-card success">
+      <div class="stat-icon">💎</div>
+      <div class="stat-value">{{ mockStats.pointsIssued | number }}</div>
+      <div class="stat-label">Puntos Emitidos</div>
+      <div class="stat-change positive">+8% este mes</div>
+    </div>
+
+    <div class="stat-card warning">
+      <div class="stat-icon">🎁</div>
+      <div class="stat-value">
+        {{ mockStats.totalRedemptions | number }}
+      </div>
+      <div class="stat-label">Canjes Realizados</div>
+      <div class="stat-change positive">+15% este mes</div>
+    </div>
+
+    <div class="stat-card danger">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-value">{{ mockStats.pendingRedemptions }}</div>
+      <div class="stat-label">Canjes Pendientes</div>
+      <div class="stat-change">Requieren atención</div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="section">
+    <h2>Acciones Rápidas</h2>
+    <div class="actions-grid">
+      <button class="action-card" (click)="navigateToRewards()">
+        <span class="action-icon">🎁</span>
+        <span class="action-label">Gestionar Premios</span>
+        <span class="action-arrow">→</span>
+      </button>
+
+      <button class="action-card" (click)="navigateToRedemptions()">
+        <span class="action-icon">🎟️</span>
+        <span class="action-label">Revisar Canjes</span>
+        @if (mockStats.pendingRedemptions > 0) {
+        <span class="badge">{{ mockStats.pendingRedemptions }}</span>
+        }
+        <span class="action-arrow">→</span>
+      </button>
+
+      <button class="action-card" (click)="navigateToPointsAdjustment()">
+        <span class="action-icon">⚙️</span>
+        <span class="action-label">Ajustar Puntos</span>
+        <span class="action-arrow">→</span>
+      </button>
+
+      <button class="action-card" (click)="navigateToConfig()">
+        <span class="action-icon">🛠️</span>
+        <span class="action-label">Configuración</span>
+        <span class="action-arrow">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Top Rewards -->
+  <div class="section">
+    <h2>Premios Más Populares</h2>
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Premio</th>
+            <th>Canjes</th>
+            <th>Puntos</th>
+            <th>Ingresos</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (reward of mockTopRewards; track reward.id) {
+          <tr>
+            <td class="reward-cell">
+              <div class="reward-info">
+                <strong>{{ reward.name }}</strong>
+                <span class="reward-type">{{ reward.type }}</span>
+              </div>
+            </td>
+            <td>{{ reward.redemptions }}</td>
+            <td>{{ reward.points | number }}</td>
+            <td class="amount">{{ reward.revenue | currency }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="section">
+    <h2>Actividad Reciente</h2>
+    <div class="activity-list">
+      @for (activity of mockRecentActivity; track activity.id) {
+      <div class="activity-item">
+        <div class="activity-icon">{{ activity.icon }}</div>
+        <div class="activity-content">
+          <div class="activity-title">{{ activity.title }}</div>
+          <div class="activity-meta">
+            <span>{{ activity.user }}</span>
+            <span>•</span>
+            <span>{{ activity.time }}</span>
+          </div>
+        </div>
+        <div class="activity-badge" [attr.data-status]="activity.status">
+          {{ activity.statusLabel }}
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</div>

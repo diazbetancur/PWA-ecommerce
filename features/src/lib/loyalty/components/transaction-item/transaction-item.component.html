@@ -1,0 +1,40 @@
+<div class="transaction-item" [attr.data-type]="transaction.type">
+  <!-- Icon -->
+  <div class="transaction-icon">
+    {{ getTransactionIcon() }}
+  </div>
+
+  <!-- Content -->
+  <div class="transaction-content">
+    <div class="transaction-header">
+      <h4 class="transaction-description">{{ transaction.description }}</h4>
+      <div
+        class="transaction-points"
+        [class.positive]="transaction.points > 0"
+        [class.negative]="transaction.points < 0"
+      >
+        {{ transaction.points > 0 ? '+' : ''
+        }}{{ transaction.points | number : '1.0-0' }}
+      </div>
+    </div>
+
+    <div class="transaction-meta">
+      <span class="meta-item">
+        <span class="meta-icon">📅</span>
+        {{ formatDate(transaction.createdAt) }}
+      </span>
+
+      <span class="meta-item">
+        <span class="meta-icon">🏷️</span>
+        {{ getTypeLabel() }}
+      </span>
+
+      @if (transaction.orderNumber) {
+      <span class="meta-item">
+        <span class="meta-icon">🛒</span>
+        {{ transaction.orderNumber }}
+      </span>
+      }
+    </div>
+  </div>
+</div>

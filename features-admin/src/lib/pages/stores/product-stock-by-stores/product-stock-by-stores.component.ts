@@ -11,6 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastService } from '@pwa/shared';
 import {
   ProductStoreStockDto,
   UpdateProductStoreStockRequest,
@@ -35,6 +36,7 @@ export class ProductStockByStoresComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly toastService = inject(ToastService);
 
   // Input para cuando se usa como componente embebido
   productId = input<string>();
@@ -129,7 +131,7 @@ export class ProductStockByStoresComponent implements OnInit {
 
     const newStock = this.editingStock();
     if (newStock < 0) {
-      alert('El stock no puede ser negativo');
+      this.toastService.warning('El stock no puede ser negativo');
       return;
     }
 
@@ -147,12 +149,13 @@ export class ProductStockByStoresComponent implements OnInit {
         next: () => {
           this.editingStoreId.set(null);
           this.savingStock.set(false);
+          this.toastService.success('Stock actualizado exitosamente');
           this.loadStock(productId); // Recargar datos
         },
         error: (err) => {
           console.error('Error al actualizar stock:', err);
           const message = err.error?.detail || 'Error al actualizar el stock';
-          alert(message);
+          this.toastService.error(message);
           this.savingStock.set(false);
         },
       });
@@ -192,6 +195,6 @@ export class ProductStockByStoresComponent implements OnInit {
    * Volver a la lista
    */
   onGoBack(): void {
-    this.router.navigate(['/admin/stores']);
+    this.router.navigate(['/tenant-admin/settings/stores']);
   }
 }
