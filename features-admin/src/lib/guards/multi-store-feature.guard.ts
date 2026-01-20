@@ -21,9 +21,18 @@ import { TenantContextService } from '@pwa/core';
  * }
  * ```
  */
-export const multiStoreFeatureGuard: CanActivateFn = () => {
+export const multiStoreFeatureGuard: CanActivateFn = async () => {
   const tenantContext = inject(TenantContextService);
   const router = inject(Router);
+
+  // Esperar a que el tenant esté disponible (máximo 3 segundos)
+  try {
+    await tenantContext.waitForTenant(3000);
+  } catch (error) {
+    console.error('[MultiStoreFeatureGuard] Timeout esperando tenant:', error);
+    router.navigate(['/tenant/not-found']);
+    return false;
+  }
 
   const currentConfig = tenantContext.currentConfig();
 
