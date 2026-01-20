@@ -26,7 +26,7 @@ export const multiStoreFeatureGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   const currentConfig = tenantContext.currentConfig();
-  const hasMultiStore = currentConfig?.features?.multiStore ?? false;
+  const hasMultiStore = currentConfig?.features?.['multiStore'] ?? false;
 
   if (!hasMultiStore) {
     console.warn(

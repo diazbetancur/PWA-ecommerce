@@ -26,7 +26,7 @@ export const loyaltyFeatureGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   const currentConfig = tenantContext.currentConfig();
-  const hasLoyalty = currentConfig?.features?.loyalty ?? false;
+  const hasLoyalty = currentConfig?.features?.['loyalty'] ?? false;
 
   if (!hasLoyalty) {
     console.warn(
