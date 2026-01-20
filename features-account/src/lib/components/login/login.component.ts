@@ -94,15 +94,18 @@ export class LoginComponent {
     );
     const isSuperAdmin = normalizedRoles.includes('superadmin') || isAdminFlag;
 
+    // 🔑 CRITICAL: Preservar query params (especialmente ?tenant=xxx)
+    const navExtras = { queryParamsHandling: 'preserve' as const };
+
     // 1️⃣ Si es SuperAdmin/Admin CON tenant en el token → Admin del Tenant
     if (isSuperAdmin && hasTenantInToken) {
-      await this.router.navigate(['/tenant-admin']);
+      await this.router.navigate(['/tenant-admin'], navExtras);
       return;
     }
 
     // 2️⃣ Si es SuperAdmin/Admin SIN tenant en el token → Admin General
     if (isSuperAdmin && !hasTenantInToken) {
-      await this.router.navigate(['/admin']);
+      await this.router.navigate(['/admin'], navExtras);
       return;
     }
 
@@ -120,22 +123,22 @@ export class LoginComponent {
       const selectedMode = await firstValueFrom(dialogRef.afterClosed());
 
       if (selectedMode === 'customer') {
-        await this.router.navigate(['/']);
+        await this.router.navigate(['/'], navExtras);
       } else if (selectedMode === 'employee') {
-        await this.router.navigate(['/tenant-admin']);
+        await this.router.navigate(['/tenant-admin'], navExtras);
       }
     }
     // 4️⃣ Si solo es Customer, ir al catálogo
     else if (this.userModeService.isCustomerOnly()) {
-      await this.router.navigate(['/']);
+      await this.router.navigate(['/'], navExtras);
     }
     // 5️⃣ Si solo tiene roles de empleado (sin Customer), ir directo a admin del tenant
     else if (this.userModeService.hasEmployeeRoles()) {
-      await this.router.navigate(['/tenant-admin']);
+      await this.router.navigate(['/tenant-admin'], navExtras);
     }
     // Fallback: ir al home
     else {
-      await this.router.navigate(['/']);
+      await this.router.navigate(['/'], navExtras);
     }
   }
 
