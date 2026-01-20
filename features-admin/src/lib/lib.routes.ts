@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { modulePermissionGuard } from '@pwa/core';
+import { loyaltyFeatureGuard, multiStoreFeatureGuard } from './guards';
 
 export const featuresAdminRoutes: Route[] = [
   // Pantalla de bienvenida / dashboard
@@ -127,7 +128,7 @@ export const featuresAdminRoutes: Route[] = [
   // === PROGRAMA DE LEALTAD ===
   {
     path: 'loyalty',
-    canActivate: [modulePermissionGuard('loyalty')],
+    canActivate: [modulePermissionGuard('loyalty'), loyaltyFeatureGuard],
     children: [
       {
         path: '',
@@ -205,7 +206,10 @@ export const featuresAdminRoutes: Route[] = [
       // Sucursales / Tiendas
       {
         path: 'stores',
-        canActivate: [modulePermissionGuard('inventory')],
+        canActivate: [
+          modulePermissionGuard('inventory'),
+          multiStoreFeatureGuard,
+        ],
         children: [
           {
             path: '',

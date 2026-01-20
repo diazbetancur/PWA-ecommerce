@@ -6,6 +6,9 @@
 // Routes
 export * from './lib/lib.routes';
 
+// Guards
+export * from './lib/guards';
+
 // Models
 export * from './lib/models';
 
