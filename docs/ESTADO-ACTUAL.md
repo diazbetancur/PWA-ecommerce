@@ -9,15 +9,18 @@
 ## ✅ Sistemas Implementados
 
 ### 1. Multitenancy
+
 **Estado:** ✅ Funcional
 
 **Estrategia de resolución:**
+
 1. Query param `?tenant=xxx` (prioridad 1)
 2. Subdomain (prioridad 2)
 3. Hostname mapping (prioridad 3)
 4. Default/fallback (prioridad 4)
 
 **Propagación:**
+
 ```
 TenantBootstrapService (APP_INITIALIZER)
   ↓ Detecta tenant via query/subdomain
@@ -33,15 +36,18 @@ TenantHeaderInterceptor
 
 **Tenant activo en backend:** `test`  
 **Features habilitados:**
+
 - ✅ Cart, Wishlist, Loyalty, Notifications
 - ❌ Reviews
 
 ---
 
 ### 2. Stock Multi-Tienda
+
 **Estado:** ✅ Implementado (commit `ac1197d`)
 
 **Funcionalidades:**
+
 - ✅ Distribución de stock en creación de producto
 - ✅ Validación: stock distribuido ≤ stock total
 - ✅ Vista de stock por tiendas
@@ -49,6 +55,7 @@ TenantHeaderInterceptor
 - ✅ DTOs: `InitialStoreStockDto`, `ProductStockByStoresResponse`
 
 **Archivos:**
+
 - [ProductFormComponent](features-admin/src/lib/pages/products/products-form/product-form.component.ts)
 - [ProductStockByStoresComponent](features-admin/src/lib/pages/stores/product-stock-by-stores/product-stock-by-stores.component.ts)
 - [StoreAdminService](features-admin/src/lib/services/store-admin.service.ts)
@@ -56,9 +63,11 @@ TenantHeaderInterceptor
 ---
 
 ### 3. Programa de Lealtad
+
 **Estado:** ✅ Implementado (commits `7835967` - `436995a`)
 
 **Módulos:**
+
 - ✅ Dashboard de métricas
 - ✅ Gestión de premios
 - ✅ Canjes de usuarios
@@ -70,13 +79,16 @@ TenantHeaderInterceptor
 ---
 
 ### 4. Feature Guards
+
 **Estado:** ✅ Nuevo (pendiente commit)
 
 **Guards creados:**
+
 - [loyaltyFeatureGuard](features-admin/src/lib/guards/loyalty-feature.guard.ts)
 - [multiStoreFeatureGuard](features-admin/src/lib/guards/multi-store-feature.guard.ts)
 
 **Rutas protegidas:**
+
 ```ts
 /tenant-admin/loyalty/*     → loyaltyFeatureGuard
 /tenant-admin/settings/stores/* → multiStoreFeatureGuard
@@ -86,25 +98,27 @@ TenantHeaderInterceptor
 
 ## ⚠️ Endpoints Backend - Estado
 
-**Base URL:** `https://api-ecommerce-d9fxeccbeeehdjd3.eastus-01.azurewebsites.net`  
+**Base URL:** `http://localhost:5093` (DEV)  
 **Tenant:** `test`
 
-### Endpoints Funcionales
-| Endpoint | Status | Notas |
-|----------|--------|-------|
-| `/api/admin/products` | ✅ 401 | Requiere auth (OK) |
-| `/api/admin/stores` | ✅ 401 | Requiere auth (OK) |
-| `/api/admin/loyalty/rewards` | ✅ 401 | Requiere auth (OK) |
+### Endpoints Funcionales ✅
 
-### Endpoints con Issues
-| Endpoint | Status | Issue |
-|----------|--------|-------|
-| `/api/public/tenant/test` | ⚠️ 400 | Requiere tenant header (paradoja) |
-| `/api/store/products` | ⚠️ 500 | Error interno del servidor |
-| `/api/store/categories` | ⚠️ 500 | Error interno del servidor |
-| `/api/admin/loyalty/dashboard` | ❌ 404 | **No implementado** |
-| `/api/admin/loyalty/program/config` | ❌ 404 | **No implementado** |
-| `/api/admin/store-stock/products/:id/stock` | ❌ 404 | **No implementado** |
+| Endpoint                     | Status | Notas                         |
+| ---------------------------- | ------ | ----------------------------- |
+| `/api/store/products`        | ✅ 200 | Catálogo público funcional    |
+| `/api/store/categories`      | ✅ 200 | Categorías públicas funcional |
+| `/api/admin/products`        | ✅ 401 | Requiere auth (OK)            |
+| `/api/admin/stores`          | ✅ 401 | Requiere auth (OK)            |
+| `/api/admin/loyalty/rewards` | ✅ 401 | Requiere auth (OK)            |
+
+### Endpoints con Issues ⚠️
+
+| Endpoint                                    | Status | Issue                             |
+| ------------------------------------------- | ------ | --------------------------------- |
+| `/api/public/tenant/test`                   | ⚠️ 400 | Requiere tenant header (paradoja) |
+| `/api/admin/loyalty/dashboard`              | ❌ 404 | **No implementado en backend**    |
+| `/api/admin/loyalty/program/config`         | ❌ 404 | **No implementado en backend**    |
+| `/api/admin/store-stock/products/:id/stock` | ❌ 404 | **No implementado en backend**    |
 
 ---
 
@@ -115,6 +129,7 @@ TenantHeaderInterceptor
 **Prioridad: 🔴 ALTA**
 
 1. **Loyalty Backend**
+
    - ❌ `/api/admin/loyalty/dashboard` → 404
    - ❌ `/api/admin/loyalty/program/config` → 404
    - ✅ `/api/admin/loyalty/rewards` → 401 (existe)
@@ -122,11 +137,13 @@ TenantHeaderInterceptor
    **Acción:** Verificar con equipo backend si loyalty está desplegado en QA
 
 2. **Multi-Store Backend**
+
    - ❌ `/api/admin/store-stock/products/:id/stock` → 404
 
    **Acción:** Confirmar ruta correcta con backend (¿es `/api/admin/products/:id/store-stock`?)
 
 3. **Storefront 500 Errors**
+
    - ⚠️ `/api/store/products` → 500
    - ⚠️ `/api/store/categories` → 500
 
@@ -139,6 +156,7 @@ TenantHeaderInterceptor
 **Prioridad: 🟡 MEDIA (SEO)**
 
 Archivo: [.github/workflows/ci.yml](.github/workflows/ci.yml#L44)
+
 ```yaml
 # TODO - Switch back to SSR build
 run: "echo 'TODO: revert to SSR build once NG0201 is fixed'"
@@ -147,6 +165,7 @@ run: "echo 'TODO: revert to SSR build once NG0201 is fixed'"
 **Issue:** NG0201 (hydration mismatch)
 
 **Impacto:**
+
 - ❌ No hay pre-rendering
 - ❌ SEO degradado
 - ❌ Peor FCP (First Contentful Paint)
@@ -166,6 +185,7 @@ run: "echo 'TODO: revert to SSR build once NG0201 is fixed'"
 ## 📋 Plan de Acción Inmediata
 
 ### Paso 1: Validar Backend (1-2h)
+
 ```bash
 # Contactar con backend team:
 # 1. ¿Loyalty está desplegado en la URL de QA?
@@ -174,6 +194,7 @@ run: "echo 'TODO: revert to SSR build once NG0201 is fixed'"
 ```
 
 ### Paso 2: Commitear Guards (10 min)
+
 ```bash
 git add features-admin/src/lib/guards/
 git add features-admin/src/lib/lib.routes.ts
@@ -182,10 +203,12 @@ git commit -m "feat(admin): add feature guards for loyalty and multi-store"
 ```
 
 ### Paso 3: Tests E2E (4-8h)
+
 - Crear `apps/pwa-e2e/src/multi-store.spec.ts`
 - Crear `apps/pwa-e2e/src/loyalty.spec.ts`
 
 ### Paso 4: SSR Fix (8-16h)
+
 - Reproducir NG0201 localmente
 - Auditar servicios que usan DOM/window
 - Habilitar build SSR en CI
@@ -195,6 +218,7 @@ git commit -m "feat(admin): add feature guards for loyalty and multi-store"
 ## 🔧 Comandos Útiles
 
 ### Validar Backend
+
 ```bash
 ./scripts/validate-backend-endpoints.sh
 
@@ -203,6 +227,7 @@ TENANT_SLUG=test ./scripts/validate-backend-endpoints.sh
 ```
 
 ### Desarrollo
+
 ```bash
 # Dev con mock API
 npm run start:dev
@@ -215,6 +240,7 @@ npm run build:prod:browser
 ```
 
 ### Cambiar Tenant
+
 ```
 http://localhost:4200?tenant=test
 http://localhost:4200?tenant=otro-tenant
@@ -225,11 +251,13 @@ http://localhost:4200?tenant=otro-tenant
 ## 📞 Contactos / Siguiente Paso
 
 **Backend Team:**
+
 - Validar despliegue de loyalty en QA
 - Confirmar rutas de store-stock
-- Investigar 500 errors en /api/store/*
+- Investigar 500 errors en /api/store/\*
 
 **Frontend Team:**
+
 - Commitear feature guards ✅
 - Crear tests E2E
 - Investigar NG0201 para SSR

@@ -11,7 +11,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuración
-API_URL="${NG_APP_API_BASE_URL:-https://api-ecommerce-d9fxeccbeeehdjd3.eastus-01.azurewebsites.net}"
+API_URL="${NG_APP_API_BASE_URL:-http://localhost:5093}"
 TENANT="${TENANT_SLUG:-test}"
 
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
