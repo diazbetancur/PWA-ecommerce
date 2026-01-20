@@ -26,17 +26,41 @@ export const loyaltyFeatureGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   const currentConfig = tenantContext.currentConfig();
-  const hasLoyalty = currentConfig?.features?.['loyalty'] ?? false;
+
+  // DEBUG: Mostrar todas las features disponibles
+  console.log('[LoyaltyFeatureGuard] DEBUG - Current Config:', currentConfig);
+  console.log(
+    '[LoyaltyFeatureGuard] DEBUG - Features:',
+    currentConfig?.features
+  );
+  console.log(
+    '[LoyaltyFeatureGuard] DEBUG - features.loyalty:',
+    currentConfig?.features?.['loyalty']
+  );
+  console.log(
+    '[LoyaltyFeatureGuard] DEBUG - features.enableLoyalty:',
+    currentConfig?.features?.['enableLoyalty']
+  );
+
+  // Buscar loyalty con diferentes nombres posibles
+  const hasLoyalty =
+    currentConfig?.features?.['loyalty'] ??
+    currentConfig?.features?.['enableLoyalty'] ??
+    false;
 
   if (!hasLoyalty) {
     console.warn(
       `[LoyaltyFeatureGuard] Loyalty feature not enabled for tenant: ${
         currentConfig?.tenant.slug || 'unknown'
-      }`
+      }. Available features:`,
+      Object.keys(currentConfig?.features || {})
     );
     router.navigate(['/tenant-admin/dashboard']);
     return false;
   }
 
+  console.log(
+    '[LoyaltyFeatureGuard] ✅ Loyalty feature enabled, allowing access'
+  );
   return true;
 };

@@ -26,17 +26,44 @@ export const multiStoreFeatureGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   const currentConfig = tenantContext.currentConfig();
-  const hasMultiStore = currentConfig?.features?.['multiStore'] ?? false;
+
+  // DEBUG: Mostrar todas las features disponibles
+  console.log(
+    '[MultiStoreFeatureGuard] DEBUG - Current Config:',
+    currentConfig
+  );
+  console.log(
+    '[MultiStoreFeatureGuard] DEBUG - Features:',
+    currentConfig?.features
+  );
+  console.log(
+    '[MultiStoreFeatureGuard] DEBUG - features.multiStore:',
+    currentConfig?.features?.['multiStore']
+  );
+  console.log(
+    '[MultiStoreFeatureGuard] DEBUG - features.enableMultiStore:',
+    currentConfig?.features?.['enableMultiStore']
+  );
+
+  // Buscar multiStore con diferentes nombres posibles
+  const hasMultiStore =
+    currentConfig?.features?.['multiStore'] ??
+    currentConfig?.features?.['enableMultiStore'] ??
+    false;
 
   if (!hasMultiStore) {
     console.warn(
       `[MultiStoreFeatureGuard] Multi-store feature not enabled for tenant: ${
         currentConfig?.tenant.slug || 'unknown'
-      }`
+      }. Available features:`,
+      Object.keys(currentConfig?.features || {})
     );
     router.navigate(['/tenant-admin/dashboard']);
     return false;
   }
 
+  console.log(
+    '[MultiStoreFeatureGuard] ✅ Multi-store feature enabled, allowing access'
+  );
   return true;
 };
