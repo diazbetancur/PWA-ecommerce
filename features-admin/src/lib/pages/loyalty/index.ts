@@ -3,7 +3,7 @@
  */
 
 export { LoyaltyDashboardComponent } from './loyalty-dashboard/loyalty-dashboard.component';
-export { RewardsListComponent } from './rewards-list/rewards-list.component';
-export { RedemptionsListComponent } from './redemptions-list/redemptions-list.component';
 export { PointsAdjustmentComponent } from './points-adjustment/points-adjustment.component';
 export { ProgramConfigComponent } from './program-config/program-config.component';
+export { RedemptionsListComponent } from './redemptions-list/redemptions-list.component';
+export { RewardsListComponent } from './rewards-list/rewards-list.component';

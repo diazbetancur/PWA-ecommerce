@@ -7,8 +7,17 @@
           <i class="bi bi-arrow-left"></i>
         </button>
         <div>
-          <h1>📦 Stock por Tienda</h1>
+          <h1>📦 Stock por Sucursal</h1>
+          @if (productName()) {
+          <p class="subtitle">
+            {{ productName() }}
+            @if (productSku()) {
+            <span class="sku-badge">SKU: {{ productSku() }}</span>
+            }
+          </p>
+          } @else {
           <p class="subtitle">Gestión de inventario por ubicación</p>
+          }
         </div>
       </div>
       <button
@@ -21,6 +30,33 @@
     </div>
   </div>
 
+  <!-- Product Info Alert -->
+  @if (productTotalStock() > 0 && !loading()) {
+  <div class="alert-info">
+    <div class="alert-content">
+      <i class="bi bi-info-circle"></i>
+      <div>
+        <strong>Stock Total del Producto:</strong>
+        {{ productTotalStock() }} unidades
+        <br />
+        <small>
+          Asignado a sucursales: {{ totalAssignedStock() }} | Disponible para
+          asignar: {{ remainingStock() }}
+        </small>
+      </div>
+    </div>
+    @if (remainingStock() < 0) {
+    <div class="alert-warning">
+      <i class="bi bi-exclamation-triangle"></i>
+      ¡Atención! Has asignado más stock del disponible ({{
+        Math.abs(remainingStock())
+      }}
+      unidades de más)
+    </div>
+    }
+  </div>
+  }
+
   <!-- Summary Cards -->
   @if (hasStock() && !loading()) {
   <div class="summary-cards">
@@ -29,8 +65,8 @@
         <i class="bi bi-box-seam"></i>
       </div>
       <div class="card-content">
-        <span class="card-label">Stock Total</span>
-        <span class="card-value">{{ totalStock() }}</span>
+        <span class="card-label">Total Asignado</span>
+        <span class="card-value">{{ totalAssignedStock() }}</span>
       </div>
     </div>
 
@@ -59,7 +95,7 @@
         <i class="bi bi-shop"></i>
       </div>
       <div class="card-content">
-        <span class="card-label">Tiendas</span>
+        <span class="card-label">Sucursales</span>
         <span class="card-value">{{ stockData().length }}</span>
       </div>
     </div>

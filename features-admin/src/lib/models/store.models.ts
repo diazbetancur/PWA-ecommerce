@@ -112,6 +112,23 @@ export interface ProductStoreStockDto {
 }
 
 /**
+ * Respuesta completa de stock por tiendas
+ * Incluye información del producto y lista de stock por tienda
+ */
+export interface ProductStockByStoresResponse {
+  /** ID del producto */
+  productId: string;
+  /** Nombre del producto */
+  productName: string;
+  /** SKU del producto */
+  productSku?: string;
+  /** Stock total del producto (desde Product.stock) */
+  productTotalStock: number;
+  /** Lista de stock por tienda */
+  stores: ProductStoreStockDto[];
+}
+
+/**
  * Request para actualizar stock de un producto en una tienda
  */
 export interface UpdateProductStoreStockRequest {

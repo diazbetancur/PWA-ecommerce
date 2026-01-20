@@ -111,6 +111,163 @@
               </mat-checkbox>
             </div>
           </div>
+
+          <!-- Distribución de Stock por Sucursales -->
+          <div class="stock-distribution-section">
+            <div class="distribution-header">
+              <button
+                type="button"
+                class="toggle-distribution-btn"
+                (click)="toggleStockDistribution()"
+              >
+                <i class="bi bi-box-seam"></i>
+                <span>{{
+                  showStockDistribution()
+                    ? 'Ocultar'
+                    : 'Distribuir Stock entre Sucursales'
+                }}</span>
+                <i
+                  class="bi"
+                  [class.bi-chevron-up]="showStockDistribution()"
+                  [class.bi-chevron-down]="!showStockDistribution()"
+                ></i>
+              </button>
+
+              @if (storeStockDistribution().length > 0) {
+              <div
+                class="stock-summary"
+                [class.stock-invalid]="!stockDistributionValid()"
+              >
+                <span class="summary-label">Distribuido:</span>
+                <strong>{{ totalDistributedStock() }}</strong>
+                <span class="separator">/</span>
+                <span>{{ totalStock() }}</span>
+                <span class="remaining" [class.negative]="remainingStock() < 0">
+                  ({{ remainingStock() >= 0 ? 'Disponible' : 'Excede' }}:
+                  {{ Math.abs(remainingStock()) }})
+                </span>
+              </div>
+              }
+            </div>
+
+            @if (showStockDistribution()) {
+            <div class="distribution-content">
+              <!-- Selector de Sucursal -->
+              @if (availableStoresForSelection.length > 0) {
+              <div class="add-stock-form">
+                <div class="form-row-inline">
+                  <select
+                    class="store-select"
+                    [value]="selectedStoreId() || ''"
+                    (change)="onStoreSelected($any($event.target).value)"
+                  >
+                    <option value="">Seleccionar sucursal...</option>
+                    @for (store of availableStoresForSelection; track store.id)
+                    {
+                    <option [value]="store.id">{{ store.name }}</option>
+                    }
+                  </select>
+
+                  <input
+                    type="number"
+                    class="stock-input"
+                    placeholder="Cantidad"
+                    min="0"
+                    [value]="stockAmount()"
+                    (input)="stockAmount.set(+$any($event.target).value)"
+                  />
+
+                  <button
+                    type="button"
+                    class="btn-add-stock"
+                    (click)="addStoreStock()"
+                    [disabled]="!selectedStoreId() || stockAmount() <= 0"
+                  >
+                    <i class="bi bi-plus-circle"></i>
+                    Asignar
+                  </button>
+                </div>
+
+                @if (!canDistributeMore() && stockDistributionValid()) {
+                <div class="alert-info-small">
+                  <i class="bi bi-info-circle"></i>
+                  Todo el stock ha sido distribuido
+                </div>
+                }
+              </div>
+              } @else if (storeStockDistribution().length > 0) {
+              <div class="alert-info-small">
+                <i class="bi bi-check-circle"></i>
+                Todas las sucursales disponibles ya tienen stock asignado
+              </div>
+              }
+
+              <!-- Tabla de Distribución -->
+              @if (storeStockDistribution().length > 0) {
+              <div class="distribution-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Sucursal</th>
+                      <th>Stock Asignado</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (item of storeStockDistribution(); track item.storeId)
+                    {
+                    <tr>
+                      <td class="store-name">
+                        <i class="bi bi-shop"></i>
+                        {{ getStoreName(item.storeId) }}
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          class="stock-input-inline"
+                          min="0"
+                          [value]="item.stock"
+                          (input)="
+                            updateStoreStock(
+                              item.storeId,
+                              +$any($event.target).value
+                            )
+                          "
+                        />
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="btn-remove"
+                          (click)="removeStoreStock(item.storeId)"
+                          title="Eliminar"
+                        >
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              @if (!stockDistributionValid()) {
+              <div class="alert-error">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <strong>Error:</strong> La suma del stock distribuido ({{
+                  totalDistributedStock()
+                }}) excede el stock total ({{ totalStock() }})
+              </div>
+              } } @else {
+              <div class="empty-state">
+                <i class="bi bi-inbox"></i>
+                <p>No hay stock distribuido aún</p>
+                <small>Selecciona una sucursal y asigna una cantidad</small>
+              </div>
+              }
+            </div>
+            }
+          </div>
         </div>
 
         <!-- Imagen y Categorización -->

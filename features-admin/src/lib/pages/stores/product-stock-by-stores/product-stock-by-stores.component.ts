@@ -43,6 +43,9 @@ export class ProductStockByStoresComponent implements OnInit {
 
   // Signals
   private _productIdSignal = signal<string | null>(null);
+  productName = signal<string>('');
+  productSku = signal<string>('');
+  productTotalStock = signal<number>(0);
   stockData = signal<ProductStoreStockDto[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
@@ -55,7 +58,7 @@ export class ProductStockByStoresComponent implements OnInit {
   currentProductId = computed(
     () => this.productId() || this._productIdSignal()
   );
-  totalStock = computed(() =>
+  totalAssignedStock = computed(() =>
     this.stockData().reduce((sum, item) => sum + item.stock, 0)
   );
   totalReserved = computed(() =>
@@ -64,6 +67,10 @@ export class ProductStockByStoresComponent implements OnInit {
   totalAvailable = computed(() =>
     this.stockData().reduce((sum, item) => sum + item.availableStock, 0)
   );
+  remainingStock = computed(
+    () => this.productTotalStock() - this.totalAssignedStock()
+  );
+  canAssignMore = computed(() => this.remainingStock() > 0);
 
   ngOnInit(): void {
     // Si no viene productId como input, tomar de la ruta
@@ -94,8 +101,11 @@ export class ProductStockByStoresComponent implements OnInit {
       .getProductStockByStores(productId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data) => {
-          this.stockData.set(data);
+        next: (response) => {
+          this.productName.set(response.productName);
+          this.productSku.set(response.productSku || '');
+          this.productTotalStock.set(response.productTotalStock);
+          this.stockData.set(response.stores);
           this.loading.set(false);
         },
         error: (err) => {
@@ -130,8 +140,29 @@ export class ProductStockByStoresComponent implements OnInit {
     if (!productId) return;
 
     const newStock = this.editingStock();
+
+    // Validación: stock no negativo
     if (newStock < 0) {
       this.toastService.warning('El stock no puede ser negativo');
+      return;
+    }
+
+    // Validación: calcular el total que se asignaría con este cambio
+    const otherStoresStock = this.stockData()
+      .filter((s) => s.storeId !== item.storeId)
+      .reduce((sum, s) => sum + s.stock, 0);
+
+    const totalAfterChange = otherStoresStock + newStock;
+    const productMax = this.productTotalStock();
+
+    // Validación: no exceder el stock total del producto
+    if (totalAfterChange > productMax) {
+      const maxAllowed = productMax - otherStoresStock;
+      this.toastService.error(
+        `No puedes asignar más de ${maxAllowed} unidades. ` +
+          `Stock total del producto: ${productMax}. ` +
+          `Ya asignado en otras sucursales: ${otherStoresStock}.`
+      );
       return;
     }
 
@@ -197,4 +228,7 @@ export class ProductStockByStoresComponent implements OnInit {
   onGoBack(): void {
     this.router.navigate(['/tenant-admin/settings/stores']);
   }
+
+  // Expose Math for template
+  Math = Math;
 }

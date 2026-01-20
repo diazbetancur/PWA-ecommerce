@@ -8,6 +8,7 @@ import {
   GetStoresQuery,
   MigrateLegacyStockRequest,
   MigrateLegacyStockResponse,
+  ProductStockByStoresResponse,
   ProductStoreStockDto,
   StoreDto,
   UpdateProductStoreStockRequest,
@@ -89,11 +90,12 @@ export class StoreAdminService {
   /**
    * Obtener stock de un producto en todas las tiendas
    * @param productId ID del producto
+   * @returns Información completa del producto y su stock por tiendas
    */
   getProductStockByStores(
     productId: string
-  ): Observable<ProductStoreStockDto[]> {
-    return this.apiClient.get<ProductStoreStockDto[]>(
+  ): Observable<ProductStockByStoresResponse> {
+    return this.apiClient.get<ProductStockByStoresResponse>(
       `${this.baseUrl}/products/${productId}/stock`
     );
   }

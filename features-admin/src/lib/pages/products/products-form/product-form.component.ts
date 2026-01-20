@@ -32,6 +32,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   CreateProductDto,
+  InitialStoreStockDto,
   ProductResponse,
   ProductService,
   UpdateProductDto,
@@ -39,6 +40,8 @@ import {
 import { AppButtonComponent } from '@pwa/shared';
 import { CategorySelectorDialogComponent } from '../../../components/category-selector-dialog/category-selector-dialog.component';
 import { CategoryListItem } from '../../../models/category.model';
+import { StoreDto } from '../../../models/store.models';
+import { StoreAdminService } from '../../../services/store-admin.service';
 
 @Component({
   selector: 'lib-product-form',
@@ -68,6 +71,7 @@ export class ProductFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly storeAdminService = inject(StoreAdminService);
 
   // Estado
   readonly loading = signal(false);
@@ -75,6 +79,13 @@ export class ProductFormComponent implements OnInit {
   readonly productId = signal<string | null>(null);
   readonly product = signal<ProductResponse | null>(null);
   readonly selectedCategories = signal<CategoryListItem[]>([]);
+
+  // Stock distribution state
+  readonly availableStores = signal<StoreDto[]>([]);
+  readonly storeStockDistribution = signal<InitialStoreStockDto[]>([]);
+  readonly selectedStoreId = signal<string | null>(null);
+  readonly stockAmount = signal<number>(0);
+  readonly showStockDistribution = signal<boolean>(false);
 
   // Formulario
   readonly form: FormGroup;
@@ -85,6 +96,22 @@ export class ProductFormComponent implements OnInit {
 
   readonly submitButtonText = computed(() =>
     this.isEditMode() ? 'Actualizar' : 'Crear'
+  );
+
+  readonly totalStock = computed(() => this.form.get('stock')?.value || 0);
+
+  readonly totalDistributedStock = computed(() =>
+    this.storeStockDistribution().reduce((sum, item) => sum + item.stock, 0)
+  );
+
+  readonly remainingStock = computed(
+    () => this.totalStock() - this.totalDistributedStock()
+  );
+
+  readonly canDistributeMore = computed(() => this.remainingStock() > 0);
+
+  readonly stockDistributionValid = computed(
+    () => this.totalDistributedStock() <= this.totalStock()
   );
 
   constructor() {
@@ -150,6 +177,9 @@ export class ProductFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Cargar stores activos
+    this.loadStores();
+
     // Verificar si estamos en modo edición
     const id = this.route.snapshot.paramMap.get('id');
 
@@ -179,6 +209,16 @@ export class ProductFormComponent implements OnInit {
             productCount: 0,
           }));
           this.selectedCategories.set(categories);
+        }
+
+        // Cargar distribución de stock por tiendas si existe
+        if (product.storeStock && product.storeStock.length > 0) {
+          const distribution = product.storeStock.map((item: any) => ({
+            storeId: item.storeId,
+            stock: item.stock,
+          }));
+          this.storeStockDistribution.set(distribution);
+          this.showStockDistribution.set(true); // Expandir automáticamente
         }
 
         this.form.patchValue({
@@ -217,9 +257,25 @@ export class ProductFormComponent implements OnInit {
       return;
     }
 
+    // Validar distribución de stock
+    if (!this.stockDistributionValid()) {
+      this.snackBar.open(
+        `La suma del stock distribuido (${this.totalDistributedStock()}) no puede exceder el stock total (${this.totalStock()})`,
+        'Cerrar',
+        { duration: 4000 }
+      );
+      return;
+    }
+
     this.loading.set(true);
 
-    const formValue = this.form.value;
+    const formValue = {
+      ...this.form.value,
+      initialStoreStock:
+        this.storeStockDistribution().length > 0
+          ? this.storeStockDistribution()
+          : undefined,
+    };
 
     if (this.isEditMode()) {
       this.updateProduct(formValue);
@@ -286,5 +342,136 @@ export class ProductFormComponent implements OnInit {
     if (errors['email']) return 'Email inválido';
 
     return 'Campo inválido';
+  }
+
+  // Expose Math for template
+  Math = Math;
+
+  // ==================== STOCK DISTRIBUTION ====================
+
+  private loadStores(): void {
+    this.storeAdminService.getStores({ includeInactive: false }).subscribe({
+      next: (stores) => {
+        this.availableStores.set(stores);
+      },
+      error: (error) => {
+        console.error('Error loading stores:', error);
+      },
+    });
+  }
+
+  toggleStockDistribution(): void {
+    this.showStockDistribution.update((show) => !show);
+  }
+
+  onStoreSelected(storeId: string): void {
+    this.selectedStoreId.set(storeId);
+  }
+
+  addStoreStock(): void {
+    const storeId = this.selectedStoreId();
+    const amount = this.stockAmount();
+
+    if (!storeId) {
+      this.snackBar.open('Selecciona una sucursal', 'Cerrar', {
+        duration: 2000,
+      });
+      return;
+    }
+
+    if (amount <= 0) {
+      this.snackBar.open('La cantidad debe ser mayor a 0', 'Cerrar', {
+        duration: 2000,
+      });
+      return;
+    }
+
+    const currentDistribution = this.storeStockDistribution();
+
+    // Verificar si la tienda ya existe
+    const existingIndex = currentDistribution.findIndex(
+      (item) => item.storeId === storeId
+    );
+
+    if (existingIndex >= 0) {
+      // Actualizar cantidad existente
+      const updated = [...currentDistribution];
+      updated[existingIndex] = { storeId, stock: amount };
+      this.storeStockDistribution.set(updated);
+    } else {
+      // Agregar nueva distribución
+      const totalAfterAdd = this.totalDistributedStock() + amount;
+
+      if (totalAfterAdd > this.totalStock()) {
+        const maxAllowed = this.remainingStock();
+        this.snackBar.open(
+          `No puedes asignar ${amount} unidades. Máximo disponible: ${maxAllowed}`,
+          'Cerrar',
+          { duration: 4000 }
+        );
+        return;
+      }
+
+      this.storeStockDistribution.set([
+        ...currentDistribution,
+        { storeId, stock: amount },
+      ]);
+    }
+
+    // Limpiar selección
+    this.selectedStoreId.set(null);
+    this.stockAmount.set(0);
+  }
+
+  updateStoreStock(storeId: string, newAmount: number): void {
+    if (newAmount < 0) return;
+
+    const currentDistribution = this.storeStockDistribution();
+    const itemIndex = currentDistribution.findIndex(
+      (item) => item.storeId === storeId
+    );
+
+    if (itemIndex < 0) return;
+
+    const otherStoresTotal = currentDistribution
+      .filter((item) => item.storeId !== storeId)
+      .reduce((sum, item) => sum + item.stock, 0);
+
+    const totalAfterUpdate = otherStoresTotal + newAmount;
+
+    if (totalAfterUpdate > this.totalStock()) {
+      const maxAllowed = this.totalStock() - otherStoresTotal;
+      this.snackBar.open(
+        `No puedes asignar ${newAmount} unidades. Máximo: ${maxAllowed}`,
+        'Cerrar',
+        { duration: 3000 }
+      );
+      return;
+    }
+
+    const updated = [...currentDistribution];
+    updated[itemIndex] = { storeId, stock: newAmount };
+    this.storeStockDistribution.set(updated);
+  }
+
+  removeStoreStock(storeId: string): void {
+    const updated = this.storeStockDistribution().filter(
+      (item) => item.storeId !== storeId
+    );
+    this.storeStockDistribution.set(updated);
+  }
+
+  getStoreName(storeId: string): string {
+    const store = this.availableStores().find((s) => s.id === storeId);
+    return store?.name || 'Sucursal desconocida';
+  }
+
+  get availableStoresForSelection(): StoreDto[] {
+    const distributedStoreIds = this.storeStockDistribution().map(
+      (item) => item.storeId
+    );
+    return this.availableStores().filter(
+      (store) => !distributedStoreIds.includes(store.id)
+    );
   }
 }

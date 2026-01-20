@@ -231,6 +231,30 @@ export interface ProductResponse {
   updatedAt: string | null;
   categories: any[]; // Array de categorías del producto
   images: string[]; // Array de URLs de imágenes adicionales
+  storeStock?: StoreStockDto[]; // Distribución de stock por tiendas
+}
+
+/**
+ * Stock de producto por tienda (response del backend)
+ */
+export interface StoreStockDto {
+  id: string;
+  productId: string;
+  storeId: string;
+  storeName: string;
+  stock: number;
+  reservedStock: number;
+  availableStock: number;
+}
+
+/**
+ * DTO para distribución inicial de stock por tienda
+ */
+export interface InitialStoreStockDto {
+  /** ID de la tienda/sucursal */
+  storeId: string;
+  /** Cantidad de stock asignada a esta tienda */
+  stock: number;
 }
 
 /**
@@ -253,6 +277,7 @@ export interface CreateProductDto {
   categoryIds?: string[];
   metaTitle?: string;
   metaDescription?: string;
+  initialStoreStock?: InitialStoreStockDto[];
 }
 
 /**
@@ -275,6 +300,7 @@ export interface UpdateProductDto {
   categoryIds?: string[];
   metaTitle?: string;
   metaDescription?: string;
+  initialStoreStock?: InitialStoreStockDto[];
 }
 
 /**

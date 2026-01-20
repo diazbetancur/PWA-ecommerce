@@ -15,6 +15,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { ToastService } from '@pwa/shared';
 import {
   CreateStoreRequest,
   StoreDto,
@@ -41,6 +42,7 @@ export class StoreFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly toastService = inject(ToastService);
 
   // Signals
   mode = signal<'create' | 'edit'>('create');
