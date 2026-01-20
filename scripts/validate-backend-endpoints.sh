@@ -97,16 +97,15 @@ echo -e "${BLUE}─────────────────────�
 
 validate_auth_endpoint "/api/admin/products" "Admin Products"
 validate_auth_endpoint "/api/admin/stores" "Stores Management"
-validate_auth_endpoint "/api/admin/loyalty/dashboard" "Loyalty Dashboard"
 validate_auth_endpoint "/api/admin/loyalty/rewards" "Loyalty Rewards"
-validate_auth_endpoint "/api/admin/loyalty/program/config" "Loyalty Config"
+validate_auth_endpoint "/api/admin/loyalty/config" "Loyalty Config"
 
 echo ""
 echo -e "${BLUE}──────────────────────────────────────────────────────────${NC}"
 echo -e "${BLUE}🏪 Endpoints Multi-Store${NC}"
 echo -e "${BLUE}──────────────────────────────────────────────────────────${NC}"
 
-validate_auth_endpoint "/api/admin/store-stock/products/test-id/stock" "Product Stock by Stores"
+validate_auth_endpoint "/api/admin/stores/products/test-id/stock" "Product Stock by Stores"
 
 echo ""
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
