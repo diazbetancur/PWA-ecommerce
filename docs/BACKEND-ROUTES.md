@@ -39,10 +39,10 @@ PUT    /api/admin/stores/:id/set-default      → Marcar como predeterminada
 ### Admin - Stock Multi-Tienda
 
 ```
-GET  /api/admin/stores/products/:productId/stock         → Stock por tiendas
-PUT  /api/admin/stores/products/:productId/stock         → Actualizar stock de tienda
-POST /api/admin/stores/products/:productId/check-stock   → Verificar disponibilidad
-POST /api/admin/stores/migrate-legacy-stock              → Migrar stock legacy
+GET  /api/admin/products/:productId/stock         → Stock por tiendas
+PUT  /api/admin/products/:productId/stock         → Actualizar stock de tienda
+POST /api/admin/products/:productId/check-stock   → Verificar disponibilidad
+POST /api/admin/stores/migrate-legacy-stock       → Migrar stock legacy
 ```
 
 ### Admin - Loyalty
