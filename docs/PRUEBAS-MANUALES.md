@@ -395,15 +395,15 @@ console.log(this.tenantContext.currentConfig()?.features?.loyalty);
 
 ## 📝 Registro de Pruebas
 
-**Usuario probador:** ********\_********  
-**Fecha:** ********\_********  
+**Usuario probador:** **\*\*\*\***\_**\*\*\*\***  
+**Fecha:** **\*\*\*\***\_**\*\*\*\***  
 **Backend URL:** http://localhost:5093  
 **Frontend URL:** http://localhost:4200?tenant=test
 
 ### Credenciales Usadas
 
-- Email: ********\_********
-- Password: ********\_********
+- Email: **\*\*\*\***\_**\*\*\*\***
+- Password: **\*\*\*\***\_**\*\*\*\***
 
 ### Resultados
 

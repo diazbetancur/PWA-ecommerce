@@ -171,6 +171,28 @@ export class TenantBootstrapService {
       };
     }
 
+    // Intentar obtener tenant del token JWT si existe
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const tenantSlugFromToken = payload.tenant_slug;
+        if (tenantSlugFromToken) {
+          console.log(
+            `[TenantBootstrap] Using tenant from JWT token: ${tenantSlugFromToken}`
+          );
+          return {
+            type: 'query',
+            value: tenantSlugFromToken,
+            source: `JWT token: tenant_slug=${tenantSlugFromToken}`,
+            priority: 1,
+          };
+        }
+      } catch (error) {
+        console.warn('[TenantBootstrap] Failed to parse JWT token:', error);
+      }
+    }
+
     const hostname = this.document.location.hostname;
     const subdomainMatch = hostname.match(/^([^.]+)\./);
     const subdomain = subdomainMatch ? subdomainMatch[1] : '';
