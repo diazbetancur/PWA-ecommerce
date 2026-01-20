@@ -95,8 +95,9 @@ export class StoreAdminService {
   getProductStockByStores(
     productId: string
   ): Observable<ProductStockByStoresResponse> {
+    // Backend usa /api/admin/products/:id/stock, no /stores/products/:id/stock
     return this.apiClient.get<ProductStockByStoresResponse>(
-      `${this.baseUrl}/products/${productId}/stock`
+      `/api/admin/products/${productId}/stock`
     );
   }
 
@@ -109,8 +110,9 @@ export class StoreAdminService {
     productId: string,
     request: UpdateProductStoreStockRequest
   ): Observable<ProductStoreStockDto> {
+    // Backend usa /api/admin/products/:id/stock, no /stores/products/:id/stock
     return this.apiClient.put<ProductStoreStockDto>(
-      `${this.baseUrl}/products/${productId}/stock`,
+      `/api/admin/products/${productId}/stock`,
       request
     );
   }
@@ -124,8 +126,9 @@ export class StoreAdminService {
     productId: string,
     request: CheckStockRequest
   ): Observable<CheckStockResponse> {
+    // Backend usa /api/admin/products/:id/check-stock
     return this.apiClient.post<CheckStockResponse>(
-      `${this.baseUrl}/products/${productId}/check-stock`,
+      `/api/admin/products/${productId}/check-stock`,
       request
     );
   }

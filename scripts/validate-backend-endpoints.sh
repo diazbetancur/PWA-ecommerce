@@ -105,7 +105,7 @@ echo -e "${BLUE}─────────────────────�
 echo -e "${BLUE}🏪 Endpoints Multi-Store${NC}"
 echo -e "${BLUE}──────────────────────────────────────────────────────────${NC}"
 
-validate_auth_endpoint "/api/admin/stores/products/test-id/stock" "Product Stock by Stores"
+validate_auth_endpoint "/api/admin/products/test-id/stock" "Product Stock by Stores"
 
 echo ""
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
