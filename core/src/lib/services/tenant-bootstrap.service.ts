@@ -192,8 +192,13 @@ export class TenantBootstrapService {
     console.log('[TenantBootstrap] No query param, checking JWT token...');
 
     // CRÍTICO: Verificar que localStorage esté disponible (solo en navegador)
-    if (!isPlatformBrowser(this.platformId) || typeof globalThis.localStorage === 'undefined') {
-      console.log('[TenantBootstrap] localStorage not available (SSR or not in browser)');
+    if (
+      !isPlatformBrowser(this.platformId) ||
+      typeof globalThis.localStorage === 'undefined'
+    ) {
+      console.log(
+        '[TenantBootstrap] localStorage not available (SSR or not in browser)'
+      );
       return {
         type: 'default',
         value: '',
@@ -205,8 +210,14 @@ export class TenantBootstrapService {
     // DEBUG: Ver todas las claves en localStorage
     const allKeys = Object.keys(globalThis.localStorage);
     console.log('[TenantBootstrap] 🔍 All localStorage keys:', allKeys);
-    console.log('[TenantBootstrap] 🔍 Keys starting with "mtkn_":', allKeys.filter(k => k.startsWith('mtkn_')));
-    console.log('[TenantBootstrap] 🔍 Has superadmin_token?:', allKeys.includes('superadmin_token'));
+    console.log(
+      '[TenantBootstrap] 🔍 Keys starting with "mtkn_":',
+      allKeys.filter((k) => k.startsWith('mtkn_'))
+    );
+    console.log(
+      '[TenantBootstrap] 🔍 Has superadmin_token?:',
+      allKeys.includes('superadmin_token')
+    );
 
     // El token puede estar en dos lugares dependiendo del tipo de usuario:
     // 1. 'superadmin_token' para SuperAdmin

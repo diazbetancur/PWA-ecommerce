@@ -52,29 +52,8 @@ export const multiStoreFeatureGuard: CanActivateFn = async () => {
 
   const currentConfig = tenantContext.currentConfig();
 
-  // DEBUG: Mostrar todas las features disponibles
-  console.log(
-    '[MultiStoreFeatureGuard] DEBUG - Current Config:',
-    currentConfig
-  );
-  console.log(
-    '[MultiStoreFeatureGuard] DEBUG - Features:',
-    currentConfig?.features
-  );
-  console.log(
-    '[MultiStoreFeatureGuard] DEBUG - features.multiStore:',
-    currentConfig?.features?.['multiStore']
-  );
-  console.log(
-    '[MultiStoreFeatureGuard] DEBUG - features.enableMultiStore:',
-    currentConfig?.features?.['enableMultiStore']
-  );
-
-  // Buscar multiStore con diferentes nombres posibles
-  const hasMultiStore =
-    currentConfig?.features?.['multiStore'] ??
-    currentConfig?.features?.['enableMultiStore'] ??
-    false;
+  // Buscar multistore (el backend responde en minúsculas)
+  const hasMultiStore = currentConfig?.features?.['multistore'] === true;
 
   if (!hasMultiStore) {
     console.warn(

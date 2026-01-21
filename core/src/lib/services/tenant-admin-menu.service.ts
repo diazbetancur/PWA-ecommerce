@@ -9,6 +9,7 @@
 
 import { computed, inject, Injectable } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
+import { TenantContextService } from './tenant-context.service';
 
 /**
  * Estructura de un item del menú de administración del tenant
@@ -34,11 +35,13 @@ interface ModuleConfig {
   route?: string;
   order: number;
   parentModule?: string; // Indica si es un submódulo
+  requiresFeature?: string; // Feature del tenant requerido para mostrar este ítem
 }
 
 @Injectable({ providedIn: 'root' })
 export class TenantAdminMenuService {
   private readonly authService = inject(AuthService);
+  private readonly tenantContext = inject(TenantContextService);
 
   /**
    * 📋 Mapeo de códigos de módulo a configuración de menú
@@ -187,6 +190,7 @@ export class TenantAdminMenuService {
       route: '/tenant-admin/settings/stores',
       order: 5,
       parentModule: 'settings',
+      requiresFeature: 'multistore', // Requiere que el tenant tenga multistore habilitado
     },
     permissions: {
       module: 'permissions',
@@ -297,11 +301,25 @@ export class TenantAdminMenuService {
       }
       // Si es "settings", incluir automáticamente sus submódulos
       else if (moduleCode.toLowerCase() === 'settings') {
+        // Obtener la configuración del tenant para verificar features
+        const tenantConfig = this.tenantContext.currentConfig();
+
         // Buscar todos los submódulos de settings definidos en moduleConfigMap
         const settingsSubModules = Object.keys(this.moduleConfigMap)
           .filter((key) => key.startsWith('settings.'))
           .map((key) => {
             const subConfig = this.moduleConfigMap[key];
+
+            // Verificar si este submódulo requiere un feature específico
+            if (subConfig.requiresFeature) {
+              const hasFeature =
+                tenantConfig?.features?.[subConfig.requiresFeature] === true;
+              if (!hasFeature) {
+                // No incluir este item si no tiene el feature requerido
+                return null;
+              }
+            }
+
             return {
               id: key,
               label: subConfig.label,
@@ -310,6 +328,7 @@ export class TenantAdminMenuService {
               visible: true,
             } as TenantAdminMenuItem;
           })
+          .filter((item): item is TenantAdminMenuItem => item !== null) // Filtrar los nulls
           .sort((a, b) => {
             const orderA = this.moduleConfigMap[a.id]?.order ?? 999;
             const orderB = this.moduleConfigMap[b.id]?.order ?? 999;

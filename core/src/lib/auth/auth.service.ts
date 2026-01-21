@@ -30,6 +30,7 @@ export class AuthService {
   }
 
   setToken(token: string) {
+    console.log('[AuthService] 🔥 setToken() called');
     this._jwt.set(token);
     try {
       const base64 = token.split('.')[1];
@@ -37,32 +38,56 @@ export class AuthService {
       const claims = JSON.parse(json);
       this._claims.set(claims);
 
-      const roleStr = Array.isArray(claims.role) ? claims.role[0] : claims.role;
+      const roleStr = Array.isArray(claims.roles)
+        ? claims.roles[0]
+        : claims.roles;
       const normalizedRole = roleStr?.toLowerCase().replaceAll('_', '');
       const isSuperAdmin =
         claims.isSuperAdmin === true || normalizedRole === 'superadmin';
       this._isSuperAdmin.set(isSuperAdmin);
+      console.log(
+        '[AuthService] isSuperAdmin:',
+        isSuperAdmin,
+        'tenantSlug:',
+        this._tenantSlug,
+        'claims.tenant_slug:',
+        claims.tenant_slug
+      );
     } catch {
       this._claims.set(null);
       this._isSuperAdmin.set(false);
     }
 
     if (this._isSuperAdmin()) {
+      console.log(
+        '[AuthService] 💾 Guardando SuperAdmin token con ambas claves'
+      );
       globalThis.localStorage?.setItem(SUPERADMIN_TOKEN_KEY, token);
+      console.log('[AuthService] ✅ Guardado en superadmin_token');
       // TAMBIÉN guardar con el tenant_slug del JWT si existe (para que TenantBootstrap lo encuentre)
       const tenantSlugFromJwt = this._claims()?.tenant_slug;
       if (tenantSlugFromJwt) {
-        globalThis.localStorage?.setItem(
-          STORAGE_PREFIX + tenantSlugFromJwt,
-          token
+        const key = STORAGE_PREFIX + tenantSlugFromJwt;
+        globalThis.localStorage?.setItem(key, token);
+        console.log('[AuthService] ✅ Guardado en', key);
+      } else {
+        console.warn(
+          '[AuthService] ⚠️ No hay tenant_slug en JWT, solo guardado en superadmin_token'
         );
       }
     } else if (this._tenantSlug) {
-      globalThis.localStorage?.setItem(
-        STORAGE_PREFIX + this._tenantSlug,
-        token
+      const key = STORAGE_PREFIX + this._tenantSlug;
+      globalThis.localStorage?.setItem(key, token);
+      console.log('[AuthService] ✅ Guardado token tenant en', key);
+    } else {
+      console.warn(
+        '[AuthService] ⚠️ No se guardó el token - no es SuperAdmin ni hay _tenantSlug'
       );
     }
+    console.log(
+      '[AuthService] 📦 localStorage keys después de setToken:',
+      Object.keys(globalThis.localStorage || {})
+    );
   }
 
   clear() {
