@@ -172,9 +172,14 @@ export class TenantBootstrapService {
   }
 
   private resolveTenantStrategy(): TenantResolutionStrategy {
+    console.log('[TenantBootstrap] === START resolveTenantStrategy ===');
+    
     const urlParams = new URLSearchParams(this.document.location.search);
     const queryTenant = urlParams.get('tenant');
+    console.log('[TenantBootstrap] Query param tenant:', queryTenant);
+    
     if (queryTenant) {
+      console.log('[TenantBootstrap] ✅ Using query param');
       return {
         type: 'query',
         value: queryTenant,
@@ -184,14 +189,21 @@ export class TenantBootstrapService {
     }
 
     // Intentar obtener tenant del token JWT si existe
+    console.log('[TenantBootstrap] No query param, checking JWT token...');
     const token = localStorage.getItem('authToken');
+    console.log('[TenantBootstrap] Token exists?', !!token);
+    console.log('[TenantBootstrap] Token value:', token ? token.substring(0, 50) + '...' : 'NULL');
+    
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('[TenantBootstrap] JWT Payload parsed:', payload);
         const tenantSlugFromToken = payload.tenant_slug;
+        console.log('[TenantBootstrap] tenant_slug from JWT:', tenantSlugFromToken);
+        
         if (tenantSlugFromToken) {
           console.log(
-            `[TenantBootstrap] Using tenant from JWT token: ${tenantSlugFromToken}`
+            `[TenantBootstrap] ✅ Using tenant from JWT token: ${tenantSlugFromToken}`
           );
           return {
             type: 'query',
