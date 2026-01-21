@@ -112,10 +112,14 @@ export class TenantBootstrapService {
 
     try {
       const strategy = this.resolveTenantStrategy();
+      console.log('[TenantBootstrap] Resolved strategy:', strategy);
       this._resolvedStrategy.set(strategy);
       this._attemptedSlug.set(strategy.value);
 
       if (!strategy.value || strategy.value.trim() === '') {
+        console.warn(
+          '[TenantBootstrap] No tenant slug found, using default config'
+        );
         this.setDefaultTenantConfig();
         this._status.set('resolved');
         this._isLoading.set(false);
@@ -124,6 +128,8 @@ export class TenantBootstrapService {
         }
         return;
       }
+
+      console.log(`[TenantBootstrap] Loading tenant: ${strategy.value}`);
 
       if (this.config.enableCache) {
         const cached = this.getCachedConfig(strategy.value);
@@ -138,10 +144,12 @@ export class TenantBootstrapService {
       }
 
       const backendResponse = await this.loadTenantFromBackend(strategy.value);
+      console.log('[TenantBootstrap] Backend response:', backendResponse);
       this._backendResponse.set(backendResponse);
 
       const tenantConfig =
         this.mapBackendResponseToTenantConfig(backendResponse);
+      console.log('[TenantBootstrap] Mapped tenant config:', tenantConfig);
 
       if (this.config.enableCache) {
         this.setCachedConfig(strategy.value, tenantConfig);
@@ -151,7 +159,11 @@ export class TenantBootstrapService {
       this._currentTenant.set(tenantConfig);
       this._tenantConfig$.next(tenantConfig);
       this._status.set('resolved');
+      console.log(
+        `[TenantBootstrap] ✅ Tenant initialized successfully: ${tenantConfig.tenant.slug}`
+      );
     } catch (error) {
+      console.error('[TenantBootstrap] Error loading tenant:', error);
       this.handleTenantError(error as HttpErrorResponse, this._attemptedSlug());
       this.setDefaultTenantConfig();
     } finally {
