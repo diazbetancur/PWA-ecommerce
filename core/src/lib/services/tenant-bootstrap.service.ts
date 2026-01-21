@@ -190,7 +190,24 @@ export class TenantBootstrapService {
 
     // Intentar obtener tenant del token JWT si existe
     console.log('[TenantBootstrap] No query param, checking JWT token...');
-    const token = localStorage.getItem('authToken');
+    
+    // El token puede estar en dos lugares dependiendo del tipo de usuario:
+    // 1. 'superadmin_token' para SuperAdmin
+    // 2. 'mtkn_{tenant}' para usuarios de tenant
+    // Primero intentar con superadmin, luego buscar cualquier token de tenant
+    let token = localStorage.getItem('superadmin_token');
+    console.log('[TenantBootstrap] SuperAdmin token exists?', !!token);
+    
+    if (!token) {
+      // Buscar cualquier token que empiece con 'mtkn_'
+      const keys = Object.keys(localStorage);
+      const tenantKey = keys.find(k => k.startsWith('mtkn_'));
+      if (tenantKey) {
+        token = localStorage.getItem(tenantKey);
+        console.log('[TenantBootstrap] Found tenant token:', tenantKey);
+      }
+    }
+    
     console.log('[TenantBootstrap] Token exists?', !!token);
     console.log('[TenantBootstrap] Token value:', token ? token.substring(0, 50) + '...' : 'NULL');
     
