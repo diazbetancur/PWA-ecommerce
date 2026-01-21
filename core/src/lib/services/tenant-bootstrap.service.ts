@@ -173,11 +173,11 @@ export class TenantBootstrapService {
 
   private resolveTenantStrategy(): TenantResolutionStrategy {
     console.log('[TenantBootstrap] === START resolveTenantStrategy ===');
-    
+
     const urlParams = new URLSearchParams(this.document.location.search);
     const queryTenant = urlParams.get('tenant');
     console.log('[TenantBootstrap] Query param tenant:', queryTenant);
-    
+
     if (queryTenant) {
       console.log('[TenantBootstrap] ✅ Using query param');
       return {
@@ -190,34 +190,51 @@ export class TenantBootstrapService {
 
     // Intentar obtener tenant del token JWT si existe
     console.log('[TenantBootstrap] No query param, checking JWT token...');
-    
+
+    // CRÍTICO: Verificar que localStorage esté disponible (solo en navegador)
+    if (!isPlatformBrowser(this.platformId) || typeof globalThis.localStorage === 'undefined') {
+      console.log('[TenantBootstrap] localStorage not available (SSR or not in browser)');
+      return {
+        type: 'default',
+        value: '',
+        source: 'default configuration (localStorage not available)',
+        priority: 4,
+      };
+    }
+
     // El token puede estar en dos lugares dependiendo del tipo de usuario:
     // 1. 'superadmin_token' para SuperAdmin
     // 2. 'mtkn_{tenant}' para usuarios de tenant
     // Primero intentar con superadmin, luego buscar cualquier token de tenant
-    let token = localStorage.getItem('superadmin_token');
+    let token = globalThis.localStorage.getItem('superadmin_token');
     console.log('[TenantBootstrap] SuperAdmin token exists?', !!token);
-    
+
     if (!token) {
       // Buscar cualquier token que empiece con 'mtkn_'
-      const keys = Object.keys(localStorage);
-      const tenantKey = keys.find(k => k.startsWith('mtkn_'));
+      const keys = Object.keys(globalThis.localStorage);
+      const tenantKey = keys.find((k) => k.startsWith('mtkn_'));
       if (tenantKey) {
-        token = localStorage.getItem(tenantKey);
+        token = globalThis.localStorage.getItem(tenantKey);
         console.log('[TenantBootstrap] Found tenant token:', tenantKey);
       }
     }
-    
+
     console.log('[TenantBootstrap] Token exists?', !!token);
-    console.log('[TenantBootstrap] Token value:', token ? token.substring(0, 50) + '...' : 'NULL');
-    
+    console.log(
+      '[TenantBootstrap] Token value:',
+      token ? token.substring(0, 50) + '...' : 'NULL'
+    );
+
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         console.log('[TenantBootstrap] JWT Payload parsed:', payload);
         const tenantSlugFromToken = payload.tenant_slug;
-        console.log('[TenantBootstrap] tenant_slug from JWT:', tenantSlugFromToken);
-        
+        console.log(
+          '[TenantBootstrap] tenant_slug from JWT:',
+          tenantSlugFromToken
+        );
+
         if (tenantSlugFromToken) {
           console.log(
             `[TenantBootstrap] ✅ Using tenant from JWT token: ${tenantSlugFromToken}`
