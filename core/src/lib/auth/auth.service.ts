@@ -49,6 +49,14 @@ export class AuthService {
 
     if (this._isSuperAdmin()) {
       globalThis.localStorage?.setItem(SUPERADMIN_TOKEN_KEY, token);
+      // TAMBIÉN guardar con el tenant_slug del JWT si existe (para que TenantBootstrap lo encuentre)
+      const tenantSlugFromJwt = this._claims()?.tenant_slug;
+      if (tenantSlugFromJwt) {
+        globalThis.localStorage?.setItem(
+          STORAGE_PREFIX + tenantSlugFromJwt,
+          token
+        );
+      }
     } else if (this._tenantSlug) {
       globalThis.localStorage?.setItem(
         STORAGE_PREFIX + this._tenantSlug,

@@ -202,6 +202,12 @@ export class TenantBootstrapService {
       };
     }
 
+    // DEBUG: Ver todas las claves en localStorage
+    const allKeys = Object.keys(globalThis.localStorage);
+    console.log('[TenantBootstrap] 🔍 All localStorage keys:', allKeys);
+    console.log('[TenantBootstrap] 🔍 Keys starting with "mtkn_":', allKeys.filter(k => k.startsWith('mtkn_')));
+    console.log('[TenantBootstrap] 🔍 Has superadmin_token?:', allKeys.includes('superadmin_token'));
+
     // El token puede estar en dos lugares dependiendo del tipo de usuario:
     // 1. 'superadmin_token' para SuperAdmin
     // 2. 'mtkn_{tenant}' para usuarios de tenant
