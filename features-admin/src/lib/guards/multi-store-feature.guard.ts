@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { TenantContextService } from '@pwa/core';
+import { TenantBootstrapService, TenantContextService } from '@pwa/core';
 
 /**
  * 🏪 Guard para verificar que el tenant tenga habilitado multi-store
@@ -23,7 +23,23 @@ import { TenantContextService } from '@pwa/core';
  */
 export const multiStoreFeatureGuard: CanActivateFn = async () => {
   const tenantContext = inject(TenantContextService);
+  const tenantBootstrap = inject(TenantBootstrapService);
   const router = inject(Router);
+
+  // Si el tenant no está cargado, forzar inicialización
+  if (!tenantContext.isTenantReady()) {
+    console.log(
+      '[MultiStoreFeatureGuard] Tenant not ready, forcing initialization...'
+    );
+    try {
+      await tenantBootstrap.initialize();
+    } catch (error) {
+      console.error(
+        '[MultiStoreFeatureGuard] Failed to initialize tenant:',
+        error
+      );
+    }
+  }
 
   // Esperar a que el tenant esté disponible (máximo 3 segundos)
   try {
