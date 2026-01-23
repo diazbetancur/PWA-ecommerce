@@ -26,6 +26,7 @@ export interface AuthUser {
   permissions: ModulePermission[]; // Permisos estructurados por módulo
   isActive: boolean;
   mustChangePassword?: boolean;
+  features?: Record<string, any>; // Features del usuario (ej: enableMultiStore, allowGuestCheckout, etc.)
   // Campos opcionales para clientes
   phoneNumber?: string;
   fullName?: string;
@@ -187,6 +188,7 @@ export interface JwtPayload {
   roles: string[]; // Array de roles (ej: ["Customer"], ["SuperAdmin"], ["Customer", "Manager"])
   permissions?: ModulePermission[]; // Array de permisos con estructura completa del backend
   modules?: string[]; // Array simple de códigos de módulo (legacy, usar permissions)
+  features?: Record<string, any>; // Features del usuario (se guarda de la respuesta del login)
   exp: number; // Expiration timestamp
   iat?: number; // Issued at timestamp
   admin?: string | boolean; // Flag de admin para tokens sin tenant (ej: "true" o true)

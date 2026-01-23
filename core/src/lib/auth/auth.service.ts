@@ -194,6 +194,21 @@ export class AuthService {
     }
 
     this.setToken(response.token);
+
+    // Guardar features del usuario en los claims (las features vienen en response.user.features)
+    if (response.user?.features) {
+      const currentClaims = this._claims();
+      if (currentClaims) {
+        this._claims.set({
+          ...currentClaims,
+          features: response.user.features,
+        });
+        console.log(
+          '[AuthService] ✅ Features guardadas en claims:',
+          response.user.features
+        );
+      }
+    }
   }
 
   async register(data: {

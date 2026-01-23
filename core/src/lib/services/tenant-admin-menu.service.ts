@@ -190,7 +190,7 @@ export class TenantAdminMenuService {
       route: '/tenant-admin/settings/stores',
       order: 5,
       parentModule: 'settings',
-      requiresFeature: 'multistore', // Requiere que el tenant tenga multistore habilitado
+      requiresFeature: 'enableMultiStore', // Requiere que el tenant tenga multistore habilitado
     },
     permissions: {
       module: 'permissions',
@@ -301,8 +301,9 @@ export class TenantAdminMenuService {
       }
       // Si es "settings", incluir automáticamente sus submódulos
       else if (moduleCode.toLowerCase() === 'settings') {
-        // Obtener la configuración del tenant para verificar features
-        const tenantConfig = this.tenantContext.currentConfig();
+        // Obtener features del usuario desde authService.claims (vienen del backend en el login)
+        const claims = this.authService.claims;
+        const userFeatures = claims?.features || {};
 
         // Buscar todos los submódulos de settings definidos en moduleConfigMap
         const settingsSubModules = Object.keys(this.moduleConfigMap)
@@ -313,11 +314,22 @@ export class TenantAdminMenuService {
             // Verificar si este submódulo requiere un feature específico
             if (subConfig.requiresFeature) {
               const hasFeature =
-                tenantConfig?.features?.[subConfig.requiresFeature] === true;
+                userFeatures[subConfig.requiresFeature] === true;
               if (!hasFeature) {
                 // No incluir este item si no tiene el feature requerido
                 return null;
               }
+            }
+
+            // Verificar si el usuario tiene permiso sobre este módulo específico
+            // Esto permite que módulos con diferentes permisos (ej: inventory) sean visibles
+            const moduleToCheck = subConfig.module;
+            if (
+              moduleToCheck &&
+              !modules.includes(moduleToCheck.toLowerCase())
+            ) {
+              // Si el módulo específico no está en la lista de módulos del usuario, no mostrarlo
+              return null;
             }
 
             return {

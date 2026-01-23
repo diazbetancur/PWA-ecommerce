@@ -1,14 +1,18 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { TenantBootstrapService, TenantContextService } from '@pwa/core';
+import {
+  AuthService,
+  TenantBootstrapService,
+  TenantContextService,
+} from '@pwa/core';
 
 /**
  * 🏪 Guard para verificar que el tenant tenga habilitado multi-store
  *
  * Protege las rutas de gestión de tiendas/sucursales para que solo sean accesibles si:
- * - El tenant tiene `features.multiStore === true` en su configuración
+ * - El usuario tiene el feature `enableMultiStore === true` en sus claims
  *
- * Si el tenant no tiene el feature habilitado:
+ * Si el usuario no tiene el feature habilitado:
  * - Redirige al dashboard de admin
  * - Muestra advertencia en consola
  *
@@ -22,6 +26,7 @@ import { TenantBootstrapService, TenantContextService } from '@pwa/core';
  * ```
  */
 export const multiStoreFeatureGuard: CanActivateFn = async () => {
+  const authService = inject(AuthService);
   const tenantContext = inject(TenantContextService);
   const tenantBootstrap = inject(TenantBootstrapService);
   const router = inject(Router);
@@ -50,17 +55,17 @@ export const multiStoreFeatureGuard: CanActivateFn = async () => {
     return false;
   }
 
-  const currentConfig = tenantContext.currentConfig();
+  // Obtener features del usuario desde authService.claims
+  const claims = authService.claims;
+  const userFeatures = claims?.features || {};
 
-  // Buscar multistore (el backend responde en minúsculas)
-  const hasMultiStore = currentConfig?.features?.['multistore'] === true;
+  // Buscar enableMultiStore en las features del usuario
+  const hasMultiStore = userFeatures['enableMultiStore'] === true;
 
   if (!hasMultiStore) {
     console.warn(
-      `[MultiStoreFeatureGuard] Multi-store feature not enabled for tenant: ${
-        currentConfig?.tenant.slug || 'unknown'
-      }. Available features:`,
-      Object.keys(currentConfig?.features || {})
+      `[MultiStoreFeatureGuard] Multi-store feature not enabled for user. Available features:`,
+      Object.keys(userFeatures)
     );
     router.navigate(['/tenant-admin/dashboard']);
     return false;
