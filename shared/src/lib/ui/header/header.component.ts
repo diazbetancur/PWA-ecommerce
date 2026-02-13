@@ -31,7 +31,18 @@ export class HeaderComponent {
 
   logoUrl = computed(() => {
     const config = this.tenantContext.getCurrentTenantConfig();
-    return config?.tenant.branding?.logoUrl || config?.theme?.logoUrl || '';
+    const tenantLogo =
+      config?.tenant.branding?.logoUrl || config?.theme?.logoUrl;
+
+    // Si hay logo del tenant, úsalo
+    if (tenantLogo) return tenantLogo;
+
+    // Si hay tenant pero sin logo, usa el logo por defecto
+    const tenant = this.tenantContext.getCurrentTenant();
+    if (tenant) return '/assets/images/logoEcommerce.png';
+
+    // Sin tenant, no hay logo
+    return '';
   });
 
   displayName = computed(() => {
