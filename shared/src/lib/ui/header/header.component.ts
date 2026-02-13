@@ -38,11 +38,12 @@ export class HeaderComponent {
     if (tenantLogo) return tenantLogo;
 
     // Si hay tenant pero sin logo, usa el logo por defecto
-    const tenant = this.tenantContext.getCurrentTenant();
-    if (tenant) return '/assets/images/logoEcommerce.png';
+    // const tenant = this.tenantContext.getCurrentTenant();
+    // if (tenant)
+    return '/assets/images/logoEcommerce.png';
 
     // Sin tenant, no hay logo
-    return '';
+    // return '';
   });
 
   displayName = computed(() => {
