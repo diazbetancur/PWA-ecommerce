@@ -17,5 +17,8 @@ export * from './stores/product-stock-by-stores/product-stock-by-stores.componen
 export * from './stores/store-form/store-form.component';
 export * from './stores/stores-list/stores-list.component';
 
+// Settings
+export * from './settings/branding-settings/branding-settings.component';
+
 // Loyalty
 export * from './loyalty/index';

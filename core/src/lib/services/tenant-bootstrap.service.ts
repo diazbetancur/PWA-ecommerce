@@ -530,15 +530,23 @@ export class TenantBootstrapService {
   private applyThemeVariables(config: TenantConfig): void {
     const root = this.document.documentElement;
     const theme = config.theme;
+    const branding = config.tenant.branding;
 
-    root.style.setProperty('--tenant-primary-color', theme.primary);
-    root.style.setProperty('--tenant-accent-color', theme.accent);
+    const primary = branding?.primaryColor || theme.primary;
+    const secondary = branding?.secondaryColor || theme.accent;
+    const accent = branding?.accentColor || theme.accent;
+    const background = branding?.backgroundColor || theme.background;
+    const textColor = branding?.textColor || theme.textColor;
 
-    if (theme.background) {
-      root.style.setProperty('--tenant-background-color', theme.background);
+    root.style.setProperty('--tenant-primary-color', primary);
+    root.style.setProperty('--tenant-secondary-color', secondary);
+    root.style.setProperty('--tenant-accent-color', accent);
+
+    if (background) {
+      root.style.setProperty('--tenant-background-color', background);
     }
-    if (theme.textColor) {
-      root.style.setProperty('--tenant-text-color', theme.textColor);
+    if (textColor) {
+      root.style.setProperty('--tenant-text-color', textColor);
     }
     if (theme.cssVars) {
       for (const [key, value] of Object.entries(theme.cssVars)) {
@@ -546,8 +554,18 @@ export class TenantBootstrapService {
       }
     }
 
-    root.style.setProperty('--mat-sys-primary', theme.primary);
-    root.style.setProperty('--mat-sys-secondary', theme.accent);
+    // Legacy vars used in shared components
+    root.style.setProperty('--primary-color', primary);
+    root.style.setProperty('--secondary-color', secondary);
+    if (background) {
+      root.style.setProperty('--bg-color', background);
+    }
+    if (textColor) {
+      root.style.setProperty('--text-color', textColor);
+    }
+
+    root.style.setProperty('--mat-sys-primary', primary);
+    root.style.setProperty('--mat-sys-secondary', accent);
   }
 
   private updateFavicon(faviconUrl: string): void {

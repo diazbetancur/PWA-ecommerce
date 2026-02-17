@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { APP_ENV, AppEnv } from '../config/app-env.token';
-import { TenantConfig } from '../models/types';
+import { BrandingConfig, TenantConfig, ThemeConfig } from '../models/types';
 import { ApiClientService } from './api-client.service';
 import { ManifestService } from './manifest.service';
 import { SeoService } from './seo.service';
@@ -48,7 +48,7 @@ export class TenantConfigService {
     const tenantKey = override;
 
     if (globalThis.window === undefined) {
-      this._config = {
+      this._config = this.withNormalizedTheme({
         tenant: { id: 'stub', slug: tenantKey, displayName: 'Demo Tenant' },
         theme: {
           primary: '#1976d2',
@@ -61,18 +61,20 @@ export class TenantConfigService {
         locale: 'es-CO',
         currency: 'COP',
         cdnBaseUrl: '',
-      };
+      });
       return;
     }
 
     try {
       if (this.env.mockApi) {
         const url = `/config/tenants/${tenantKey}.json`;
-        this._config = await firstValueFrom(this.http.get<TenantConfig>(url));
+        const loaded = await firstValueFrom(this.http.get<TenantConfig>(url));
+        this._config = this.withNormalizedTheme(loaded);
       } else {
-        this._config = (await firstValueFrom(
+        const loaded = (await firstValueFrom(
           this.apiClient.getTenantConfig(tenantKey)
         )) as TenantConfig;
+        this._config = this.withNormalizedTheme(loaded);
       }
       this.applyDynamic(reapply);
     } catch (e: any) {
@@ -107,5 +109,34 @@ export class TenantConfigService {
     }
     this.seo.apply(c);
     this.i18n.setActiveLang(c.locale || 'es-CO');
+  }
+
+  private withNormalizedTheme(config: TenantConfig): TenantConfig {
+    const branding = config.tenant?.branding;
+    const mergedTheme = this.mergeThemeWithBranding(config.theme, branding);
+
+    return {
+      ...config,
+      theme: mergedTheme,
+    };
+  }
+
+  private mergeThemeWithBranding(
+    theme: ThemeConfig,
+    branding?: BrandingConfig
+  ): ThemeConfig {
+    if (!branding) {
+      return theme;
+    }
+
+    return {
+      ...theme,
+      primary: branding.primaryColor || theme.primary,
+      accent: branding.accentColor || theme.accent,
+      background: branding.backgroundColor || theme.background,
+      textColor: branding.textColor || theme.textColor,
+      logoUrl: branding.logoUrl || theme.logoUrl,
+      faviconUrl: branding.faviconUrl || theme.faviconUrl,
+    };
   }
 }

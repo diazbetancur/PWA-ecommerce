@@ -160,7 +160,7 @@ export class TenantAdminMenuService {
       parentModule: 'settings',
     },
     'settings.branding': {
-      module: 'settings.branding',
+      module: 'settings',
       label: 'Marca',
       icon: 'palette',
       route: '/tenant-admin/settings/branding',

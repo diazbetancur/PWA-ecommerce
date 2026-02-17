@@ -1,0 +1,226 @@
+<div class="settings-page">
+  <div class="page-header">
+    <h1>🎨 Branding y Configuración de Tienda</h1>
+    <p>
+      Personaliza la identidad visual de tu tenant y administra datos de
+      contacto, redes, locale y SEO.
+    </p>
+  </div>
+
+  @if (isLoading()) {
+  <div class="state-box">Cargando configuración...</div>
+  }
+
+  @if (errorMessage() && !isLoading()) {
+  <div class="state-box error">{{ errorMessage() }}</div>
+  }
+
+  @if (!isLoading()) {
+  <form [formGroup]="settingsForm" class="settings-form">
+    <div class="tabs-nav">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'branding'"
+        (click)="setTab('branding')"
+      >
+        Branding
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'contact'"
+        (click)="setTab('contact')"
+      >
+        Contacto
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'social'"
+        (click)="setTab('social')"
+      >
+        Redes
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="activeTab() === 'advanced'"
+        (click)="setTab('advanced')"
+      >
+        Avanzado
+      </button>
+    </div>
+
+    @if (activeTab() === 'branding') {
+    <section class="section-card" formGroupName="branding">
+      <div class="section-header">
+        <h2>Branding</h2>
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveBranding()"
+          [disabled]="isSaving('branding')"
+        >
+          @if (isSaving('branding')) { Guardando... } @else { Guardar branding }
+        </button>
+      </div>
+
+      <div class="grid two">
+        <label>
+          Logo URL
+          <input type="url" formControlName="logoUrl" />
+        </label>
+
+        <label>
+          Favicon URL
+          <input type="url" formControlName="faviconUrl" />
+        </label>
+      </div>
+
+      <div class="grid four colors">
+        <label>
+          Primary
+          <input type="color" formControlName="primaryColor" />
+        </label>
+        <label>
+          Secondary
+          <input type="color" formControlName="secondaryColor" />
+        </label>
+        <label>
+          Accent
+          <input type="color" formControlName="accentColor" />
+        </label>
+        <label>
+          Background
+          <input type="color" formControlName="backgroundColor" />
+        </label>
+      </div>
+    </section>
+    }
+
+    @if (activeTab() === 'contact') {
+    <section class="section-card" formGroupName="contact">
+      <div class="section-header">
+        <h2>Contacto</h2>
+        <button
+          type="button"
+          class="btn"
+          (click)="saveContact()"
+          [disabled]="isSaving('contact')"
+        >
+          @if (isSaving('contact')) { Guardando... } @else { Guardar contacto }
+        </button>
+      </div>
+
+      <div class="grid two">
+        <label>
+          Email
+          <input type="email" formControlName="email" />
+        </label>
+        <label>
+          Teléfono
+          <input type="text" formControlName="phone" />
+        </label>
+        <label>
+          WhatsApp
+          <input type="text" formControlName="whatsApp" />
+        </label>
+        <label>
+          Dirección
+          <input type="text" formControlName="address" />
+        </label>
+      </div>
+    </section>
+    }
+
+    @if (activeTab() === 'social') {
+    <section class="section-card" formGroupName="social">
+      <div class="section-header">
+        <h2>Redes Sociales</h2>
+        <button
+          type="button"
+          class="btn"
+          (click)="saveSocial()"
+          [disabled]="isSaving('social')"
+        >
+          @if (isSaving('social')) { Guardando... } @else { Guardar redes }
+        </button>
+      </div>
+
+      <div class="grid two">
+        <label>
+          Facebook
+          <input type="url" formControlName="facebook" />
+        </label>
+        <label>
+          Instagram
+          <input type="url" formControlName="instagram" />
+        </label>
+        <label>
+          Twitter / X
+          <input type="url" formControlName="twitter" />
+        </label>
+        <label>
+          TikTok
+          <input type="url" formControlName="tikTok" />
+        </label>
+      </div>
+    </section>
+    }
+
+    @if (activeTab() === 'advanced') {
+    <section class="section-card" formGroupName="locale">
+      <h2>Locale</h2>
+      <div class="grid four">
+        <label>
+          Locale
+          <input type="text" formControlName="locale" />
+        </label>
+        <label>
+          Currency
+          <input type="text" formControlName="currency" />
+        </label>
+        <label>
+          Symbol
+          <input type="text" formControlName="currencySymbol" />
+        </label>
+        <label>
+          Tax Rate
+          <input type="number" step="0.01" formControlName="taxRate" />
+        </label>
+      </div>
+    </section>
+
+    <section class="section-card" formGroupName="seo">
+      <h2>SEO</h2>
+      <div class="grid one">
+        <label>
+          Title
+          <input type="text" formControlName="title" />
+        </label>
+        <label>
+          Description
+          <textarea rows="3" formControlName="description"></textarea>
+        </label>
+        <label>
+          Keywords
+          <input type="text" formControlName="keywords" />
+        </label>
+      </div>
+    </section>
+    }
+
+    <div class="actions">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="saveAll()"
+        [disabled]="isSaving('all')"
+      >
+        @if (isSaving('all')) { Guardando... } @else { Guardar todo }
+      </button>
+    </div>
+  </form>
+  }
+</div>

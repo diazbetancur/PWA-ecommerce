@@ -4,27 +4,36 @@ import { DEFAULT_TENANT_CONFIG } from '../config/default-tenant.config';
 import { type TenantBranding } from '../models/pwa-branding.types';
 import { TenantConfig } from '../models/types';
 import { TenantBootstrapService } from './tenant-bootstrap.service';
+import { TenantConfigService } from './tenant-config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TenantContextService {
   private readonly tenantBootstrap = inject(TenantBootstrapService);
+  private readonly tenantConfigService = inject(TenantConfigService);
+
+  private readonly resolvedConfig = computed<TenantConfig | null>(() => {
+    const bootstrapConfig = this.tenantBootstrap.currentTenant();
+    if (bootstrapConfig) {
+      return bootstrapConfig;
+    }
+
+    return this.tenantConfigService.config ?? null;
+  });
 
   readonly tenantSlug = computed(
-    () => this.tenantBootstrap.currentTenant()?.tenant.slug ?? null
+    () => this.resolvedConfig()?.tenant.slug ?? null
   );
   readonly tenantKey = computed(
-    () => this.tenantBootstrap.currentTenant()?.tenant.id ?? null
+    () => this.resolvedConfig()?.tenant.id ?? null
   );
-  readonly isReady = computed(
-    () => this.tenantBootstrap.currentTenant() !== null
-  );
-  readonly currentConfig = computed(() => this.tenantBootstrap.currentTenant());
+  readonly isReady = computed(() => this.resolvedConfig() !== null);
+  readonly currentConfig = computed(() => this.resolvedConfig());
   readonly isLoading = computed(() => this.tenantBootstrap.isLoading());
 
   readonly currentTenant = computed(
-    () => this.tenantBootstrap.currentTenant()?.tenant ?? null
+    () => this.resolvedConfig()?.tenant ?? null
   );
   readonly tenantBranding = computed(
     () => this.currentTenant()?.branding ?? null
@@ -34,10 +43,10 @@ export class TenantContextService {
   );
 
   readonly currency = computed(
-    () => this.tenantBootstrap.currentTenant()?.currency ?? 'USD'
+    () => this.resolvedConfig()?.currency ?? 'USD'
   );
   readonly locale = computed(
-    () => this.tenantBootstrap.currentTenant()?.locale ?? 'en-US'
+    () => this.resolvedConfig()?.locale ?? 'en-US'
   );
 
   readonly pwaBranding = computed(() => {

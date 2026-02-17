@@ -196,12 +196,17 @@ export const featuresAdminRoutes: Route[] = [
     children: [
       {
         path: '',
+        redirectTo: 'branding',
+        pathMatch: 'full',
+      },
+      {
+        path: 'branding',
         loadComponent: () =>
           import(
-            './components/dashboard-welcome/dashboard-welcome.component'
-          ).then((m) => m.DashboardWelcomeComponent),
+            './pages/settings/branding-settings/branding-settings.component'
+          ).then((m) => m.BrandingSettingsComponent),
         data: {
-          title: 'Configuración',
+          title: 'Marca y Configuración',
         },
       },
       // Sucursales / Tiendas
