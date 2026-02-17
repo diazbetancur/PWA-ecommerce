@@ -3,7 +3,12 @@
     <!-- Logo -->
     <a routerLink="/" class="logo">
       @if (logoUrl(); as logo) {
-      <img [src]="logo" [alt]="displayName()" class="logo-img" />
+      <img
+        [src]="logo"
+        alt="Logo del comercio"
+        title="Logo del comercio"
+        class="logo-img"
+      />
       } @else {
       <span class="logo-text">{{ displayName() }}</span>
       }
@@ -59,16 +64,20 @@
           </svg>
         </button>
         @if (isUserMenuOpen()) {
-        <div class="user-dropdown" (click)="closeUserMenu()">
-          <a routerLink="/account/profile">Mi Perfil</a>
-          <a routerLink="/orders">Mis Pedidos</a>
-          <a routerLink="/loyalty/account">💎 Programa de Lealtad</a>
+        <div class="user-dropdown">
+          <a routerLink="/account/profile" (click)="closeUserMenu()"
+            >Mi Perfil</a
+          >
+          <a routerLink="/orders" (click)="closeUserMenu()">Mis Pedidos</a>
+          <a routerLink="/loyalty/account" (click)="closeUserMenu()"
+            >💎 Programa de Lealtad</a
+          >
           <button class="logout-btn" (click)="logout()">Cerrar Sesión</button>
         </div>
         }
       </div>
       } @else {
-      <a routerLink="/account/login" class="action-btn login-btn">
+      <button class="action-btn login-btn" (click)="openAuthModal('login')">
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -79,7 +88,7 @@
           <circle cx="12" cy="7" r="4" />
         </svg>
         <span class="login-text">Ingresar</span>
-      </a>
+      </button>
       }
 
       <!-- Mobile Menu Toggle -->
@@ -221,11 +230,7 @@
       Cerrar Sesión
     </button>
     } @else {
-    <a
-      routerLink="/account/login"
-      (click)="closeMobileMenu()"
-      class="mobile-login"
-    >
+    <button class="mobile-login" (click)="openAuthModal('login')">
       <svg
         viewBox="0 0 24 24"
         fill="none"
@@ -237,7 +242,7 @@
         />
       </svg>
       Ingresar
-    </a>
+    </button>
     }
   </nav>
   }

@@ -1,0 +1,216 @@
+:host {
+  display: block;
+}
+
+.tenant-auth-modal {
+  position: relative;
+  width: min(100%, 560px);
+  padding: 1.25rem;
+  background: var(--tenant-surface-color, var(--tenant-background-color, #fff));
+  color: var(--tenant-text-color, #1f2937);
+}
+
+.close-button {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: var(--tenant-text-muted-color, rgba(31, 41, 55, 0.72));
+  cursor: pointer;
+}
+
+.close-button:hover {
+  background: var(--tenant-primary-light, rgba(0, 0, 0, 0.04));
+  color: var(--tenant-text-color, #1f2937);
+}
+
+.modal-header {
+  margin-bottom: 1rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--tenant-text-color, #1f2937);
+}
+
+.modal-header p {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  color: var(--tenant-text-muted-color, rgba(31, 41, 55, 0.72));
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tab {
+  border: 1px solid var(--tenant-border-color, rgba(31, 41, 55, 0.2));
+  background: transparent;
+  color: var(--tenant-text-color, #1f2937);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab.active {
+  border-color: var(--tenant-secondary-color, #64748b);
+  background: var(--tenant-primary-light, #eff6ff);
+  color: var(--tenant-secondary-color, #64748b);
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--tenant-text-color, #1f2937);
+}
+
+input[type='email'],
+input[type='password'],
+input[type='text'],
+input[type='tel'] {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--tenant-border-color, rgba(31, 41, 55, 0.2));
+  background: var(--tenant-background-color, #fff);
+  color: var(--tenant-text-color, #1f2937);
+}
+
+input:focus {
+  outline: 0;
+  border-color: var(--tenant-secondary-color, #64748b);
+  box-shadow: 0 0 0 3px var(--tenant-primary-light, rgba(0, 0, 0, 0.04));
+}
+
+input.error {
+  border-color: var(--tenant-accent-color, #ef4444);
+}
+
+.password-input {
+  position: relative;
+}
+
+.password-input input {
+  padding-right: 2.5rem;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.inline-group {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.8125rem;
+}
+
+.checkbox-label input[type='checkbox'] {
+  width: auto;
+}
+
+.text-link {
+  border: 0;
+  background: transparent;
+  color: var(--tenant-secondary-color, #64748b);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.submit-btn {
+  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--tenant-secondary-color, #64748b);
+  color: var(--tenant-on-primary, #fff);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit-btn:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  font-size: 0.75rem;
+  color: var(--tenant-accent-color, #ef4444);
+}
+
+.alert {
+  font-size: 0.8125rem;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.alert-error {
+  border: 1px solid var(--tenant-accent-color, #ef4444);
+  color: var(--tenant-accent-color, #ef4444);
+  background: var(--tenant-primary-light, #fff5f5);
+}
+
+.alert-success {
+  border: 1px solid var(--tenant-secondary-color, #64748b);
+  color: var(--tenant-secondary-color, #64748b);
+  background: var(--tenant-primary-light, #eff6ff);
+}
+
+.split-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .split-row {
+    grid-template-columns: 1fr;
+  }
+
+  .inline-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

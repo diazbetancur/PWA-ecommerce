@@ -5,8 +5,8 @@
 }
 
 mat-card {
-  background: #fff;
-  color: #000;
+  background: var(--tenant-surface-color, #fff);
+  color: var(--tenant-text-color, #000);
 }
 
 .header-content {
@@ -19,7 +19,7 @@ mat-card {
     margin: 0;
     font-size: 1.5rem;
     font-weight: 500;
-    color: #000 !important;
+    color: var(--tenant-text-color, #000) !important;
   }
 }
 
@@ -31,7 +31,7 @@ mat-card {
 
   p {
     margin: 0;
-    color: rgba(0, 0, 0, 0.6);
+    color: var(--tenant-text-muted-color, rgba(0, 0, 0, 0.6));
   }
 }
 
@@ -50,7 +50,7 @@ mat-card {
     margin: 0 0 0.5rem;
     font-size: 1.125rem;
     font-weight: 500;
-    color: #000 !important;
+    color: var(--tenant-text-color, #000) !important;
     border-bottom: 2px solid var(--tenant-primary-color, #1976d2);
     padding-bottom: 0.5rem;
   }
@@ -98,7 +98,7 @@ mat-form-field {
   display: block;
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--tenant-text-muted-color, rgba(0, 0, 0, 0.6));
   margin-bottom: 0.25rem;
 }
 
@@ -114,11 +114,11 @@ mat-form-field {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
-  background: #e3f2fd;
-  border: 1px solid #90caf9;
+  background: var(--tenant-primary-light, #e3f2fd);
+  border: 1px solid var(--tenant-border-color, #90caf9);
   border-radius: 16px;
   font-size: 0.875rem;
-  color: #1976d2;
+  color: var(--tenant-primary-color, #1976d2);
 
   .category-name {
     font-weight: 500;
@@ -127,7 +127,7 @@ mat-form-field {
   .remove-category {
     background: transparent;
     border: none;
-    color: #1976d2;
+    color: var(--tenant-primary-color, #1976d2);
     font-size: 1.25rem;
     line-height: 1;
     cursor: pointer;
@@ -142,7 +142,8 @@ mat-form-field {
 
     &:hover {
       background: rgba(25, 118, 210, 0.1);
-      color: #0d47a1;
+      background: var(--tenant-primary-light, rgba(25, 118, 210, 0.1));
+      color: var(--tenant-primary-hover, #0d47a1);
     }
   }
 }
@@ -151,7 +152,7 @@ mat-form-field {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  border: 2px dashed #e0e0e0;
+  border: 2px dashed var(--tenant-border-color, #e0e0e0);
   border-radius: 4px;
   padding: 0.75rem 1rem;
   justify-content: center;
@@ -160,11 +161,11 @@ mat-form-field {
 
   &:hover {
     border-color: var(--tenant-primary-color, #1976d2);
-    background: rgba(25, 118, 210, 0.04);
+    background: var(--tenant-primary-light, rgba(25, 118, 210, 0.04));
   }
 
   mat-icon {
-    color: rgba(0, 0, 0, 0.54);
+    color: var(--tenant-text-muted-color, rgba(0, 0, 0, 0.54));
   }
 }
 
@@ -175,7 +176,7 @@ mat-form-field {
 // ==================== STOCK DISTRIBUTION ====================
 .stock-distribution-section {
   margin-top: 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--tenant-border-color, #e0e0e0);
   border-radius: 8px;
   overflow: hidden;
 
@@ -198,28 +199,28 @@ mat-form-field {
     align-items: center;
     gap: 0.75rem;
     padding: 1rem;
-    background: #f5f5f5;
+    background: var(--tenant-primary-light, #f5f5f5);
     border: none;
     cursor: pointer;
     font-size: 1rem;
     font-weight: 500;
-    color: #333;
+    color: var(--tenant-text-color, #333);
     transition: background 0.2s;
 
     &:hover {
-      background: #e8e8e8;
+      background: var(--tenant-primary-light, #e8e8e8);
     }
 
     i.bi-box-seam {
       font-size: 1.25rem;
-      color: #1976d2;
+      color: var(--tenant-primary-color, #1976d2);
     }
 
     i.bi-chevron-up,
     i.bi-chevron-down {
       margin-left: auto;
       font-size: 1rem;
-      color: #666;
+      color: var(--tenant-text-muted-color, #666);
     }
   }
 
@@ -228,42 +229,42 @@ mat-form-field {
     align-items: center;
     gap: 0.5rem;
     padding: 1rem;
-    background: #e8f5e9;
-    border-left: 3px solid #4caf50;
+    background: var(--tenant-primary-light, #e8f5e9);
+    border-left: 3px solid var(--tenant-secondary-color, #4caf50);
     font-size: 0.95rem;
 
     &.stock-invalid {
-      background: #ffebee;
-      border-left-color: #f44336;
+      background: var(--tenant-primary-light, #ffebee);
+      border-left-color: var(--tenant-accent-color, #f44336);
     }
 
     .summary-label {
-      color: #666;
+      color: var(--tenant-text-muted-color, #666);
     }
 
     strong {
-      color: #2e7d32;
+      color: var(--tenant-secondary-color, #2e7d32);
       font-size: 1.1rem;
     }
 
     .separator {
-      color: #999;
+      color: var(--tenant-text-muted-color, #999);
     }
 
     .remaining {
-      color: #2e7d32;
+      color: var(--tenant-secondary-color, #2e7d32);
       font-weight: 500;
 
       &.negative {
-        color: #d32f2f;
+        color: var(--tenant-accent-color, #d32f2f);
       }
     }
   }
 
   .distribution-content {
     padding: 1.5rem;
-    background: #fafafa;
-    border-top: 1px solid #e0e0e0;
+    background: var(--tenant-primary-light, #fafafa);
+    border-top: 1px solid var(--tenant-border-color, #e0e0e0);
   }
 
   .add-stock-form {
@@ -283,23 +284,23 @@ mat-form-field {
 
   .store-select {
     padding: 0.75rem;
-    border: 1px solid #d0d0d0;
+    border: 1px solid var(--tenant-border-color, #d0d0d0);
     border-radius: 4px;
     font-size: 0.95rem;
     background: #fff;
-    color: #333;
+    color: var(--tenant-text-color, #333);
     cursor: pointer;
 
     &:focus {
       outline: none;
       border-color: #1976d2;
-      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+      box-shadow: 0 0 0 2px var(--tenant-primary-light, rgba(25, 118, 210, 0.1));
     }
   }
 
   .stock-input {
     padding: 0.75rem;
-    border: 1px solid #d0d0d0;
+    border: 1px solid var(--tenant-border-color, #d0d0d0);
     border-radius: 4px;
     font-size: 0.95rem;
     text-align: center;
@@ -307,7 +308,7 @@ mat-form-field {
     &:focus {
       outline: none;
       border-color: #1976d2;
-      box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+      box-shadow: 0 0 0 2px var(--tenant-primary-light, rgba(25, 118, 210, 0.1));
     }
   }
 
@@ -316,8 +317,8 @@ mat-form-field {
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1.25rem;
-    background: #1976d2;
-    color: #fff;
+    background: var(--tenant-primary-color, #1976d2);
+    color: var(--tenant-on-primary, #fff);
     border: none;
     border-radius: 4px;
     font-weight: 500;
@@ -326,11 +327,11 @@ mat-form-field {
     white-space: nowrap;
 
     &:hover:not(:disabled) {
-      background: #1565c0;
+      background: var(--tenant-primary-hover, #1565c0);
     }
 
     &:disabled {
-      background: #ccc;
+      background: var(--tenant-text-muted-color, #ccc);
       cursor: not-allowed;
       opacity: 0.6;
     }
@@ -345,10 +346,10 @@ mat-form-field {
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem;
-    background: #e3f2fd;
-    border: 1px solid #90caf9;
+    background: var(--tenant-primary-light, #e3f2fd);
+    border: 1px solid var(--tenant-border-color, #90caf9);
     border-radius: 4px;
-    color: #1565c0;
+    color: var(--tenant-primary-color, #1565c0);
     font-size: 0.9rem;
     margin-top: 0.75rem;
 
@@ -358,8 +359,8 @@ mat-form-field {
   }
 
   .distribution-table {
-    background: #fff;
-    border: 1px solid #e0e0e0;
+    background: var(--tenant-surface-color, #fff);
+    border: 1px solid var(--tenant-border-color, #e0e0e0);
     border-radius: 4px;
     overflow: hidden;
 
@@ -368,15 +369,15 @@ mat-form-field {
       border-collapse: collapse;
 
       thead {
-        background: #f5f5f5;
+        background: var(--tenant-primary-light, #f5f5f5);
 
         th {
           padding: 0.75rem 1rem;
           text-align: left;
           font-weight: 600;
           font-size: 0.875rem;
-          color: #555;
-          border-bottom: 2px solid #e0e0e0;
+          color: var(--tenant-text-muted-color, #555);
+          border-bottom: 2px solid var(--tenant-border-color, #e0e0e0);
 
           &:last-child {
             text-align: center;
@@ -387,16 +388,16 @@ mat-form-field {
 
       tbody {
         tr {
-          border-bottom: 1px solid #f0f0f0;
+          border-bottom: 1px solid var(--tenant-border-color, #f0f0f0);
 
           &:hover {
-            background: #fafafa;
+            background: var(--tenant-primary-light, #fafafa);
           }
         }
 
         td {
           padding: 0.75rem 1rem;
-          color: #333;
+          color: var(--tenant-text-color, #333);
 
           &.store-name {
             display: flex;
@@ -405,7 +406,7 @@ mat-form-field {
             font-weight: 500;
 
             i {
-              color: #1976d2;
+              color: var(--tenant-primary-color, #1976d2);
               font-size: 1.1rem;
             }
           }
@@ -420,7 +421,7 @@ mat-form-field {
     .stock-input-inline {
       width: 100px;
       padding: 0.5rem;
-      border: 1px solid #d0d0d0;
+      border: 1px solid var(--tenant-border-color, #d0d0d0);
       border-radius: 4px;
       text-align: center;
       font-size: 0.95rem;
@@ -428,7 +429,8 @@ mat-form-field {
       &:focus {
         outline: none;
         border-color: #1976d2;
-        box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        box-shadow: 0 0 0 2px
+          var(--tenant-primary-light, rgba(25, 118, 210, 0.1));
       }
     }
 
@@ -439,15 +441,15 @@ mat-form-field {
       width: 32px;
       height: 32px;
       background: transparent;
-      border: 1px solid #f44336;
+      border: 1px solid var(--tenant-accent-color, #f44336);
       border-radius: 4px;
-      color: #f44336;
+      color: var(--tenant-accent-color, #f44336);
       cursor: pointer;
       transition: all 0.2s;
 
       &:hover {
-        background: #f44336;
-        color: #fff;
+        background: var(--tenant-accent-color, #f44336);
+        color: var(--tenant-on-primary, #fff);
       }
 
       i {
@@ -461,15 +463,15 @@ mat-form-field {
     align-items: center;
     gap: 0.75rem;
     padding: 1rem;
-    background: #ffebee;
-    border: 1px solid #f44336;
+    background: var(--tenant-primary-light, #ffebee);
+    border: 1px solid var(--tenant-accent-color, #f44336);
     border-radius: 4px;
-    color: #c62828;
+    color: var(--tenant-accent-color, #c62828);
     margin-top: 1rem;
 
     i {
       font-size: 1.25rem;
-      color: #f44336;
+      color: var(--tenant-accent-color, #f44336);
     }
 
     strong {
@@ -480,22 +482,22 @@ mat-form-field {
   .empty-state {
     text-align: center;
     padding: 3rem 1rem;
-    color: #999;
+    color: var(--tenant-text-muted-color, #999);
 
     i {
       font-size: 3rem;
-      color: #ccc;
+      color: var(--tenant-text-muted-color, #ccc);
       margin-bottom: 1rem;
     }
 
     p {
       margin: 0.5rem 0;
       font-size: 1rem;
-      color: #666;
+      color: var(--tenant-text-muted-color, #666);
     }
 
     small {
-      color: #999;
+      color: var(--tenant-text-muted-color, #999);
       font-size: 0.875rem;
     }
   }
@@ -506,27 +508,27 @@ mat-form-field {
   .product-form-container {
     mat-form-field {
       .mat-mdc-text-field-wrapper {
-        background: #fff;
+        background: var(--tenant-surface-color, #fff);
       }
 
       input,
       textarea {
-        color: #000 !important;
+        color: var(--tenant-text-color, #000) !important;
       }
 
       .mat-mdc-form-field-label,
       .mat-mdc-floating-label {
-        color: rgba(0, 0, 0, 0.6) !important;
+        color: var(--tenant-text-muted-color, rgba(0, 0, 0, 0.6)) !important;
       }
 
       .mat-mdc-form-field-hint {
-        color: rgba(0, 0, 0, 0.6) !important;
+        color: var(--tenant-text-muted-color, rgba(0, 0, 0, 0.6)) !important;
       }
     }
 
     mat-checkbox {
       .mdc-label {
-        color: #000 !important;
+        color: var(--tenant-text-color, #000) !important;
       }
     }
   }
@@ -537,7 +539,7 @@ mat-form-field {
   justify-content: flex-end;
   gap: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--tenant-border-color, #e0e0e0);
 
   button {
     display: inline-flex;

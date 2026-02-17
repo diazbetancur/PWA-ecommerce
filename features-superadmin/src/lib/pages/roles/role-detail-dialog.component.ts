@@ -151,7 +151,6 @@ export class RoleDetailDialogComponent implements OnInit {
 
       this.users.set(usersWithRole);
     } catch (err: unknown) {
-      console.error('Error al cargar usuarios:', err);
     } finally {
       this.isLoadingUsers.set(false);
     }

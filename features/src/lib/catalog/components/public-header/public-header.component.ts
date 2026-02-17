@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService, TenantConfigService } from '@pwa/core';
+import { TenantAuthModalService } from '@pwa/features-account';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
@@ -34,6 +35,7 @@ export class PublicHeaderComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly tenantConfig = inject(TenantConfigService);
+  private readonly tenantAuthModal = inject(TenantAuthModalService);
 
   // Search control
   searchControl = new FormControl('');
@@ -87,7 +89,7 @@ export class PublicHeaderComponent {
   }
 
   goToLogin(): void {
-    this.router.navigate(['/account/login']);
+    this.tenantAuthModal.open('login');
   }
 
   goToProfile(): void {

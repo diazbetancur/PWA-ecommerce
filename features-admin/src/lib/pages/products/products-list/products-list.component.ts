@@ -127,7 +127,6 @@ export class ProductsListComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading products:', error);
         this.snackBar.open('Error al cargar productos', 'Cerrar', {
           duration: 3000,
         });
@@ -168,7 +167,6 @@ export class ProductsListComponent implements OnInit {
         this.loadProducts();
       },
       error: (error) => {
-        console.error('Error toggling featured:', error);
         this.snackBar.open('Error al actualizar producto', 'Cerrar', {
           duration: 3000,
         });
@@ -201,7 +199,6 @@ export class ProductsListComponent implements OnInit {
         this.loadProducts();
       },
       error: (error) => {
-        console.error('Error deleting product:', error);
         this.snackBar.open('Error al eliminar producto', 'Cerrar', {
           duration: 3000,
         });

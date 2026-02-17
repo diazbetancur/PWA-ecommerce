@@ -74,7 +74,6 @@ export class CreateRoleDialogComponent implements OnInit {
       const response = await this.rolesService.getAllPermissions();
       this.permissionGroups.set(response.groups);
     } catch (err: unknown) {
-      console.error('Error al cargar permisos:', err)
       this.error.set('Error al cargar los permisos disponibles');
     } finally {
       this.isLoading.set(false);
@@ -165,7 +164,6 @@ export class CreateRoleDialogComponent implements OnInit {
 
       this.dialogRef.close(true); // Cierra y notifica creación exitosa
     } catch (err: unknown) {
-      console.error('Error al crear rol:', err);
       this.error.set('Error al crear el rol. Verifique que el nombre no exista.');
     } finally {
       this.isSaving.set(false);

@@ -56,7 +56,6 @@ export class StorefrontApiService {
       .getWithParams<StoreBannerDto[]>('/api/store/banners', params)
       .pipe(
         catchError((error: unknown) => {
-          console.error('[StorefrontApiService] Error getting banners:', error);
           throw error;
         })
       );
@@ -82,10 +81,6 @@ export class StorefrontApiService {
       .getWithParams<StoreCategoryDto[]>('/api/store/categories', params)
       .pipe(
         catchError((error: unknown) => {
-          console.error(
-            '[StorefrontApiService] Error getting categories:',
-            error
-          );
           throw error;
         })
       );
@@ -102,10 +97,6 @@ export class StorefrontApiService {
       .get<StoreCategoryDetailDto>(`/api/store/categories/${slug}`)
       .pipe(
         catchError((error: unknown) => {
-          console.error(
-            `[StorefrontApiService] Error getting category ${slug}:`,
-            error
-          );
           throw error;
         })
       );
@@ -144,10 +135,6 @@ export class StorefrontApiService {
       .getWithParams<StoreProductListResponse>('/api/store/products', params)
       .pipe(
         catchError((error: unknown) => {
-          console.error(
-            '[StorefrontApiService] Error getting products:',
-            error
-          );
           throw error;
         })
       );
@@ -166,10 +153,6 @@ export class StorefrontApiService {
       .getWithParams<StoreProductDto[]>('/api/store/products/featured', params)
       .pipe(
         catchError((error: unknown) => {
-          console.error(
-            '[StorefrontApiService] Error getting featured products:',
-            error
-          );
           throw error;
         })
       );
@@ -189,9 +172,6 @@ export class StorefrontApiService {
     limit = 10
   ): Observable<StoreProductSearchResult[]> {
     if (query.length < 2) {
-      console.warn(
-        '[StorefrontApiService] Search query too short, minimum 2 characters'
-      );
       return new Observable((observer) => {
         observer.next([]);
         observer.complete();
@@ -210,10 +190,6 @@ export class StorefrontApiService {
       )
       .pipe(
         catchError((error: unknown) => {
-          console.error(
-            '[StorefrontApiService] Error searching products:',
-            error
-          );
           throw error;
         })
       );
@@ -232,10 +208,6 @@ export class StorefrontApiService {
       .get<StoreProductDetailDto>(`/api/store/products/${slug}`)
       .pipe(
         catchError((error: unknown) => {
-          console.error(
-            `[StorefrontApiService] Error getting product ${slug}:`,
-            error
-          );
           throw error;
         })
       );

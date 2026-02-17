@@ -11,9 +11,7 @@ export function tenantBootstrapFactory(): () => Promise<void> {
   return async (): Promise<void> => {
     try {
       await tenantBootstrapService.initialize();
-      console.log('✅ Tenant bootstrap completado exitosamente');
     } catch (error) {
-      console.error('❌ Error en tenant bootstrap:', error);
       // No lanzar el error para evitar que la app falle completamente
       // El servicio ya maneja el fallback a configuración por defecto
     }

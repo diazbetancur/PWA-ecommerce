@@ -210,7 +210,6 @@ export class AppEnvService {
       // Validar configuración
       const validation = this.validateEnvironment();
       if (!validation.isValid) {
-        console.error('❌ Environment validation failed:', validation.errors);
       }
     }
   }

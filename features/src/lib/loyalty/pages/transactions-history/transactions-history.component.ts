@@ -407,7 +407,6 @@ export class TransactionsHistoryComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error('Error cargando transacciones:', err);
           this.error.set(
             'No se pudieron cargar las transacciones. Por favor, intenta de nuevo.'
           );

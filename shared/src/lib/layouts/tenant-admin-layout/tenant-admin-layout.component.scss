@@ -81,7 +81,7 @@
   height: 40px;
   border: none;
   background: transparent;
-  color: var(--tenant-text-muted-color, #6b7280);
+  color: var(--tenant-primary-color, #6b7280);
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s;
@@ -89,7 +89,7 @@
 
 .icon-button:hover {
   background: var(--tenant-primary-light, #f3f4f6);
-  color: var(--tenant-text-color, #111827);
+  color: var(--tenant-primary-hover, #111827);
 }
 
 .icon-button .material-icons {

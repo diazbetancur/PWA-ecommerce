@@ -109,7 +109,6 @@ export class ProductStockByStoresComponent implements OnInit {
           this.loading.set(false);
         },
         error: (err) => {
-          console.error('Error al cargar stock:', err);
           this.error.set('Error al cargar el stock por tiendas');
           this.loading.set(false);
         },
@@ -184,7 +183,6 @@ export class ProductStockByStoresComponent implements OnInit {
           this.loadStock(productId); // Recargar datos
         },
         error: (err) => {
-          console.error('Error al actualizar stock:', err);
           const message = err.error?.detail || 'Error al actualizar el stock';
           this.toastService.error(message);
           this.savingStock.set(false);

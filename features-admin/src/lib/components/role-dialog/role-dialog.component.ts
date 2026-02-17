@@ -130,7 +130,6 @@ export class RoleDialogComponent implements OnInit {
             this.dialogRef.close(true); // Cerrar con éxito
           }),
           catchError((error) => {
-            console.error('Error al actualizar rol:', error);
             this.handleError(error);
             return of(null);
           }),
@@ -146,7 +145,6 @@ export class RoleDialogComponent implements OnInit {
             this.dialogRef.close(true);
           }),
           catchError((error) => {
-            console.error('Error al crear rol:', error);
             this.handleError(error);
             return of(null);
           }),

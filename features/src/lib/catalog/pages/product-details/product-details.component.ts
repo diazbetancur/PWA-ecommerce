@@ -90,7 +90,6 @@ export class ProductDetailsComponent implements OnInit {
   addToCart() {
     const prod = this.product();
     if (prod) {
-      console.log('Agregar al carrito:', prod);
       // Placeholder: integrar con CartService
       alert(`${prod.name} agregado al carrito`);
     }

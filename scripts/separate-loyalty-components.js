@@ -58,14 +58,12 @@ function processComponent(componentPath) {
     .replace('.component', '');
   const baseName = path.basename(fullPath, '.ts');
 
-  console.log(`\nProcesando: ${componentPath}`);
 
   // Leer el archivo
   let content;
   try {
     content = fs.readFileSync(fullPath, 'utf8');
   } catch (error) {
-    console.error(`  ❌ Error leyendo archivo: ${error.message}`);
     return false;
   }
 
@@ -74,7 +72,6 @@ function processComponent(componentPath) {
   const styles = extractStyles(content);
 
   if (!template && !styles) {
-    console.log(`  ⚠️  No tiene template o styles inline, saltando...`);
     return true; // Ya está separado
   }
 
@@ -83,9 +80,7 @@ function processComponent(componentPath) {
     const htmlPath = path.join(componentDir, `${baseName}.html`);
     try {
       fs.writeFileSync(htmlPath, template.trim() + '\n', 'utf8');
-      console.log(`  ✅ HTML creado: ${baseName}.html`);
     } catch (error) {
-      console.error(`  ❌ Error creando HTML: ${error.message}`);
       return false;
     }
   }
@@ -95,9 +90,7 @@ function processComponent(componentPath) {
     const scssPath = path.join(componentDir, `${baseName}.scss`);
     try {
       fs.writeFileSync(scssPath, styles.trim() + '\n', 'utf8');
-      console.log(`  ✅ SCSS creado: ${baseName}.scss`);
     } catch (error) {
-      console.error(`  ❌ Error creando SCSS: ${error.message}`);
       return false;
     }
   }
@@ -108,9 +101,7 @@ function processComponent(componentPath) {
 
   try {
     fs.writeFileSync(fullPath, newContent, 'utf8');
-    console.log(`  ✅ TS actualizado`);
   } catch (error) {
-    console.error(`  ❌ Error actualizando TS: ${error.message}`);
     return false;
   }
 
@@ -118,8 +109,7 @@ function processComponent(componentPath) {
 }
 
 // Procesar todos los componentes
-console.log('🚀 Iniciando separación de componentes de lealtad...\n');
-console.log(
+void (
   `📦 Total de componentes a procesar: ${componentsToProcess.length}\n`
 );
 
@@ -138,12 +128,5 @@ componentsToProcess.forEach((componentPath) => {
   }
 });
 
-console.log('\n' + '='.repeat(60));
-console.log('📊 RESUMEN');
-console.log('='.repeat(60));
-console.log(`✅ Procesados exitosamente: ${successCount}`);
-console.log(`⚠️  Saltados (ya separados): ${skipCount}`);
-console.log(`❌ Errores: ${errorCount}`);
-console.log('='.repeat(60) + '\n');
 
 process.exit(errorCount > 0 ? 1 : 0);

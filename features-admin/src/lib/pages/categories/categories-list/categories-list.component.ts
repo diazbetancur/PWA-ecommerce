@@ -134,7 +134,6 @@ export class CategoriesListComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading categories:', error);
         this.snackBar.open('Error al cargar categorías', 'Cerrar', {
           duration: 3000,
         });
@@ -188,7 +187,6 @@ export class CategoriesListComponent implements OnInit {
         this.loadCategories();
       },
       error: (error) => {
-        console.error('Error deleting category:', error);
         this.snackBar.open(
           error.error?.message || 'Error al eliminar categoría',
           'Cerrar',

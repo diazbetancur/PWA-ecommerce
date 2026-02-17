@@ -414,7 +414,6 @@ export class RewardsCatalogComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error('Error cargando premios:', err);
           this.error.set(
             'No se pudieron cargar los premios. Por favor, intenta de nuevo.'
           );
@@ -520,7 +519,6 @@ export class RewardsCatalogComponent implements OnInit {
           this.loadRewards(); // Recargar para actualizar stock
         },
         error: (err) => {
-          console.error('Error canjeando premio:', err);
           alert(
             'No se pudo canjear el premio. Verifica que tengas suficientes puntos.'
           );

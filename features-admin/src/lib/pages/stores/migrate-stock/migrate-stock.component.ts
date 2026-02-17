@@ -81,7 +81,6 @@ export class MigrateStockComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error('Error al cargar tiendas:', err);
           this.error.set('Error al cargar las tiendas');
           this.loading.set(false);
         },
@@ -138,7 +137,6 @@ export class MigrateStockComponent implements OnInit {
           this.migrating.set(false);
         },
         error: (err) => {
-          console.error('Error en migración:', err);
           const errorMessage =
             err.error?.detail || 'Error al ejecutar la migración de stock';
           this.error.set(errorMessage);

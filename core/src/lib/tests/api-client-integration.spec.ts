@@ -183,20 +183,12 @@ describe('ApiClientService + TenantHeaderInterceptor Integration', () => {
 export function demoApiClientHeaders() {
   console.group('🧪 Demo ApiClientService Multi-tenant Headers');
 
-  console.log('✅ Headers automáticos agregados:');
-  console.log('   X-Tenant-Slug: demo-tenant');
-  console.log('   X-Tenant-Key: demo-key-123');
 
-  console.log(String.raw`
+  void (String.raw`
 📡 Request simulada:`);
-  console.log('   GET /api/catalog/products');
 
-  console.log(String.raw`
+  void (String.raw`
 🔍 Interceptor detecta:`);
-  console.log('   - URL contiene "/api/" ✓');
-  console.log('   - No es URL pública ✓');
-  console.log('   - Tenant cargado ✓');
-  console.log('   - Headers agregados automáticamente ✓');
 
   console.groupEnd();
 }

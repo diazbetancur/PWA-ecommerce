@@ -6,7 +6,7 @@
 
 mat-card {
   margin-bottom: 1rem;
-  background-color: #ffffff;
+  background-color: var(--tenant-surface-color, #ffffff);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -24,14 +24,14 @@ mat-card {
     font-size: 2rem;
     width: 2rem;
     height: 2rem;
-    color: #475569;
+    color: var(--tenant-secondary-color, #475569);
   }
 
   h1 {
     margin: 0;
     font-size: 1.5rem;
     font-weight: 500;
-    color: #1e293b;
+    color: var(--tenant-text-color, #1e293b);
   }
 }
 
@@ -45,7 +45,7 @@ mat-card {
   gap: 1rem;
 
   p {
-    color: #64748b;
+    color: var(--tenant-text-muted-color, #64748b);
     margin: 0;
   }
 }
@@ -78,7 +78,7 @@ mat-card {
       textarea {
         padding: 0.75rem 1rem;
         font-size: 0.9375rem;
-        color: #1e293b;
+        color: var(--tenant-text-color, #1e293b);
         background: white;
       }
 
@@ -91,6 +91,7 @@ mat-card {
         .mdc-notched-outline__notch,
         .mdc-notched-outline__trailing {
           border-color: #cbd5e1;
+          border-color: var(--tenant-border-color, #cbd5e1);
           border-width: 1px;
         }
       }
@@ -107,7 +108,7 @@ mat-card {
       }
 
       .mat-mdc-floating-label {
-        color: #64748b;
+        color: var(--tenant-text-muted-color, #64748b);
         font-size: 0.9rem;
       }
 
@@ -116,12 +117,12 @@ mat-card {
       }
 
       mat-hint {
-        color: #94a3b8;
+        color: var(--tenant-text-muted-color, #94a3b8);
         font-size: 0.8125rem;
       }
 
       mat-error {
-        color: #ef4444;
+        color: var(--tenant-accent-color, #ef4444);
         font-size: 0.8125rem;
       }
     }
@@ -130,14 +131,14 @@ mat-card {
   // Preview de imagen
   .image-preview {
     padding: 1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--tenant-border-color, #e2e8f0);
     border-radius: 8px;
-    background-color: #f8fafc;
+    background-color: var(--tenant-primary-light, #f8fafc);
 
     .preview-label {
       margin: 0 0 0.75rem;
       font-size: 0.875rem;
-      color: #475569;
+      color: var(--tenant-text-muted-color, #475569);
       font-weight: 500;
     }
 
@@ -154,28 +155,28 @@ mat-card {
     padding: 0.5rem 0;
 
     ::ng-deep .mat-mdc-checkbox-label {
-      color: #000000 !important;
+      color: var(--tenant-text-color, #000000) !important;
     }
 
     .checkbox-hint {
       margin: 0.5rem 0 0 2rem;
       font-size: 0.875rem;
-      color: #000000;
+      color: var(--tenant-text-color, #000000);
     }
   }
 
   // Sección de info adicional
   .info-section {
     padding: 1.5rem;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--tenant-border-color, rgba(0, 0, 0, 0.3));
     border-radius: 8px;
-    background-color: #f5f5f5;
+    background-color: var(--tenant-primary-light, #f5f5f5);
 
     h3 {
       margin: 0 0 1rem;
       font-size: 1rem;
       font-weight: 500;
-      color: #000000;
+      color: var(--tenant-text-color, #000000);
     }
 
     .info-grid {
@@ -194,22 +195,24 @@ mat-card {
         font-weight: 500;
         text-transform: uppercase;
         color: #000000;
+        color: var(--tenant-text-muted-color, #000000);
         letter-spacing: 0.5px;
       }
 
       code {
         font-family: 'Courier New', monospace;
         background-color: #fff;
+        background-color: var(--tenant-surface-color, #fff);
         padding: 0.25rem 0.5rem;
         border-radius: 4px;
         font-size: 0.875rem;
-        border: 1px solid rgba(0, 0, 0, 0.3);
-        color: #000000;
+        border: 1px solid var(--tenant-border-color, rgba(0, 0, 0, 0.3));
+        color: var(--tenant-text-color, #000000);
       }
 
       span {
         font-size: 0.875rem;
-        color: #000000;
+        color: var(--tenant-text-color, #000000);
       }
     }
   }
@@ -220,7 +223,7 @@ mat-card {
     justify-content: flex-end;
     gap: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba(0, 0, 0, 0.3);
+    border-top: 1px solid var(--tenant-border-color, rgba(0, 0, 0, 0.3));
 
     button {
       min-width: 120px;
@@ -241,7 +244,7 @@ mat-card {
           .mat-mdc-button-persistent-ripple,
           .mdc-button__label,
           mat-icon {
-            color: #000000 !important;
+            color: var(--tenant-on-primary, #ffffff) !important;
           }
 
           .mat-ripple-element {
@@ -264,11 +267,11 @@ mat-card {
 
       // Botón secundario/stroked
       &.mat-mdc-outlined-button {
-        color: #000000;
-        border-color: rgba(0, 0, 0, 0.3);
+        color: var(--tenant-text-color, #000000);
+        border-color: var(--tenant-border-color, rgba(0, 0, 0, 0.3));
 
         &:hover {
-          background-color: rgba(0, 0, 0, 0.05);
+          background-color: var(--tenant-primary-light, rgba(0, 0, 0, 0.05));
         }
       }
     }

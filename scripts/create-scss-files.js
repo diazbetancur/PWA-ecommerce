@@ -29,14 +29,12 @@ function extractAndCreateScss(componentPath) {
   const componentDir = path.dirname(fullPath);
   const baseName = path.basename(fullPath, '.ts');
 
-  console.log(`\nProcesando: ${componentPath}`);
 
   // Leer el archivo
   let content;
   try {
     content = fs.readFileSync(fullPath, 'utf8');
   } catch (error) {
-    console.error(`  ❌ Error leyendo archivo: ${error.message}`);
     return false;
   }
 
@@ -69,7 +67,6 @@ function extractAndCreateScss(componentPath) {
   }
 
   if (!stylesContent) {
-    console.log(`  ⚠️  No se encontraron styles inline`);
     return null;
   }
 
@@ -78,17 +75,15 @@ function extractAndCreateScss(componentPath) {
 
   // Verificar si ya existe
   if (fs.existsSync(scssPath)) {
-    console.log(`  ⚠️  SCSS ya existe, saltando...`);
     return null;
   }
 
   try {
     fs.writeFileSync(scssPath, stylesContent.trim() + '\n', 'utf8');
-    console.log(
+    void (
       `  ✅ SCSS creado: ${baseName}.scss (${stylesContent.length} caracteres)`
     );
   } catch (error) {
-    console.error(`  ❌ Error creando SCSS: ${error.message}`);
     return false;
   }
 
@@ -102,9 +97,7 @@ function extractAndCreateScss(componentPath) {
 
   try {
     fs.writeFileSync(fullPath, newContent, 'utf8');
-    console.log(`  ✅ TS actualizado con styleUrl`);
   } catch (error) {
-    console.error(`  ❌ Error actualizando TS: ${error.message}`);
     return false;
   }
 
@@ -112,8 +105,7 @@ function extractAndCreateScss(componentPath) {
 }
 
 // Procesar todos los componentes
-console.log('🚀 Iniciando creación de archivos SCSS...\n');
-console.log(
+void (
   `📦 Total de componentes a procesar: ${componentsToProcess.length}\n`
 );
 
@@ -132,12 +124,5 @@ componentsToProcess.forEach((componentPath) => {
   }
 });
 
-console.log('\n' + '='.repeat(60));
-console.log('📊 RESUMEN');
-console.log('='.repeat(60));
-console.log(`✅ Procesados exitosamente: ${successCount}`);
-console.log(`⚠️  Saltados (sin styles/ya existe): ${skipCount}`);
-console.log(`❌ Errores: ${errorCount}`);
-console.log('='.repeat(60) + '\n');
 
 process.exit(errorCount > 0 ? 1 : 0);

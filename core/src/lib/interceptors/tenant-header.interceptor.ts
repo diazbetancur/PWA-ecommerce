@@ -46,11 +46,6 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
         });
 
         if (this.isDevelopment()) {
-          console.log(
-            `🔐 [TenantHeaderInterceptor] Modo Admin General\n` +
-              `   URL: ${req.method} ${req.url}\n` +
-              `   Header: X-Admin-Mode: general`
-          );
         }
 
         return next.handle(adminRequest);
@@ -78,11 +73,6 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
 
     // Si no hay tenant cargado aún, continuar sin headers (caso borde inicial)
     if (!tenantHeaders.slug && !tenantHeaders.key) {
-      console.warn(
-        `⚠️  [TenantHeaderInterceptor] No hay tenant cargado\n` +
-          `    URL: ${req.method} ${req.url}\n` +
-          `    Continuando sin headers de tenant...`
-      );
       return next.handle(req);
     }
 
@@ -147,24 +137,15 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
     const relativePath = urlObj.pathname + urlObj.search;
 
     console.group(`🔐 [TenantHeaderInterceptor] ${req.method} ${relativePath}`);
-    console.log('📍 URL completa:', req.url);
-    console.log('🏢 Tenant Slug:', tenantHeaders.slug);
-    console.log(
-      '🔑 Tenant Key:',
-      tenantHeaders.key ? `${tenantHeaders.key.substring(0, 8)}...` : null
-    );
-    console.log('📋 Headers agregados:', headersToAdd);
 
     // Mostrar todos los headers del request (útil para debugging)
     const allHeaders: { [key: string]: string } = {};
     for (const key of req.headers.keys()) {
       allHeaders[key] = req.headers.get(key) || '';
     }
-    console.log('📨 Todos los headers:', allHeaders);
 
     // Si hay body, mostrarlo
     if (req.body) {
-      console.log('📦 Request Body:', req.body);
     }
 
     console.groupEnd();
@@ -185,12 +166,8 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
     console.group(
       `✅ [TenantHeaderInterceptor] ${req.method} ${relativePath} - ${event.status}`
     );
-    console.log('⏱️  Duración:', `${duration}ms`);
-    console.log('📊 Status:', event.status, event.statusText);
-    console.log('📍 URL:', req.url);
 
     if (event.body) {
-      console.log('📥 Response Body:', event.body);
     }
 
     console.groupEnd();
@@ -211,13 +188,8 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
     console.group(
       `❌ [TenantHeaderInterceptor] ${req.method} ${relativePath} - ERROR`
     );
-    console.error('⏱️  Duración:', `${duration}ms`);
-    console.error('🚨 Status:', error.status, error.statusText);
-    console.error('📍 URL:', req.url);
-    console.error('💥 Error:', error.error || error.message);
 
     if (error.error) {
-      console.error('📥 Error Body:', error.error);
     }
 
     console.groupEnd();
@@ -228,10 +200,7 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
    */
   private logPublicRequest(req: HttpRequest<any>): void {
     const urlObj = new URL(req.url);
-    const relativePath = urlObj.pathname + urlObj.search;
-
-    console.log(
-      `🌐 [TenantHeaderInterceptor] ${req.method} ${relativePath} (público, sin tenant headers)`
-    );
+    void urlObj;
+    void req;
   }
 }

@@ -2,11 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '@pwa/shared';
-import { TenantUserSummaryDto } from '../../../models/tenant-user.model';
 import {
   AdjustPointsRequest,
   AdjustPointsResponse,
 } from '../../../models/loyalty.models';
+import { TenantUserSummaryDto } from '../../../models/tenant-user.model';
 import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 import { TenantUserService } from '../../../services/tenant-user.service';
 
@@ -471,12 +471,16 @@ export class PointsAdjustmentComponent {
     }
 
     if (!this.isValidUuid(this.formData.userId)) {
-      this.toastService.warning('El ID de usuario debe tener formato UUID válido.');
+      this.toastService.warning(
+        'El ID de usuario debe tener formato UUID válido.'
+      );
       return;
     }
 
     if (this.formData.points < -100000 || this.formData.points > 100000) {
-      this.toastService.warning('Los puntos deben estar entre -100000 y 100000.');
+      this.toastService.warning(
+        'Los puntos deben estar entre -100000 y 100000.'
+      );
       return;
     }
 
@@ -516,7 +520,6 @@ export class PointsAdjustmentComponent {
           this.isSubmitting.set(false);
         },
         error: (err) => {
-          console.error('Error ajustando puntos:', err);
           this.toastService.error(
             'No se pudo realizar el ajuste. Verifica los datos e intenta nuevamente.'
           );
@@ -567,13 +570,14 @@ export class PointsAdjustmentComponent {
           this.customerSearchResults.set(response.users);
 
           if (response.users.length === 0) {
-            this.toastService.info('No se encontraron clientes con ese correo.');
+            this.toastService.info(
+              'No se encontraron clientes con ese correo.'
+            );
           }
 
           this.isSearchingUser.set(false);
         },
         error: (err) => {
-          console.error('Error buscando clientes por correo:', err);
           this.toastService.error(
             'No se pudo buscar el cliente. Intenta nuevamente.'
           );

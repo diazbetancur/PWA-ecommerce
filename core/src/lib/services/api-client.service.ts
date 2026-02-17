@@ -269,7 +269,6 @@ export class ApiClientService {
   ): Observable<never> {
     const duration = Math.round(performance.now() - startTime);
     if (this.envService.isConsoleLoggingEnabled) {
-      console.error('API Error:', error);
     }
     return throwError(() => error);
   }

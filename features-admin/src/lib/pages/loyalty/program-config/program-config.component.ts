@@ -50,13 +50,11 @@ export class ProgramConfigComponent implements OnInit {
     this.isLoading.set(true);
     this.loyaltyAdminService.getProgramConfig().subscribe({
       next: (config) => {
-        console.log('✅ Configuración cargada:', config);
         this.config.set(config);
         this.initForm(config);
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('❌ Error cargando configuración:', err);
         this.toastService.error(
           `No se pudo cargar la configuración: ${
             err.status || 'Error desconocido'
@@ -74,7 +72,6 @@ export class ProgramConfigComponent implements OnInit {
           updatedAt: new Date().toISOString(),
         };
 
-        console.log('⚠️ Usando configuración por defecto:', defaultConfig);
         this.config.set(defaultConfig);
         this.initForm(defaultConfig);
         this.isLoading.set(false);
@@ -136,7 +133,6 @@ export class ProgramConfigComponent implements OnInit {
         // No redireccionamos, nos quedamos en la misma vista
       },
       error: (err) => {
-        console.error('Error guardando configuración:', err);
         this.toastService.error('No se pudo guardar la configuración');
         this.isSaving.set(false);
       },

@@ -138,7 +138,6 @@ export class ProductGridComponent implements OnInit {
 
   addToCart(product: ProductResponse): void {
     const quantity = this.getQuantity(product.id);
-    console.log(`Agregar al carrito: ${product.name} x${quantity}`);
     // TODO: Implementar servicio de carrito
     // this.cartService.add(product, quantity);
   }

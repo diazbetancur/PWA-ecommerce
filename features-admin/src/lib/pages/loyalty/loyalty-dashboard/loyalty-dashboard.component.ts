@@ -113,19 +113,18 @@ export class LoyaltyDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     // En producción, cargar datos reales aquí
-    console.log('Dashboard de lealtad inicializado');
   }
 
   navigateToRewards(): void {
-    this.router.navigate(['/admin/loyalty/rewards']);
+    this.router.navigate(['/tenant-admin/loyalty/rewards']);
   }
 
   navigateToRedemptions(): void {
-    this.router.navigate(['/admin/loyalty/redemptions']);
+    this.router.navigate(['/tenant-admin/loyalty/redemptions']);
   }
 
   navigateToPointsAdjustment(): void {
-    this.router.navigate(['/admin/loyalty/points-adjustment']);
+    this.router.navigate(['/tenant-admin/loyalty/points-adjustment']);
   }
   navigateToConfig(): void {
     this.router.navigate(['/tenant-admin/loyalty/config']);

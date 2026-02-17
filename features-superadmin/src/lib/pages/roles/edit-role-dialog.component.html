@@ -59,7 +59,9 @@
       <mat-spinner diameter="20"></mat-spinner>
       <span>Guardando...</span>
     } @else {
-      <mat-icon>save</mat-icon>
+      <ng-container matButtonIcon>
+        <mat-icon>save</mat-icon>
+      </ng-container>
       <span>Guardar Cambios</span>
     }
   </button>

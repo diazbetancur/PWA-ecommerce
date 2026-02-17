@@ -442,7 +442,6 @@ export class MyRedemptionsComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error('Error cargando canjes:', err);
           this.error.set(
             'No se pudieron cargar tus canjes. Por favor, intenta de nuevo.'
           );

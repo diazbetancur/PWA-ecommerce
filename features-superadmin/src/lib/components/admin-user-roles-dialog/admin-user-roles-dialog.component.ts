@@ -136,7 +136,6 @@ export class AdminUserRolesDialogComponent implements OnInit {
 
       this.dialogRef.close({ success: true });
     } catch (err: unknown) {
-      console.error('Error al actualizar roles:', err);
       const error = err as { error?: { detail?: string } };
       this.error.set(
         error.error?.detail || 'Error al actualizar los roles del usuario'

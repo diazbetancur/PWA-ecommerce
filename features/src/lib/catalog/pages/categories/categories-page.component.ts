@@ -67,7 +67,6 @@ export class CategoriesPageComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('[CategoriesPage] Error loading categories:', error);
         this.categories.set([]);
         this.displayedCategories.set([]);
         this.loading.set(false);

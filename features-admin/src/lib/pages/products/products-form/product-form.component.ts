@@ -242,7 +242,6 @@ export class ProductFormComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading product:', error);
         this.snackBar.open('Error al cargar el producto', 'Cerrar', {
           duration: 3000,
         });
@@ -293,7 +292,6 @@ export class ProductFormComponent implements OnInit {
         this.router.navigate(['/tenant-admin/catalog/products']);
       },
       error: (error) => {
-        console.error('Error creating product:', error);
         const message = error?.error?.title || 'Error al crear el producto';
         this.snackBar.open(message, 'Cerrar', { duration: 3000 });
         this.loading.set(false);
@@ -313,7 +311,6 @@ export class ProductFormComponent implements OnInit {
         this.router.navigate(['/tenant-admin/catalog/products']);
       },
       error: (error) => {
-        console.error('Error updating product:', error);
         const message =
           error?.error?.title || 'Error al actualizar el producto';
         this.snackBar.open(message, 'Cerrar', { duration: 3000 });
@@ -355,7 +352,6 @@ export class ProductFormComponent implements OnInit {
         this.availableStores.set(stores);
       },
       error: (error) => {
-        console.error('Error loading stores:', error);
       },
     });
   }

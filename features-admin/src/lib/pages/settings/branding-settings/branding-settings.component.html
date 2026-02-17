@@ -9,13 +9,9 @@
 
   @if (isLoading()) {
   <div class="state-box">Cargando configuración...</div>
-  }
-
-  @if (errorMessage() && !isLoading()) {
+  } @if (errorMessage() && !isLoading()) {
   <div class="state-box error">{{ errorMessage() }}</div>
-  }
-
-  @if (!isLoading()) {
+  } @if (!isLoading()) {
   <form [formGroup]="settingsForm" class="settings-form">
     <div class="tabs-nav">
       <button
@@ -97,9 +93,7 @@
         </label>
       </div>
     </section>
-    }
-
-    @if (activeTab() === 'contact') {
+    } @if (activeTab() === 'contact') {
     <section class="section-card" formGroupName="contact">
       <div class="section-header">
         <h2>Contacto</h2>
@@ -132,9 +126,7 @@
         </label>
       </div>
     </section>
-    }
-
-    @if (activeTab() === 'social') {
+    } @if (activeTab() === 'social') {
     <section class="section-card" formGroupName="social">
       <div class="section-header">
         <h2>Redes Sociales</h2>
@@ -167,9 +159,7 @@
         </label>
       </div>
     </section>
-    }
-
-    @if (activeTab() === 'advanced') {
+    } @if (activeTab() === 'advanced') {
     <section class="section-card" formGroupName="locale">
       <h2>Locale</h2>
       <div class="grid four">

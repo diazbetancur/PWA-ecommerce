@@ -1,10 +1,10 @@
 :host {
   display: block;
-  background: white;
+  background: var(--tenant-surface-color, white);
 }
 
 ::ng-deep .mat-mdc-dialog-surface {
-  background: white !important;
+  background: var(--tenant-surface-color, white) !important;
 }
 
 .modal-header {
@@ -12,13 +12,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 0 1rem 0;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--tenant-border-color, #e2e8f0);
 
   h2 {
     margin: 0;
     font-size: 1.25rem;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--tenant-text-color, #1e293b);
   }
 }
 
@@ -39,7 +39,7 @@ mat-dialog-content {
 
   p {
     margin: 0;
-    color: #64748b;
+    color: var(--tenant-text-muted-color, #64748b);
   }
 }
 
@@ -52,23 +52,23 @@ mat-dialog-content {
 
   th {
     font-weight: 600;
-    color: #475569;
+    color: var(--tenant-text-muted-color, #475569);
   }
 
   td {
-    color: #1e293b;
+    color: var(--tenant-text-color, #1e293b);
   }
 
   code {
     padding: 0.125rem 0.5rem;
-    background: #f1f5f9;
+    background: var(--tenant-primary-light, #f1f5f9);
     border-radius: 4px;
     font-size: 0.875rem;
-    color: #475569;
+    color: var(--tenant-text-muted-color, #475569);
   }
 
   .low-stock {
-    color: #ef4444;
+    color: var(--tenant-accent-color, #ef4444);
     font-weight: 600;
   }
 }
@@ -81,26 +81,26 @@ mat-dialog-content {
   font-weight: 500;
 
   &.active {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--tenant-primary-light, #dcfce7);
+    color: var(--tenant-secondary-color, #166534);
   }
 
   &.inactive {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--tenant-primary-light, #fee2e2);
+    color: var(--tenant-accent-color, #991b1b);
   }
 }
 
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: #64748b;
+  color: var(--tenant-text-muted-color, #64748b);
 
   mat-icon {
     font-size: 4rem;
     width: 4rem;
     height: 4rem;
-    color: #cbd5e1;
+    color: var(--tenant-text-muted-color, #cbd5e1);
     margin-bottom: 1rem;
   }
 

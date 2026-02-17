@@ -36,17 +36,22 @@
           @if (selectedCustomer()) {
           <div class="selected-user-card">
             <div>
-              <strong>{{ selectedCustomer()!.firstName }} {{ selectedCustomer()!.lastName }}</strong>
+              <strong
+                >{{ selectedCustomer()!.firstName }}
+                {{ selectedCustomer()!.lastName }}</strong
+              >
               <div>{{ selectedCustomer()!.email }}</div>
               <small>ID: {{ selectedCustomer()!.id }}</small>
             </div>
-            <button type="button" class="btn-clear-user" (click)="clearSelectedCustomer()">
+            <button
+              type="button"
+              class="btn-clear-user"
+              (click)="clearSelectedCustomer()"
+            >
               Quitar
             </button>
           </div>
-          }
-
-          @if (customerSearchResults().length > 0) {
+          } @if (customerSearchResults().length > 0) {
           <div class="search-results">
             @for (user of customerSearchResults(); track user.id) {
             <button
@@ -54,7 +59,9 @@
               class="search-result-item"
               (click)="selectCustomer(user)"
             >
-              <div><strong>{{ user.firstName }} {{ user.lastName }}</strong></div>
+              <div>
+                <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+              </div>
               <div>{{ user.email }}</div>
               <small>ID: {{ user.id }}</small>
             </button>
@@ -63,7 +70,8 @@
           }
 
           <small class="help-text"
-            >Busca por correo y selecciona un cliente para autocompletar el ID.</small
+            >Busca por correo y selecciona un cliente para autocompletar el
+            ID.</small
           >
         </div>
 

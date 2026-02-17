@@ -51,7 +51,6 @@ export class ManagePermissionsDialogComponent implements OnInit {
   readonly originalPermissions = signal<Set<string>>(new Set());
 
   ngOnInit(): void {
-    console.log('🎬 [ManagePermissionsDialog] ngOnInit - Rol:', this.role.name, 'ID:', this.role.id);
     void this.loadPermissions();
   }
 
@@ -60,32 +59,25 @@ export class ManagePermissionsDialogComponent implements OnInit {
    * Hace cruce entre permisos disponibles y permisos asignados al rol
    */
   private async loadPermissions(): Promise<void> {
-    console.log('🔄 [ManagePermissionsDialog] Iniciando carga de permisos para rol:', this.role.id);
     this.isLoading.set(true);
     this.error.set(null);
 
     try {
       // 1. Cargar todos los permisos disponibles en el sistema
-      console.log('📋 [ManagePermissionsDialog] Cargando todos los permisos disponibles...');
       const allPermissionsResponse = await this.rolesService.getAllPermissions();
-      console.log('✅ [ManagePermissionsDialog] Permisos disponibles cargados:', allPermissionsResponse.groups.length, 'grupos');
       this.permissionGroups.set(allPermissionsResponse.groups);
 
       // 2. Cargar permisos actuales del rol desde el backend
-      console.log('🔍 [ManagePermissionsDialog] Cargando permisos actuales del rol ID:', this.role.id);
       const rolePermissionsResponse = await this.rolesService.getRolePermissions(this.role.id);
-      console.log('✅ [ManagePermissionsDialog] Permisos del rol cargados:', rolePermissionsResponse.permissions.length, 'permisos');
       this.currentRolePermissions.set(rolePermissionsResponse.permissions);
       
       // 3. Hacer cruce: marcar permisos que el rol ya tiene
       const currentPermissionIds = new Set(
         rolePermissionsResponse.permissions.map(p => p.id)
       );
-      console.log('🎯 [ManagePermissionsDialog] Permisos marcados como seleccionados:', currentPermissionIds.size);
       this.selectedPermissions.set(currentPermissionIds);
       this.originalPermissions.set(new Set(currentPermissionIds));
     } catch (err: unknown) {
-      console.error('❌ [ManagePermissionsDialog] Error al cargar permisos:', err);
       this.error.set('Error al cargar los permisos del rol');
     } finally {
       this.isLoading.set(false);
@@ -186,7 +178,6 @@ export class ManagePermissionsDialogComponent implements OnInit {
 
       this.dialogRef.close(true); // Cierra y notifica cambios
     } catch (err: unknown) {
-      console.error('Error al actualizar permisos:', err);
       this.error.set('Error al actualizar los permisos del rol');
     } finally {
       this.isSaving.set(false);

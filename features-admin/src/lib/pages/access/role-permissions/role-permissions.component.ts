@@ -83,7 +83,6 @@ export class RolePermissionsComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('roleId');
     if (!id) {
-      console.error('No roleId in route');
       this.router.navigate(['/tenant-admin/access/roles']);
       return;
     }
@@ -147,7 +146,6 @@ export class RolePermissionsComponent implements OnInit {
           );
         }),
         catchError((error) => {
-          console.error('Error al cargar permisos:', error);
           this.isError.set(true);
           this.errorMessage.set(
             error?.error?.message ||
@@ -258,7 +256,6 @@ export class RolePermissionsComponent implements OnInit {
       .pipe(
         tap(() => {
           // TODO: Mostrar toast de éxito
-          console.log('Permisos actualizados exitosamente');
 
           // Actualizar baseline (original)
           this.originalPermissions.set(
@@ -266,7 +263,6 @@ export class RolePermissionsComponent implements OnInit {
           );
         }),
         catchError((error) => {
-          console.error('Error al guardar permisos:', error);
           this.errorMessage.set(
             error?.error?.message ||
               'Error al guardar permisos. Por favor, intente nuevamente.'

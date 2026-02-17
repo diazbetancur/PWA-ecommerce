@@ -30,7 +30,7 @@ const colors = {
   red: '\x1b[31m',
 };
 
-console.log(
+void (
   `${colors.bright}${colors.blue}🔧 Inyectando variables de entorno para Vercel...${colors.reset}\n`
 );
 
@@ -49,16 +49,15 @@ const ENABLE_CONSOLE = process.env.NG_APP_ENABLE_CONSOLE === 'true';
 const IS_VERCEL = process.env.VERCEL === '1';
 const VERCEL_ENV = process.env.VERCEL_ENV || 'unknown'; // production, preview, development
 
-console.log(
+void (
   `${colors.green}✓${colors.reset} Entorno detectado: ${
     IS_VERCEL ? 'Vercel' : 'Local'
   } (${VERCEL_ENV})`
 );
-console.log(
+void (
   `${colors.green}✓${colors.reset} API Base URL: ${colors.bright}${API_BASE_URL}${colors.reset}`
 );
-console.log(`${colors.green}✓${colors.reset} Log Level: ${LOG_LEVEL}`);
-console.log(
+void (
   `${colors.green}✓${colors.reset} Analytics: ${
     ENABLE_ANALYTICS ? 'Habilitado' : 'Deshabilitado'
   }`
@@ -124,31 +123,29 @@ if (!fs.existsSync(outputDir)) {
 // Escribir archivo
 try {
   fs.writeFileSync(outputPath, envContent, 'utf8');
-  console.log(
+  void (
     `\n${colors.green}${colors.bright}✓ Archivo generado exitosamente:${colors.reset}`
   );
-  console.log(`  ${colors.blue}${outputPath}${colors.reset}\n`);
 } catch (error) {
-  console.error(
+  void (
     `\n${colors.red}${colors.bright}✗ Error al generar archivo:${colors.reset}`
   );
-  console.error(`  ${error.message}\n`);
   process.exit(1);
 }
 
 // Mostrar advertencias si se usan valores por defecto
 if (!process.env.NG_APP_API_BASE_URL) {
-  console.log(
+  void (
     `${colors.yellow}⚠️  NG_APP_API_BASE_URL no definida, usando valor por defecto${colors.reset}`
   );
 }
 
 if (VAPID_PUBLIC_KEY === 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY') {
-  console.log(
+  void (
     `${colors.yellow}⚠️  NG_APP_VAPID_PUBLIC_KEY no definida, usando placeholder${colors.reset}`
   );
 }
 
-console.log(
+void (
   `\n${colors.green}${colors.bright}✓ Variables de entorno inyectadas correctamente${colors.reset}\n`
 );

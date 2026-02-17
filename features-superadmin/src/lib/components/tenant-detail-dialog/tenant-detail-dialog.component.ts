@@ -51,7 +51,6 @@ export class TenantDetailDialogComponent implements OnInit {
       const details = await this.tenantService.getTenantById(this.data.tenantId);
       this.tenant.set(details);
     } catch (err: unknown) {
-      console.error('Error al cargar detalles del tenant:', err);
       this.error.set('Error al cargar los detalles del comercio');
     } finally {
       this.isLoading.set(false);

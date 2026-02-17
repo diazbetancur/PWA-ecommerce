@@ -295,7 +295,6 @@ export class LoyaltyAccountComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error('Error cargando cuenta de lealtad:', err);
         this.error.set(
           'No se pudo cargar tu cuenta de lealtad. Por favor, intenta de nuevo.'
         );

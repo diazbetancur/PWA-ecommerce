@@ -18,7 +18,8 @@ export class ThemeService {
 
     applyCustomCssVars(root, theme.cssVars);
 
-    const secondary = theme.cssVars?.['--tenant-secondary-color'] || theme.accent;
+    const secondary =
+      theme.cssVars?.['--tenant-secondary-color'] || theme.accent;
     const background = theme.background || '#ffffff';
     const textColor = theme.textColor || '#1f2937';
     const primaryHover = darkenHex(theme.primary, 10);
@@ -126,7 +127,10 @@ function applyTenantColorVars(
 
   // Compatibility aliases used in legacy admin/shared styles
   root.style.setProperty('--tenant-primary', vars.primary);
-  root.style.setProperty('--tenant-primary-active', darkenHex(vars.primary, 18));
+  root.style.setProperty(
+    '--tenant-primary-active',
+    darkenHex(vars.primary, 18)
+  );
   root.style.setProperty('--tenant-on-primary', onPrimary);
 
   root.style.setProperty('--primary-color', vars.primary);
@@ -190,9 +194,7 @@ function normalizeHex(hex: string): [number, number, number] | null {
 }
 
 function rgbToHex(r: number, g: number, b: number): string {
-  return `#${((1 << 24) + (r << 16) + (g << 8) + b)
-    .toString(16)
-    .slice(1)}`;
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 }
 
 function getContrastYIQ(hex: string): string {

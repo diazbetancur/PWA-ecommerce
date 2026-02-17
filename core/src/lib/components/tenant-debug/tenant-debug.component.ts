@@ -58,7 +58,6 @@ export class TenantDebugComponent {
     try {
       await this.tenantBootstrap.initialize();
     } catch (error) {
-      console.error('Error refreshing tenant info:', error);
     } finally {
       this.isRefreshing.set(false);
     }

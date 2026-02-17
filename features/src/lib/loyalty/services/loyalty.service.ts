@@ -27,7 +27,7 @@ import {
  * ngOnInit() {
  *   // Obtener balance de puntos
  *   this.loyaltyService.getMyAccount().subscribe(account => {
- *     console.log(`Tengo ${account.pointsBalance} puntos`);
+ *     void (`Tengo ${account.pointsBalance} puntos`);
  *   });
  * }
  * ```
@@ -53,10 +53,10 @@ export class LoyaltyService {
    * ```typescript
    * this.loyaltyService.getMyAccount().subscribe({
    *   next: (account) => {
-   *     console.log(`Balance: ${account.pointsBalance} puntos`);
-   *     console.log(`Tier: ${account.tier}`);
+   *     void (`Balance: ${account.pointsBalance} puntos`);
+   *     void (`Tier: ${account.tier}`);
    *   },
-   *   error: (err) => console.error('Error al cargar cuenta', err)
+   *   error: (err) => void ('Error al cargar cuenta', err)
    * });
    * ```
    */
@@ -86,9 +86,9 @@ export class LoyaltyService {
    * };
    *
    * this.loyaltyService.getMyTransactions(query).subscribe(response => {
-   *   console.log(`Total de transacciones: ${response.totalItems}`);
+   *   void (`Total de transacciones: ${response.totalItems}`);
    *   response.items.forEach(tx => {
-   *     console.log(`${tx.description}: ${tx.points} puntos`);
+   *     void (`${tx.description}: ${tx.points} puntos`);
    *   });
    * });
    * ```
@@ -137,7 +137,7 @@ export class LoyaltyService {
    *   const affordable = response.items.filter(
    *     reward => reward.pointsCost <= this.userBalance
    *   );
-   *   console.log(`Puedes canjear ${affordable.length} premios`);
+   *   void (`Puedes canjear ${affordable.length} premios`);
    * });
    * ```
    */
@@ -179,7 +179,7 @@ export class LoyaltyService {
    * this.loyaltyService.redeemReward(rewardId).subscribe({
    *   next: (response) => {
    *     alert(`¡Canje exitoso! Cupón: ${response.couponCode}`);
-   *     console.log(`Nuevo balance: ${response.newBalance} puntos`);
+   *     void (`Nuevo balance: ${response.newBalance} puntos`);
    *
    *     // Guardar cupón en localStorage o estado
    *     this.saveCoupon(response.couponCode);
@@ -227,7 +227,7 @@ export class LoyaltyService {
    *   );
    *
    *   activeCoupons.forEach(coupon => {
-   *     console.log(`Cupón ${coupon.couponCode} - Expira: ${coupon.expiresAt}`);
+   *     void (`Cupón ${coupon.couponCode} - Expira: ${coupon.expiresAt}`);
    *   });
    * });
    * ```

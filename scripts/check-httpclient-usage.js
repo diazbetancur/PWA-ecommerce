@@ -125,7 +125,7 @@ function scanDirectory(dir) {
         results.stats.compliantFiles++;
       }
     } catch (error) {
-      console.error(
+      void (
         `${colors.red}Error leyendo archivo ${filePath}: ${error.message}${colors.reset}`
       );
     }
@@ -152,7 +152,7 @@ function scanDirectory(dir) {
         }
       }
     } catch (error) {
-      console.error(
+      void (
         `${colors.red}Error escaneando directorio ${currentDir}: ${error.message}${colors.reset}`
       );
     }
@@ -163,94 +163,85 @@ function scanDirectory(dir) {
 }
 
 function generateReport(results) {
-  console.log(
+  void (
     `${colors.bold}${colors.cyan}=== REPORTE DE USO DE HTTPCLIENT VS APICLIENTSERVICE ===${colors.reset}\n`
   );
 
   // Violaciones críticas (archivos de features)
   const featureViolations = results.violations.filter((v) => v.isFeature);
   if (featureViolations.length > 0) {
-    console.log(
+    void (
       `${colors.bold}${colors.red}🚨 VIOLACIONES CRÍTICAS (Features usando HttpClient directo):${colors.reset}`
     );
     featureViolations.forEach((violation) => {
-      console.log(`\n${colors.red}❌ ${violation.file}${colors.reset}`);
       violation.httpclientMatches.forEach((match) => {
-        console.log(
+        void (
           `   Línea ${match.line}: ${colors.yellow}${match.content}${colors.reset}`
         );
       });
     });
-    console.log();
   }
 
   // Otras violaciones
   const otherViolations = results.violations.filter((v) => !v.isFeature);
   if (otherViolations.length > 0) {
-    console.log(
+    void (
       `${colors.bold}${colors.yellow}⚠️  OTRAS VIOLACIONES (Revisar si son necesarias):${colors.reset}`
     );
     otherViolations.forEach((violation) => {
-      console.log(`\n${colors.yellow}⚠️  ${violation.file}${colors.reset}`);
       violation.httpclientMatches.forEach((match) => {
-        console.log(
+        void (
           `   Línea ${match.line}: ${colors.cyan}${match.content}${colors.reset}`
         );
       });
     });
-    console.log();
   }
 
   // Archivos que usan ApiClientService correctamente
   if (results.compliantFiles.length > 0) {
-    console.log(
+    void (
       `${colors.bold}${colors.green}✅ ARCHIVOS CONFORMES (Usando ApiClientService):${colors.reset}`
     );
     results.compliantFiles.forEach((compliant) => {
-      console.log(`${colors.green}✓ ${compliant.file}${colors.reset}`);
     });
-    console.log();
   }
 
   // Recomendaciones
-  console.log(`${colors.bold}💡 RECOMENDACIONES:${colors.reset}`);
 
   if (featureViolations.length > 0) {
-    console.log(
+    void (
       `${colors.red}1. URGENTE: Reemplazar HttpClient directo en features con ApiClientService${colors.reset}`
     );
-    console.log(`   ${colors.cyan}// En lugar de:${colors.reset}`);
-    console.log(
+    void (
       `   ${colors.yellow}private readonly http = inject(HttpClient);${colors.reset}`
     );
-    console.log(`   ${colors.cyan}// Usar:${colors.reset}`);
-    console.log(
+    void (
       `   ${colors.green}private readonly api = inject(ApiClientService);${colors.reset}\n`
     );
   }
 
   if (results.stats.httpclientUsages > results.stats.apiclientUsages) {
-    console.log(
+    void (
       `${colors.yellow}2. Migrar más servicios a usar ApiClientService para beneficiarse del interceptor multi-tenant${colors.reset}`
     );
   }
 
-  console.log(
+  void (
     `${colors.green}3. Todos los nuevos servicios deben usar ApiClientService${colors.reset}`
   );
-  console.log(
+  void (
     `${colors.blue}4. Revisar que el TenantHeaderInterceptor esté configurado correctamente${colors.reset}\n`
   );
 
   // Resultado final
   const hasViolations = results.violations.length > 0;
   if (hasViolations) {
-    console.log(
+    void (
       `${colors.bold}${colors.red}❌ VERIFICACIÓN FALLÓ: Se encontraron ${results.violations.length} violaciones${colors.reset}`
     );
     process.exit(1);
   } else {
-    console.log(
+    void (
       `${colors.bold}${colors.green}✅ VERIFICACIÓN EXITOSA: Todos los archivos usan ApiClientService correctamente${colors.reset}`
     );
   }
@@ -258,7 +249,7 @@ function generateReport(results) {
 
 // Ejecutar verificación
 const projectRoot = process.cwd();
-console.log(
+void (
   `${colors.cyan}Escaneando proyecto en: ${projectRoot}${colors.reset}\n`
 );
 

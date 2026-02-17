@@ -33,24 +33,17 @@ export const multiStoreFeatureGuard: CanActivateFn = async () => {
 
   // Si el tenant no está cargado, forzar inicialización
   if (!tenantContext.isTenantReady()) {
-    console.log(
-      '[MultiStoreFeatureGuard] Tenant not ready, forcing initialization...'
-    );
     try {
       await tenantBootstrap.initialize();
     } catch (error) {
-      console.error(
-        '[MultiStoreFeatureGuard] Failed to initialize tenant:',
-        error
-      );
+      void error;
     }
   }
 
   // Esperar a que el tenant esté disponible (máximo 3 segundos)
   try {
     await tenantContext.waitForTenant(3000);
-  } catch (error) {
-    console.error('[MultiStoreFeatureGuard] Timeout esperando tenant:', error);
+  } catch {
     router.navigate(['/tenant/not-found']);
     return false;
   }
@@ -63,16 +56,8 @@ export const multiStoreFeatureGuard: CanActivateFn = async () => {
   const hasMultiStore = userFeatures['enableMultiStore'] === true;
 
   if (!hasMultiStore) {
-    console.warn(
-      `[MultiStoreFeatureGuard] Multi-store feature not enabled for user. Available features:`,
-      Object.keys(userFeatures)
-    );
     router.navigate(['/tenant-admin/dashboard']);
     return false;
   }
-
-  console.log(
-    '[MultiStoreFeatureGuard] ✅ Multi-store feature enabled, allowing access'
-  );
   return true;
 };

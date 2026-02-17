@@ -51,11 +51,7 @@ export class IosInstallBannerComponent {
     // Effect para debug en desarrollo
     effect(() => {
       if (!this.isProduction() && this.shouldShow()) {
-        console.log('[IosInstallBannerComponent] Banner visible');
-        console.log(
-          '[IosInstallBannerComponent] Branding:',
-          this.tenantBranding()
-        );
+        this.tenantBranding();
       }
     });
   }

@@ -60,7 +60,6 @@ export class CategoryCarouselComponent implements OnInit {
           this.loading.set(false);
         },
         error: (error: unknown) => {
-          console.error('Error loading categories:', error);
           this.loading.set(false);
         },
       });
@@ -86,7 +85,6 @@ export class CategoryCarouselComponent implements OnInit {
           this.loadingMore.set(false);
         },
         error: (error: unknown) => {
-          console.error('Error loading more categories:', error);
           this.loadingMore.set(false);
           this.currentPage--;
         },

@@ -135,7 +135,6 @@ export class CatalogPageComponent implements OnInit {
         this.banners.set(mapped);
       },
       error: (error) => {
-        console.error('[CatalogPage] Error loading banners:', error);
         this.banners.set([]);
       },
     });
@@ -151,7 +150,6 @@ export class CatalogPageComponent implements OnInit {
         this.categories.set(categories);
       },
       error: (error) => {
-        console.error('[CatalogPage] Error loading categories:', error);
         this.categories.set([]);
       },
     });
@@ -197,7 +195,6 @@ export class CatalogPageComponent implements OnInit {
         this.isLoadingMore.set(false);
       },
       error: (error) => {
-        console.error('[CatalogPage] Error loading products:', error);
         this.isLoading.set(false);
         this.isLoadingMore.set(false);
       },
@@ -232,11 +229,9 @@ export class CatalogPageComponent implements OnInit {
   }
 
   onAddToCart(product: ProductCardData): void {
-    console.log('Agregar al carrito:', product);
   }
 
   onQuickView(product: ProductCardData): void {
-    console.log('Ver producto:', product);
   }
 
   /**

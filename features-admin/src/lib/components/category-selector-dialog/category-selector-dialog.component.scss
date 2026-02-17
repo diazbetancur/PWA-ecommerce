@@ -17,9 +17,9 @@ mat-dialog-content {
 .categories-list-container {
   flex: 1;
   overflow-y: auto;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--tenant-border-color, #e0e0e0);
   border-radius: 4px;
-  background: #fff;
+  background: var(--tenant-surface-color, #fff);
 }
 
 .categories-list {
@@ -27,13 +27,13 @@ mat-dialog-content {
 }
 
 .category-option {
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--tenant-border-color, #f0f0f0);
   cursor: pointer;
   transition: background 0.2s;
 }
 
 .category-option:hover {
-  background: #f5f5f5;
+  background: var(--tenant-primary-light, #f5f5f5);
 }
 
 .category-item {
@@ -53,18 +53,18 @@ mat-dialog-content {
 
 .category-name {
   font-weight: 500;
-  color: #000;
+  color: var(--tenant-text-color, #000);
 }
 
 .category-description {
   font-size: 0.85rem;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--tenant-text-muted-color, rgba(0, 0, 0, 0.6));
 }
 
 .inactive-badge {
   padding: 4px 8px;
-  background: #f8d7da;
-  color: #721c24;
+  background: var(--tenant-primary-light, #f8d7da);
+  color: var(--tenant-accent-color, #721c24);
   border-radius: 12px;
   font-size: 0.75rem;
   font-weight: 500;
@@ -86,12 +86,12 @@ mat-dialog-content {
   font-size: 3rem;
   width: 3rem;
   height: 3rem;
-  color: rgba(0, 0, 0, 0.3);
+  color: var(--tenant-text-muted-color, rgba(0, 0, 0, 0.3));
 }
 
 .empty-state p {
   margin: 0;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--tenant-text-muted-color, rgba(0, 0, 0, 0.6));
 }
 
 .loading-more {
@@ -101,7 +101,7 @@ mat-dialog-content {
 .loading-more p {
   margin: 0;
   font-size: 0.875rem;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--tenant-text-muted-color, rgba(0, 0, 0, 0.6));
 }
 
 /* Scrollbar */
@@ -110,16 +110,16 @@ mat-dialog-content {
 }
 
 .categories-list-container::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--tenant-primary-light, #f1f1f1);
 }
 
 .categories-list-container::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--tenant-text-muted-color, #888);
   border-radius: 4px;
 }
 
 .categories-list-container::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--tenant-text-color, #555);
 }
 
 @media (max-width: 768px) {

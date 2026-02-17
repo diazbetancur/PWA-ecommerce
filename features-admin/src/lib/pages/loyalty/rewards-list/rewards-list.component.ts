@@ -486,7 +486,6 @@ export class RewardsListComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error('Error cargando premios:', err);
           this.error.set(
             'No se pudieron cargar los premios. Por favor, intenta de nuevo.'
           );
@@ -566,7 +565,6 @@ export class RewardsListComponent implements OnInit {
         );
       },
       error: (err) => {
-        console.error('Error actualizando estado:', err);
         this.toastService.error('No se pudo actualizar el estado del premio');
       },
     });
@@ -576,14 +574,14 @@ export class RewardsListComponent implements OnInit {
    * Crear nuevo premio
    */
   createReward(): void {
-    this.router.navigate(['/admin/loyalty/rewards/new']);
+    this.router.navigate(['/tenant-admin/loyalty/rewards/new']);
   }
 
   /**
    * Editar premio
    */
   editReward(reward: LoyaltyRewardDto): void {
-    this.router.navigate(['/admin/loyalty/rewards', reward.id, 'edit']);
+    this.router.navigate(['/tenant-admin/loyalty/rewards', reward.id, 'edit']);
   }
 
   /**
@@ -597,7 +595,6 @@ export class RewardsListComponent implements OnInit {
           this.loadRewards();
         },
         error: (err) => {
-          console.error('Error eliminando premio:', err);
           this.toastService.error('No se pudo eliminar el premio');
         },
       });

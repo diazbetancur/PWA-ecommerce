@@ -66,7 +66,6 @@ export class RolesListComponent implements OnInit {
       const roles = await this.rolesService.getAllRoles();
       this.roles.set(roles);
     } catch (err: unknown) {
-      console.error('Error al cargar roles:', err);
       this.error.set('Error al cargar los roles del sistema');
     } finally {
       this.isLoading.set(false);
@@ -173,7 +172,6 @@ export class RolesListComponent implements OnInit {
         
         await this.loadRoles();
       } catch (err: unknown) {
-        console.error('Error al eliminar rol:', err);
         this.confirmDialog.confirm({
           title: 'Error al eliminar',
           message: 'No se pudo eliminar el rol. Por favor, inténtelo nuevamente.',

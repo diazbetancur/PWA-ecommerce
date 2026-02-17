@@ -37,9 +37,6 @@ export function modulePermissionGuard(moduleCode: string): CanActivateFn {
     }
 
     if (!menuService.isTenantAdmin()) {
-      console.warn(
-        '[ModulePermissionGuard] Usuario no es administrador del tenant'
-      );
       router.navigate(['/']);
       return false;
     }
@@ -48,13 +45,6 @@ export function modulePermissionGuard(moduleCode: string): CanActivateFn {
     const hasPermission = menuService.canPerformAction(moduleCode);
 
     if (!hasPermission) {
-      console.warn(
-        `[ModulePermissionGuard] Sin permiso para módulo: ${moduleCode}`,
-        {
-          moduleCode,
-          userModules: authService.claims?.modules,
-        }
-      );
       router.navigate(['/tenant-admin']);
       return false;
     }
@@ -80,7 +70,6 @@ export const customerGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   if (!menuService.isCustomer()) {
-    console.warn('[CustomerGuard] Usuario no es cliente');
     router.navigate(['/admin']);
     return false;
   }
@@ -106,13 +95,11 @@ export const tenantAdminGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   if (!authService.isAuthenticated()) {
-    console.warn('[TenantAdminGuard] Usuario no autenticado');
     router.navigate(['/login']);
     return false;
   }
 
   if (!menuService.isTenantAdmin()) {
-    console.warn('[TenantAdminGuard] Usuario no es administrador del tenant');
     router.navigate(['/']);
     return false;
   }

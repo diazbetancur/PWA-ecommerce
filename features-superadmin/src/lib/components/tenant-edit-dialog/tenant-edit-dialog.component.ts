@@ -81,7 +81,6 @@ export class TenantEditDialogComponent implements OnInit {
         featureFlagsJson: tenant.featureFlagsJson || '',
       });
     } catch (err: unknown) {
-      console.error('Error al cargar datos:', err);
       this.error.set('Error al cargar los datos del comercio');
     } finally {
       this.isLoading.set(false);
@@ -126,7 +125,6 @@ export class TenantEditDialogComponent implements OnInit {
       await this.tenantService.updateTenant(this.data.tenantId, updateData);
       this.dialogRef.close(true);
     } catch (err: unknown) {
-      console.error('Error al actualizar tenant:', err);
       this.error.set('Error al actualizar el comercio. Inténtelo nuevamente.');
     } finally {
       this.isSaving.set(false);

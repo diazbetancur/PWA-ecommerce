@@ -70,7 +70,6 @@ export class StoresListComponent implements OnInit {
           this.loading.set(false);
         },
         error: (err) => {
-          console.error('Error al cargar tiendas:', err);
           this.error.set('Error al cargar las tiendas');
           this.loading.set(false);
         },
@@ -134,7 +133,6 @@ export class StoresListComponent implements OnInit {
           this.loadStores();
         },
         error: (err) => {
-          console.error('Error al establecer predeterminada:', err);
           this.toastService.error(
             err.error?.detail || 'Error al establecer tienda predeterminada'
           );
@@ -170,7 +168,6 @@ export class StoresListComponent implements OnInit {
           this.loadStores();
         },
         error: (err) => {
-          console.error('Error al eliminar tienda:', err);
           const message =
             err.error?.detail ||
             'Error al eliminar la tienda. Puede tener stock u órdenes asociadas.';

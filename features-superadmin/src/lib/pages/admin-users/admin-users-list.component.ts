@@ -131,7 +131,6 @@ export class AdminUsersListComponent implements OnInit {
       this.users.set(response.items);
       this.totalCount.set(response.totalCount);
     } catch (err: unknown) {
-      console.error('Error al cargar usuarios:', err);
       const error = err as { error?: { detail?: string } };
       this.error.set(
         error.error?.detail || 'Error al cargar la lista de usuarios'
@@ -248,7 +247,6 @@ export class AdminUsersListComponent implements OnInit {
         
         this.loadUsers();
       } catch (err: unknown) {
-        console.error(`Error al ${action} usuario:`, err);
         const error = err as { error?: { detail?: string } };
         
         this.confirmDialog.confirm({
@@ -285,7 +283,6 @@ export class AdminUsersListComponent implements OnInit {
         
         this.loadUsers();
       } catch (err: unknown) {
-        console.error('Error al eliminar usuario:', err);
         const error = err as { error?: { detail?: string } };
         
         this.confirmDialog.confirm({

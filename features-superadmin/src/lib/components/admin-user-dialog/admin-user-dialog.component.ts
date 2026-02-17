@@ -174,7 +174,6 @@ export class AdminUserDialogComponent implements OnInit {
       }
 
     } catch (err: unknown) {
-      console.error('Error al guardar usuario:', err);
       
       const error = err as { status?: number; error?: { detail?: string } };
       // Manejar errores específicos

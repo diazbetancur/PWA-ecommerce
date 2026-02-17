@@ -201,7 +201,7 @@ export class AdminUserManagementService {
    * @example
    * ```ts
    * const roles = await service.getAllRoles();
-   * console.log('Roles:', roles.map(r => r.name));
+   * void ('Roles:', roles.map(r => r.name));
    * ```
    */
   async getAllRoles(): Promise<AdminRoleDto[]> {

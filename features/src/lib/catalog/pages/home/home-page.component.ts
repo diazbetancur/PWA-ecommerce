@@ -118,7 +118,6 @@ export class HomePageComponent implements OnInit {
         this.isLoadingBanners.set(false);
       },
       error: (error) => {
-        console.error('[HomePage] Error loading banners:', error);
         this.banners.set([]);
         this.isLoadingBanners.set(false);
       },
@@ -137,7 +136,6 @@ export class HomePageComponent implements OnInit {
         this.isLoadingCategories.set(false);
       },
       error: (error) => {
-        console.error('[HomePage] Error loading categories:', error);
         this.categories.set([]);
         this.isLoadingCategories.set(false);
       },
@@ -156,7 +154,6 @@ export class HomePageComponent implements OnInit {
         this.isLoadingProducts.set(false);
       },
       error: (error) => {
-        console.error('[HomePage] Error loading featured products:', error);
         this.featuredProducts.set([]);
         this.isLoadingProducts.set(false);
       },
@@ -195,7 +192,6 @@ export class HomePageComponent implements OnInit {
           this.isSearching.set(false);
         },
         error: (error) => {
-          console.error('[HomePage] Error searching products:', error);
           this.searchResults.set([]);
           this.showSearchResults.set(false);
           this.isSearching.set(false);
@@ -258,12 +254,10 @@ export class HomePageComponent implements OnInit {
   // ============================================
 
   onAddToCart(product: ProductCardData): void {
-    console.log('Agregar al carrito:', product);
     // TODO: Implementar lógica de carrito
   }
 
   onQuickView(product: ProductCardData): void {
-    console.log('Ver producto:', product);
     // TODO: Implementar modal de vista rápida
   }
 

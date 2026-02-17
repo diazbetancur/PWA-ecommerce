@@ -114,7 +114,6 @@ export class UsersListComponent implements OnInit {
           this.users.set(response.users);
         }),
         catchError((error) => {
-          console.error('[UsersListComponent] Error loading users:', error);
           this.isError.set(true);
           this.errorMessage.set(
             error.message || 'Error al cargar la lista de usuarios'
@@ -197,10 +196,6 @@ export class UsersListComponent implements OnInit {
               this.loadUsers();
             }),
             catchError((error) => {
-              console.error(
-                '[UsersListComponent] Error toggling status:',
-                error
-              );
               alert(`Error al ${action} usuario: ${error.message}`);
               return of(null);
             })
@@ -237,7 +232,6 @@ export class UsersListComponent implements OnInit {
               this.loadUsers();
             }),
             catchError((error) => {
-              console.error('[UsersListComponent] Error deleting user:', error);
               alert(`Error al eliminar usuario: ${error.message}`);
               return of(null);
             })

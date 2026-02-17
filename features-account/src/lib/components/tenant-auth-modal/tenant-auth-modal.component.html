@@ -1,0 +1,274 @@
+<div class="tenant-auth-modal">
+  <button
+    type="button"
+    class="close-button"
+    (click)="close()"
+    aria-label="Cerrar"
+  >
+    ✕
+  </button>
+
+  <div class="modal-header">
+    <h2>Tu cuenta</h2>
+    <p>{{ tenantName() }}</p>
+  </div>
+
+  <div class="tabs">
+    <button
+      type="button"
+      class="tab"
+      [class.active]="activeTab() === 'login'"
+      (click)="selectTab('login')"
+    >
+      Iniciar sesión
+    </button>
+    <button
+      type="button"
+      class="tab"
+      [class.active]="activeTab() === 'register'"
+      (click)="selectTab('register')"
+    >
+      Crear cuenta
+    </button>
+  </div>
+
+  @if (errorMessage()) {
+  <div class="alert alert-error">{{ errorMessage() }}</div>
+  } @if (successMessage()) {
+  <div class="alert alert-success">{{ successMessage() }}</div>
+  } @if (activeTab() === 'login') { @if (showForgotPassword()) {
+  <form
+    class="auth-form"
+    [formGroup]="forgotForm"
+    (ngSubmit)="submitForgotPassword()"
+  >
+    <div class="form-group">
+      <label for="forgot-email">Correo electrónico</label>
+      <input
+        id="forgot-email"
+        type="email"
+        formControlName="email"
+        placeholder="tu@email.com"
+        [class.error]="getForgotFieldError()"
+      />
+      @if (getForgotFieldError()) {
+      <span class="error-message">{{ getForgotFieldError() }}</span>
+      }
+    </div>
+
+    <button
+      type="submit"
+      class="submit-btn"
+      [disabled]="isLoading() || forgotForm.invalid"
+    >
+      @if (isLoading()) { Enviando... } @else { Enviar enlace }
+    </button>
+
+    <button type="button" class="text-link" (click)="toggleForgotPassword()">
+      Volver al inicio de sesión
+    </button>
+  </form>
+  } @else {
+  <form class="auth-form" [formGroup]="loginForm" (ngSubmit)="submitLogin()">
+    <div class="form-group">
+      <label for="login-email">Correo electrónico</label>
+      <input
+        id="login-email"
+        type="email"
+        formControlName="email"
+        placeholder="tu@email.com"
+        [class.error]="getLoginFieldError('email')"
+      />
+      @if (getLoginFieldError('email')) {
+      <span class="error-message">{{ getLoginFieldError('email') }}</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="login-password">Contraseña</label>
+      <div class="password-input">
+        <input
+          id="login-password"
+          [type]="showPassword() ? 'text' : 'password'"
+          formControlName="password"
+          placeholder="••••••••"
+          [class.error]="getLoginFieldError('password')"
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="togglePasswordVisibility()"
+        >
+          {{ showPassword() ? '🙈' : '👁️' }}
+        </button>
+      </div>
+      @if (getLoginFieldError('password')) {
+      <span class="error-message">{{ getLoginFieldError('password') }}</span>
+      }
+    </div>
+
+    <div class="form-group inline-group">
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="rememberMe" />
+        <span>Recordarme</span>
+      </label>
+      <button type="button" class="text-link" (click)="toggleForgotPassword()">
+        ¿Olvidaste tu cuenta?
+      </button>
+    </div>
+
+    <button
+      type="submit"
+      class="submit-btn"
+      [disabled]="isLoading() || loginForm.invalid"
+    >
+      @if (isLoading()) { Iniciando... } @else { Iniciar sesión }
+    </button>
+  </form>
+  } } @if (activeTab() === 'register') {
+  <form
+    class="auth-form"
+    [formGroup]="registerForm"
+    (ngSubmit)="submitRegister()"
+  >
+    @if (!hasTenant()) {
+    <div class="alert alert-error">
+      No hay un comercio activo para registrarse.
+    </div>
+    }
+
+    <div class="split-row">
+      <div class="form-group">
+        <label for="firstName">Nombre</label>
+        <input
+          id="firstName"
+          type="text"
+          formControlName="firstName"
+          placeholder="Juan"
+          [class.error]="getRegisterFieldError('firstName')"
+        />
+        @if (getRegisterFieldError('firstName')) {
+        <span class="error-message">{{
+          getRegisterFieldError('firstName')
+        }}</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Apellido</label>
+        <input
+          id="lastName"
+          type="text"
+          formControlName="lastName"
+          placeholder="Pérez"
+          [class.error]="getRegisterFieldError('lastName')"
+        />
+        @if (getRegisterFieldError('lastName')) {
+        <span class="error-message">{{
+          getRegisterFieldError('lastName')
+        }}</span>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="register-email">Correo electrónico</label>
+      <input
+        id="register-email"
+        type="email"
+        formControlName="email"
+        placeholder="tu@email.com"
+        [class.error]="getRegisterFieldError('email')"
+      />
+      @if (getRegisterFieldError('email')) {
+      <span class="error-message">{{ getRegisterFieldError('email') }}</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Teléfono (opcional)</label>
+      <input
+        id="phone"
+        type="tel"
+        formControlName="phoneNumber"
+        placeholder="+57 300 000 0000"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="register-password">Contraseña</label>
+      <div class="password-input">
+        <input
+          id="register-password"
+          [type]="showPassword() ? 'text' : 'password'"
+          formControlName="password"
+          placeholder="••••••••"
+          [class.error]="getRegisterFieldError('password')"
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="togglePasswordVisibility()"
+        >
+          {{ showPassword() ? '🙈' : '👁️' }}
+        </button>
+      </div>
+      @if (getRegisterFieldError('password')) {
+      <span class="error-message">{{ getRegisterFieldError('password') }}</span>
+      }
+    </div>
+
+    <div class="form-group">
+      <label for="confirm-password">Confirmar contraseña</label>
+      <div class="password-input">
+        <input
+          id="confirm-password"
+          [type]="showConfirmPassword() ? 'text' : 'password'"
+          formControlName="confirmPassword"
+          placeholder="••••••••"
+          [class.error]="
+            getRegisterFieldError('confirmPassword') || !passwordsMatch()
+          "
+        />
+        <button
+          type="button"
+          class="toggle-password"
+          (click)="toggleConfirmPasswordVisibility()"
+        >
+          {{ showConfirmPassword() ? '🙈' : '👁️' }}
+        </button>
+      </div>
+      @if (getRegisterFieldError('confirmPassword')) {
+      <span class="error-message">{{
+        getRegisterFieldError('confirmPassword')
+      }}</span>
+      } @if (!passwordsMatch() && registerForm.get('confirmPassword')?.touched)
+      {
+      <span class="error-message">Las contraseñas no coinciden</span>
+      }
+    </div>
+
+    <div class="form-group inline-group">
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="acceptTerms" />
+        <span>Acepto los términos y condiciones</span>
+      </label>
+    </div>
+    @if (getRegisterFieldError('acceptTerms')) {
+    <span class="error-message">{{
+      getRegisterFieldError('acceptTerms')
+    }}</span>
+    }
+
+    <button
+      type="submit"
+      class="submit-btn"
+      [disabled]="
+        !hasTenant() || isLoading() || registerForm.invalid || !passwordsMatch()
+      "
+    >
+      @if (isLoading()) { Creando... } @else { Crear cuenta }
+    </button>
+  </form>
+  }
+</div>

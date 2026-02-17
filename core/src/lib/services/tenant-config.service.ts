@@ -78,7 +78,6 @@ export class TenantConfigService {
       }
       this.applyDynamic(reapply);
     } catch (e: any) {
-      console.error('Failed to load tenant config', e);
       // Si es 404, no lanzar error - dejar config undefined para que el guard redirija
       if (e?.status === 404) {
         this._config = undefined;

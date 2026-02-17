@@ -72,7 +72,6 @@ export class CategoryProductsModalComponent implements OnInit {
           this.loading.set(false);
         },
         error: (error) => {
-          console.error('Error loading products:', error);
           this.loading.set(false);
         },
       });

@@ -128,7 +128,6 @@ export class UserDialogComponent implements OnInit {
             this.userForm.get('password')?.updateValueAndValidity();
           }),
           catchError((error) => {
-            console.error('[UserDialogComponent] Error loading data:', error);
             this.errorMessage.set('Error al cargar los datos del usuario');
             return of(null);
           }),
@@ -146,7 +145,6 @@ export class UserDialogComponent implements OnInit {
             this.availableRoles.set(response.roles);
           }),
           catchError((error) => {
-            console.error('[UserDialogComponent] Error loading roles:', error);
             this.errorMessage.set('Error al cargar los roles disponibles');
             return of(null);
           }),
@@ -229,7 +227,6 @@ export class UserDialogComponent implements OnInit {
             this.dialogRef.close(true);
           }),
           catchError((error) => {
-            console.error('[UserDialogComponent] Error updating user:', error);
             this.errorMessage.set(
               error.message || 'Error al actualizar el usuario'
             );
@@ -257,7 +254,6 @@ export class UserDialogComponent implements OnInit {
             this.dialogRef.close(true);
           }),
           catchError((error) => {
-            console.error('[UserDialogComponent] Error creating user:', error);
             this.errorMessage.set(
               error.message || 'Error al crear el usuario'
             );

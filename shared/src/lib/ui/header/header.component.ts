@@ -10,7 +10,23 @@ import {
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TenantContextService } from '@pwa/core';
-import { AccountService } from '@pwa/features-account';
+import { AccountService, TenantAuthModalService } from '@pwa/features-account';
+
+type HeaderThemeConfig = {
+  tenant?: {
+    branding?: {
+      primaryColor?: string;
+      secondaryColor?: string;
+      backgroundColor?: string;
+      textColor?: string;
+    };
+  };
+  theme?: {
+    primary?: string;
+    background?: string;
+    textColor?: string;
+  };
+};
 
 @Component({
   selector: 'app-header',
@@ -22,6 +38,7 @@ import { AccountService } from '@pwa/features-account';
 export class HeaderComponent {
   private readonly tenantContext = inject(TenantContextService);
   private readonly accountService = inject(AccountService);
+  private readonly tenantAuthModal = inject(TenantAuthModalService);
   private readonly renderer = inject(Renderer2);
   private readonly document = inject(DOCUMENT);
 
@@ -62,7 +79,7 @@ export class HeaderComponent {
     });
   }
 
-  private applyThemeVars(config: any): void {
+  private applyThemeVars(config: HeaderThemeConfig): void {
     const root = this.document.documentElement;
     const branding = config.tenant?.branding || {};
     const theme = config.theme || {};
@@ -70,15 +87,25 @@ export class HeaderComponent {
     const primary = branding.primaryColor || theme.primary || '#3b82f6';
     const secondary = branding.secondaryColor || '#64748b';
     const bg = branding.backgroundColor || theme.background || '#ffffff';
+    const text = branding.textColor || theme.textColor || '#374151';
 
     this.renderer.setStyle(root, '--primary-color', primary);
     this.renderer.setStyle(root, '--primary-hover', this.darken(primary, 10));
     this.renderer.setStyle(root, '--primary-light', this.lighten(primary, 95));
     this.renderer.setStyle(root, '--secondary-color', secondary);
     this.renderer.setStyle(root, '--bg-color', bg);
-    this.renderer.setStyle(root, '--text-color', '#374151');
-    this.renderer.setStyle(root, '--border-color', '#e5e7eb');
-    this.renderer.setStyle(root, '--hover-bg', '#f3f4f6');
+    this.renderer.setStyle(root, '--text-color', text);
+    this.renderer.setStyle(
+      root,
+      '--border-color',
+      'var(--tenant-border-color)'
+    );
+    this.renderer.setStyle(root, '--hover-bg', this.lighten(primary, 95));
+    this.renderer.setStyle(
+      root,
+      '--danger-color',
+      'var(--tenant-accent-color)'
+    );
   }
 
   private lighten(hex: string, percent: number): string {
@@ -126,6 +153,11 @@ export class HeaderComponent {
 
   closeUserMenu(): void {
     this.isUserMenuOpen.set(false);
+  }
+
+  openAuthModal(tab: 'login' | 'register' = 'login'): void {
+    this.tenantAuthModal.open(tab);
+    this.closeMobileMenu();
   }
 
   async logout(): Promise<void> {

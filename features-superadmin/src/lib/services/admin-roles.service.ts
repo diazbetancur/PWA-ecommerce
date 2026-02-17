@@ -31,7 +31,7 @@ export class AdminRolesService {
    * @example
    * ```ts
    * const roles = await service.getAllRoles();
-   * console.log('Roles:', roles.length);
+   * void ('Roles:', roles.length);
    * ```
    */
   async getAllRoles(): Promise<AdminRoleDetailDto[]> {
@@ -127,12 +127,11 @@ export class AdminRolesService {
    * @example
    * ```ts
    * const grouped = await service.getAllPermissions();
-   * console.log('Recursos:', grouped.groups.map(g => g.resource));
+   * void ('Recursos:', grouped.groups.map(g => g.resource));
    * ```
    */
   async getAllPermissions(): Promise<PermissionsGroupedResponse> {
     const endpoint = '/superadmin/permissions';
-    console.log('🌐 [AdminRolesService] GET', endpoint);
     return firstValueFrom(
       this.apiClient.get<PermissionsGroupedResponse>(endpoint)
     );
@@ -146,7 +145,6 @@ export class AdminRolesService {
    */
   async getRolePermissions(roleId: string): Promise<RolePermissionsResponse> {
     const endpoint = `/superadmin/admin-roles/${roleId}/permissions`;
-    console.log('🌐 [AdminRolesService] GET', endpoint);
     return firstValueFrom(
       this.apiClient.get<RolePermissionsResponse>(endpoint)
     );

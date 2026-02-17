@@ -58,7 +58,6 @@ export class CatalogService {
           this.mapPaginatedProductsResponse(response, this.mapProductSummaryDto)
         ),
         catchError((error: unknown) => {
-          console.error('[CatalogService] Error getting products:', error);
           throw error;
         })
       );
@@ -71,10 +70,6 @@ export class CatalogService {
         success: true,
       })),
       catchError((error: unknown) => {
-        console.error(
-          `[CatalogService] Error getting product ${productId}:`,
-          error
-        );
         throw error;
       })
     );
@@ -86,7 +81,6 @@ export class CatalogService {
         this.mapPaginatedCategoriesResponse(response, this.mapCategoryDto)
       ),
       catchError((error: unknown) => {
-        console.error('[CatalogService] Error getting categories:', error);
         throw error;
       })
     );
@@ -112,10 +106,6 @@ export class CatalogService {
           this.mapPaginatedProductsResponse(response, this.mapProductSummaryDto)
         ),
         catchError((error: unknown) => {
-          console.error(
-            '[CatalogService] Error getting featured products:',
-            error
-          );
           throw error;
         })
       );

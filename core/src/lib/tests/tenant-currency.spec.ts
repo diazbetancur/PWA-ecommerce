@@ -282,10 +282,8 @@ export function testCurrencyPipes() {
     { locale: 'ja-JP', currency: 'JPY' },
   ];
 
-  console.log('📊 Resultados por configuración:');
 
   for (const config of localeConfigs) {
-    console.log(`\\n🌍 ${config.locale} - ${config.currency}:`);
 
     for (const value of testValues) {
       try {
@@ -294,11 +292,9 @@ export function testCurrencyPipes() {
           currency: config.currency,
         }).format(value);
 
-        console.log(`  ${value} → ${formatted}`);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
-        console.log(`  ${value} → ERROR: ${errorMessage}`);
       }
     }
   }

@@ -31,13 +31,8 @@ export const EmployeeGuard: CanActivateFn = () => {
   const router = inject(Router);
 
   const claims = auth.claims;
-  console.log('[EmployeeGuard] Checking access');
-  console.log('[EmployeeGuard] Claims:', claims);
-  console.log('[EmployeeGuard] Roles:', claims?.roles);
-  console.log('[EmployeeGuard] Modules:', claims?.modules);
 
   if (!claims?.roles || claims.roles.length === 0) {
-    console.log('[EmployeeGuard] ❌ No roles found - denying access');
     router.navigate(['/']);
     return false;
   }
@@ -47,10 +42,8 @@ export const EmployeeGuard: CanActivateFn = () => {
     (role) => role.toLowerCase() !== 'customer'
   );
 
-  console.log('[EmployeeGuard] hasEmployeeRole:', hasEmployeeRole);
 
   if (!hasEmployeeRole) {
-    console.log('[EmployeeGuard] ❌ Only Customer role - denying access');
     router.navigate(['/']);
     return false;
   }
@@ -58,19 +51,8 @@ export const EmployeeGuard: CanActivateFn = () => {
   // Verificar que tenga el campo modules (puede estar vacío)
   // La presencia del campo indica que es un usuario con acceso administrativo
   if (!claims.modules) {
-    console.log(
-      '[EmployeeGuard] ❌ No modules field in token - denying access'
-    );
     router.navigate(['/']);
     return false;
   }
-
-  console.log(
-    '[EmployeeGuard] ✅ Employee role + modules field found - granting access'
-  );
-  console.log(
-    '[EmployeeGuard] Available modules:',
-    claims.modules.length === 0 ? 'ALL (empty array)' : claims.modules
-  );
   return true;
 };

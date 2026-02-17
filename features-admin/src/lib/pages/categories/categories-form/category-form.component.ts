@@ -123,7 +123,6 @@ export class CategoryFormComponent implements OnInit {
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error loading category:', error);
         this.snackBar.open('Error al cargar la categoría', 'Cerrar', {
           duration: 3000,
         });
@@ -158,7 +157,6 @@ export class CategoryFormComponent implements OnInit {
         this.router.navigate(['/tenant-admin/catalog/categories']);
       },
       error: (error) => {
-        console.error('Error creating category:', error);
         this.snackBar.open(
           error.error?.message || 'Error al crear la categoría',
           'Cerrar',
@@ -181,7 +179,6 @@ export class CategoryFormComponent implements OnInit {
         this.router.navigate(['/tenant-admin/catalog/categories']);
       },
       error: (error) => {
-        console.error('Error updating category:', error);
         this.snackBar.open(
           error.error?.message || 'Error al actualizar la categoría',
           'Cerrar',

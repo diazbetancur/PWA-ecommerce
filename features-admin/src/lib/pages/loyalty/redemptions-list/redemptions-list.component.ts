@@ -436,7 +436,6 @@ export class RedemptionsListComponent implements OnInit {
           this.isLoading.set(false);
         },
         error: (err) => {
-          console.error('Error cargando canjes:', err);
           this.error.set(
             'No se pudieron cargar los canjes. Por favor, intenta de nuevo.'
           );
@@ -508,7 +507,6 @@ export class RedemptionsListComponent implements OnInit {
           this.loadRedemptions();
         },
         error: (err) => {
-          console.error('Error aprobando canje:', err);
           this.toastService.error('No se pudo aprobar el canje');
         },
       });
@@ -533,7 +531,6 @@ export class RedemptionsListComponent implements OnInit {
             this.loadRedemptions();
           },
           error: (err) => {
-            console.error('Error marcando como entregado:', err);
             this.toastService.error('No se pudo actualizar el estado');
           },
         });
@@ -560,7 +557,6 @@ export class RedemptionsListComponent implements OnInit {
           this.loadRedemptions();
         },
         error: (err) => {
-          console.error('Error cancelando canje:', err);
           this.toastService.error('No se pudo cancelar el canje');
         },
       });

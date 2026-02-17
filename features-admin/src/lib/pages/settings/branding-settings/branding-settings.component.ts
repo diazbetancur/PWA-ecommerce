@@ -1,6 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { ToastService } from '@pwa/shared';
 import { TenantSettingsDto } from '../../../models/tenant-settings.model';
 import { TenantSettingsService } from '../../../services/tenant-settings.service';
@@ -22,7 +27,9 @@ export class BrandingSettingsComponent implements OnInit {
   readonly activeTab = signal<'branding' | 'contact' | 'social' | 'advanced'>(
     'branding'
   );
-  readonly savingSection = signal<'branding' | 'contact' | 'social' | 'all' | null>(null);
+  readonly savingSection = signal<
+    'branding' | 'contact' | 'social' | 'all' | null
+  >(null);
 
   readonly settingsForm: FormGroup = this.fb.group({
     branding: this.fb.group({
@@ -49,7 +56,10 @@ export class BrandingSettingsComponent implements OnInit {
       locale: ['es-CO', [Validators.required]],
       currency: ['COP', [Validators.required]],
       currencySymbol: ['$', [Validators.required]],
-      taxRate: [19, [Validators.required, Validators.min(0), Validators.max(100)]],
+      taxRate: [
+        19,
+        [Validators.required, Validators.min(0), Validators.max(100)],
+      ],
     }),
     seo: this.fb.group({
       title: ['', [Validators.required]],

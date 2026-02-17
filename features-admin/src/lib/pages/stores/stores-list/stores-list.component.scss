@@ -277,21 +277,22 @@
 }
 
 .btn-primary {
-  background: #3b82f6;
-  color: white;
+  background: var(--tenant-primary-color, #3b82f6);
+  color: var(--tenant-on-primary, #fff);
 
   &:hover:not(:disabled) {
-    background: #2563eb;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: var(--tenant-primary-hover, #2563eb);
+    box-shadow: 0 4px 12px
+      color-mix(in srgb, var(--tenant-primary-color, #3b82f6) 35%, transparent);
   }
 }
 
 .btn-secondary {
-  background: #6b7280;
-  color: white;
+  background: var(--tenant-secondary-color, #6b7280);
+  color: var(--tenant-on-primary, #fff);
 
   &:hover:not(:disabled) {
-    background: #4b5563;
+    filter: brightness(0.95);
   }
 }
 

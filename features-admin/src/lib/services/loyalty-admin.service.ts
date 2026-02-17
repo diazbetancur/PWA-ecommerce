@@ -49,7 +49,7 @@ import {
  *
  *   this.loyaltyAdminService.createReward(reward).subscribe({
  *     next: () => alert('Premio creado'),
- *     error: (err) => console.error('Error', err)
+ *     error: (err) => void ('Error', err)
  *   });
  * }
  * ```
@@ -90,7 +90,7 @@ export class LoyaltyAdminService {
    *
    * this.loyaltyAdminService.createReward(newReward).subscribe({
    *   next: (reward) => {
-   *     console.log(`Premio creado con ID: ${reward.id}`);
+   *     void (`Premio creado con ID: ${reward.id}`);
    *     this.router.navigate(['/admin/loyalty/rewards']);
    *   },
    *   error: (err) => {
@@ -127,13 +127,13 @@ export class LoyaltyAdminService {
    * };
    *
    * this.loyaltyAdminService.listRewards(query).subscribe(response => {
-   *   console.log(`Total de premios: ${response.totalItems}`);
+   *   void (`Total de premios: ${response.totalItems}`);
    *
    *   // Premios con stock bajo
    *   const lowStock = response.items.filter(
    *     r => r.stock !== null && r.stock < 10
    *   );
-   *   console.log(`${lowStock.length} premios con stock bajo`);
+   *   void (`${lowStock.length} premios con stock bajo`);
    * });
    * ```
    */
@@ -210,8 +210,8 @@ export class LoyaltyAdminService {
    *   };
    *
    *   this.loyaltyAdminService.updateReward(rewardId, updated).subscribe({
-   *     next: () => console.log('Stock actualizado'),
-   *     error: (err) => console.error('Error al actualizar', err)
+   *     next: () => void ('Stock actualizado'),
+   *     error: (err) => void ('Error al actualizar', err)
    *   });
    * });
    * ```
@@ -276,7 +276,7 @@ export class LoyaltyAdminService {
    * };
    *
    * this.loyaltyAdminService.listAllRedemptions(query).subscribe(response => {
-   *   console.log(`${response.totalItems} canjes pendientes`);
+   *   void (`${response.totalItems} canjes pendientes`);
    *
    *   // Separar por tipo
    *   const products = response.items.filter(r => r.rewardType === 'PRODUCT');
@@ -284,8 +284,8 @@ export class LoyaltyAdminService {
    *     r => r.rewardType.includes('DISCOUNT')
    *   );
    *
-   *   console.log(`${products.length} productos por entregar`);
-   *   console.log(`${discounts.length} cupones por aprobar`);
+   *   void (`${products.length} productos por entregar`);
+   *   void (`${discounts.length} cupones por aprobar`);
    * });
    * ```
    */
@@ -401,9 +401,9 @@ omer(redemptionId);
    *
    * this.loyaltyAdminService.adjustPoints(adjust).subscribe({
    *   next: (response) => {
-  *     alert(`Puntos ajustados: ${response.pointsAdjusted}`);
-  *     console.log(`Transaction ID: ${response.transactionId}`);
-  *     console.log(`Nuevo balance: ${response.newBalance}`);
+   *     alert(`Puntos ajustados: ${response.pointsAdjusted}`);
+   *     void (`Transaction ID: ${response.transactionId}`);
+   *     void (`Nuevo balance: ${response.newBalance}`);
    *   },
    *   error: (err) => {
    *     if (err.status === 400) {
@@ -449,8 +449,8 @@ omer(redemptionId);
    * ```typescript
    * this.loyaltyAdminService.getProgramConfig().subscribe({
    *   next: (config) => {
-   *     console.log(`1 ${config.currency} = ${config.pointsPerCurrencyUnit} puntos`);
-   *     console.log(`Tier Oro: ${config.goldTierThreshold} puntos`);
+   *     void (`1 ${config.currency} = ${config.pointsPerCurrencyUnit} puntos`);
+   *     void (`Tier Oro: ${config.goldTierThreshold} puntos`);
    *   }
    * });
    * ```
@@ -484,7 +484,7 @@ omer(redemptionId);
    *
    * this.loyaltyAdminService.updateProgramConfig(update).subscribe({
    *   next: (config) => alert('Configuración actualizada'),
-   *   error: (err) => console.error('Error al actualizar', err)
+   *   error: (err) => void ('Error al actualizar', err)
    * });
    * ```
    */

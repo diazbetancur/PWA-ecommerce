@@ -38,7 +38,7 @@ export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
     if (tenantSlug) {
       headers = headers.set('X-Tenant-Slug', tenantSlug);
       // Log solo en modo desarrollo y si es necesario
-      // console.log('[authTenantInterceptor] Adding X-Tenant-Slug:', tenantSlug);
+      // void ('[authTenantInterceptor] Adding X-Tenant-Slug:', tenantSlug);
     }
   }
 
@@ -46,7 +46,6 @@ export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((e) => {
       // Solo log de errores críticos (401, 403, 500)
       if (e?.status === 401 || e?.status === 403 || e?.status >= 500) {
-        console.error('[authTenantInterceptor] Error:', e?.status, e?.message);
       }
 
       // 401 = No autenticado (token inválido/expirado) -> Desloguear

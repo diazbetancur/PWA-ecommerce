@@ -130,7 +130,6 @@ export class StoreFormComponent implements OnInit {
           }
         },
         error: (err) => {
-          console.error('Error al cargar tienda:', err);
           this.error.set('Error al cargar la tienda');
           this.loading.set(false);
         },
@@ -179,7 +178,6 @@ export class StoreFormComponent implements OnInit {
           this.router.navigate(['/tenant-admin/settings/stores']);
         },
         error: (err) => {
-          console.error('Error al crear tienda:', err);
           const message =
             err.error?.detail ||
             err.error?.errors?.[0]?.message ||
@@ -220,7 +218,6 @@ export class StoreFormComponent implements OnInit {
           this.router.navigate(['/tenant-admin/settings/stores']);
         },
         error: (err) => {
-          console.error('Error al actualizar tienda:', err);
           const message =
             err.error?.detail ||
             err.error?.errors?.[0]?.message ||

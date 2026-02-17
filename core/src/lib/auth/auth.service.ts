@@ -31,7 +31,6 @@ export class AuthService {
   }
 
   setToken(token: string) {
-    console.log('[AuthService] 🔥 setToken() called');
     this._jwt.set(token);
     try {
       const base64 = token.split('.')[1];
@@ -46,49 +45,23 @@ export class AuthService {
       const isSuperAdmin =
         claims.isSuperAdmin === true || normalizedRole === 'superadmin';
       this._isSuperAdmin.set(isSuperAdmin);
-      console.log(
-        '[AuthService] isSuperAdmin:',
-        isSuperAdmin,
-        'tenantSlug:',
-        this._tenantSlug,
-        'claims.tenant_slug:',
-        claims.tenant_slug
-      );
     } catch {
       this._claims.set(null);
       this._isSuperAdmin.set(false);
     }
 
     if (this._isSuperAdmin()) {
-      console.log(
-        '[AuthService] 💾 Guardando SuperAdmin token con ambas claves'
-      );
       globalThis.localStorage?.setItem(SUPERADMIN_TOKEN_KEY, token);
-      console.log('[AuthService] ✅ Guardado en superadmin_token');
       // TAMBIÉN guardar con el tenant_slug del JWT si existe (para que TenantBootstrap lo encuentre)
       const tenantSlugFromJwt = this._claims()?.tenant_slug;
       if (tenantSlugFromJwt) {
         const key = STORAGE_PREFIX + tenantSlugFromJwt;
         globalThis.localStorage?.setItem(key, token);
-        console.log('[AuthService] ✅ Guardado en', key);
-      } else {
-        console.warn(
-          '[AuthService] ⚠️ No hay tenant_slug en JWT, solo guardado en superadmin_token'
-        );
       }
     } else if (this._tenantSlug) {
       const key = STORAGE_PREFIX + this._tenantSlug;
       globalThis.localStorage?.setItem(key, token);
-      console.log('[AuthService] ✅ Guardado token tenant en', key);
-    } else {
-      console.warn(
-        '[AuthService] ⚠️ No se guardó el token - no es SuperAdmin ni hay _tenantSlug'
-      );
     }
-    console.log(
-      '[AuthService] 📦 localStorage keys después de setToken:',
-      Object.keys(globalThis.localStorage || {})
-    );
   }
 
   clear() {
@@ -185,7 +158,6 @@ export class AuthService {
       this.initSuperAdmin();
     } else if (tenantSlug && !this._tenantSlug) {
       // Si hay tenant pero AuthService no está inicializado, inicializarlo
-      console.log('[AuthService] Initializing with tenant slug:', tenantSlug);
       this.init(tenantSlug);
     }
 
@@ -210,10 +182,6 @@ export class AuthService {
           ...currentClaims,
           features: response.user.features,
         });
-        console.log(
-          '[AuthService] ✅ Features guardadas en claims:',
-          response.user.features
-        );
       }
     }
   }
@@ -233,7 +201,6 @@ export class AuthService {
       const config = this.tenantConfig.config;
       if (config?.tenant?.slug) {
         tenantSlug = config.tenant.slug;
-        console.log('[AuthService] Using tenant slug from TenantConfigService:', tenantSlug);
         // Inicializar el AuthService con el tenant slug
         this.init(tenantSlug);
       }

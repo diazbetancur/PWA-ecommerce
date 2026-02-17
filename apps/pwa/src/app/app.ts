@@ -28,7 +28,6 @@ export class App implements OnInit {
             this.dynamicPwaAssets.applyBranding(branding);
           })
           .catch((error) => {
-            console.warn('Error precargando branding assets:', error);
             // Aplicar de todas formas aunque fallen algunas imágenes
             this.dynamicPwaAssets.applyBranding(branding);
           });

@@ -28,16 +28,10 @@ export const loyaltyFeatureGuard: CanActivateFn = async () => {
 
   // Si el tenant no está cargado, forzar inicialización
   if (!tenantContext.isTenantReady()) {
-    console.log(
-      '[LoyaltyFeatureGuard] Tenant not ready, forcing initialization...'
-    );
     try {
       await tenantBootstrap.initialize();
     } catch (error) {
-      console.error(
-        '[LoyaltyFeatureGuard] Failed to initialize tenant:',
-        error
-      );
+      void error;
     }
   }
 
@@ -45,47 +39,27 @@ export const loyaltyFeatureGuard: CanActivateFn = async () => {
   try {
     await tenantContext.waitForTenant(3000);
   } catch (error) {
-    console.error('[LoyaltyFeatureGuard] Timeout esperando tenant:', error);
-    router.navigate(['/tenant/not-found']);
+    router.navigate(['/tenant/not-found'], { queryParamsHandling: 'preserve' });
     return false;
   }
 
   const currentConfig = tenantContext.currentConfig();
 
-  // DEBUG: Mostrar todas las features disponibles
-  console.log('[LoyaltyFeatureGuard] DEBUG - Current Config:', currentConfig);
-  console.log(
-    '[LoyaltyFeatureGuard] DEBUG - Features:',
-    currentConfig?.features
-  );
-  console.log(
-    '[LoyaltyFeatureGuard] DEBUG - features.loyalty:',
-    currentConfig?.features?.['loyalty']
-  );
-  console.log(
-    '[LoyaltyFeatureGuard] DEBUG - features.enableLoyalty:',
-    currentConfig?.features?.['enableLoyalty']
-  );
+  const features = currentConfig?.features;
 
-  // Buscar loyalty con diferentes nombres posibles
-  const hasLoyalty =
-    currentConfig?.features?.['loyalty'] ??
-    currentConfig?.features?.['enableLoyalty'] ??
-    false;
+  // Compatibilidad: si backend no envía features o viene vacío, NO bloquear.
+  if (!features || Object.keys(features).length === 0) {
+    return true;
+  }
 
-  if (!hasLoyalty) {
-    console.warn(
-      `[LoyaltyFeatureGuard] Loyalty feature not enabled for tenant: ${
-        currentConfig?.tenant.slug || 'unknown'
-      }. Available features:`,
-      Object.keys(currentConfig?.features || {})
-    );
-    router.navigate(['/tenant-admin/dashboard']);
+  // Bloquear únicamente cuando loyalty está explícitamente deshabilitado.
+  const loyaltyFlag = features['loyalty'] ?? features['enableLoyalty'];
+  if (loyaltyFlag === false) {
+    router.navigate(['/tenant-admin/dashboard'], {
+      queryParamsHandling: 'preserve',
+    });
     return false;
   }
 
-  console.log(
-    '[LoyaltyFeatureGuard] ✅ Loyalty feature enabled, allowing access'
-  );
   return true;
 };

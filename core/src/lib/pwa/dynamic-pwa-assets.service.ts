@@ -49,14 +49,8 @@ export class DynamicPwaAssetsService {
     // Effect para log en desarrollo
     if (this.isBrowser && !this.isProduction()) {
       effect(() => {
-        console.log(
-          '[DynamicPwaAssetsService] Current Branding:',
-          this._currentBranding()
-        );
-        console.log(
-          '[DynamicPwaAssetsService] Assets Applied:',
-          this._assetsApplied()
-        );
+        this._currentBranding();
+        this._assetsApplied();
       });
     }
   }
@@ -215,10 +209,7 @@ export class DynamicPwaAssetsService {
 
       this.updateManifest(manifestUrl);
     } catch (error) {
-      console.warn(
-        '[DynamicPwaAssetsService] Error generando manifest dinámico:',
-        error
-      );
+      void error;
     }
   }
 

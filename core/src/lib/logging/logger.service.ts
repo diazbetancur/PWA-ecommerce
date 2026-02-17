@@ -9,13 +9,10 @@ export class LoggerService {
   }
 
   log(message?: unknown, ...optionalParams: unknown[]) {
-    console.log(this.prefix(), message, ...optionalParams);
   }
   warn(message?: unknown, ...optionalParams: unknown[]) {
-    console.warn(this.prefix(), message, ...optionalParams);
   }
   error(message?: unknown, ...optionalParams: unknown[]) {
-    console.error(this.prefix(), message, ...optionalParams);
   }
 
   private prefix() {

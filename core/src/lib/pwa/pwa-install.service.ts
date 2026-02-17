@@ -96,12 +96,7 @@ export class PwaInstallService {
     // Effect para debug (solo en desarrollo)
     if (this.isBrowser && !this.isProduction()) {
       effect(() => {
-        console.log('[PwaInstallService] Platform Info:', this._platformInfo());
-        console.log('[PwaInstallService] Banner State:', this._bannerState());
-        console.log(
-          '[PwaInstallService] Should Show iOS Banner:',
-          this.shouldShowIosBanner()
-        );
+        this.shouldShowIosBanner();
       });
     }
   }
@@ -206,10 +201,7 @@ export class PwaInstallService {
           })
         );
       } catch (error) {
-        console.warn(
-          '[PwaInstallService] No se pudo guardar dismiss en localStorage:',
-          error
-        );
+        void error;
       }
     }
   }
@@ -227,10 +219,7 @@ export class PwaInstallService {
       try {
         localStorage.removeItem(this.config.bannerDismissStorageKey);
       } catch (error) {
-        console.warn(
-          '[PwaInstallService] No se pudo eliminar dismiss de localStorage:',
-          error
-        );
+        void error;
       }
     }
   }
@@ -273,7 +262,6 @@ export class PwaInstallService {
         dismissedAt,
       });
     } catch (error) {
-      console.warn('[PwaInstallService] Error cargando dismiss state:', error);
     }
   }
 

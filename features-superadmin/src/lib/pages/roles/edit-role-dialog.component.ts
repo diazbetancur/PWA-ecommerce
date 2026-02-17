@@ -89,7 +89,6 @@ export class EditRoleDialogComponent {
 
       this.dialogRef.close(true); // Cierra y notifica actualización exitosa
     } catch (err: unknown) {
-      console.error('Error al actualizar rol:', err);
       this.error.set('Error al actualizar el rol. Verifique que el nombre no exista.');
     } finally {
       this.isSaving.set(false);

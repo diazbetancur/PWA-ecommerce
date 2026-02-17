@@ -59,20 +59,17 @@ function processComponent(componentPath) {
   const baseName = path.basename(fullPath, '.ts');
   const componentName = baseName.replace('.component', '');
 
-  console.log(`\nProcesando: ${componentName}`);
 
   // Leer el archivo
   let content;
   try {
     content = fs.readFileSync(fullPath, 'utf8');
   } catch (error) {
-    console.error(`  ❌ Error leyendo archivo: ${error.message}`);
     return false;
   }
 
   // Verificar si ya tiene styleUrl
   if (content.includes('styleUrl:')) {
-    console.log(`  ⚠️  Ya tiene styleUrl, saltando...`);
     return null;
   }
 
@@ -80,20 +77,16 @@ function processComponent(componentPath) {
   const stylesContent = extractStylesAdvanced(content);
 
   if (!stylesContent) {
-    console.log(`  ⚠️  No se pudieron extraer styles`);
     return null;
   }
 
-  console.log(`  📏 Styles encontrados: ${stylesContent.length} caracteres`);
 
   // Crear archivo SCSS
   const scssPath = path.join(componentDir, `${baseName}.scss`);
 
   try {
     fs.writeFileSync(scssPath, stylesContent.trim() + '\n', 'utf8');
-    console.log(`  ✅ SCSS creado: ${baseName}.scss`);
   } catch (error) {
-    console.error(`  ❌ Error creando SCSS: ${error.message}`);
     return false;
   }
 
@@ -108,9 +101,7 @@ function processComponent(componentPath) {
 
   try {
     fs.writeFileSync(fullPath, newContent, 'utf8');
-    console.log(`  ✅ TS actualizado con styleUrl`);
   } catch (error) {
-    console.error(`  ❌ Error actualizando TS: ${error.message}`);
     return false;
   }
 
@@ -118,8 +109,6 @@ function processComponent(componentPath) {
 }
 
 // Procesar todos los componentes
-console.log('🚀 Iniciando extracción y creación de archivos SCSS...\n');
-console.log(`📦 Total de componentes: ${componentsWithStyles.length}\n`);
 
 let successCount = 0;
 let skipCount = 0;
@@ -136,12 +125,5 @@ componentsWithStyles.forEach((componentPath) => {
   }
 });
 
-console.log('\n' + '='.repeat(60));
-console.log('📊 RESUMEN FINAL');
-console.log('='.repeat(60));
-console.log(`✅ Procesados exitosamente: ${successCount}`);
-console.log(`⚠️  Saltados: ${skipCount}`);
-console.log(`❌ Errores: ${errorCount}`);
-console.log('='.repeat(60) + '\n');
 
 process.exit(errorCount > 0 ? 1 : 0);

@@ -111,7 +111,6 @@ export class TenantCreateComponent implements OnInit {
       const plans = await this.tenantService.getPlans();
       this.plans.set(plans);
     } catch (err) {
-      console.error('Error al cargar planes:', err);
       this.error.set('Error al cargar los planes disponibles');
     } finally {
       this.isLoadingPlans.set(false);
@@ -207,7 +206,6 @@ export class TenantCreateComponent implements OnInit {
         }, 2000);
       },
       (err) => {
-        console.error('Error al copiar:', err);
       }
     );
   }

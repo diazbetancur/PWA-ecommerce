@@ -79,7 +79,6 @@ export class RolesListComponent implements OnInit {
           this.roles.set(response.roles);
         }),
         catchError((error) => {
-          console.error('Error al cargar roles:', error);
           this.isError.set(true);
           this.errorMessage.set(
             error?.error?.message ||
@@ -187,10 +186,8 @@ export class RolesListComponent implements OnInit {
           this.roles.set(updated);
 
           // TODO: Mostrar toast de éxito
-          console.log('Rol eliminado exitosamente');
         }),
         catchError((error) => {
-          console.error('Error al eliminar rol:', error);
 
           // Manejar error 409 (Conflict) - rol con usuarios asignados
           if (error?.status === 409) {

@@ -25,9 +25,7 @@ export class TenantContextService {
   readonly tenantSlug = computed(
     () => this.resolvedConfig()?.tenant.slug ?? null
   );
-  readonly tenantKey = computed(
-    () => this.resolvedConfig()?.tenant.id ?? null
-  );
+  readonly tenantKey = computed(() => this.resolvedConfig()?.tenant.id ?? null);
   readonly isReady = computed(() => this.resolvedConfig() !== null);
   readonly currentConfig = computed(() => this.resolvedConfig());
   readonly isLoading = computed(() => this.tenantBootstrap.isLoading());
@@ -42,12 +40,8 @@ export class TenantContextService {
     () => this.currentTenant()?.displayName ?? null
   );
 
-  readonly currency = computed(
-    () => this.resolvedConfig()?.currency ?? 'USD'
-  );
-  readonly locale = computed(
-    () => this.resolvedConfig()?.locale ?? 'en-US'
-  );
+  readonly currency = computed(() => this.resolvedConfig()?.currency ?? 'USD');
+  readonly locale = computed(() => this.resolvedConfig()?.locale ?? 'en-US');
 
   readonly pwaBranding = computed(() => {
     const tenant = this.currentTenant();

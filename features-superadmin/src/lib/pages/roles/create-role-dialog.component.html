@@ -96,7 +96,9 @@
       <mat-spinner diameter="20"></mat-spinner>
       <span>Creando...</span>
     } @else {
-      <mat-icon>save</mat-icon>
+      <ng-container matButtonIcon>
+        <mat-icon>save</mat-icon>
+      </ng-container>
       <span>Crear Rol</span>
     }
   </button>

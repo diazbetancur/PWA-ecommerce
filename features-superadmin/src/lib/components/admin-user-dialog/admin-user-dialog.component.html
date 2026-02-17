@@ -135,11 +135,13 @@
     >
       @if (isSaving()) {
         <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
-        <span>Guardando...</span>
-      } @else {
-        <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
-        <span>{{ isEditMode ? 'Guardar Cambios' : 'Crear Usuario' }}</span>
       }
+      @if (!isSaving()) {
+        <ng-container matButtonIcon>
+          <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+        </ng-container>
+      }
+      <span>{{ isSaving() ? 'Guardando...' : (isEditMode ? 'Guardar Cambios' : 'Crear Usuario') }}</span>
     </button>
   </mat-dialog-actions>
 </div>

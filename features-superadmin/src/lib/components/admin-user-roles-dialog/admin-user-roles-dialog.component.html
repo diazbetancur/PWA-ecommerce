@@ -81,11 +81,13 @@
     >
       @if (isSaving()) {
         <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
-        <span>Guardando...</span>
-      } @else {
-        <mat-icon>save</mat-icon>
-        <span>Guardar Cambios</span>
       }
+      @if (!isSaving()) {
+        <ng-container matButtonIcon>
+          <mat-icon>save</mat-icon>
+        </ng-container>
+      }
+      <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}</span>
     </button>
   </mat-dialog-actions>
 </div>

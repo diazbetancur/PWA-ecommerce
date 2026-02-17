@@ -117,7 +117,6 @@ export class CategorySelectorDialogComponent implements OnInit {
           this.loading.set(false);
         },
         error: (error: any) => {
-          console.error('Error loading categories:', error);
           this.loading.set(false);
         },
       });
@@ -144,7 +143,6 @@ export class CategorySelectorDialogComponent implements OnInit {
           this.loadingMore.set(false);
         },
         error: (error: any) => {
-          console.error('Error loading more categories:', error);
           this.loadingMore.set(false);
           this.currentPage--; // Revertir incremento en caso de error
         },

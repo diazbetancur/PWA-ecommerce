@@ -251,7 +251,6 @@ export class ProductListExampleComponent implements OnInit {
       error: (err) => {
         this.error.set('Error de conexión: ' + err.message);
         this.isLoading.set(false);
-        console.error('Error cargando productos:', err);
       },
     });
   }
@@ -287,7 +286,6 @@ export class ProductListExampleComponent implements OnInit {
    * Navega a la vista de detalle del producto
    */
   viewProduct(productId: string) {
-    console.log('Ver producto:', productId);
     // Aquí implementarías la navegación al detalle
     // this.router.navigate(['/products', productId]);
   }
