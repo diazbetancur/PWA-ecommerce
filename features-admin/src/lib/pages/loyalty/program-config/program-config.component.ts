@@ -144,6 +144,6 @@ export class ProgramConfigComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/admin/loyalty/dashboard']);
+    this.router.navigate(['/tenant-admin/loyalty/dashboard']);
   }
 }

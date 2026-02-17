@@ -194,10 +194,27 @@ export class TenantAdminMenuService {
     },
     permissions: {
       module: 'permissions',
-      label: 'Permisos',
+      label: 'Accesibilidad',
       icon: 'security',
-      route: '/tenant-admin/permissions',
       order: 7,
+      // No tiene route porque es un padre con hijos
+    },
+    // Submódulos de permissions
+    'permissions.users': {
+      module: 'permissions',
+      label: 'Usuarios',
+      icon: 'people',
+      route: '/tenant-admin/access/users',
+      order: 1,
+      parentModule: 'permissions',
+    },
+    'permissions.roles': {
+      module: 'permissions',
+      label: 'Roles',
+      icon: 'shield',
+      route: '/tenant-admin/access/roles',
+      order: 2,
+      parentModule: 'permissions',
     },
   };
 
@@ -230,7 +247,6 @@ export class TenantAdminMenuService {
 
   private buildMenuFromModules(modules: string[]): TenantAdminMenuItem[] {
     const mainModules = modules.filter((m) => !m.includes('.'));
-    const subModules = modules.filter((m) => m.includes('.'));
 
     const menuItems: TenantAdminMenuItem[] = [];
 
@@ -349,6 +365,32 @@ export class TenantAdminMenuService {
 
         if (settingsSubModules.length > 0) {
           menuItem.children = settingsSubModules;
+          menuItems.push(menuItem);
+        }
+      }
+      // Si es "permissions", incluir automáticamente sus submódulos
+      else if (moduleCode.toLowerCase() === 'permissions') {
+        // Buscar todos los submódulos de permissions definidos en moduleConfigMap
+        const permissionsSubModules = Object.keys(this.moduleConfigMap)
+          .filter((key) => key.startsWith('permissions.'))
+          .map((key) => {
+            const subConfig = this.moduleConfigMap[key];
+            return {
+              id: key,
+              label: subConfig.label,
+              icon: subConfig.icon,
+              route: subConfig.route,
+              visible: true,
+            } as TenantAdminMenuItem;
+          })
+          .sort((a, b) => {
+            const orderA = this.moduleConfigMap[a.id]?.order ?? 999;
+            const orderB = this.moduleConfigMap[b.id]?.order ?? 999;
+            return orderA - orderB;
+          });
+
+        if (permissionsSubModules.length > 0) {
+          menuItem.children = permissionsSubModules;
           menuItems.push(menuItem);
         }
       } else {

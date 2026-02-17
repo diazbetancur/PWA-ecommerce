@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '@pwa/shared';
+import { TenantUserSummaryDto } from '../../../models/tenant-user.model';
 import {
   AdjustPointsRequest,
   AdjustPointsResponse,
 } from '../../../models/loyalty.models';
 import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
+import { TenantUserService } from '../../../services/tenant-user.service';
 
 /**
  * ⚙️ Ajuste Manual de Puntos
@@ -94,6 +96,69 @@ import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 
       .form-textarea {
         resize: vertical;
+      }
+
+      .search-row {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-search {
+        border: none;
+        background: #007bff;
+        color: white;
+        padding: 0 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn-search:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .selected-user-card {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid #b6e0fe;
+        background: #f1f8ff;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .btn-clear-user {
+        border: 1px solid #dc3545;
+        background: white;
+        color: #dc3545;
+        padding: 6px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .search-results {
+        margin-top: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        max-height: 220px;
+        overflow-y: auto;
+      }
+
+      .search-result-item {
+        width: 100%;
+        display: block;
+        text-align: left;
+        background: white;
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        padding: 10px 12px;
+        cursor: pointer;
+      }
+
+      .search-result-item:hover {
+        background: #f8f9fa;
       }
 
       .help-text {
@@ -345,17 +410,23 @@ import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 })
 export class PointsAdjustmentComponent {
   private readonly loyaltyAdminService = inject(LoyaltyAdminService);
+  private readonly tenantUserService = inject(TenantUserService);
   private readonly toastService = inject(ToastService);
 
   // Signals
   isSubmitting = signal(false);
   successMessage = signal<string | null>(null);
   errorMessage = signal<string | null>(null);
+  isSearchingUser = signal(false);
+  customerSearchResults = signal<TenantUserSummaryDto[]>([]);
+  selectedCustomer = signal<TenantUserSummaryDto | null>(null);
+  userEmailSearch = '';
 
   // Form data
   formData: AdjustPointsRequest = {
     userId: '',
     points: 0,
+    transactionType: 'ADJUST',
     reason: '',
     referenceId: '',
   };
@@ -392,19 +463,54 @@ export class PointsAdjustmentComponent {
    * Enviar ajuste
    */
   submitAdjustment(): void {
+    if (!this.formData.userId.trim()) {
+      this.toastService.warning(
+        'Selecciona un usuario por correo o ingresa un ID de usuario válido.'
+      );
+      return;
+    }
+
+    if (!this.isValidUuid(this.formData.userId)) {
+      this.toastService.warning('El ID de usuario debe tener formato UUID válido.');
+      return;
+    }
+
+    if (this.formData.points < -100000 || this.formData.points > 100000) {
+      this.toastService.warning('Los puntos deben estar entre -100000 y 100000.');
+      return;
+    }
+
+    if (this.formData.points === 0) {
+      this.toastService.warning('La cantidad de puntos no puede ser 0.');
+      return;
+    }
+
+    const trimmedReason = this.formData.reason.trim();
+    if (trimmedReason.length < 5 || trimmedReason.length > 500) {
+      this.toastService.warning(
+        'La razón del ajuste debe tener entre 5 y 500 caracteres.'
+      );
+      return;
+    }
+
     this.isSubmitting.set(true);
     this.successMessage.set(null);
     this.errorMessage.set(null);
 
+    const transactionType = this.resolveTransactionType(this.formData.points);
+
     this.loyaltyAdminService
       .adjustPoints({
         ...this.formData,
+        reason: trimmedReason,
+        transactionType,
         referenceId: this.formData.referenceId || undefined,
       })
       .subscribe({
         next: (response: AdjustPointsResponse) => {
           this.toastService.success(
-            `Ajuste realizado exitosamente. Balance anterior: ${response.previousBalance}, Nuevo balance: ${response.newBalance}`
+            response.message ||
+              `Ajuste realizado exitosamente. Nuevo balance: ${response.newBalance}`
           );
           this.resetForm();
           this.isSubmitting.set(false);
@@ -426,10 +532,87 @@ export class PointsAdjustmentComponent {
     this.formData = {
       userId: '',
       points: 0,
+      transactionType: 'ADJUST',
       reason: '',
       referenceId: '',
     };
+    this.userEmailSearch = '';
+    this.selectedCustomer.set(null);
+    this.customerSearchResults.set([]);
     this.successMessage.set(null);
     this.errorMessage.set(null);
+  }
+
+  searchCustomerByEmail(): void {
+    const email = this.userEmailSearch.trim();
+
+    this.selectedCustomer.set(null);
+    this.customerSearchResults.set([]);
+
+    if (!email) {
+      this.toastService.warning('Ingresa un correo para buscar clientes.');
+      return;
+    }
+
+    this.isSearchingUser.set(true);
+
+    this.tenantUserService
+      .listCustomers({
+        search: email,
+        page: 1,
+        pageSize: 10,
+      })
+      .subscribe({
+        next: (response) => {
+          this.customerSearchResults.set(response.users);
+
+          if (response.users.length === 0) {
+            this.toastService.info('No se encontraron clientes con ese correo.');
+          }
+
+          this.isSearchingUser.set(false);
+        },
+        error: (err) => {
+          console.error('Error buscando clientes por correo:', err);
+          this.toastService.error(
+            'No se pudo buscar el cliente. Intenta nuevamente.'
+          );
+          this.isSearchingUser.set(false);
+        },
+      });
+  }
+
+  selectCustomer(user: TenantUserSummaryDto): void {
+    this.selectedCustomer.set(user);
+    this.formData.userId = user.id;
+    this.userEmailSearch = user.email;
+    this.customerSearchResults.set([]);
+  }
+
+  clearSelectedCustomer(): void {
+    this.selectedCustomer.set(null);
+    this.formData.userId = '';
+    this.customerSearchResults.set([]);
+  }
+
+  onUserIdManualChange(): void {
+    if (
+      this.selectedCustomer() &&
+      this.selectedCustomer()?.id !== this.formData.userId
+    ) {
+      this.selectedCustomer.set(null);
+    }
+  }
+
+  private resolveTransactionType(
+    _points: number
+  ): 'EARN' | 'REDEEM' | 'ADJUST' {
+    return 'ADJUST';
+  }
+
+  private isValidUuid(value: string): boolean {
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(value.trim());
   }
 }

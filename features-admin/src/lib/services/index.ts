@@ -6,3 +6,5 @@
 export * from './category.service';
 export * from './loyalty-admin.service';
 export * from './store-admin.service';
+export * from './role.service';
+export * from './permission.service';

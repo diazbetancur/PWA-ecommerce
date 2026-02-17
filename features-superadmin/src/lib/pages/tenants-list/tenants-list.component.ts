@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
+import { ConfirmationDialogService } from '@pwa/shared';
+import { TenantDetailDialogComponent } from '../../components/tenant-detail-dialog/tenant-detail-dialog.component';
+import { TenantEditDialogComponent } from '../../components/tenant-edit-dialog/tenant-edit-dialog.component';
 import { TenantListItem, TenantStatus } from '../../models/tenant.model';
 import { TenantAdminService } from '../../services/tenant-admin.service';
 
@@ -15,6 +19,8 @@ import { TenantAdminService } from '../../services/tenant-admin.service';
 export class TenantsListComponent {
   private readonly tenantService = inject(TenantAdminService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
+  private readonly confirmDialog = inject(ConfirmationDialogService);
 
   // Expose enum to template
   readonly TenantStatus = TenantStatus;
@@ -142,30 +148,59 @@ export class TenantsListComponent {
   }
 
   viewTenant(tenantId: string): void {
-    this.router.navigate(['/admin/tenants', tenantId]);
+    this.dialog.open(TenantDetailDialogComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      data: { tenantId },
+    });
   }
 
   editTenant(tenantId: string): void {
-    this.router.navigate(['/admin/tenants', tenantId, 'edit']);
+    const dialogRef = this.dialog.open(TenantEditDialogComponent, {
+      width: '600px',
+      maxHeight: '90vh',
+      data: { tenantId },
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((updated: boolean) => {
+      if (updated) {
+        void this.loadTenants();
+      }
+    });
   }
 
-  async deleteTenant(tenant: TenantListItem): Promise<void> {
-    const confirmed = confirm(
-      `¿Estás seguro de eliminar el comercio "${tenant.name}"? Esta acción no se puede deshacer.`
-    );
+  deleteTenant(tenant: TenantListItem): void {
+    this.confirmDialog.confirmDelete(
+      tenant.name,
+      'Esta acción no se puede deshacer. Se eliminará el comercio y todos sus datos.'
+    ).subscribe(async (confirmed) => {
+      if (!confirmed) return;
 
-    if (!confirmed) return;
-
-    try {
-      await this.tenantService.deleteTenant(tenant.id);
-      await this.loadTenants();
-    } catch (err) {
-      alert(
-        err instanceof Error
-          ? err.message
-          : 'Error al eliminar el comercio. Inténtalo de nuevo.'
-      );
-    }
+      try {
+        await this.tenantService.deleteTenant(tenant.id);
+        
+        this.confirmDialog.confirm({
+          title: 'Eliminación exitosa',
+          message: `El comercio "${tenant.name}" ha sido eliminado correctamente.`,
+          confirmText: 'Aceptar',
+          type: 'info',
+          icon: 'check_circle',
+        }).subscribe();
+        
+        await this.loadTenants();
+      } catch (err) {
+        this.confirmDialog.confirm({
+          title: 'Error al eliminar',
+          message: err instanceof Error
+            ? err.message
+            : 'Error al eliminar el comercio. Por favor, inténtelo nuevamente.',
+          confirmText: 'Aceptar',
+          type: 'danger',
+          icon: 'error',
+        }).subscribe();
+      }
+    });
   }
 
   // Utilities

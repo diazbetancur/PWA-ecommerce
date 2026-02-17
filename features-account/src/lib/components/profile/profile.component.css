@@ -25,6 +25,62 @@ h2 {
   color: #2d3748;
 }
 
+/* Tabs Navigation */
+.tabs-navigation {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.tab-button {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #718096;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  bottom: -2px;
+}
+
+.tab-button:hover {
+  color: #667eea;
+}
+
+.tab-button.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+/* Tab Content */
+.tab-content {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Logout Section */
+.logout-section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: center;
+}
+
 .alert {
   padding: 0.75rem;
   border-radius: 0.5rem;
@@ -95,7 +151,18 @@ input {
   transition: border-color 0.2s;
 }
 
-input:focus {
+select {
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+  background-color: white;
+  cursor: pointer;
+}
+
+input:focus,
+select:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -104,6 +171,12 @@ input:focus {
 input[readonly] {
   background-color: #f7fafc;
   cursor: not-allowed;
+}
+
+select:disabled {
+  background-color: #f7fafc;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 small {
@@ -177,28 +250,6 @@ small {
   }
 }
 
-.info-grid {
-  display: grid;
-  gap: 1rem;
-}
-
-.info-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.75rem;
-  background: #f7fafc;
-  border-radius: 0.5rem;
-}
-
-.info-label {
-  font-weight: 500;
-  color: #2d3748;
-}
-
-.info-value {
-  color: #718096;
-}
-
 @media (max-width: 640px) {
   .form-row {
     grid-template-columns: 1fr;
@@ -208,5 +259,16 @@ small {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
+  }
+
+  .tabs-navigation {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tab-button {
+    white-space: nowrap;
+    font-size: 0.875rem;
+    padding: 0.625rem 1rem;
   }
 }

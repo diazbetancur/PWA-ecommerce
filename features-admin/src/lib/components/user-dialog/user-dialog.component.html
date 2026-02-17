@@ -1,0 +1,167 @@
+<h2 mat-dialog-title>
+  {{ isEditMode ? 'Editar Usuario' : 'Crear Nuevo Usuario' }}
+</h2>
+
+<mat-dialog-content>
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Cargando datos...</p>
+  </div>
+  }
+
+  <!-- Error Message -->
+  @if (errorMessage()) {
+  <div class="error-message">
+    <p>{{ errorMessage() }}</p>
+  </div>
+  }
+
+  <!-- Form -->
+  @if (!isLoading()) {
+  <form [formGroup]="userForm" class="user-form">
+    <!-- Información Personal -->
+    <div class="form-section">
+      <h3 class="section-title">Información Personal</h3>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          type="email"
+          formControlName="email"
+          placeholder="email@ejemplo.com"
+          [readonly]="isEditMode"
+        />
+        @if (userForm.get('email')?.invalid && userForm.get('email')?.touched)
+        {
+        <mat-error>{{ getErrorMessage('email') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="firstName"
+            placeholder="Juan"
+          />
+          @if (userForm.get('firstName')?.invalid &&
+          userForm.get('firstName')?.touched) {
+          <mat-error>{{ getErrorMessage('firstName') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Apellido</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="lastName"
+            placeholder="Pérez"
+          />
+          @if (userForm.get('lastName')?.invalid &&
+          userForm.get('lastName')?.touched) {
+          <mat-error>{{ getErrorMessage('lastName') }}</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Teléfono (opcional)</mat-label>
+        <input
+          matInput
+          type="tel"
+          formControlName="phoneNumber"
+          placeholder="+57 300 123 4567"
+        />
+      </mat-form-field>
+    </div>
+
+    <!-- Roles -->
+    <div class="form-section">
+      <h3 class="section-title">Roles y Permisos</h3>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Roles</mat-label>
+        <mat-select formControlName="roleIds" multiple>
+          @for (role of availableRoles(); track role.id) {
+          <mat-option [value]="role.id">
+            {{ role.name }}
+            @if (role.description) {
+            <span class="role-description">- {{ role.description }}</span>
+            }
+          </mat-option>
+          }
+        </mat-select>
+        @if (userForm.get('roleIds')?.invalid &&
+        userForm.get('roleIds')?.touched) {
+        <mat-error>Debes seleccionar al menos un rol</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Contraseña (solo en creación o si se quiere cambiar) -->
+    <div class="form-section">
+      <h3 class="section-title">
+        {{ isEditMode ? 'Cambiar Contraseña (opcional)' : 'Contraseña' }}
+      </h3>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Contraseña</mat-label>
+        <input
+          matInput
+          type="password"
+          formControlName="password"
+          [placeholder]="isEditMode ? 'Dejar vacío para mantener la actual' : '••••••••'"
+        />
+        @if (userForm.get('password')?.invalid &&
+        userForm.get('password')?.touched) {
+        <mat-error>{{ getErrorMessage('password') }}</mat-error>
+        }
+      </mat-form-field>
+
+      @if (userForm.get('password')?.value) {
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Confirmar Contraseña</mat-label>
+        <input
+          matInput
+          type="password"
+          formControlName="confirmPassword"
+          placeholder="••••••••"
+        />
+        @if (userForm.get('confirmPassword')?.invalid &&
+        userForm.get('confirmPassword')?.touched) {
+        <mat-error>{{ getErrorMessage('confirmPassword') }}</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-checkbox formControlName="mustChangePassword" class="full-width">
+        Requerir cambio de contraseña en el primer inicio de sesión
+      </mat-checkbox>
+      }
+    </div>
+  </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="isSaving()">
+    Cancelar
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="userForm.invalid || isSaving()"
+  >
+    @if (isSaving()) {
+    <mat-spinner diameter="20" style="display: inline-block"></mat-spinner>
+    } @else {
+    {{ isEditMode ? 'Actualizar' : 'Crear' }}
+    }
+  </button>
+</mat-dialog-actions>

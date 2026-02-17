@@ -19,16 +19,17 @@ export interface ModulePermission {
 export interface AuthUser {
   userId: string; // Backend envía "userId" no "id"
   email: string;
-  userType: 'tenant_user' | 'customer' | 'super_admin'; // Tipo de usuario
+  userType?: 'tenant_user' | 'customer' | 'super_admin'; // Tipo de usuario
   firstName?: string;
   lastName?: string;
-  roles: string[]; // Array de roles como strings
-  permissions: ModulePermission[]; // Permisos estructurados por módulo
+  roles: string[]; // Array de roles como strings (ej: ["SuperAdmin"], ["Customer"])
+  modules?: string[]; // Array de códigos de módulo permitidos (ej: ["catalog", "orders", "permissions"])
+  permissions: ModulePermission[]; // Permisos estructurados por módulo con canView/canCreate/canUpdate/canDelete
   isActive: boolean;
   mustChangePassword?: boolean;
-  features?: Record<string, any>; // Features del usuario (ej: enableMultiStore, allowGuestCheckout, etc.)
+  features?: Record<string, any>; // Features del usuario (ej: enableMultiStore, allowGuestCheckout, payments, etc.)
   // Campos opcionales para clientes
-  phoneNumber?: string;
+  phoneNumber?: string | null;
   fullName?: string;
   createdAt?: string;
   lastLoginAt?: string | null;

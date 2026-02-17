@@ -1,0 +1,100 @@
+<h2 mat-dialog-title>
+  <mat-icon>edit</mat-icon>
+  Editar Comercio
+</h2>
+
+<mat-dialog-content>
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (error() && !isLoading()) {
+    <div class="error-message">
+      <mat-icon>error</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+  }
+
+  @if (tenant() && !isLoading()) {
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-section">
+        <h3>Información Básica</h3>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre del comercio</mat-label>
+          <input matInput formControlName="name" placeholder="Mi Tienda" />
+          <mat-icon matPrefix>store</mat-icon>
+          @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+            <mat-error>El nombre es requerido</mat-error>
+          }
+          @if (form.get('name')?.hasError('minlength')) {
+            <mat-error>Mínimo 3 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Plan</mat-label>
+          <mat-select formControlName="planId">
+            @for (plan of plans(); track plan.id) {
+              <mat-option [value]="plan.id">
+                {{ plan.name }}
+              </mat-option>
+            }
+          </mat-select>
+          <mat-icon matPrefix>package</mat-icon>
+          @if (form.get('planId')?.hasError('required') && form.get('planId')?.touched) {
+            <mat-error>Debe seleccionar un plan</mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+      <div class="form-section">
+        <h3>Configuración Avanzada</h3>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Orígenes Permitidos (CORS)</mat-label>
+          <textarea 
+            matInput 
+            formControlName="allowedOrigins" 
+            rows="3"
+            placeholder="https://example.com,https://app.example.com"
+          ></textarea>
+          <mat-icon matPrefix>link</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Feature Flags (JSON)</mat-label>
+          <textarea 
+            matInput 
+            formControlName="featureFlagsJson" 
+            rows="4"
+            placeholder='{"enableLoyalty": true, "enablePush": false}'
+            class="mono-input"
+          ></textarea>
+          <mat-icon matPrefix>settings</mat-icon>
+        </mat-form-field>
+      </div>
+    </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="isSaving()">
+    Cancelar
+  </button>
+  <button 
+    mat-raised-button 
+    color="primary" 
+    (click)="onSubmit()"
+    [disabled]="form.invalid || !hasChanges() || isSaving()"
+  >
+    @if (isSaving()) {
+      <mat-spinner diameter="16"></mat-spinner>
+    } @else {
+      <mat-icon>save</mat-icon>
+    }
+    <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}</span>
+  </button>
+</mat-dialog-actions>

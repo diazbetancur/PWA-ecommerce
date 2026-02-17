@@ -1,0 +1,161 @@
+<div class="roles-container">
+  <!-- Toolbar -->
+  <div class="roles-toolbar">
+    <div class="toolbar-left">
+      <h1 class="toolbar-title">
+        <mat-icon>shield</mat-icon>
+        Accesibilidad / Roles
+      </h1>
+      <p class="toolbar-subtitle">
+        Gestiona los roles y permisos de acceso al sistema
+      </p>
+    </div>
+    <div class="toolbar-actions">
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="openCreateDialog()"
+        [disabled]="isLoading()"
+      >
+        <mat-icon>add</mat-icon>
+        Crear rol
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando roles...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (isError() && !isLoading()) {
+  <div class="error-container">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <h3>Error al cargar roles</h3>
+    <p>{{ errorMessage() }}</p>
+    <button mat-raised-button color="primary" (click)="loadRoles()">
+      <mat-icon>refresh</mat-icon>
+      Reintentar
+    </button>
+  </div>
+  }
+
+  <!-- Empty State -->
+  @if (!isLoading() && !isError() && roles().length === 0) {
+  <div class="empty-container">
+    <mat-icon class="empty-icon">assignment_ind</mat-icon>
+    <h3>No hay roles creados</h3>
+    <p>Crea el primer rol para empezar a gestionar permisos</p>
+    <button mat-raised-button color="primary" (click)="openCreateDialog()">
+      <mat-icon>add</mat-icon>
+      Crear primer rol
+    </button>
+  </div>
+  }
+
+  <!-- Data Table -->
+  @if (!isLoading() && !isError() && roles().length > 0) {
+  <div class="table-container">
+    <table mat-table [dataSource]="roles()" class="roles-table">
+      <!-- Nombre Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Nombre</th>
+        <td mat-cell *matCellDef="let role">
+          <div class="role-name">
+            <strong>{{ role.name }}</strong>
+            @if (role.isSystemRole) {
+            <mat-icon
+              class="system-icon"
+              matTooltip="Rol del sistema"
+              matTooltipPosition="right"
+              >verified</mat-icon
+            >
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <!-- Descripción Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Descripción</th>
+        <td mat-cell *matCellDef="let role">
+          <span class="role-description">{{
+            role.description || "Sin descripción"
+          }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Tipo Column -->
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Tipo</th>
+        <td mat-cell *matCellDef="let role">
+          @if (role.isSystemRole) {
+          <mat-chip class="chip-system">Sistema</mat-chip>
+          } @else {
+          <mat-chip class="chip-custom">Personalizado</mat-chip>
+          }
+        </td>
+      </ng-container>
+
+      <!-- Usuarios Column -->
+      <ng-container matColumnDef="usersCount">
+        <th mat-header-cell *matHeaderCellDef>Usuarios</th>
+        <td mat-cell *matCellDef="let role">
+          <span class="users-count">{{ role.usersCount || 0 }}</span>
+        </td>
+      </ng-container>
+
+      <!-- Acciones Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Acciones</th>
+        <td mat-cell *matCellDef="let role">
+          <div class="actions-cell">
+            <button
+              mat-icon-button
+              color="primary"
+              (click)="navigateToPermissions(role)"
+              matTooltip="Gestionar permisos"
+            >
+              <mat-icon>lock_open</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              (click)="openEditDialog(role)"
+              [disabled]="!canEditRole(role)"
+              [matTooltip]="
+                canEditRole(role)
+                  ? 'Editar rol'
+                  : 'Los roles del sistema no se pueden editar'
+              "
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="confirmDelete(role)"
+              [disabled]="!canDeleteRole(role)"
+              [matTooltip]="
+                canDeleteRole(role)
+                  ? 'Eliminar rol'
+                  : 'Los roles del sistema no se pueden eliminar'
+              "
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+  }
+</div>

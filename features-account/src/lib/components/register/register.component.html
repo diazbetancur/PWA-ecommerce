@@ -3,6 +3,12 @@
     <h1>Crear Cuenta</h1>
     <p class="subtitle">Únete a {{ tenantName() }}</p>
 
+    @if (!hasTenant()) {
+    <div class="alert alert-error">
+      No hay un comercio activo. El registro de clientes solo está disponible cuando accedes a través de un comercio específico.
+    </div>
+    }
+
     @if (errorMessage()) {
     <div class="alert alert-error">
       {{ errorMessage() }}
@@ -135,7 +141,7 @@
       <button
         type="submit"
         class="btn-primary"
-        [disabled]="isLoading() || registerForm.invalid || !passwordsMatch()"
+        [disabled]="!hasTenant() || isLoading() || registerForm.invalid || !passwordsMatch()"
       >
         @if (isLoading()) {
         <span class="spinner"></span>

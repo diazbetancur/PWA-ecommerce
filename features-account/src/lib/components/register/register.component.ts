@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import {
   AuthService,
   ModeSelectorDialogComponent,
+  TenantConfigService,
   TenantContextService,
   UserModeService,
 } from '@pwa/core';
@@ -23,6 +24,7 @@ export class RegisterComponent {
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
   private readonly tenantContext = inject(TenantContextService);
+  private readonly tenantConfig = inject(TenantConfigService);
   private readonly userModeService = inject(UserModeService);
   private readonly dialog = inject(MatDialog);
   private readonly authService = inject(AuthService);
@@ -32,10 +34,14 @@ export class RegisterComponent {
   readonly errorMessage = signal<string | null>(null);
 
   // Usar tenant por defecto si no hay tenant disponible
-  readonly tenantConfig = computed(() =>
+  readonly tenantConfigData = computed(() =>
     this.tenantContext.getTenantConfigOrDefault()
   );
-  readonly tenantName = computed(() => this.tenantConfig().tenant.displayName);
+  readonly tenantName = computed(() => this.tenantConfigData().tenant.displayName);
+  
+  // Verificar si hay tenant activo (necesario para permitir registro de clientes)
+  // Usar TenantConfigService que es el que se inicializa en APP_INITIALIZER
+  readonly hasTenant = computed(() => !!this.tenantConfig.tenantSlug);
 
   readonly registerForm = this.fb.nonNullable.group({
     firstName: ['', [Validators.required]],
@@ -59,6 +65,12 @@ export class RegisterComponent {
   async onSubmit(): Promise<void> {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
+      return;
+    }
+
+    // Validar que hay tenant activo antes de registrar
+    if (!this.hasTenant()) {
+      this.errorMessage.set('No hay un comercio activo para registrarse');
       return;
     }
 

@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>
+  <mat-icon>edit</mat-icon>
+  Editar Rol
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form">
+    <!-- Nombre del Rol -->
+    <mat-form-field appearance="outline">
+      <mat-label>Nombre del Rol</mat-label>
+      <input
+        matInput
+        formControlName="name"
+        placeholder="Nombre del rol"
+        autocomplete="off"
+      />
+      @if (form.get('name')?.hasError('required')) {
+        <mat-error>El nombre es requerido</mat-error>
+      }
+      @if (form.get('name')?.hasError('minlength')) {
+        <mat-error>Mínimo 3 caracteres</mat-error>
+      }
+      @if (role.isSystemRole) {
+        <mat-hint>Los roles del sistema no pueden cambiar de nombre</mat-hint>
+      }
+    </mat-form-field>
+
+    <!-- Descripción -->
+    <mat-form-field appearance="outline">
+      <mat-label>Descripción</mat-label>
+      <textarea
+        matInput
+        formControlName="description"
+        placeholder="Describe el propósito de este rol"
+        rows="3"
+      ></textarea>
+    </mat-form-field>
+
+    @if (error()) {
+      <div class="error-message">
+        <mat-icon>error</mat-icon>
+        <p>{{ error() }}</p>
+      </div>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="isSaving()">
+    Cancelar
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="isSaving() || form.invalid || !hasChanges()"
+  >
+    @if (isSaving()) {
+      <mat-spinner diameter="20"></mat-spinner>
+      <span>Guardando...</span>
+    } @else {
+      <mat-icon>save</mat-icon>
+      <span>Guardar Cambios</span>
+    }
+  </button>
+</mat-dialog-actions>

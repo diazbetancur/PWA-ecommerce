@@ -1,0 +1,210 @@
+<div class="permissions-container">
+  <!-- Toolbar -->
+  <div class="permissions-toolbar">
+    <div class="toolbar-left">
+      <button
+        mat-icon-button
+        (click)="onCancel()"
+        [disabled]="isLoading() || isSaving()"
+        matTooltip="Volver a roles"
+      >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="toolbar-title-section">
+        <h1 class="toolbar-title">
+          <mat-icon>lock_open</mat-icon>
+          Accesibilidad / Permisos del rol
+        </h1>
+        <p class="toolbar-subtitle">{{ roleName() }}</p>
+      </div>
+    </div>
+    <div class="toolbar-actions">
+      <button
+        mat-button
+        (click)="onCancel()"
+        [disabled]="isLoading() || isSaving()"
+      >
+        Cancelar
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onSave()"
+        [disabled]="!isDirty() || isLoading() || isSaving()"
+      >
+        @if (isSaving()) {
+        <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+        } @else {
+        <mat-icon>save</mat-icon>
+        } Guardar cambios
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando permisos...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (isError() && !isLoading()) {
+  <div class="error-container">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <h3>Error al cargar permisos</h3>
+    <p>{{ errorMessage() }}</p>
+    <button mat-raised-button color="primary" (click)="retry()">
+      <mat-icon>refresh</mat-icon>
+      Reintentar
+    </button>
+  </div>
+  }
+
+  <!-- Permissions Grid -->
+  @if (!isLoading() && !isError()) {
+  <div class="permissions-content">
+    <!-- Global Actions -->
+    <div class="global-actions">
+      <h3>Acciones rápidas:</h3>
+      <div class="action-buttons">
+        <button mat-stroked-button (click)="selectAll()">
+          <mat-icon>check_box</mat-icon>
+          Seleccionar todo
+        </button>
+        <button mat-stroked-button (click)="clearAll()">
+          <mat-icon>clear</mat-icon>
+          Limpiar todo
+        </button>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Error Message -->
+    @if (errorMessage() && !isLoading()) {
+    <div class="error-message">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+    }
+
+    <!-- Dirty State Indicator -->
+    @if (isDirty()) {
+    <div class="dirty-notice">
+      <mat-icon>info</mat-icon>
+      <span
+        >Hay cambios sin guardar. Recuerda hacer clic en "Guardar cambios" para
+        aplicar tus modificaciones.</span
+      >
+    </div>
+    }
+
+    <!-- Permissions Table -->
+    <div class="permissions-table">
+      <!-- Header Row -->
+      <div class="table-header">
+        <div class="header-cell module-cell">Módulo</div>
+        <div class="header-cell action-cell">Ver</div>
+        <div class="header-cell action-cell">Crear</div>
+        <div class="header-cell action-cell">Editar</div>
+        <div class="header-cell action-cell">Eliminar</div>
+        <div class="header-cell actions-cell">Acciones rápidas</div>
+      </div>
+
+      <!-- Data Rows -->
+      @for (row of permissionRows(); track row.module.code) {
+      <div class="table-row">
+        <!-- Módulo -->
+        <div class="data-cell module-cell">
+          <mat-icon class="module-icon">{{ row.module.icon }}</mat-icon>
+          <div class="module-info">
+            <strong>{{ row.module.name }}</strong>
+            <span class="module-description">{{
+              row.module.description
+            }}</span>
+          </div>
+        </div>
+
+        <!-- Checkboxes -->
+        <div class="data-cell action-cell">
+          @if (row.hasView) {
+          <mat-checkbox
+            [(ngModel)]="row.permission.canView"
+            (change)="onCheckboxChange()"
+            color="primary"
+          ></mat-checkbox>
+          } @else {
+          <span class="not-available">—</span>
+          }
+        </div>
+
+        <div class="data-cell action-cell">
+          @if (row.hasCreate) {
+          <mat-checkbox
+            [(ngModel)]="row.permission.canCreate"
+            (change)="onCheckboxChange()"
+            color="primary"
+          ></mat-checkbox>
+          } @else {
+          <span class="not-available">—</span>
+          }
+        </div>
+
+        <div class="data-cell action-cell">
+          @if (row.hasUpdate) {
+          <mat-checkbox
+            [(ngModel)]="row.permission.canUpdate"
+            (change)="onCheckboxChange()"
+            color="primary"
+          ></mat-checkbox>
+          } @else {
+          <span class="not-available">—</span>
+          }
+        </div>
+
+        <div class="data-cell action-cell">
+          @if (row.hasDelete) {
+          <mat-checkbox
+            [(ngModel)]="row.permission.canDelete"
+            (change)="onCheckboxChange()"
+            color="primary"
+          ></mat-checkbox>
+          } @else {
+          <span class="not-available">—</span>
+          }
+        </div>
+
+        <!-- Row Actions -->
+        <div class="data-cell actions-cell">
+          <button
+            mat-icon-button
+            (click)="setRowAll(row)"
+            matTooltip="Activar todo"
+            color="primary"
+          >
+            <mat-icon>done_all</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            (click)="setRowReadOnly(row)"
+            matTooltip="Solo lectura"
+          >
+            <mat-icon>visibility</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            (click)="clearRow(row)"
+            matTooltip="Limpiar permisos"
+            color="warn"
+          >
+            <mat-icon>clear</mat-icon>
+          </button>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
+</div>

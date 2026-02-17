@@ -1,0 +1,220 @@
+/**
+ * Estilos del Diálogo de Gestión de Permisos
+ */
+
+mat-dialog-content {
+  padding: 0 !important;
+  max-height: 70vh;
+  overflow: hidden;
+
+  .tab-content {
+    padding: 20px 24px;
+    max-height: 55vh;
+    overflow-y: auto;
+  }
+
+  .loading,
+  .error-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    text-align: center;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: 16px;
+    }
+
+    p {
+      margin: 0;
+      color: #616161;
+    }
+  }
+
+  .error-message mat-icon {
+    color: #d32f2f;
+  }
+
+  .info-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #e3f2fd;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+
+    mat-icon {
+      color: #1976d2;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    strong {
+      color: #1565c0;
+    }
+  }
+
+  // ========== TAB 1: VER PERMISOS ACTUALES ==========
+  .permissions-summary {
+    .resource-group {
+      margin-bottom: 24px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+
+      h4 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding: 12px 16px;
+        background: #f5f5f5;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #212121;
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+          color: #757575;
+        }
+
+        .count {
+          margin-left: 4px;
+          font-size: 13px;
+          color: #757575;
+          font-weight: 400;
+        }
+      }
+
+      .permissions-list {
+        padding: 12px 16px;
+
+        .permission-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 8px 0;
+
+          mat-icon {
+            color: #4caf50;
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+          }
+
+          .permission-info {
+            flex: 1;
+
+            strong {
+              display: block;
+              font-size: 14px;
+              color: #212121;
+              margin-bottom: 2px;
+            }
+
+            .desc {
+              display: block;
+              font-size: 13px;
+              color: #757575;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // ========== TAB 2: GESTIONAR PERMISOS ==========
+  .manage-section {
+    .permission-group {
+      margin-bottom: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+
+      .group-header {
+        background: #f5f5f5;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e0e0e0;
+
+        mat-checkbox {
+          strong {
+            font-size: 14px;
+            font-weight: 600;
+            color: #212121;
+          }
+
+          .count {
+            margin-left: 6px;
+            font-size: 13px;
+            color: #757575;
+          }
+        }
+      }
+
+      .group-permissions {
+        padding: 12px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        .permission-checkbox {
+          padding-left: 24px;
+
+          .permission-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #424242;
+            margin-right: 8px;
+          }
+
+          .permission-desc {
+            font-size: 13px;
+            color: #757575;
+            display: block;
+            margin-top: 2px;
+          }
+        }
+      }
+    }
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px !important;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    mat-icon {
+      margin-right: 6px;
+    }
+
+    mat-spinner {
+      display: inline-block;
+      margin-right: 8px;
+    }
+  }
+}
+
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
+
+  mat-icon {
+    color: #4caf50;
+  }
+}

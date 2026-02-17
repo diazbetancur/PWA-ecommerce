@@ -401,9 +401,9 @@ omer(redemptionId);
    *
    * this.loyaltyAdminService.adjustPoints(adjust).subscribe({
    *   next: (response) => {
-   *     alert(`Puntos agregados: ${response.pointsAdjusted}`);
-   *     console.log(`Balance anterior: ${response.previousBalance}`);
-   *     console.log(`Nuevo balance: ${response.newBalance}`);
+  *     alert(`Puntos ajustados: ${response.pointsAdjusted}`);
+  *     console.log(`Transaction ID: ${response.transactionId}`);
+  *     console.log(`Nuevo balance: ${response.newBalance}`);
    *   },
    *   error: (err) => {
    *     if (err.status === 400) {

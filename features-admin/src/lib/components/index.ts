@@ -12,3 +12,6 @@ export * from './redemption-status/redemption-status.component';
 export * from './reward-card/reward-card.component';
 export * from './tier-badge/tier-badge.component';
 export * from './transaction-item/transaction-item.component';
+
+// RBAC Components
+export * from './role-dialog/role-dialog.component';

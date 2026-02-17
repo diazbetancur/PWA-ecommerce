@@ -6,6 +6,7 @@ import { Router, RouterLink } from '@angular/router';
 import {
   AuthService,
   ModeSelectorDialogComponent,
+  TenantConfigService,
   TenantContextService,
   UserModeService,
 } from '@pwa/core';
@@ -23,6 +24,7 @@ export class LoginComponent {
   private readonly accountService = inject(AccountService);
   private readonly router = inject(Router);
   private readonly tenantContext = inject(TenantContextService);
+  private readonly tenantConfig = inject(TenantConfigService);
   private readonly userModeService = inject(UserModeService);
   private readonly dialog = inject(MatDialog);
   private readonly authService = inject(AuthService);
@@ -31,10 +33,14 @@ export class LoginComponent {
   readonly errorMessage = signal<string | null>(null);
 
   // Usar tenant por defecto si no hay tenant disponible
-  readonly tenantConfig = computed(() =>
+  readonly tenantConfigData = computed(() =>
     this.tenantContext.getTenantConfigOrDefault()
   );
-  readonly tenantName = computed(() => this.tenantConfig().tenant.displayName);
+  readonly tenantName = computed(() => this.tenantConfigData().tenant.displayName);
+  
+  // Verificar si hay tenant activo (necesario para mostrar opción de registro)
+  // Usar TenantConfigService que es el que se inicializa en APP_INITIALIZER
+  readonly hasTenant = computed(() => !!this.tenantConfig.tenantSlug);
 
   readonly loginForm = this.fb.nonNullable.group({
     email: ['admin@yourdomain.com', [Validators.required, Validators.email]],

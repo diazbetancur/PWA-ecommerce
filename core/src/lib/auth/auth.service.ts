@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { AuthResponse, JwtPayload, UserProfile } from '../models/types';
@@ -175,11 +176,17 @@ export class AuthService {
     rememberMe?: boolean;
   }): Promise<void> {
     // Verificar si hay tenant activo desde TenantConfigService
-    const hasTenant = !!this.tenantConfig.tenantSlug;
+    const tenantSlug = this.tenantConfig.tenantSlug;
+    const hasTenant = !!tenantSlug;
     const endpoint = hasTenant ? '/auth/login' : '/admin/auth/login';
 
+    // Inicializar AuthService según el contexto
     if (!hasTenant) {
       this.initSuperAdmin();
+    } else if (tenantSlug && !this._tenantSlug) {
+      // Si hay tenant pero AuthService no está inicializado, inicializarlo
+      console.log('[AuthService] Initializing with tenant slug:', tenantSlug);
+      this.init(tenantSlug);
     }
 
     const response = await firstValueFrom(
@@ -218,19 +225,62 @@ export class AuthService {
     lastName: string;
     phoneNumber?: string;
   }): Promise<void> {
-    if (!this._tenantSlug) {
+    // Verificar si tenemos tenant slug inicializado
+    let tenantSlug = this._tenantSlug;
+    
+    // Si no está inicializado, intentar obtenerlo del TenantConfigService
+    if (!tenantSlug) {
+      const config = this.tenantConfig.config;
+      if (config?.tenant?.slug) {
+        tenantSlug = config.tenant.slug;
+        console.log('[AuthService] Using tenant slug from TenantConfigService:', tenantSlug);
+        // Inicializar el AuthService con el tenant slug
+        this.init(tenantSlug);
+      }
+    }
+
+    // Si aún no hay tenant slug, lanzar error
+    if (!tenantSlug) {
       throw new Error('El registro requiere un comercio activo');
     }
 
-    const response = await firstValueFrom(
-      this.apiClient.post<AuthResponse>('/auth/register', data)
-    );
+    try {
+      const response = await firstValueFrom(
+        this.apiClient.post<AuthResponse>('/auth/register', data)
+      );
 
-    if (!response?.token) {
-      throw new Error('No se recibió token del servidor');
+      if (!response?.token) {
+        throw new Error('No se recibió token del servidor');
+      }
+
+      this.setToken(response.token);
+    } catch (error) {
+      // Manejar errores HTTP específicos
+      if (error instanceof HttpErrorResponse) {
+        // Error 409: Email ya existe
+        if (error.status === 409) {
+          const detail = error.error?.detail || '';
+          if (detail.includes('Email already registered')) {
+            throw new Error('Este email ya está registrado. Por favor, inicia sesión o usa otro email.');
+          }
+          // Otros errores 409 (ej: Tenant no resuelto)
+          throw new Error(detail || 'No se pudo completar el registro');
+        }
+        
+        // Error 400: Validación
+        if (error.status === 400) {
+          const detail = error.error?.detail || 'Datos de registro inválidos';
+          throw new Error(detail);
+        }
+        
+        // Otros errores HTTP
+        const detail = error.error?.detail || error.message || 'Error al registrar usuario';
+        throw new Error(detail);
+      }
+      
+      // Re-lanzar otros tipos de errores
+      throw error;
     }
-
-    this.setToken(response.token);
   }
 
   async getProfile(): Promise<UserProfile> {

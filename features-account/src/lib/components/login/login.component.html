@@ -69,11 +69,13 @@
       </button>
     </form>
 
+    @if (hasTenant()) {
     <div class="footer-links">
       <p>
         ¿No tienes cuenta?
         <a routerLink="/account/register">Regístrate aquí</a>
       </p>
     </div>
+    }
   </div>
 </div>

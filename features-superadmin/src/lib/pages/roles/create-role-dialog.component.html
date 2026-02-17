@@ -1,0 +1,103 @@
+<h2 mat-dialog-title>
+  <mat-icon>add</mat-icon>
+  Crear Nuevo Rol
+</h2>
+
+<mat-dialog-content>
+  @if (isLoading()) {
+    <div class="loading">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando permisos...</p>
+    </div>
+  } @else if (error()) {
+    <div class="error-message">
+      <mat-icon>error</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+  } @else {
+    <form [formGroup]="form">
+      <!-- Nombre del Rol -->
+      <mat-form-field appearance="outline">
+        <mat-label>Nombre del Rol</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          placeholder="Ej: ReportViewer"
+          autocomplete="off"
+        />
+        @if (form.get('name')?.hasError('required')) {
+          <mat-error>El nombre es requerido</mat-error>
+        }
+        @if (form.get('name')?.hasError('minlength')) {
+          <mat-error>Mínimo 3 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Descripción -->
+      <mat-form-field appearance="outline">
+        <mat-label>Descripción (opcional)</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          placeholder="Describe el propósito de este rol"
+          rows="2"
+        ></textarea>
+      </mat-form-field>
+
+      <!-- Permisos -->
+      <div class="permissions-section">
+        <h3>Permisos del Rol ({{ selectedPermissions().size }})</h3>
+
+        @for (group of permissionGroups(); track group.resource) {
+          <div class="permission-group">
+            <div class="group-header">
+              <mat-checkbox
+                [checked]="isGroupFullySelected(group)"
+                [indeterminate]="isGroupPartiallySelected(group)"
+                (change)="toggleGroupPermissions(group, $event)"
+              >
+                <strong>{{ group.resource }}</strong>
+                <span class="count">({{ group.permissions.length }})</span>
+              </mat-checkbox>
+            </div>
+
+            <div class="group-permissions">
+              @for (permission of group.permissions; track permission.id) {
+                <mat-checkbox
+                  [checked]="isPermissionSelected(permission)"
+                  (change)="togglePermission(permission)"
+                  class="permission-checkbox"
+                >
+                  <span class="permission-name">{{ permission.action }}</span>
+                  @if (permission.description) {
+                    <span class="permission-desc">{{ permission.description }}</span>
+                  }
+                </mat-checkbox>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </form>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="isSaving()">
+    Cancelar
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="isLoading() || isSaving() || form.invalid"
+  >
+    @if (isSaving()) {
+      <mat-spinner diameter="20"></mat-spinner>
+      <span>Creando...</span>
+    } @else {
+      <mat-icon>save</mat-icon>
+      <span>Crear Rol</span>
+    }
+  </button>
+</mat-dialog-actions>

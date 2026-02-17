@@ -1,0 +1,161 @@
+<!-- 🔍 Diálogo de Detalle de Rol -->
+<div class="role-detail-dialog">
+  <!-- Header -->
+  <div class="dialog-header" [class]="'dialog-header-' + role.color">
+    <div class="header-content">
+      <div class="role-icon" [class]="'role-icon-' + role.color">
+        @switch (role.name) {
+          @case ('SuperAdmin') {
+            <mat-icon>shield</mat-icon>
+          }
+          @case ('TenantManager') {
+            <mat-icon>business</mat-icon>
+          }
+          @case ('Support') {
+            <mat-icon>support_agent</mat-icon>
+          }
+          @case ('Viewer') {
+            <mat-icon>visibility</mat-icon>
+          }
+        }
+      </div>
+      <div class="header-text">
+        <h2>{{ role.label }}</h2>
+        <p>{{ role.description }}</p>
+      </div>
+    </div>
+    <button
+      mat-icon-button
+      (click)="close()"
+      class="close-button"
+      matTooltip="Cerrar"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <mat-dialog-content>
+    <mat-tab-group animationDuration="300ms">
+      <!-- Tab 1: Permisos -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>lock</mat-icon>
+          Permisos ({{ role.permissions.length }})
+        </ng-template>
+
+        <div class="tab-content">
+          @if (role.permissions.includes('*')) {
+            <!-- SuperAdmin - Acceso Total -->
+            <div class="wildcard-permissions">
+              <div class="wildcard-icon">
+                <mat-icon>all_inclusive</mat-icon>
+              </div>
+              <h3>Acceso Total sin Restricciones</h3>
+              <p>
+                Este rol tiene permisos completos para realizar cualquier
+                acción en el sistema, incluyendo gestión de comercios,
+                usuarios, configuración, facturación y más.
+              </p>
+              <div class="alert-info">
+                <mat-icon>info</mat-icon>
+                <span>
+                  El rol <strong>SuperAdmin</strong> es el único con acceso
+                  total al sistema y no puede ser eliminado.
+                </span>
+              </div>
+            </div>
+          } @else {
+            <!-- Permisos Agrupados por Recurso -->
+            <div class="permissions-groups">
+              @for (group of groupedPermissions(); track group.resource) {
+                <div class="permission-group">
+                  <div class="group-header">
+                    <mat-icon>{{ getResourceIcon(group.resource) }}</mat-icon>
+                    <h3>{{ group.resourceLabel }}</h3>
+                    <mat-chip class="count-chip">
+                      {{ group.permissions.length }}
+                    </mat-chip>
+                  </div>
+
+                  <mat-divider></mat-divider>
+
+                  <div class="permissions-list">
+                    @for (permission of group.permissions; track permission.key) {
+                      <div class="permission-item">
+                        <mat-icon
+                          [class]="getPermissionChipClass(permission.key)"
+                        >
+                          check_circle
+                        </mat-icon>
+                        <span>{{ permission.label }}</span>
+                        <code class="permission-code">{{
+                          permission.key
+                        }}</code>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Tab 2: Usuarios -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>people</mat-icon>
+          Usuarios ({{ role.userCount }})
+        </ng-template>
+
+        <div class="tab-content">
+          @if (isLoadingUsers()) {
+            <div class="loading-users">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p>Cargando usuarios...</p>
+            </div>
+          } @else if (users().length === 0) {
+            <div class="empty-users">
+              <mat-icon>people_outline</mat-icon>
+              <h3>Sin usuarios asignados</h3>
+              <p>
+                Actualmente no hay usuarios con el rol
+                <strong>{{ role.label }}</strong>
+              </p>
+            </div>
+          } @else {
+            <mat-list class="users-list">
+              @for (user of users(); track user.id) {
+                <mat-list-item>
+                  <mat-icon matListItemIcon>person</mat-icon>
+                  <div matListItemTitle>{{ user.fullName }}</div>
+                  <div matListItemLine>{{ user.email }}</div>
+                  <div matListItemMeta class="user-status">
+                    @if (user.isActive) {
+                      <mat-chip class="status-chip active">
+                        <mat-icon>check_circle</mat-icon>
+                        Activo
+                      </mat-chip>
+                    } @else {
+                      <mat-chip class="status-chip inactive">
+                        <mat-icon>cancel</mat-icon>
+                        Inactivo
+                      </mat-chip>
+                    }
+                  </div>
+                </mat-list-item>
+                <mat-divider></mat-divider>
+              }
+            </mat-list>
+          }
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-dialog-content>
+
+  <!-- Footer -->
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="close()">Cerrar</button>
+  </mat-dialog-actions>
+</div>

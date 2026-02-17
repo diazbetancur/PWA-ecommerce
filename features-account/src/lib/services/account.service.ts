@@ -216,7 +216,7 @@ export class AccountService {
 
     try {
       const user = await firstValueFrom(
-        this.apiClient.get<User>('/auth/profile')
+        this.apiClient.get<User>('/auth/me')
       );
 
       this._state.update((s) => ({

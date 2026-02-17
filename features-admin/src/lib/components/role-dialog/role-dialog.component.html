@@ -1,0 +1,93 @@
+<div class="role-dialog">
+  <h2 mat-dialog-title>
+    <mat-icon>{{ isEditMode() ? "edit" : "add_circle" }}</mat-icon>
+    {{ dialogTitle }}
+  </h2>
+
+  <mat-dialog-content>
+    <!-- System Role Info -->
+    @if (isSystemRole()) {
+    <div class="system-role-notice">
+      <mat-icon>info</mat-icon>
+      <span
+        >Este es un rol del sistema. Solo se puede editar la descripción.</span
+      >
+    </div>
+    }
+
+    <!-- Form -->
+    <form [formGroup]="roleForm" class="role-form">
+      <!-- Nombre -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Nombre del rol</mat-label>
+        <input
+          matInput
+          formControlName="name"
+          placeholder="Ejemplo: Editor de Contenido"
+          autocomplete="off"
+        />
+        <mat-icon matPrefix>badge</mat-icon>
+        <mat-hint>{{ nameHintMessage }}</mat-hint>
+        @if (roleForm.get('name')?.hasError('required')) {
+        <mat-error>El nombre es requerido</mat-error>
+        } @else if (roleForm.get('name')?.hasError('minlength')) {
+        <mat-error>El nombre debe tener al menos 3 caracteres</mat-error>
+        } @else if (roleForm.get('name')?.hasError('maxlength')) {
+        <mat-error>El nombre no puede exceder 50 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Descripción -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Descripción</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          placeholder="Breve descripción de las responsabilidades de este rol"
+          rows="3"
+          maxlength="200"
+        ></textarea>
+        <mat-icon matPrefix>description</mat-icon>
+        <mat-hint align="end"
+          >{{ roleForm.get("description")?.value?.length || 0 }}/200</mat-hint
+        >
+        @if (roleForm.get('description')?.hasError('maxlength')) {
+        <mat-error>La descripción no puede exceder 200 caracteres</mat-error>
+        }
+      </mat-form-field>
+    </form>
+
+    <!-- Error Message -->
+    @if (errorMessage()) {
+    <div class="error-message">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button
+      mat-button
+      type="button"
+      (click)="onCancel()"
+      [disabled]="isSaving()"
+    >
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      (click)="onSave()"
+      [disabled]="roleForm.invalid || isSaving()"
+    >
+      @if (isSaving()) {
+      <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+      } @else {
+      <mat-icon>{{ isEditMode() ? "save" : "add" }}</mat-icon>
+      }
+      {{ isEditMode() ? "Guardar cambios" : "Crear rol" }}
+    </button>
+  </mat-dialog-actions>
+</div>

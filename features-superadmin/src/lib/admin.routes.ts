@@ -26,7 +26,6 @@ import {
   TenantDetailComponent,
   TenantEditComponent,
   UserListComponent,
-  UserRolesComponent,
 } from './pages/placeholder.components';
 
 export const ADMIN_ROUTES: Routes = [
@@ -118,7 +117,7 @@ export const ADMIN_ROUTES: Routes = [
           },
         ],
       },
-      // --- GESTIÓN DE USUARIOS ---
+      // --- GESTIÓN DE USUARIOS ADMINISTRATIVOS ---
       {
         path: 'users',
         canActivate: [adminPermissionGuard],
@@ -128,14 +127,20 @@ export const ADMIN_ROUTES: Routes = [
         children: [
           {
             path: '',
-            component: UserListComponent,
+            loadComponent: () =>
+              import('./pages/admin-users/admin-users-list.component').then(
+                (m) => m.AdminUsersListComponent
+              ),
             data: {
-              title: 'Lista de Usuarios',
+              title: 'Usuarios Administrativos',
             },
           },
           {
             path: 'roles',
-            component: UserRolesComponent,
+            loadComponent: () =>
+              import('./pages/roles/roles-list.component').then(
+                (m) => m.RolesListComponent
+              ),
             canActivate: [adminPermissionGuard],
             data: {
               title: 'Roles y Permisos',

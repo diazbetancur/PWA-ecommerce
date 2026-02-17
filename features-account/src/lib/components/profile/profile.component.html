@@ -10,8 +10,32 @@
     <div class="alert alert-success">
       {{ successMessage() }}
     </div>
-    } @if (user()) {
-    <div class="profile-section">
+    }
+
+    @if (user()) {
+    <!-- Tabs Navigation -->
+    <div class="tabs-navigation">
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="activeTab() === 'profile'"
+        (click)="switchTab('profile')"
+      >
+        Información Personal
+      </button>
+      <button
+        type="button"
+        class="tab-button"
+        [class.active]="activeTab() === 'password'"
+        (click)="switchTab('password')"
+      >
+        Cambiar Contraseña
+      </button>
+    </div>
+
+    <!-- Tab Content: Información Personal -->
+    @if (activeTab() === 'profile') {
+    <div class="tab-content">
       <div class="section-header">
         <h2>Información Personal</h2>
         <button type="button" class="btn-secondary" (click)="toggleEditMode()">
@@ -54,8 +78,79 @@
             type="tel"
             id="phoneNumber"
             formControlName="phoneNumber"
+            placeholder="+57 300 123 4567"
             [readonly]="!isEditMode()"
           />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="documentType">Tipo de Documento</label>
+            <select
+              id="documentType"
+              formControlName="documentType"
+              [disabled]="!isEditMode()"
+            >
+              <option value="">Seleccione...</option>
+              <option value="CC">Cédula de Ciudadanía</option>
+              <option value="CE">Cédula de Extranjería</option>
+              <option value="TI">Tarjeta de Identidad</option>
+              <option value="PA">Pasaporte</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="documentNumber">Número de Documento</label>
+            <input
+              type="text"
+              id="documentNumber"
+              formControlName="documentNumber"
+              [readonly]="!isEditMode()"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="birthDate">Fecha de Nacimiento</label>
+          <input
+            type="date"
+            id="birthDate"
+            formControlName="birthDate"
+            [readonly]="!isEditMode()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="address">Dirección</label>
+          <input
+            type="text"
+            id="address"
+            formControlName="address"
+            placeholder="Calle 123 #45-67"
+            [readonly]="!isEditMode()"
+          />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">Ciudad</label>
+            <input
+              type="text"
+              id="city"
+              formControlName="city"
+              [readonly]="!isEditMode()"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="country">País</label>
+            <input
+              type="text"
+              id="country"
+              formControlName="country"
+              [readonly]="!isEditMode()"
+            />
+          </div>
         </div>
 
         @if (isEditMode()) {
@@ -71,8 +166,11 @@
         }
       </form>
     </div>
+    }
 
-    <div class="profile-section">
+    <!-- Tab Content: Cambiar Contraseña -->
+    @if (activeTab() === 'password') {
+    <div class="tab-content">
       <h2>Cambiar Contraseña</h2>
 
       <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
@@ -117,32 +215,10 @@
         </button>
       </form>
     </div>
+    }
 
-    <div class="profile-section">
-      <h2>Información de Cuenta</h2>
-      <div class="info-grid">
-        <div class="info-item">
-          <span class="info-label">Rol:</span>
-          <span class="info-value">{{ user()!.role }}</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Fecha de registro:</span>
-          <span class="info-value">{{
-            user()!.createdAt | date : 'medium'
-          }}</span>
-        </div>
-        @if (user()!.lastLogin) {
-        <div class="info-item">
-          <span class="info-label">Último acceso:</span>
-          <span class="info-value">{{
-            user()!.lastLogin | date : 'medium'
-          }}</span>
-        </div>
-        }
-      </div>
-    </div>
-
-    <div class="profile-section">
+    <!-- Logout Button -->
+    <div class="logout-section">
       <button type="button" class="btn-danger" (click)="logout()">
         Cerrar Sesión
       </button>

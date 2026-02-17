@@ -1,0 +1,163 @@
+<h2 mat-dialog-title>
+  <mat-icon>store</mat-icon>
+  Detalles del Comercio
+</h2>
+
+<mat-dialog-content>
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (error() && !isLoading()) {
+    <div class="error-message">
+      <mat-icon>error</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
+  }
+
+  @if (tenant() && !isLoading()) {
+    <mat-tab-group>
+      <!-- Tab: Información General -->
+      <mat-tab label="General">
+        <div class="tab-content">
+          <div class="info-section">
+            <h3>Información Básica</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">Nombre</span>
+                <span class="value">{{ tenant()!.name }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Slug</span>
+                <span class="value mono">{{ tenant()!.slug }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">ID</span>
+                <span class="value mono small">{{ tenant()!.id }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Base de Datos</span>
+                <span class="value mono">{{ tenant()!.dbName }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Estado</span>
+                <span class="value">
+                  <span 
+                    class="status-badge" 
+                    [class]="getStatusClass(tenant()!.status)"
+                  >
+                    {{ tenant()!.status }}
+                  </span>
+                </span>
+              </div>
+              <div class="info-item">
+                <span class="label">Plan</span>
+                <span class="value">{{ tenant()!.planName }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3>Fechas</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="label">Creado</span>
+                <span class="value">{{ formatDate(tenant()!.createdAt) }}</span>
+              </div>
+              <div class="info-item">
+                <span class="label">Última Actualización</span>
+                <span class="value">{{ formatDate(tenant()!.updatedAt) }}</span>
+              </div>
+            </div>
+          </div>
+
+          @if (tenant()!.lastError) {
+            <div class="info-section error-section">
+              <h3>Último Error</h3>
+              <div class="error-box">
+                <mat-icon>warning</mat-icon>
+                <span>{{ tenant()!.lastError }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Tab: Configuración -->
+      <mat-tab label="Configuración">
+        <div class="tab-content">
+          <div class="info-section">
+            <h3>Orígenes Permitidos (CORS)</h3>
+            @if (getAllowedOriginsList().length > 0) {
+              <div class="origins-list">
+                @for (origin of getAllowedOriginsList(); track origin) {
+                  <div class="origin-item">
+                    <mat-icon>link</mat-icon>
+                    <span>{{ origin }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="info-section">
+            <h3>Feature Flags</h3>
+            @if (getFeatureFlags().length > 0) {
+              <div class="flags-list">
+                @for (flag of getFeatureFlags(); track flag.key) {
+                  <div class="flag-item">
+                    <mat-icon [class.flag-enabled]="flag.value">
+                      {{ flag.value ? 'check_circle' : 'cancel' }}
+                    </mat-icon>
+                    <span>{{ flag.key }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Tab: Provisioning -->
+      <mat-tab label="Provisioning">
+        <div class="tab-content">
+          <div class="info-section">
+            <h3>Pasos de Aprovisionamiento</h3>
+            @if (tenant(); as currentTenant) {
+              @if (currentTenant.recentProvisioningSteps && currentTenant.recentProvisioningSteps.length > 0) {
+                <div class="steps-list">
+                  @for (step of currentTenant.recentProvisioningSteps; track step.step) {
+                    <div class="step-item">
+                      <mat-icon [class]="'step-' + step.status.toLowerCase()">
+                        {{ getStepStatusIcon(step.status) }}
+                      </mat-icon>
+                      <div class="step-content">
+                        <div class="step-header">
+                          <strong>{{ step.step }}</strong>
+                          <span class="step-status" [class]="'status-' + step.status.toLowerCase()">
+                            {{ step.status }}
+                          </span>
+                        </div>
+                        @if (step.details) {
+                          <p class="step-log">{{ step.details }}</p>
+                        }
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            }
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">
+    Cerrar
+  </button>
+</mat-dialog-actions>

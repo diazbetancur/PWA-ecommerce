@@ -19,12 +19,19 @@ export class ProfileComponent implements OnInit {
   readonly errorMessage = signal<string | null>(null);
   readonly successMessage = signal<string | null>(null);
   readonly isEditMode = signal(false);
+  readonly activeTab = signal<'profile' | 'password'>('profile');
 
   readonly profileForm = this.fb.nonNullable.group({
     firstName: ['', [Validators.required]],
     lastName: ['', [Validators.required]],
     email: [{ value: '', disabled: true }],
     phoneNumber: [''],
+    documentType: [''],
+    documentNumber: [''],
+    birthDate: [''],
+    address: [''],
+    city: [''],
+    country: [''],
   });
 
   readonly passwordForm = this.fb.nonNullable.group({
@@ -55,6 +62,12 @@ export class ProfileComponent implements OnInit {
         lastName: user.lastName,
         email: user.email,
         phoneNumber: user.phoneNumber || '',
+        documentType: user.documentType || '',
+        documentNumber: user.documentNumber || '',
+        birthDate: user.birthDate ? user.birthDate.split('T')[0] : '',
+        address: user.address || '',
+        city: user.city || '',
+        country: user.country || '',
       });
     } catch (error) {
       this.errorMessage.set(
@@ -73,6 +86,12 @@ export class ProfileComponent implements OnInit {
           firstName: user.firstName,
           lastName: user.lastName,
           phoneNumber: user.phoneNumber || '',
+          documentType: user.documentType || '',
+          documentNumber: user.documentNumber || '',
+          birthDate: user.birthDate ? user.birthDate.split('T')[0] : '',
+          address: user.address || '',
+          city: user.city || '',
+          country: user.country || '',
         });
       }
     }
@@ -93,6 +112,12 @@ export class ProfileComponent implements OnInit {
         firstName: values.firstName,
         lastName: values.lastName,
         phoneNumber: values.phoneNumber || undefined,
+        documentType: values.documentType || undefined,
+        documentNumber: values.documentNumber || undefined,
+        birthDate: values.birthDate ? new Date(values.birthDate).toISOString() : undefined,
+        address: values.address || undefined,
+        city: values.city || undefined,
+        country: values.country || undefined,
       });
       this.user.set(updatedUser);
       this.isEditMode.set(false);
@@ -136,5 +161,11 @@ export class ProfileComponent implements OnInit {
 
   async logout(): Promise<void> {
     await this.accountService.logout();
+  }
+
+  switchTab(tab: 'profile' | 'password'): void {
+    this.activeTab.set(tab);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
   }
 }

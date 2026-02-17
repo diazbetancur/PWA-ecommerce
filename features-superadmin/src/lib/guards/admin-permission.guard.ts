@@ -24,6 +24,7 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { AuthService, TenantContextService } from '@pwa/core';
+import { derivePermissionsFromRoles } from '../models/role-permissions-map';
 
 /**
  * Datos que se pueden configurar en route.data para el guard
@@ -68,52 +69,129 @@ function normalizeRole(role: string | string[] | undefined): string | null {
 }
 
 /**
- * Helper para verificar si el usuario tiene el acceso requerido
+ * Extrae y normaliza los roles del usuario desde los claims
  */
-function hasRequiredAccess(
-  claims: { role?: string | string[]; permissions?: any },
-  requiredRoles: string[],
-  requiredPermissions: string[],
-  mode: 'all' | 'any' = 'all'
-): boolean {
+function extractUserRoles(claims: { role?: string | string[]; roles?: string[] }): string[] {
+  // Priorizar claims.roles si existe
+  if (claims.roles && claims.roles.length > 0) {
+    return claims.roles;
+  }
+  
+  // Fallback a claims.role (legacy)
+  if (!claims.role) {
+    return [];
+  }
+  
+  return Array.isArray(claims.role) ? claims.role : [claims.role];
+}
+
+/**
+ * Verifica si es SuperAdmin
+ */
+function isSuperAdmin(claims: { role?: string | string[]; roles?: string[] }): boolean {
   const normalizedRole = normalizeRole(claims.role);
   if (normalizedRole === 'superadmin') {
     return true;
   }
 
-  // Verificar roles (lógica OR: al menos uno)
-  if (requiredRoles.length > 0 && normalizedRole) {
-    // Normalizar roles requeridos también
-    const normalizedRequired = requiredRoles.map((r) =>
-      r.toLowerCase().replaceAll('_', '')
+  const userRoles = extractUserRoles(claims);
+  return userRoles.some(role => 
+    role.toLowerCase().replace('_', '') === 'superadmin'
+  );
+}
+
+/**
+ * Verifica si el usuario tiene alguno de los roles requeridos
+ */
+function hasAnyRequiredRole(userRoles: string[], requiredRoles: string[]): boolean {
+  if (requiredRoles.length === 0) {
+    return false;
+  }
+
+  const normalizedRequired = requiredRoles.map((r) =>
+    r.toLowerCase().replaceAll('_', '')
+  );
+  
+  return userRoles.some(userRole => {
+    const normalizedUserRole = userRole.toLowerCase().replaceAll('_', '');
+    return normalizedRequired.includes(normalizedUserRole);
+  });
+}
+
+/**
+ * Obtiene los permisos del usuario (explícitos o derivados de roles)
+ */
+function getUserPermissions(
+  claims: { permissions?: any; roles?: string[]; role?: string | string[] }
+): string[] {
+  // Intentar obtener permisos explícitos del JWT
+  const explicitPermissions = Array.isArray(claims.permissions)
+    ? claims.permissions.map((p: any) =>
+        typeof p === 'string' ? p : p.moduleCode
+      )
+    : [];
+
+  if (explicitPermissions.length > 0) {
+    return explicitPermissions;
+  }
+
+  // Si no hay permisos explícitos, derivarlos de los roles
+  const userRoles = extractUserRoles(claims);
+  if (userRoles.length > 0) {
+    return derivePermissionsFromRoles(userRoles);
+  }
+
+  return [];
+}
+
+/**
+ * Verifica si el usuario tiene los permisos requeridos
+ */
+function hasRequiredPermissions(
+  userPermissions: string[],
+  requiredPermissions: string[],
+  mode: 'all' | 'any' = 'all'
+): boolean {
+  // Permiso wildcard para super admin
+  if (userPermissions.includes('*')) {
+    return true;
+  }
+
+  if (mode === 'all') {
+    return requiredPermissions.every((permission) =>
+      userPermissions.includes(permission)
     );
-    if (normalizedRequired.includes(normalizedRole)) {
-      return true;
-    }
+  } else {
+    return requiredPermissions.some((permission) =>
+      userPermissions.includes(permission)
+    );
+  }
+}
+
+/**
+ * Helper para verificar si el usuario tiene el acceso requerido
+ */
+function hasRequiredAccess(
+  claims: { role?: string | string[]; roles?: string[]; permissions?: any },
+  requiredRoles: string[],
+  requiredPermissions: string[],
+  mode: 'all' | 'any' = 'all'
+): boolean {
+  // SuperAdmin tiene acceso total
+  if (isSuperAdmin(claims)) {
+    return true;
+  }
+
+  // Verificar roles (lógica OR: al menos uno)
+  const userRoles = extractUserRoles(claims);
+  if (hasAnyRequiredRole(userRoles, requiredRoles)) {
+    return true;
   }
 
   // Verificar permisos
   if (requiredPermissions.length > 0) {
-    const userPermissions = Array.isArray(claims.permissions)
-      ? claims.permissions.map((p: any) =>
-          typeof p === 'string' ? p : p.moduleCode
-        )
-      : [];
-
-    // Permiso wildcard para super admin
-    if (userPermissions.includes('*')) {
-      return true;
-    }
-
-    if (mode === 'all') {
-      return requiredPermissions.every((permission) =>
-        userPermissions.includes(permission)
-      );
-    } else {
-      return requiredPermissions.some((permission) =>
-        userPermissions.includes(permission)
-      );
-    }
+    const userPermissions = getUserPermissions(claims);
+    return hasRequiredPermissions(userPermissions, requiredPermissions, mode);
   }
 
   return false;

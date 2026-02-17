@@ -340,6 +340,8 @@ export interface AdjustPointsRequest {
   userId: string;
   /** Cantidad de puntos (positivo = agregar, negativo = deducir) */
   points: number;
+  /** Tipo de transacción requerido por backend */
+  transactionType: 'EARN' | 'REDEEM' | 'ADJUST';
   /** Razón del ajuste (requerido) */
   reason: string;
   /** Referencia opcional (orden, ticket, etc.) */
@@ -350,20 +352,21 @@ export interface AdjustPointsRequest {
  * Respuesta al ajustar puntos
  */
 export interface AdjustPointsResponse {
-  /** ID del usuario */
-  userId: string;
+  /** ID de la transacción creada */
+  transactionId: string;
   /** Puntos ajustados */
   pointsAdjusted: number;
-  /** Balance anterior */
-  previousBalance: number;
   /** Nuevo balance */
   newBalance: number;
-  /** Razón del ajuste */
-  reason: string;
-  /** Referencia */
+  /** Mensaje informativo del backend */
+  message: string;
+
+  /** Campos legacy opcionales para compatibilidad temporal */
+  userId?: string;
+  previousBalance?: number;
+  reason?: string;
   referenceId?: string;
-  /** Fecha del ajuste */
-  adjustedAt: string;
+  adjustedAt?: string;
 }
 
 // ==================== TIPOS AUXILIARES ====================

@@ -117,11 +117,12 @@ export const featuresAdminRoutes: Route[] = [
     path: 'customers',
     canActivate: [modulePermissionGuard('customers')],
     loadComponent: () =>
-      import('./components/dashboard-welcome/dashboard-welcome.component').then(
-        (m) => m.DashboardWelcomeComponent
+      import('./pages/access/users-list/users-list.component').then(
+        (m) => m.UsersListComponent
       ),
     data: {
       title: 'Clientes',
+      userSegment: 'customers',
     },
   },
 
@@ -266,16 +267,49 @@ export const featuresAdminRoutes: Route[] = [
     ],
   },
 
-  // === PERMISOS ===
+  // === ACCESIBILIDAD (RBAC - Usuarios, Roles y Permisos) ===
   {
-    path: 'permissions',
+    path: 'access',
     canActivate: [modulePermissionGuard('permissions')],
-    loadComponent: () =>
-      import('./components/dashboard-welcome/dashboard-welcome.component').then(
-        (m) => m.DashboardWelcomeComponent
-      ),
-    data: {
-      title: 'Permisos',
-    },
+    children: [
+      {
+        path: '',
+        redirectTo: 'users',
+        pathMatch: 'full',
+      },
+      // Usuarios
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./pages/access/users-list/users-list.component').then(
+            (m) => m.UsersListComponent
+          ),
+        data: {
+          title: 'Usuarios',
+          userSegment: 'staff',
+        },
+      },
+      // Roles
+      {
+        path: 'roles',
+        loadComponent: () =>
+          import('./pages/access/roles-list/roles-list.component').then(
+            (m) => m.RolesListComponent
+          ),
+        data: {
+          title: 'Roles',
+        },
+      },
+      {
+        path: 'roles/:roleId/permissions',
+        loadComponent: () =>
+          import(
+            './pages/access/role-permissions/role-permissions.component'
+          ).then((m) => m.RolePermissionsComponent),
+        data: {
+          title: 'Permisos del Rol',
+        },
+      },
+    ],
   },
 ];

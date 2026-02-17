@@ -1,0 +1,91 @@
+<div class="dialog-container">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 mat-dialog-title>
+      <mat-icon>admin_panel_settings</mat-icon>
+      Gestionar Roles
+    </h2>
+    <button mat-icon-button (click)="cancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Content -->
+  <mat-dialog-content class="dialog-content">
+    <!-- User Info -->
+    <div class="user-info">
+      <mat-icon class="user-icon">person</mat-icon>
+      <div class="user-details">
+        <p class="user-name">{{ user.fullName }}</p>
+        <p class="user-email">{{ user.email }}</p>
+      </div>
+    </div>
+
+    <!-- Error Message -->
+    @if (error()) {
+      <div class="error-banner">
+        <mat-icon>error</mat-icon>
+        <p>{{ error() }}</p>
+      </div>
+    }
+
+    <!-- Roles List -->
+    <div class="roles-section">
+      <h3 class="section-title">Roles del Sistema</h3>
+      <p class="section-subtitle">
+        Seleccione al menos un rol para este usuario
+      </p>
+
+      <div class="roles-list">
+        @for (role of roleOptions(); track role.name) {
+          <div class="role-item" [class.role-selected]="role.selected">
+            <mat-checkbox
+              [(ngModel)]="role.selected"
+              (change)="onRoleToggle()"
+              [color]="'primary'"
+            >
+              <div class="role-content">
+                <div class="role-header">
+                  <span class="role-label">{{ role.label }}</span>
+                  <span
+                    class="role-badge"
+                    [style.background-color]="getRoleBadgeColor(role.color)"
+                  >
+                    {{ role.name }}
+                  </span>
+                </div>
+                <p class="role-description">{{ role.description }}</p>
+              </div>
+            </mat-checkbox>
+          </div>
+        }
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <!-- Actions -->
+  <mat-dialog-actions class="dialog-actions">
+    <button
+      mat-button
+      (click)="cancel()"
+      [disabled]="isSaving()"
+    >
+      Cancelar
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="save()"
+      [disabled]="!hasChanges() || !isValid() || isSaving()"
+      class="save-button"
+    >
+      @if (isSaving()) {
+        <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+        <span>Guardando...</span>
+      } @else {
+        <mat-icon>save</mat-icon>
+        <span>Guardar Cambios</span>
+      }
+    </button>
+  </mat-dialog-actions>
+</div>

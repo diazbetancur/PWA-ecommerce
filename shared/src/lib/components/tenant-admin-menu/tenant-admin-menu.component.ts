@@ -25,7 +25,7 @@ export class TenantAdminMenuComponent {
 
   // Signal para controlar qué grupos están expandidos
   private readonly expandedGroups = signal<Set<string>>(
-    new Set(['catalog', 'settings'])
+    new Set(['catalog', 'settings', 'permissions'])
   );
 
   constructor() {

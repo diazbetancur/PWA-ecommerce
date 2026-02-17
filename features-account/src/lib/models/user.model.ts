@@ -1,14 +1,21 @@
+/**
+ * Modelo de Usuario para respuesta de /auth/me
+ * Contiene solo información de perfil, sin roles ni permisos
+ */
 export interface User {
   id: string;
   email: string;
   firstName: string;
   lastName: string;
-  role: string;
-  permissions: string[];
-  avatarUrl?: string;
-  phoneNumber?: string;
+  phoneNumber?: string | null;
+  documentType?: string | null;
+  documentNumber?: string | null;
+  birthDate?: string | null;
+  address?: string | null;
+  city?: string | null;
+  country?: string | null;
   createdAt: string;
-  lastLogin?: string;
+  isActive: boolean;
 }
 
 export interface LoginRequest {
@@ -51,10 +58,15 @@ export interface ChangePasswordRequest {
 }
 
 export interface UpdateProfileRequest {
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
   phoneNumber?: string;
-  avatarUrl?: string;
+  documentType?: string;
+  documentNumber?: string;
+  birthDate?: string;
+  address?: string;
+  city?: string;
+  country?: string;
 }
 
 export interface AuthState {

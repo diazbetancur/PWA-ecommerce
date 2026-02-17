@@ -1,0 +1,119 @@
+<h2 mat-dialog-title>
+  <mat-icon>lock</mat-icon>
+  Permisos del Rol: {{ role.name }}
+</h2>
+
+<mat-dialog-content>
+  <mat-tab-group>
+    <!-- Tab 1: Ver Permisos Actuales -->
+    <mat-tab label="Permisos Actuales">
+      <div class="tab-content">
+        <div class="permissions-summary">
+          <p class="info-text">
+            <mat-icon>info</mat-icon>
+            Este rol tiene <strong>{{ currentRolePermissions().length }}</strong> permiso(s) asignado(s)
+          </p>
+
+          @for (entry of currentPermissionsByResource | keyvalue; track entry.key) {
+            <div class="resource-group">
+              <h4>
+                <mat-icon>folder</mat-icon>
+                {{ entry.key }}
+                <span class="count">({{ entry.value.length }})</span>
+              </h4>
+              <div class="permissions-list">
+                @for (perm of entry.value; track perm.id) {
+                  <div class="permission-item">
+                    <mat-icon>check_circle</mat-icon>
+                    <div class="permission-info">
+                      <strong>{{ perm.action }}</strong>
+                      @if (perm.description) {
+                        <span class="desc">{{ perm.description }}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </mat-tab>
+
+    <!-- Tab 2: Gestionar Permisos -->
+    <mat-tab label="Gestionar Permisos">
+      <div class="tab-content">
+        @if (isLoading()) {
+          <div class="loading">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Cargando permisos disponibles...</p>
+          </div>
+        } @else if (error()) {
+          <div class="error-message">
+            <mat-icon>error</mat-icon>
+            <p>{{ error() }}</p>
+          </div>
+        } @else {
+          <div class="manage-section">
+            <p class="info-text">
+              <mat-icon>info</mat-icon>
+              Seleccione los permisos que desea asignar al rol ({{ selectedPermissions().size }} seleccionados)
+            </p>
+
+            @for (group of permissionGroups(); track group.resource) {
+              <div class="permission-group">
+                <div class="group-header">
+                  <mat-checkbox
+                    [checked]="isGroupFullySelected(group)"
+                    [indeterminate]="isGroupPartiallySelected(group)"
+                    (change)="toggleGroupPermissions(group, $event)"
+                  >
+                    <strong>{{ group.resource }}</strong>
+                    <span class="count">({{ group.permissions.length }})</span>
+                  </mat-checkbox>
+                </div>
+
+                <div class="group-permissions">
+                  @for (permission of group.permissions; track permission.id) {
+                    <mat-checkbox
+                      [checked]="isPermissionSelected(permission)"
+                      (change)="togglePermission(permission)"
+                      class="permission-checkbox"
+                    >
+                      <span class="permission-name">{{ permission.action }}</span>
+                      @if (permission.description) {
+                        <span class="permission-desc">{{ permission.description }}</span>
+                      }
+                    </mat-checkbox>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()" [disabled]="isSaving()">
+    Cerrar
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="isLoading() || isSaving() || !hasChanges()"
+  >
+    @if (isSaving()) {
+      <mat-spinner diameter="20"></mat-spinner>
+      <span>Guardando...</span>
+    } @else {
+      <ng-container>
+        <mat-icon>save</mat-icon>
+        <span>Guardar Cambios</span>
+      </ng-container>
+    }
+  </button>
+</mat-dialog-actions>
