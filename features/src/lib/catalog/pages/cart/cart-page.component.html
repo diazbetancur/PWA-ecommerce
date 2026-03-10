@@ -43,7 +43,12 @@
               aria-label="Eliminar producto"
               title="Eliminar"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M8 6V4h8v2" />
                 <path d="M19 6l-1 14H6L5 6" />
@@ -59,7 +64,12 @@
               aria-label="Disminuir cantidad"
               title="Disminuir"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
             </button>
@@ -74,14 +84,21 @@
               aria-label="Aumentar cantidad"
               title="Aumentar"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
                 <line x1="12" y1="5" x2="12" y2="19" />
                 <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
             </button>
           </fieldset>
 
-          <p class="line-total">{{ line.quantity * line.unitPrice | tenantCurrency }}</p>
+          <p class="line-total">
+            {{ line.quantity * line.unitPrice | tenantCurrency }}
+          </p>
         </article>
         }
       </section>
@@ -101,7 +118,9 @@
             </button>
           </div>
           @if (couponMessage()) {
-          <p class="coupon-message" [class.ok]="couponApplied()">{{ couponMessage() }}</p>
+          <p class="coupon-message" [class.ok]="couponApplied()">
+            {{ couponMessage() }}
+          </p>
           }
         </section>
 
@@ -167,7 +186,9 @@
             <strong>{{ grandTotal() | tenantCurrency }}</strong>
           </div>
 
-          <button type="button" class="pay-btn" (click)="payNow()">Pagar</button>
+          <button type="button" class="pay-btn" (click)="payNow()">
+            Pagar
+          </button>
         </section>
       </aside>
     </div>

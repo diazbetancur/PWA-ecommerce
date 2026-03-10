@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 
 /**
  * 📊 Dashboard de Administración del Programa de Lealtad
@@ -21,13 +22,13 @@ import { Router } from '@angular/router';
 })
 export class LoyaltyDashboardComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly loyaltyAdminService = inject(LoyaltyAdminService);
 
-  // Mock data (en producción vendría del servicio)
-  mockStats = {
-    totalUsers: 5432,
-    pointsIssued: 1250000,
-    totalRedemptions: 892,
-    pendingRedemptions: 23,
+  stats = {
+    totalUsers: '-',
+    pointsIssued: '-',
+    totalRedemptions: '-',
+    pendingRedemptions: '-',
   };
 
   mockTopRewards = [
@@ -112,7 +113,44 @@ export class LoyaltyDashboardComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    // En producción, cargar datos reales aquí
+    this.loadDashboardSummary();
+  }
+
+  private loadDashboardSummary(): void {
+    this.loyaltyAdminService.getDashboardSummary().subscribe({
+      next: (summary) => {
+        const pointsIssuedCurrentMonth = this.formatMetric(
+          summary?.pointsIssuedCurrentMonth
+        );
+
+        this.stats = {
+          totalUsers: this.formatMetric(summary?.activeUsersLast6Months),
+          pointsIssued: pointsIssuedCurrentMonth,
+          totalRedemptions: this.formatMetric(
+            summary?.completedRedemptionsCurrentMonth
+          ),
+          pendingRedemptions: this.formatMetric(
+            summary?.pendingRedemptionsCurrent
+          ),
+        };
+      },
+      error: () => {
+        this.stats = {
+          totalUsers: '-',
+          pointsIssued: '-',
+          totalRedemptions: '-',
+          pendingRedemptions: '-',
+        };
+      },
+    });
+  }
+
+  private formatMetric(value: number | null | undefined): string {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+      return '-';
+    }
+
+    return value.toLocaleString('es-CO');
   }
 
   navigateToRewards(): void {

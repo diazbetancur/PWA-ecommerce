@@ -90,7 +90,7 @@
         <tr>
           <td class="user-cell">
             <div class="user-info">
-              <strong>{{ redemption.userName || 'Usuario' }}</strong>
+              <!-- <strong>{{ redemption.userName || 'Usuario' }}</strong> -->
               <span class="user-email">{{ redemption.userEmail }}</span>
             </div>
           </td>
@@ -121,7 +121,7 @@
             </span>
           </td>
           <td class="actions-cell">
-            @if (redemption.status === 'PENDING') {
+            <!-- @if (redemption.status === 'PENDING') {
             <button
               class="btn-sm success"
               (click)="approveRedemption(redemption)"
@@ -144,7 +144,7 @@
             >
               📦 Entregar
             </button>
-            }
+            } -->
             <button
               class="btn-sm"
               (click)="viewDetails(redemption)"

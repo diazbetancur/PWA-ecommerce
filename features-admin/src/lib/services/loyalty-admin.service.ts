@@ -8,6 +8,7 @@ import {
   CreateLoyaltyRewardRequest,
   GetLoyaltyRedemptionsQuery,
   GetLoyaltyRewardsQuery,
+  LoyaltyDashboardSummaryDto,
   LoyaltyProgramConfigDto,
   LoyaltyRewardDto,
   PagedLoyaltyRedemptionsResponse,
@@ -62,6 +63,12 @@ import {
 export class LoyaltyAdminService {
   private readonly apiClient = inject(ApiClientService);
   private readonly baseUrl = '/api/admin/loyalty';
+
+  getDashboardSummary(): Observable<LoyaltyDashboardSummaryDto> {
+    return this.apiClient.get<LoyaltyDashboardSummaryDto>(
+      `${this.baseUrl}/dashboard/summary`
+    );
+  }
 
   // ==================== GESTIÓN DE PREMIOS ====================
 

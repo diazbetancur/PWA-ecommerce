@@ -377,6 +377,21 @@ export interface PagedLoyaltyRedemptionsResponse {
   totalPages: number;
 }
 
+/**
+ * Resumen de métricas del dashboard admin de lealtad
+ * Respuesta del endpoint GET /api/admin/loyalty/dashboard/summary
+ */
+export interface LoyaltyDashboardSummaryDto {
+  /** Puntos emitidos en el mes actual */
+  pointsIssuedCurrentMonth?: number | null;
+  /** Canjes completados en el mes actual */
+  completedRedemptionsCurrentMonth?: number | null;
+  /** Canjes pendientes actuales */
+  pendingRedemptionsCurrent?: number | null;
+  /** Usuarios activos en los últimos 6 meses */
+  activeUsersLast6Months?: number | null;
+}
+
 // ==================== AJUSTE MANUAL DE PUNTOS ====================
 
 /**
