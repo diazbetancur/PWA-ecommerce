@@ -1,0 +1,13 @@
+<section class="preview">
+  <div class="preview__header">
+    <h2>Últimos 5 movimientos</h2>
+    <button type="button" class="preview__link" (click)="onViewAll()">
+      Ver historial completo
+    </button>
+  </div>
+
+  <lib-loyalty-transactions-table
+    [transactions]="transactions()"
+    [emptyMessage]="'Aún no tienes movimientos de puntos'"
+  />
+</section>

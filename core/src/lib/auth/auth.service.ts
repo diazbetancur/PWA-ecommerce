@@ -195,7 +195,7 @@ export class AuthService {
   }): Promise<void> {
     // Verificar si tenemos tenant slug inicializado
     let tenantSlug = this._tenantSlug;
-    
+
     // Si no está inicializado, intentar obtenerlo del TenantConfigService
     if (!tenantSlug) {
       const config = this.tenantConfig.config;
@@ -228,23 +228,26 @@ export class AuthService {
         if (error.status === 409) {
           const detail = error.error?.detail || '';
           if (detail.includes('Email already registered')) {
-            throw new Error('Este email ya está registrado. Por favor, inicia sesión o usa otro email.');
+            throw new Error(
+              'Este email ya está registrado. Por favor, inicia sesión o usa otro email.'
+            );
           }
           // Otros errores 409 (ej: Tenant no resuelto)
           throw new Error(detail || 'No se pudo completar el registro');
         }
-        
+
         // Error 400: Validación
         if (error.status === 400) {
           const detail = error.error?.detail || 'Datos de registro inválidos';
           throw new Error(detail);
         }
-        
+
         // Otros errores HTTP
-        const detail = error.error?.detail || error.message || 'Error al registrar usuario';
+        const detail =
+          error.error?.detail || error.message || 'Error al registrar usuario';
         throw new Error(detail);
       }
-      
+
       // Re-lanzar otros tipos de errores
       throw error;
     }

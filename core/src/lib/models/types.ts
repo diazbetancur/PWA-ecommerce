@@ -127,6 +127,7 @@ export interface AppFeatures {
   enableWishlist?: boolean;
   enableReviews?: boolean;
   enableComparisons?: boolean;
+  enableLoyalty?: boolean;
 }
 
 export interface TenantConfig {

@@ -42,7 +42,6 @@ export const EmployeeGuard: CanActivateFn = () => {
     (role) => role.toLowerCase() !== 'customer'
   );
 
-
   if (!hasEmployeeRole) {
     router.navigate(['/']);
     return false;

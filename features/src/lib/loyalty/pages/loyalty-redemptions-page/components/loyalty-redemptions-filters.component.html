@@ -1,0 +1,44 @@
+<form class="filters" [formGroup]="filtersForm" (ngSubmit)="apply()">
+  <div class="field">
+    <label for="status">Estado</label>
+    <select id="status" class="form-control" formControlName="status">
+      <option value="">Todos</option>
+      <option value="PENDING">PENDING</option>
+      <option value="APPROVED">APPROVED</option>
+      <option value="DELIVERED">DELIVERED</option>
+      <option value="CANCELLED">CANCELLED</option>
+      <option value="EXPIRED">EXPIRED</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="fromDate">Fecha desde</label>
+    <input
+      id="fromDate"
+      type="date"
+      class="form-control"
+      formControlName="fromDate"
+    />
+  </div>
+
+  <div class="field">
+    <label for="toDate">Fecha hasta</label>
+    <input
+      id="toDate"
+      type="date"
+      class="form-control"
+      formControlName="toDate"
+    />
+  </div>
+
+  <div class="actions">
+    <button type="submit" class="btn btn-primary">Aplicar</button>
+    <button type="button" class="btn btn-secondary" (click)="clear()">
+      Limpiar
+    </button>
+  </div>
+</form>
+
+@if (dateError()) {
+<small class="error-text">{{ dateError() }}</small>
+}

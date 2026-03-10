@@ -1,0 +1,227 @@
+@if (isOpen()) {
+<dialog class="quick-view-backdrop" open>
+  <button
+    type="button"
+    class="backdrop-close"
+    (click)="onBackdropClose()"
+    aria-label="Cerrar detalle"
+    title="Cerrar"
+  ></button>
+
+  <section class="quick-view-modal" aria-label="Detalle del producto">
+    <header class="modal-header">
+      <button
+        type="button"
+        class="icon-button favorite-button"
+        [class.active]="isFavorite()"
+        [title]="
+          isFavorite() ? 'Retirar de favoritos' : 'Adicionar a favoritos'
+        "
+        (click)="onToggleFavorite($event)"
+        [attr.aria-label]="
+          isFavorite() ? 'Quitar de favoritos' : 'Agregar a favoritos'
+        "
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          @if (isFavorite()) {
+          <path
+            d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3 9.24 3 10.91 3.81 12 5.09 13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            fill="currentColor"
+            stroke="none"
+          />
+          } @else {
+          <path
+            d="M12.1 21.35l-1.1-1.02C5.14 14.9 2 12.07 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.57-3.14 6.4-8.9 11.83l-1 .92z"
+          />
+          }
+        </svg>
+      </button>
+
+      <button
+        type="button"
+        class="icon-button close-button"
+        title="Cerrar"
+        (click)="onCloseClick($event)"
+        aria-label="Cerrar detalle"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </header>
+
+    @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span>
+      <p>Cargando detalle del producto...</p>
+    </div>
+    } @else if (product(); as product) {
+    <div class="modal-content">
+      <div class="media-column">
+        <div class="media-frame">
+          <img
+            [src]="currentMediaUrl()"
+            [alt]="product.name"
+            title="Imagen del producto"
+            class="main-media"
+            loading="lazy"
+          />
+
+          @if (hasMediaGallery()) {
+          <button
+            type="button"
+            class="carousel-nav prev"
+            title="Imagen anterior"
+            (click)="goToPreviousMedia($event)"
+            aria-label="Imagen anterior"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="carousel-nav next"
+            title="Imagen siguiente"
+            (click)="goToNextMedia($event)"
+            aria-label="Imagen siguiente"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </button>
+          }
+        </div>
+
+        @if (hasMediaGallery()) {
+        <div class="media-thumbnails">
+          @for (url of mediaUrls(); track $index) {
+          <button
+            type="button"
+            class="thumb"
+            [class.active]="$index === mediaUrls().indexOf(currentMediaUrl())"
+            title="Ver media"
+            (click)="selectMedia($index, $event)"
+            [attr.aria-label]="'Ver media ' + ($index + 1)"
+          >
+            <img
+              [src]="url"
+              [alt]="product.name + ' ' + ($index + 1)"
+              title="Media del producto"
+              loading="lazy"
+            />
+          </button>
+          }
+        </div>
+        }
+      </div>
+
+      <div class="info-column">
+        <h2 class="product-title">{{ product.name }}</h2>
+
+        @if (product.description || product.shortDescription) {
+        <p class="product-description">
+          {{ product.description || product.shortDescription }}
+        </p>
+        }
+
+        <div class="price-row">
+          <span class="current-price">{{
+            product.price | tenantCurrency
+          }}</span>
+          @if (hasDiscount()) {
+          <span class="compare-price">{{
+            product.compareAtPrice | tenantCurrency
+          }}</span>
+          }
+        </div>
+
+        @if (product.stock !== null && product.stock !== undefined) {
+        <p
+          class="stock-text"
+          [class.out-of-stock]="product.stock <= 0 || product.inStock === false"
+        >
+          @if (product.stock > 0 && product.inStock !== false) {
+          {{ product.stock }} disponibles } @else { Sin stock disponible }
+        </p>
+        }
+
+        <div class="purchase-actions">
+          <div class="purchase-row">
+            <div class="quantity-control" aria-label="Control de cantidad">
+              <button
+                type="button"
+                class="qty-button"
+                title="Disminuir"
+                (click)="onDecrement($event)"
+                aria-label="Disminuir cantidad"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+
+              <span class="qty-value">{{ quantity() }}</span>
+
+              <button
+                type="button"
+                class="qty-button"
+                title="Aumentar"
+                (click)="onIncrement($event)"
+                aria-label="Aumentar cantidad"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                </svg>
+              </button>
+            </div>
+
+            <button
+              type="button"
+              class="add-button"
+              title="Agregar al carrito"
+              (click)="onAddToCart($event)"
+            >
+              Agregar al carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+  </section>
+</dialog>
+}

@@ -18,6 +18,9 @@ import { ApiClientService } from '@pwa/core';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
+  AddFavoriteResponse,
+  CheckFavoriteResponse,
+  FavoriteListResponse,
   ProductFilters,
   StoreBannerDto,
   StoreCategoryDetailDto,
@@ -254,5 +257,47 @@ export class StorefrontApiService {
       pageSize,
       ...additionalFilters,
     });
+  }
+
+  // ============================================
+  // FAVORITOS
+  // ============================================
+
+  getFavorites(): Observable<FavoriteListResponse> {
+    return this.apiClient.get<FavoriteListResponse>('/me/favorites').pipe(
+      catchError((error: unknown) => {
+        throw error;
+      })
+    );
+  }
+
+  addFavorite(productId: string): Observable<AddFavoriteResponse> {
+    return this.apiClient
+      .post<AddFavoriteResponse, { productId: string }>('/me/favorites', {
+        productId,
+      })
+      .pipe(
+        catchError((error: unknown) => {
+          throw error;
+        })
+      );
+  }
+
+  removeFavorite(productId: string): Observable<void> {
+    return this.apiClient.delete<void>(`/me/favorites/${productId}`).pipe(
+      catchError((error: unknown) => {
+        throw error;
+      })
+    );
+  }
+
+  checkFavorite(productId: string): Observable<CheckFavoriteResponse> {
+    return this.apiClient
+      .get<CheckFavoriteResponse>(`/me/favorites/check/${productId}`)
+      .pipe(
+        catchError((error: unknown) => {
+          throw error;
+        })
+      );
   }
 }

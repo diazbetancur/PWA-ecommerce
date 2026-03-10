@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
-import { TenantContextService, PwaInstallService } from '@pwa/core';
+import { PwaInstallService, TenantContextService } from '@pwa/core';
 
 /**
  * Componente de banner para instalación PWA en iOS

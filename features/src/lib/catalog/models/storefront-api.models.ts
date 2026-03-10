@@ -148,3 +148,31 @@ export interface StorefrontError {
   status?: number;
   detail?: string;
 }
+
+// ============================================
+// FAVORITOS
+// ============================================
+
+export interface FavoriteProductDto {
+  productId: string;
+  productName: string;
+  price: number;
+  mainImageUrl?: string | null;
+  addedAt: string;
+  isActive: boolean;
+}
+
+export interface FavoriteListResponse {
+  items: FavoriteProductDto[];
+  totalCount: number;
+}
+
+export interface AddFavoriteResponse {
+  favoriteId: string;
+  productId: string;
+  message: string;
+}
+
+export interface CheckFavoriteResponse {
+  isFavorite: boolean;
+}

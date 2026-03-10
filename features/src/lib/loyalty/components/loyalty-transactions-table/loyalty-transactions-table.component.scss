@@ -1,0 +1,101 @@
+.transactions-table {
+  border: 1px solid #e6ebf1;
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.table-desktop {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-desktop th,
+.table-desktop td {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid #eef2f6;
+  font-size: 0.9rem;
+}
+
+.table-desktop th {
+  background: #f8fafc;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #5b6470;
+}
+
+.points-positive {
+  color: #0f7a2e;
+  font-weight: 700;
+}
+
+.points-negative {
+  color: #8f1f23;
+  font-weight: 700;
+}
+
+.table-mobile {
+  display: none;
+}
+
+.empty-state {
+  border: 1px dashed #d5deea;
+  border-radius: 14px;
+  padding: 1rem;
+  text-align: center;
+  color: #637085;
+  background: #fafcff;
+}
+
+.movement-card {
+  border-bottom: 1px solid #eef2f6;
+  padding: 0.9rem 1rem;
+}
+
+.movement-card:last-child {
+  border-bottom: none;
+}
+
+.movement-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.movement-detail {
+  margin: 0.55rem 0 0.75rem;
+  font-size: 0.9rem;
+  color: #334155;
+}
+
+.movement-card dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
+}
+
+.movement-card dt {
+  font-size: 0.72rem;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.movement-card dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: #0f172a;
+}
+
+@media (max-width: 768px) {
+  .table-desktop {
+    display: none;
+  }
+
+  .table-mobile {
+    display: block;
+  }
+}

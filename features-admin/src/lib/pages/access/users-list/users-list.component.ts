@@ -7,23 +7,23 @@
 
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatBadgeModule } from '@angular/material/badge';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   ConfirmationDialogComponent,
   ConfirmationDialogData,
 } from '@pwa/shared';
-import { TenantUserService } from '../../../services/tenant-user.service';
-import { TenantUserSummaryDto } from '../../../models/tenant-user.model';
-import { UserDialogComponent } from '../../../components/user-dialog/user-dialog.component';
 import { catchError, finalize, of, tap } from 'rxjs';
+import { UserDialogComponent } from '../../../components/user-dialog/user-dialog.component';
+import { TenantUserSummaryDto } from '../../../models/tenant-user.model';
+import { TenantUserService } from '../../../services/tenant-user.service';
 
 @Component({
   selector: 'lib-users-list',

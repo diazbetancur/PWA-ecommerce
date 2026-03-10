@@ -13,6 +13,7 @@ import {
   UpdateLoyaltyConfigRequest,
 } from '../../../models/loyalty.models';
 import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
+import { TenantSettingsService } from '../../../services/tenant-settings.service';
 
 /**
  * ⚙️ Página de Configuración del Programa de Lealtad
@@ -33,6 +34,7 @@ import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 export class ProgramConfigComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly loyaltyAdminService = inject(LoyaltyAdminService);
+  private readonly tenantSettingsService = inject(TenantSettingsService);
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
 
@@ -41,9 +43,24 @@ export class ProgramConfigComponent implements OnInit {
   isLoading = signal(false);
   isSaving = signal(false);
   currencyAmount = signal(100); // Valor inicial: $100
+  currencyCode = signal('COP');
+  currencySymbol = signal('$');
 
   ngOnInit(): void {
+    this.loadTenantCurrency();
     this.loadConfig();
+  }
+
+  private loadTenantCurrency(): void {
+    this.tenantSettingsService.getSettings().subscribe({
+      next: (settings) => {
+        this.currencyCode.set(settings.locale?.currency || 'COP');
+        this.currencySymbol.set(settings.locale?.currencySymbol || '$');
+      },
+      error: () => {
+        // Fallback silencioso para no bloquear la configuración del programa
+      },
+    });
   }
 
   private loadConfig(): void {

@@ -1,105 +1,183 @@
 <div class="rewards-list-page">
-  <!-- Header -->
   <div class="page-header">
     <div class="header-content">
       <h1>🎁 Gestión de Premios</h1>
-      <p>Administra el catálogo de premios del programa de lealtad</p>
+      <p>
+        Administra catálogo, vigencia y disponibilidad de cupones del programa.
+      </p>
     </div>
-    <button class="btn-primary" (click)="createReward()">
-      <span class="icon">➕</span>
+
+    <button class="btn btn-primary" (click)="createReward()">
+      <span>➕</span>
       Crear Premio
     </button>
   </div>
 
-  <!-- Filters -->
-  <div class="filters-section">
-    <div class="filter-group">
-      <label for="typeFilter">Tipo:</label>
-      <select
-        id="typeFilter"
-        [(ngModel)]="selectedType"
-        (change)="onFilterChange()"
-        class="form-select"
-      >
-        <option value="">Todos</option>
-        <option value="PRODUCT">Productos</option>
-        <option value="DISCOUNT_PERCENTAGE">Descuentos %</option>
-        <option value="DISCOUNT_FIXED">Descuentos Fijos</option>
-        <option value="FREE_SHIPPING">Envío Gratis</option>
-      </select>
+  <div class="filters-card">
+    <div class="filters-top-row">
+      <div class="filter-group search">
+        <label for="searchInput">Buscar</label>
+        <input
+          id="searchInput"
+          type="text"
+          class="form-control"
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="search()"
+          placeholder="Nombre o descripción"
+        />
+      </div>
+
+      <div class="top-actions">
+        <button class="btn btn-primary" type="button" (click)="search()">
+          Buscar
+        </button>
+        <button
+          class="btn btn-secondary"
+          type="button"
+          (click)="toggleAdvancedFilters()"
+        >
+          {{ showAdvancedFilters() ? 'Ocultar filtros' : 'Más filtros' }}
+        </button>
+      </div>
     </div>
 
-    <div class="filter-group">
-      <label for="statusFilter">Estado:</label>
-      <select
-        id="statusFilter"
-        [(ngModel)]="selectedStatus"
-        (change)="onFilterChange()"
-        class="form-select"
-      >
-        <option value="">Todos</option>
-        <option value="true">Activos</option>
-        <option value="false">Inactivos</option>
-      </select>
-    </div>
+    @if (showAdvancedFilters()) {
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label for="typeFilter">Tipo</label>
+        <select
+          id="typeFilter"
+          class="form-control"
+          [(ngModel)]="selectedType"
+          (change)="onFilterChange()"
+        >
+          <option value="">Todos</option>
+          <option value="PRODUCT">Productos</option>
+          <option value="DISCOUNT_PERCENTAGE">Descuentos %</option>
+          <option value="DISCOUNT_FIXED">Descuentos Fijos</option>
+          <option value="FREE_SHIPPING">Envío Gratis</option>
+        </select>
+      </div>
 
-    <div class="filter-group search">
-      <label for="searchInput">Buscar:</label>
-      <input
-        type="text"
-        id="searchInput"
-        [(ngModel)]="searchTerm"
-        (input)="onSearchChange()"
-        placeholder="Nombre del premio..."
-        class="form-input"
-      />
+      <div class="filter-group">
+        <label for="statusFilter">Estado</label>
+        <select
+          id="statusFilter"
+          class="form-control"
+          [(ngModel)]="selectedStatus"
+          (change)="onFilterChange()"
+        >
+          <option value="">Todos</option>
+          <option value="true">Activos</option>
+          <option value="false">Inactivos</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="availabilityFilter">Disponible ahora</label>
+        <select
+          id="availabilityFilter"
+          class="form-control"
+          [(ngModel)]="selectedAvailability"
+          (change)="onFilterChange()"
+        >
+          <option value="">Todos</option>
+          <option value="true">Sí</option>
+          <option value="false">No</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="availableFrom">Vigencia desde</label>
+        <input
+          id="availableFrom"
+          type="date"
+          class="form-control"
+          [(ngModel)]="availableFrom"
+          (change)="onFilterChange()"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="availableUntil">Vigencia hasta</label>
+        <input
+          id="availableUntil"
+          type="date"
+          class="form-control"
+          [(ngModel)]="availableUntil"
+          (change)="onFilterChange()"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="createdFrom">Creado desde</label>
+        <input
+          id="createdFrom"
+          type="date"
+          class="form-control"
+          [(ngModel)]="createdFrom"
+          (change)="onFilterChange()"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="createdTo">Creado hasta</label>
+        <input
+          id="createdTo"
+          type="date"
+          class="form-control"
+          [(ngModel)]="createdTo"
+          (change)="onFilterChange()"
+        />
+      </div>
+    </div>
+    }
+
+    <div class="filters-actions">
+      <button class="btn btn-secondary" type="button" (click)="clearFilters()">
+        Limpiar filtros
+      </button>
     </div>
   </div>
 
-  <!-- Loading State -->
   @if (isLoading()) {
   <div class="loading-container">
     <div class="spinner"></div>
     <p>Cargando premios...</p>
   </div>
-  }
-
-  <!-- Error State -->
-  @if (error()) {
+  } @if (error()) {
   <div class="alert alert-danger"><strong>Error:</strong> {{ error() }}</div>
-  }
-
-  <!-- Rewards Table -->
-  @if (!isLoading() && rewards().length > 0) {
+  } @if (!isLoading() && rewards().length > 0) {
   <div class="table-container">
     <table class="data-table">
       <thead>
         <tr>
           <th>Premio</th>
           <th>Tipo</th>
-          <th>Costo (Puntos)</th>
-          <th>Stock</th>
+          <th>Puntos</th>
+          <th>Cupones</th>
+          <th>Vigencia</th>
+          <th>Disponible</th>
           <th>Estado</th>
           <th>Acciones</th>
         </tr>
       </thead>
       <tbody>
-        @for (reward of rewards(); track reward.id) {
+        @for (reward of rewards(); track trackByRewardId($index, reward)) {
         <tr>
-          <td class="reward-cell">
+          <td>
             <div class="reward-info">
               @if (reward.imageUrl) {
               <img
                 [src]="reward.imageUrl"
                 [alt]="reward.name"
+                title="Imagen del premio"
                 class="reward-thumb"
               />
               }
-              <div class="reward-details">
+              <div class="reward-content">
                 <strong>{{ reward.name }}</strong>
-                <span class="reward-desc">{{
-                  truncateDescription(reward.description)
-                }}</span>
+                <span class="reward-desc">{{ reward.description }}</span>
               </div>
             </div>
           </td>
@@ -108,50 +186,53 @@
               getRewardTypeLabel(reward.rewardType)
             }}</span>
           </td>
-          <td class="points-cell">
-            <span class="icon">💎</span>
-            {{ reward.pointsCost | number }}
+          <td>
+            <span class="points">💎 {{ reward.pointsCost | number }}</span>
           </td>
           <td>
-            @if (reward.stock === null || reward.stock === undefined) {
-            <span class="stock-badge unlimited">Ilimitado</span>
-            } @else if (reward.stock === 0) {
-            <span class="stock-badge out">Agotado</span>
-            } @else if (reward.stock <= 5) {
-            <span class="stock-badge low">{{ reward.stock }} unidades</span>
-            } @else {
-            <span class="stock-badge available"
-              >{{ reward.stock }} unidades</span
-            >
-            }
+            <span class="coupon-badge">{{
+              getCouponQuantityLabel(reward)
+            }}</span>
           </td>
           <td>
-            <div class="toggle-container">
-              <label class="toggle-switch">
-                <input
-                  type="checkbox"
-                  [checked]="reward.isActive"
-                  (change)="toggleRewardStatus(reward)"
-                />
-                <span class="toggle-slider"></span>
-              </label>
-              <span class="toggle-label">{{
-                reward.isActive ? 'Activo' : 'Inactivo'
+            <div class="date-cell">
+              <span>{{
+                reward.availableFrom
+                  ? (reward.availableFrom | date : 'short')
+                  : 'Sin inicio'
+              }}</span>
+              <span>{{
+                reward.availableUntil
+                  ? (reward.availableUntil | date : 'short')
+                  : 'Sin fin'
               }}</span>
             </div>
           </td>
+          <td>
+            <span
+              class="availability"
+              [attr.data-available]="isCurrentlyAvailable(reward)"
+            >
+              {{ getAvailabilityLabel(reward) }}
+            </span>
+          </td>
+          <td>
+            <span class="status" [attr.data-active]="reward.isActive">
+              {{ reward.isActive ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
           <td class="actions-cell">
             <button
-              class="btn-icon"
-              (click)="editReward(reward)"
+              class="btn btn-icon"
               title="Editar"
+              (click)="editReward(reward)"
             >
               ✏️
             </button>
             <button
-              class="btn-icon danger"
-              (click)="deleteReward(reward)"
+              class="btn btn-icon danger"
               title="Eliminar"
+              (click)="deleteReward(reward)"
             >
               🗑️
             </button>
@@ -162,11 +243,10 @@
     </table>
   </div>
 
-  <!-- Pagination -->
   @if (totalPages() > 1) {
   <div class="pagination">
     <button
-      class="page-btn"
+      class="btn btn-secondary"
       [disabled]="currentPage() === 1"
       (click)="goToPage(currentPage() - 1)"
     >
@@ -174,28 +254,25 @@
     </button>
 
     <span class="page-info">
-      Página {{ currentPage() }} de {{ totalPages() }}
-      <span class="total-items">({{ totalItems() }} premios)</span>
+      Página {{ currentPage() }} de {{ totalPages() }} ({{ totalItems() }}
+      registros)
     </span>
 
     <button
-      class="page-btn"
+      class="btn btn-secondary"
       [disabled]="currentPage() === totalPages()"
       (click)="goToPage(currentPage() + 1)"
     >
       Siguiente →
     </button>
   </div>
-  } }
-
-  <!-- Empty State -->
-  @if (!isLoading() && rewards().length === 0) {
+  } } @if (!isLoading() && rewards().length === 0) {
   <div class="empty-state">
     <div class="empty-icon">🎁</div>
-    <h3>No hay premios</h3>
-    <p>Crea el primer premio del catálogo</p>
-    <button class="btn-primary" (click)="createReward()">
-      Crear Primer Premio
+    <h3>No hay premios con los filtros seleccionados</h3>
+    <p>Ajusta los filtros o crea un nuevo premio.</p>
+    <button class="btn btn-primary" (click)="createReward()">
+      Crear Premio
     </button>
   </div>
   }

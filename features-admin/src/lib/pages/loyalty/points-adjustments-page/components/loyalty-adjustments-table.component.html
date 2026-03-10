@@ -1,0 +1,81 @@
+@if (isLoading) {
+<div class="state-block">
+  <div class="spinner"></div>
+  <p>Cargando ajustes de puntos...</p>
+</div>
+} @else if (error) {
+<div class="state-block error-state">
+  <p>{{ error }}</p>
+</div>
+} @else if (items.length === 0) {
+<div class="state-block empty-state">
+  <p>No se encontraron ajustes de puntos</p>
+</div>
+} @else {
+<div class="table-container">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Usuario</th>
+        <th>Ajustado por</th>
+        <th>Puntos</th>
+        <th>Tipo</th>
+        <th>Fecha ajuste</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of items; track item.transactionId) {
+      <tr>
+        <td>{{ item.userEmail }}</td>
+        <td>{{ item.adjustedByEmail }}</td>
+        <td
+          [class.positive-points]="item.points > 0"
+          [class.negative-points]="item.points < 0"
+        >
+          {{ item.points }}
+        </td>
+        <td>{{ getTransactionTypeLabel(item.transactionType) }}</td>
+        <td>{{ item.createdAt | date : 'dd/MM/yyyy HH:mm' }}</td>
+        <td>
+          <button
+            type="button"
+            class="btn-view"
+            (click)="viewDetail.emit(item)"
+            title="Ver detalle"
+            aria-label="Ver detalle"
+          >
+            👁️
+          </button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (totalPages > 1) {
+<div class="pagination">
+  <button
+    type="button"
+    class="page-btn"
+    (click)="goToPreviousPage()"
+    [disabled]="currentPage === 1"
+  >
+    Anterior
+  </button>
+
+  <span class="page-info">
+    Página {{ currentPage }} de {{ totalPages }} ({{ totalCount }} registros)
+  </span>
+
+  <button
+    type="button"
+    class="page-btn"
+    (click)="goToNextPage()"
+    [disabled]="currentPage === totalPages"
+  >
+    Siguiente
+  </button>
+</div>
+} }

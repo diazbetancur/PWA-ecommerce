@@ -6,4 +6,5 @@
 export * from './banner-carousel/banner-carousel.component';
 export * from './category-carousel/category-carousel.component';
 export * from './product-grid/product-grid.component';
+export * from './product-quick-view-modal/product-quick-view-modal.component';
 export * from './public-header/public-header.component';

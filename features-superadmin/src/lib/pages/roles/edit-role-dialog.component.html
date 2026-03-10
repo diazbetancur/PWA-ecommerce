@@ -15,13 +15,11 @@
         autocomplete="off"
       />
       @if (form.get('name')?.hasError('required')) {
-        <mat-error>El nombre es requerido</mat-error>
-      }
-      @if (form.get('name')?.hasError('minlength')) {
-        <mat-error>Mínimo 3 caracteres</mat-error>
-      }
-      @if (role.isSystemRole) {
-        <mat-hint>Los roles del sistema no pueden cambiar de nombre</mat-hint>
+      <mat-error>El nombre es requerido</mat-error>
+      } @if (form.get('name')?.hasError('minlength')) {
+      <mat-error>Mínimo 3 caracteres</mat-error>
+      } @if (role.isSystemRole) {
+      <mat-hint>Los roles del sistema no pueden cambiar de nombre</mat-hint>
       }
     </mat-form-field>
 
@@ -37,10 +35,10 @@
     </mat-form-field>
 
     @if (error()) {
-      <div class="error-message">
-        <mat-icon>error</mat-icon>
-        <p>{{ error() }}</p>
-      </div>
+    <div class="error-message">
+      <mat-icon>error</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
     }
   </form>
 </mat-dialog-content>
@@ -56,13 +54,10 @@
     [disabled]="isSaving() || form.invalid || !hasChanges()"
   >
     @if (isSaving()) {
-      <mat-spinner diameter="20"></mat-spinner>
-      <span>Guardando...</span>
+    <mat-spinner diameter="20"></mat-spinner>
     } @else {
-      <ng-container matButtonIcon>
-        <mat-icon>save</mat-icon>
-      </ng-container>
-      <span>Guardar Cambios</span>
+    <mat-icon matButtonIcon>save</mat-icon>
     }
+    <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}</span>
   </button>
 </mat-dialog-actions>

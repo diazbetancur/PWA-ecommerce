@@ -1,0 +1,58 @@
+@if (transactions().length === 0) {
+<section class="empty-state" aria-live="polite">
+  <p>{{ emptyMessage() }}</p>
+</section>
+} @else {
+<section class="transactions-table" aria-label="Movimientos de puntos">
+  <table class="table-desktop">
+    <thead>
+      <tr>
+        <th>Tipo</th>
+        <th>Detalle</th>
+        <th>Puntos</th>
+        <th>Fecha transacción</th>
+        <th>Fecha expiración</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (transaction of transactions(); track transaction.id) {
+      <tr>
+        <td>
+          <lib-loyalty-transaction-type-badge [type]="transaction.type" />
+        </td>
+        <td>{{ getDetail(transaction) }}</td>
+        <td [class]="getPointClass(transaction.points)">
+          {{ formatPoints(transaction.points) }}
+        </td>
+        <td>{{ formatDate(getTransactionDate(transaction)) }}</td>
+        <td>{{ formatDate(transaction.expirationDate) }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="table-mobile">
+    @for (transaction of transactions(); track transaction.id) {
+    <article class="movement-card">
+      <header>
+        <lib-loyalty-transaction-type-badge [type]="transaction.type" />
+        <span [class]="getPointClass(transaction.points)">
+          {{ formatPoints(transaction.points) }}
+        </span>
+      </header>
+      <p class="movement-detail">{{ getDetail(transaction) }}</p>
+      <dl>
+        <div>
+          <dt>Fecha transacción</dt>
+          <dd>{{ formatDate(getTransactionDate(transaction)) }}</dd>
+        </div>
+        <div>
+          <dt>Fecha expiración</dt>
+          <dd>{{ formatDate(transaction.expirationDate) }}</dd>
+        </div>
+      </dl>
+    </article>
+    }
+  </div>
+</section>
+}

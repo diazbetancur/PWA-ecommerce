@@ -1,0 +1,100 @@
+.redemptions-page {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 1rem;
+  display: grid;
+  gap: 0.9rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.2vw, 1.7rem);
+  color: var(--tenant-text-color, #0f172a);
+}
+
+.page-header p {
+  margin: 0.35rem 0 0;
+  color: var(--tenant-text-muted-color, #64748b);
+}
+
+.filters-shell {
+  border: 1px solid var(--tenant-border-color, #e5e7eb);
+  border-radius: 14px;
+  background: var(--tenant-background-color, #fff);
+  padding: 0.8rem;
+}
+
+.state-shell {
+  border: 1px solid var(--tenant-border-color, #e5e7eb);
+  border-radius: 14px;
+  background: var(--tenant-background-color, #fff);
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  color: var(--tenant-text-muted-color, #64748b);
+}
+
+.state-shell.error {
+  border-color: color-mix(
+    in oklab,
+    var(--tenant-accent-color, #ef4444) 40%,
+    var(--tenant-border-color, #e5e7eb)
+  );
+}
+
+.loader {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--tenant-border-color, #e5e7eb);
+  border-top-color: var(--tenant-primary-color, #2563eb);
+  border-radius: 999px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+}
+
+.pagination span {
+  color: var(--tenant-text-color, #334155);
+  font-size: 0.86rem;
+}
+
+.btn-primary,
+.btn-secondary {
+  border: none;
+  border-radius: 10px;
+  padding: 0.55rem 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary {
+  background: var(--tenant-primary-color, #2563eb);
+  color: var(--tenant-on-primary, #fff);
+}
+
+.btn-secondary {
+  background: var(--tenant-surface-color, #f3f4f6);
+  color: var(--tenant-text-color, #334155);
+  border: 1px solid var(--tenant-border-color, #d1d5db);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

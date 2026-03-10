@@ -3,11 +3,8 @@ import { Routes } from '@angular/router';
 export const catalogRoutes: Routes = [
   {
     path: '',
-    loadComponent: () =>
-      import('./pages/home/home-page.component').then(
-        (m) => m.HomePageComponent
-      ),
-    title: 'Inicio',
+    redirectTo: 'catalog',
+    pathMatch: 'full',
   },
   {
     path: 'catalog',
@@ -34,6 +31,12 @@ export const catalogRoutes: Routes = [
       ),
     title: 'Detalle del Producto',
     data: { prerender: false },
+  },
+  {
+    path: 'cart',
+    loadComponent: () =>
+      import('./pages/cart/cart-page.component').then((m) => m.CartPageComponent),
+    title: 'Carrito de compras',
   },
 ];
 

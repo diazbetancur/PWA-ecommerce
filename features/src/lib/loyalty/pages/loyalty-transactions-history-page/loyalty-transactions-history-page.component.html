@@ -1,0 +1,77 @@
+<div class="history-page">
+  <header class="history-header">
+    <button type="button" class="btn-back" (click)="goToSummary()">
+      ← Volver al resumen de puntos
+    </button>
+    <h1>Historial de movimientos</h1>
+    <p>
+      Revisa el detalle completo de tus puntos acumulados, redimidos o vencidos.
+    </p>
+  </header>
+
+  <section class="history-controls">
+    <label for="typeFilter">Tipo de movimiento</label>
+    <select
+      id="typeFilter"
+      class="history-select"
+      [ngModel]="selectedType()"
+      (ngModelChange)="onTypeChange($event)"
+    >
+      <option value="">Todos</option>
+      <option value="EARN">Acumulación</option>
+      <option value="REDEEM">Redención</option>
+      <option value="EXPIRE">Vencimiento</option>
+      <option value="ADJUST">Ajuste</option>
+    </select>
+  </section>
+
+  @if (isLoading()) {
+  <section class="skeleton-list" aria-hidden="true">
+    <div class="skeleton-row"></div>
+    <div class="skeleton-row"></div>
+    <div class="skeleton-row"></div>
+    <div class="skeleton-row"></div>
+  </section>
+  } @if (error()) {
+  <section class="error-box" role="alert">
+    <p>{{ error() }}</p>
+    <button type="button" class="btn-primary" (click)="loadTransactions()">
+      Reintentar
+    </button>
+  </section>
+  } @if (!isLoading()) {
+  <lib-loyalty-transactions-table
+    [transactions]="transactions()"
+    [emptyMessage]="'Aún no tienes movimientos de puntos'"
+  />
+
+  @if (totalPages() > 1) {
+  <nav
+    class="history-pagination"
+    aria-label="Paginación historial de movimientos"
+  >
+    <button
+      type="button"
+      class="btn-secondary"
+      [disabled]="currentPage() === 1"
+      (click)="goToPage(currentPage() - 1)"
+    >
+      Anterior
+    </button>
+
+    <span
+      >Página {{ currentPage() }} de {{ totalPages() }} ·
+      {{ totalCount() }} registros</span
+    >
+
+    <button
+      type="button"
+      class="btn-secondary"
+      [disabled]="currentPage() === totalPages()"
+      (click)="goToPage(currentPage() + 1)"
+    >
+      Siguiente
+    </button>
+  </nav>
+  } }
+</div>

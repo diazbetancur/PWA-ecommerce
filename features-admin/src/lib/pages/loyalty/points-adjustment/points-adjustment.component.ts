@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ToastService } from '@pwa/shared';
 import {
   AdjustPointsRequest,
@@ -46,19 +47,13 @@ import { TenantUserService } from '../../../services/tenant-user.service';
         color: #6c757d;
       }
 
-      /* Content Grid */
-      .content-grid {
-        display: grid;
-        grid-template-columns: 1fr 400px;
-        gap: 30px;
-      }
-
       /* Form Section */
       .form-section {
         background: white;
         padding: 30px;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        max-width: 900px;
       }
 
       .form-section h2 {
@@ -166,6 +161,25 @@ import { TenantUserService } from '../../../services/tenant-user.service';
         margin-top: 6px;
         font-size: 0.85rem;
         color: #6c757d;
+      }
+
+      .field-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .char-counter {
+        font-size: 0.8rem;
+        color: #6c757d;
+      }
+
+      .field-error {
+        display: block;
+        margin-top: 6px;
+        font-size: 0.82rem;
+        color: #dc3545;
       }
 
       /* Adjustment Preview */
@@ -397,12 +411,8 @@ import { TenantUserService } from '../../../services/tenant-user.service';
 
       /* Responsive */
       @media (max-width: 1200px) {
-        .content-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .info-section {
-          order: -1;
+        .form-section {
+          max-width: 100%;
         }
       }
     `,
@@ -412,6 +422,7 @@ export class PointsAdjustmentComponent {
   private readonly loyaltyAdminService = inject(LoyaltyAdminService);
   private readonly tenantUserService = inject(TenantUserService);
   private readonly toastService = inject(ToastService);
+  private readonly router = inject(Router);
 
   // Signals
   isSubmitting = signal(false);
@@ -434,38 +445,13 @@ export class PointsAdjustmentComponent {
   // Para acceder a Math.abs en el template
   Math = Math;
 
-  // Mock data
-  mockRecentAdjustments = [
-    {
-      id: '1',
-      userId: 'user-123',
-      points: 500,
-      reason: 'Compensación por error en orden',
-      time: 'Hace 10 min',
-    },
-    {
-      id: '2',
-      userId: 'user-456',
-      points: -200,
-      reason: 'Corrección de puntos duplicados',
-      time: 'Hace 1 hora',
-    },
-    {
-      id: '3',
-      userId: 'user-789',
-      points: 1000,
-      reason: 'Bonificación especial Black Friday',
-      time: 'Hace 2 horas',
-    },
-  ];
-
   /**
    * Enviar ajuste
    */
   submitAdjustment(): void {
     if (!this.formData.userId.trim()) {
       this.toastService.warning(
-        'Selecciona un usuario por correo o ingresa un ID de usuario válido.'
+        'Selecciona un cliente antes de confirmar el ajuste.'
       );
       return;
     }
@@ -490,9 +476,9 @@ export class PointsAdjustmentComponent {
     }
 
     const trimmedReason = this.formData.reason.trim();
-    if (trimmedReason.length < 5 || trimmedReason.length > 500) {
+    if (trimmedReason.length < 10 || trimmedReason.length > 500) {
       this.toastService.warning(
-        'La razón del ajuste debe tener entre 5 y 500 caracteres.'
+        'La razón del ajuste debe tener entre 10 y 500 caracteres.'
       );
       return;
     }
@@ -516,8 +502,8 @@ export class PointsAdjustmentComponent {
             response.message ||
               `Ajuste realizado exitosamente. Nuevo balance: ${response.newBalance}`
           );
-          this.resetForm();
           this.isSubmitting.set(false);
+          this.router.navigate(['/tenant-admin/loyalty/points-adjustments']);
         },
         error: (err) => {
           this.toastService.error(
@@ -599,13 +585,8 @@ export class PointsAdjustmentComponent {
     this.customerSearchResults.set([]);
   }
 
-  onUserIdManualChange(): void {
-    if (
-      this.selectedCustomer() &&
-      this.selectedCustomer()?.id !== this.formData.userId
-    ) {
-      this.selectedCustomer.set(null);
-    }
+  goToAdjustmentsHistory(): void {
+    this.router.navigate(['/tenant-admin/loyalty/points-adjustments']);
   }
 
   private resolveTransactionType(

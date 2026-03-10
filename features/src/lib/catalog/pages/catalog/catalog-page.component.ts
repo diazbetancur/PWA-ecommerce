@@ -11,17 +11,28 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
-import { TenantContextService } from '@pwa/core';
+import {
+  AuthService,
+  PublicCartUiService,
+  TenantContextService,
+} from '@pwa/core';
+import { TenantAuthModalService } from '@pwa/features-account';
 import {
   Banner,
   BannerCarouselComponent,
   ProductCardComponent,
   ProductCardData,
   ProductsGridSkeletonComponent,
+  ToastService,
 } from '@pwa/shared';
+import {
+  ProductQuickViewModalComponent,
+  QuickViewProductData,
+} from '../../components/product-quick-view-modal/product-quick-view-modal.component';
 import {
   ProductFilters,
   StoreCategoryDto,
+  StoreProductDetailDto,
   StoreProductDto,
 } from '../../models/storefront-api.models';
 import { StorefrontApiService } from '../../services/storefront-api.service';
@@ -35,6 +46,7 @@ import { StorefrontApiService } from '../../services/storefront-api.service';
     ReactiveFormsModule,
     BannerCarouselComponent,
     ProductCardComponent,
+    ProductQuickViewModalComponent,
     ProductsGridSkeletonComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +55,10 @@ import { StorefrontApiService } from '../../services/storefront-api.service';
 })
 export class CatalogPageComponent implements OnInit {
   private readonly storefrontApi = inject(StorefrontApiService);
+  private readonly publicCartUi = inject(PublicCartUiService);
+  private readonly authService = inject(AuthService);
+  private readonly tenantAuthModal = inject(TenantAuthModalService);
+  private readonly toastService = inject(ToastService);
   private readonly tenantContext = inject(TenantContextService);
   private readonly route = inject(ActivatedRoute);
 
@@ -56,6 +72,12 @@ export class CatalogPageComponent implements OnInit {
   readonly isLoading = signal(true);
   readonly isLoadingMore = signal(false);
   readonly currentFilters = signal<ProductFilters>({});
+  readonly isQuickViewOpen = signal(false);
+  readonly isQuickViewLoading = signal(false);
+  readonly quickViewCardProduct = signal<ProductCardData | null>(null);
+  readonly quickViewDetail = signal<StoreProductDetailDto | null>(null);
+  readonly quickViewSelectedQuantity = signal(1);
+  readonly favoriteProductIds = signal<Set<string>>(new Set());
   readonly pagination = signal({
     page: 1,
     pageSize: 20,
@@ -83,6 +105,45 @@ export class CatalogPageComponent implements OnInit {
   readonly showLoadMore = computed(() => {
     const p = this.pagination();
     return p.page < p.totalPages && !this.isLoading();
+  });
+
+  readonly quickViewProduct = computed<QuickViewProductData | null>(() => {
+    const card = this.quickViewCardProduct();
+    if (!card) {
+      return null;
+    }
+
+    const detail = this.quickViewDetail();
+    const imageUrls =
+      detail?.images
+        ?.map((image) => image.url)
+        .filter((url): url is string => !!url) ?? [];
+
+    const fallbackImages = card.imageUrl ? [card.imageUrl] : [];
+
+    return {
+      id: card.id,
+      slug: card.slug,
+      name: detail?.name ?? card.name,
+      shortDescription: detail?.shortDescription ?? card.shortDescription,
+      description: detail?.description ?? card.shortDescription,
+      price: detail?.price ?? card.price,
+      compareAtPrice: detail?.compareAtPrice ?? card.compareAtPrice,
+      stock: detail?.stock ?? undefined,
+      inStock: detail?.inStock ?? (card.stock === undefined || card.stock > 0),
+      imageUrls: imageUrls.length > 0 ? imageUrls : fallbackImages,
+    };
+  });
+
+  readonly quickViewQuantity = computed(() => this.quickViewSelectedQuantity());
+
+  readonly quickViewIsFavorite = computed(() => {
+    const product = this.quickViewProduct();
+    if (!product) {
+      return false;
+    }
+
+    return this.favoriteProductIds().has(product.id);
   });
 
   ngOnInit(): void {
@@ -229,9 +290,157 @@ export class CatalogPageComponent implements OnInit {
   }
 
   onAddToCart(product: ProductCardData): void {
+    this.publicCartUi.addItem({
+      productId: product.id,
+      name: product.name,
+      imageUrl: product.imageUrl,
+      unitPrice: product.price,
+      quantity: 1,
+    });
   }
 
   onQuickView(product: ProductCardData): void {
+    this.quickViewCardProduct.set(product);
+    this.quickViewDetail.set(null);
+    this.quickViewSelectedQuantity.set(1);
+    this.isQuickViewOpen.set(true);
+    this.syncFavoriteStatus(product.id);
+
+    if (!product.slug) {
+      this.isQuickViewLoading.set(false);
+      return;
+    }
+
+    this.isQuickViewLoading.set(true);
+    const requestedProductId = product.id;
+
+    this.storefrontApi.getProductBySlug(product.slug).subscribe({
+      next: (detail) => {
+        if (this.quickViewCardProduct()?.id !== requestedProductId) {
+          return;
+        }
+
+        this.quickViewDetail.set(detail);
+        this.isQuickViewLoading.set(false);
+      },
+      error: () => {
+        if (this.quickViewCardProduct()?.id !== requestedProductId) {
+          return;
+        }
+
+        this.quickViewDetail.set(null);
+        this.isQuickViewLoading.set(false);
+      },
+    });
+  }
+
+  closeQuickView(): void {
+    this.isQuickViewOpen.set(false);
+    this.isQuickViewLoading.set(false);
+    this.quickViewCardProduct.set(null);
+    this.quickViewDetail.set(null);
+    this.quickViewSelectedQuantity.set(1);
+  }
+
+  addToCartFromQuickView(): void {
+    const product = this.quickViewProduct();
+    if (!product) {
+      return;
+    }
+
+    this.publicCartUi.addItem({
+      productId: product.id,
+      name: product.name,
+      imageUrl:
+        product.imageUrls[0] ?? '/assets/images/product-placeholder.webp',
+      unitPrice: product.price,
+      quantity: this.quickViewSelectedQuantity(),
+    });
+
+    this.closeQuickView();
+  }
+
+  incrementQuickViewQuantity(): void {
+    this.quickViewSelectedQuantity.update((qty) => qty + 1);
+  }
+
+  decrementQuickViewQuantity(): void {
+    this.quickViewSelectedQuantity.update((qty) => Math.max(1, qty - 1));
+  }
+
+  toggleQuickViewFavorite(): void {
+    const product = this.quickViewProduct();
+    if (!product) {
+      return;
+    }
+
+    if (!this.authService.isAuthenticated()) {
+      this.toastService.warning(
+        'Debes iniciar sesión antes de agregar productos a favoritos'
+      );
+      this.closeQuickView();
+      setTimeout(() => this.tenantAuthModal.open('login'), 0);
+      return;
+    }
+
+    const isFavorite = this.favoriteProductIds().has(product.id);
+
+    if (isFavorite) {
+      this.storefrontApi.removeFavorite(product.id).subscribe({
+        next: () => {
+          this.favoriteProductIds.update((currentSet) => {
+            const nextSet = new Set(currentSet);
+            nextSet.delete(product.id);
+            return nextSet;
+          });
+        },
+        error: () => {
+          // no-op
+        },
+      });
+      return;
+    }
+
+    this.storefrontApi.addFavorite(product.id).subscribe({
+      next: () => {
+        this.favoriteProductIds.update((currentSet) => {
+          const nextSet = new Set(currentSet);
+          nextSet.add(product.id);
+          return nextSet;
+        });
+      },
+      error: () => {
+        // no-op
+      },
+    });
+  }
+
+  private syncFavoriteStatus(productId: string): void {
+    if (!this.authService.isAuthenticated()) {
+      this.favoriteProductIds.update((currentSet) => {
+        const nextSet = new Set(currentSet);
+        nextSet.delete(productId);
+        return nextSet;
+      });
+      return;
+    }
+
+    this.storefrontApi.checkFavorite(productId).subscribe({
+      next: (response) => {
+        this.favoriteProductIds.update((currentSet) => {
+          const nextSet = new Set(currentSet);
+          if (response.isFavorite) {
+            nextSet.add(productId);
+          } else {
+            nextSet.delete(productId);
+          }
+          return nextSet;
+        });
+      },
+      error: () => {
+        // no-op
+      },
+    });
   }
 
   /**

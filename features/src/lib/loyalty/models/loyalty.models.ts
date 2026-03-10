@@ -19,6 +19,10 @@ export enum LoyaltyTransactionType {
   REDEEMED = 'REDEEMED', // Puntos gastados (canjes)
   EXPIRED = 'EXPIRED', // Puntos expirados
   ADJUSTED = 'ADJUSTED', // Ajuste manual por admin
+  EARN = 'EARN',
+  REDEEM = 'REDEEM',
+  EXPIRE = 'EXPIRE',
+  ADJUST = 'ADJUST',
 }
 
 /**
@@ -64,6 +68,8 @@ export interface LoyaltyAccountSummaryDto {
   totalEarned: number;
   /** Total de puntos gastados en toda la vida */
   totalRedeemed: number;
+  /** Puntos que vencen en los próximos 60 días */
+  pointsExpiringIn60Days?: number;
   /** Últimas transacciones recientes */
   lastTransactions: LoyaltyTransactionDto[];
   /** Nivel/tier actual del usuario (opcional, calculado en el frontend si no viene del backend) */
@@ -84,8 +90,14 @@ export interface LoyaltyTransactionDto {
   points: number;
   /** Descripción del movimiento */
   description: string;
+  /** Detalle simplificado para UI */
+  detail?: string;
   /** Número de orden relacionada (si aplica) */
-  orderNumber?: string;
+  orderNumber?: string | null;
+  /** Fecha funcional de transacción */
+  transactionDate?: string;
+  /** Fecha de expiración asociada */
+  expirationDate?: string | null;
   /** Fecha de la transacción */
   createdAt: string;
 }
@@ -118,6 +130,8 @@ export interface PagedLoyaltyTransactionsResponse {
   pageSize: number;
   /** Total de items */
   totalItems: number;
+  /** Total de items (algunos endpoints responden totalCount) */
+  totalCount?: number;
   /** Total de páginas */
   totalPages: number;
 }
@@ -142,16 +156,34 @@ export interface LoyaltyRewardDto {
   discountValue?: number;
   /** ID del producto asociado (si aplica) */
   productId?: string | null;
+  /** IDs de productos asociados (si aplica) */
+  productIds?: string[] | null;
   /** Nombre del producto (si aplica) */
   productName?: string | null;
+  /** Si aplica a todos los productos elegibles */
+  appliesToAllEligibleProducts?: boolean;
+  /** Regla de selección cuando aplica solo a un producto */
+  singleProductSelectionRule?: string | null;
   /** URL de la imagen */
   imageUrl?: string;
   /** Stock disponible (null = ilimitado) */
   stock?: number | null;
+  /** Cantidad de cupones configurados */
+  couponQuantity?: number | null;
+  /** Cupones emitidos */
+  couponsIssued?: number;
+  /** Cupones disponibles */
+  couponsAvailable?: number;
   /** Si el premio está activo */
   isActive: boolean;
   /** Días de validez del cupón/premio (null = sin expiración) */
   validityDays?: number | null;
+  /** Inicio de disponibilidad */
+  availableFrom?: string | null;
+  /** Fin de disponibilidad */
+  availableUntil?: string | null;
+  /** Disponible actualmente */
+  isCurrentlyAvailable?: boolean;
   /** Términos y condiciones */
   termsAndConditions?: string;
   /** Orden de visualización en el catálogo */
@@ -224,6 +256,8 @@ export interface PagedLoyaltyRewardsResponse {
   pageSize: number;
   /** Total de items */
   totalItems: number;
+  /** Total de items (algunos endpoints responden totalCount) */
+  totalCount?: number;
   /** Total de páginas */
   totalPages: number;
 }
@@ -326,8 +360,23 @@ export interface PagedLoyaltyRedemptionsResponse {
   pageSize: number;
   /** Total de items */
   totalItems: number;
+  /** Total de items (algunos endpoints responden totalCount) */
+  totalCount?: number;
   /** Total de páginas */
   totalPages: number;
+}
+
+export interface LoyaltyRedemptionItem extends LoyaltyRedemptionDto {}
+
+export interface LoyaltyRedemptionsResponse
+  extends PagedLoyaltyRedemptionsResponse {}
+
+export interface LoyaltyRedemptionsFilters {
+  page: number;
+  pageSize: number;
+  status?: RedemptionStatus | string;
+  fromDate?: string;
+  toDate?: string;
 }
 
 // ==================== AJUSTE MANUAL DE PUNTOS ====================

@@ -2,602 +2,237 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ToastService } from '@pwa/shared';
+import { ConfirmationDialogService, ToastService } from '@pwa/shared';
 import {
+  GetLoyaltyRewardsQuery,
   LoyaltyRewardDto,
   PagedLoyaltyRewardsResponse,
   REWARD_TYPE_LABELS,
-  UpdateLoyaltyRewardRequest,
 } from '../../../models/loyalty.models';
 import { LoyaltyAdminService } from '../../../services/loyalty-admin.service';
 
-/**
- * 📋 Lista de Premios (Admin)
- *
- * Gestión completa de premios:
- * - Listado con filtros y búsqueda
- * - Activar/desactivar premios
- * - Editar y eliminar premios
- * - Crear nuevo premio
- */
 @Component({
   selector: 'lib-rewards-list',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './rewards-list.component.html',
-  styles: [
-    `
-      .rewards-list-page {
-        padding: 20px;
-        max-width: 1400px;
-        margin: 0 auto;
-      }
-
-      .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 30px;
-        gap: 20px;
-      }
-
-      .header-content h1 {
-        font-size: 2rem;
-        color: #333;
-        margin-bottom: 5px;
-      }
-
-      .header-content p {
-        color: #6c757d;
-      }
-
-      .btn-primary {
-        padding: 12px 24px;
-        background: #007bff;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: background 0.2s;
-      }
-
-      .btn-primary:hover {
-        background: #0056b3;
-      }
-
-      .btn-primary .icon {
-        font-size: 1.2rem;
-      }
-
-      /* Filters */
-      .filters-section {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 30px;
-        flex-wrap: wrap;
-      }
-
-      .filter-group {
-        flex: 1;
-        min-width: 200px;
-      }
-
-      .filter-group.search {
-        flex: 2;
-      }
-
-      .filter-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #333;
-      }
-
-      .form-select,
-      .form-input {
-        width: 100%;
-        padding: 10px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1rem;
-      }
-
-      .form-select:focus,
-      .form-input:focus {
-        outline: none;
-        border-color: #007bff;
-      }
-
-      /* Loading & Errors */
-      .loading-container {
-        text-align: center;
-        padding: 60px 20px;
-      }
-
-      .spinner {
-        width: 50px;
-        height: 50px;
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #007bff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-
-      .alert-danger {
-        padding: 15px;
-        border-radius: 8px;
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-        margin-bottom: 20px;
-      }
-
-      /* Table */
-      .table-container {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        margin-bottom: 30px;
-      }
-
-      .data-table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      .data-table th {
-        background: #f8f9fa;
-        padding: 15px;
-        text-align: left;
-        font-weight: 600;
-        color: #495057;
-        border-bottom: 2px solid #dee2e6;
-      }
-
-      .data-table td {
-        padding: 15px;
-        border-bottom: 1px solid #dee2e6;
-      }
-
-      .data-table tbody tr:hover {
-        background: #f8f9fa;
-      }
-
-      .reward-cell .reward-info {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-
-      .reward-thumb {
-        width: 50px;
-        height: 50px;
-        object-fit: cover;
-        border-radius: 8px;
-      }
-
-      .reward-details {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
-
-      .reward-desc {
-        font-size: 0.85rem;
-        color: #6c757d;
-      }
-
-      .type-badge {
-        display: inline-block;
-        padding: 4px 12px;
-        background: #e7f3ff;
-        color: #0056b3;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        font-weight: 600;
-      }
-
-      .points-cell {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        font-weight: 600;
-        color: #007bff;
-      }
-
-      .points-cell .icon {
-        font-size: 1.1rem;
-      }
-
-      .stock-badge {
-        display: inline-block;
-        padding: 4px 12px;
-        border-radius: 12px;
-        font-size: 0.85rem;
-        font-weight: 600;
-      }
-
-      .stock-badge.unlimited {
-        background: #e7f3ff;
-        color: #0056b3;
-      }
-
-      .stock-badge.available {
-        background: #d4edda;
-        color: #155724;
-      }
-
-      .stock-badge.low {
-        background: #fff3cd;
-        color: #856404;
-      }
-
-      .stock-badge.out {
-        background: #f8d7da;
-        color: #721c24;
-      }
-
-      /* Toggle Switch */
-      .toggle-container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .toggle-switch {
-        position: relative;
-        display: inline-block;
-        width: 48px;
-        height: 26px;
-      }
-
-      .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .toggle-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: 0.3s;
-        border-radius: 26px;
-      }
-
-      .toggle-slider:before {
-        position: absolute;
-        content: '';
-        height: 18px;
-        width: 18px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: 0.3s;
-        border-radius: 50%;
-      }
-
-      input:checked + .toggle-slider {
-        background-color: #28a745;
-      }
-
-      input:checked + .toggle-slider:before {
-        transform: translateX(22px);
-      }
-
-      .toggle-label {
-        font-size: 0.9rem;
-        color: #6c757d;
-      }
-
-      /* Actions */
-      .actions-cell {
-        display: flex;
-        gap: 8px;
-      }
-
-      .btn-icon {
-        padding: 8px 12px;
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 1.1rem;
-        transition: all 0.2s;
-      }
-
-      .btn-icon:hover {
-        background: #e9ecef;
-        transform: scale(1.1);
-      }
-
-      .btn-icon.danger:hover {
-        background: #f8d7da;
-        border-color: #f5c6cb;
-      }
-
-      /* Pagination */
-      .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 20px;
-        flex-wrap: wrap;
-      }
-
-      .page-btn {
-        padding: 10px 20px;
-        background: #007bff;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: background 0.2s;
-      }
-
-      .page-btn:hover:not(:disabled) {
-        background: #0056b3;
-      }
-
-      .page-btn:disabled {
-        background: #6c757d;
-        cursor: not-allowed;
-        opacity: 0.6;
-      }
-
-      .page-info {
-        font-weight: 600;
-        color: #333;
-        text-align: center;
-      }
-
-      .total-items {
-        display: block;
-        font-size: 0.85rem;
-        font-weight: normal;
-        color: #6c757d;
-        margin-top: 3px;
-      }
-
-      /* Empty State */
-      .empty-state {
-        text-align: center;
-        padding: 80px 20px;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
-
-      .empty-icon {
-        font-size: 5rem;
-        margin-bottom: 20px;
-      }
-
-      .empty-state h3 {
-        font-size: 1.5rem;
-        color: #333;
-        margin-bottom: 10px;
-      }
-
-      .empty-state p {
-        color: #6c757d;
-        margin-bottom: 25px;
-      }
-
-      /* Responsive */
-      @media (max-width: 768px) {
-        .page-header {
-          flex-direction: column;
-        }
-
-        .filters-section {
-          flex-direction: column;
-        }
-
-        .table-container {
-          overflow-x: auto;
-        }
-
-        .data-table {
-          min-width: 800px;
-        }
-      }
-    `,
-  ],
+  styleUrl: './rewards-list.component.scss',
 })
 export class RewardsListComponent implements OnInit {
   private readonly loyaltyAdminService = inject(LoyaltyAdminService);
   private readonly router = inject(Router);
   private readonly toastService = inject(ToastService);
+  private readonly confirmationDialog = inject(ConfirmationDialogService);
 
-  // Signals
   rewards = signal<LoyaltyRewardDto[]>([]);
   isLoading = signal(true);
   error = signal<string | null>(null);
   currentPage = signal(1);
   totalPages = signal(1);
   totalItems = signal(0);
+  showAdvancedFilters = signal(false);
 
-  // Filters
   selectedType = '';
   selectedStatus = '';
+  selectedAvailability = '';
   searchTerm = '';
-  pageSize = 15;
+  availableFrom = '';
+  availableUntil = '';
+  createdFrom = '';
+  createdTo = '';
+  pageSize = 20;
 
   ngOnInit(): void {
     this.loadRewards();
   }
 
-  /**
-   * Cargar premios
-   */
   private loadRewards(): void {
     this.isLoading.set(true);
     this.error.set(null);
 
-    const isActive =
-      this.selectedStatus === '' ? undefined : this.selectedStatus === 'true';
+    const query: GetLoyaltyRewardsQuery = {
+      page: this.currentPage(),
+      pageSize: this.pageSize,
+      isActive:
+        this.selectedStatus === '' ? undefined : this.selectedStatus === 'true',
+      rewardType: this.selectedType || undefined,
+      search: this.searchTerm.trim() || undefined,
+      availableFrom: this.toIsoStart(this.availableFrom),
+      availableUntil: this.toIsoEnd(this.availableUntil),
+      createdFrom: this.toIsoStart(this.createdFrom),
+      createdTo: this.toIsoEnd(this.createdTo),
+      isCurrentlyAvailable:
+        this.selectedAvailability === ''
+          ? undefined
+          : this.selectedAvailability === 'true',
+    };
 
-    this.loyaltyAdminService
-      .listRewards({
-        page: this.currentPage(),
-        pageSize: this.pageSize,
-        isActive,
-        rewardType: this.selectedType || undefined,
-      })
-      .subscribe({
-        next: (response: PagedLoyaltyRewardsResponse) => {
-          let items = response.items;
+    this.loyaltyAdminService.listRewards(query).subscribe({
+      next: (response: PagedLoyaltyRewardsResponse) => {
+        this.rewards.set(response.items || []);
 
-          // Filtro local por búsqueda (en producción debería ser server-side)
-          if (this.searchTerm) {
-            items = items.filter(
-              (r) =>
-                r.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                r.description
-                  .toLowerCase()
-                  .includes(this.searchTerm.toLowerCase())
-            );
-          }
+        const total =
+          response.totalItems ??
+          response.totalCount ??
+          response.items?.length ??
+          0;
+        this.totalItems.set(total);
 
-          this.rewards.set(items);
+        if (response.totalPages && response.totalPages > 0) {
           this.totalPages.set(response.totalPages);
-          this.totalItems.set(response.totalItems);
-          this.isLoading.set(false);
-        },
-        error: (err) => {
-          this.error.set(
-            'No se pudieron cargar los premios. Por favor, intenta de nuevo.'
-          );
-          this.isLoading.set(false);
-        },
-      });
+        } else {
+          this.totalPages.set(Math.max(1, Math.ceil(total / this.pageSize)));
+        }
+
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.error.set(
+          'No se pudieron cargar los premios. Intenta nuevamente.'
+        );
+        this.isLoading.set(false);
+      },
+    });
   }
 
-  /**
-   * Cambio en filtros
-   */
   onFilterChange(): void {
     this.currentPage.set(1);
     this.loadRewards();
   }
 
-  /**
-   * Cambio en búsqueda (con debounce idealmente)
-   */
   onSearchChange(): void {
     this.currentPage.set(1);
     this.loadRewards();
   }
 
-  /**
-   * Ir a página
-   */
+  search(): void {
+    this.onSearchChange();
+  }
+
+  toggleAdvancedFilters(): void {
+    this.showAdvancedFilters.update((value) => !value);
+  }
+
+  clearFilters(): void {
+    this.selectedType = '';
+    this.selectedStatus = '';
+    this.selectedAvailability = '';
+    this.searchTerm = '';
+    this.availableFrom = '';
+    this.availableUntil = '';
+    this.createdFrom = '';
+    this.createdTo = '';
+    this.currentPage.set(1);
+    this.loadRewards();
+  }
+
   goToPage(page: number): void {
     this.currentPage.set(page);
     this.loadRewards();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  /**
-   * Obtener etiqueta del tipo
-   */
   getRewardTypeLabel(type: string): string {
     return REWARD_TYPE_LABELS[type] || type;
   }
 
-  /**
-   * Truncar descripción
-   */
-  truncateDescription(desc: string): string {
-    return desc.length > 60 ? desc.substring(0, 60) + '...' : desc;
+  getCouponQuantityLabel(reward: LoyaltyRewardDto): string {
+    const quantity = reward.couponQuantity ?? reward.stock;
+
+    if (quantity === null || quantity === undefined) {
+      return 'Ilimitado';
+    }
+
+    if (quantity === 0) {
+      return '0';
+    }
+
+    return `${quantity}`;
   }
 
-  /**
-   * Activar/desactivar premio
-   */
-  toggleRewardStatus(reward: LoyaltyRewardDto): void {
-    const newStatus = !reward.isActive;
-
-    const updateRequest: UpdateLoyaltyRewardRequest = {
-      name: reward.name,
-      description: reward.description,
-      rewardType: reward.rewardType,
-      pointsCost: reward.pointsCost,
-      discountValue: reward.discountValue,
-      productId: reward.productId,
-      imageUrl: reward.imageUrl,
-      stock: reward.stock,
-      isActive: newStatus,
-      validityDays: reward.validityDays,
-      termsAndConditions: reward.termsAndConditions,
-      displayOrder: reward.displayOrder,
-    };
-
-    this.loyaltyAdminService.updateReward(reward.id, updateRequest).subscribe({
-      next: () => {
-        reward.isActive = newStatus;
-        this.rewards.set([...this.rewards()]);
-        this.toastService.success(
-          newStatus
-            ? 'Premio activado exitosamente'
-            : 'Premio desactivado exitosamente'
-        );
-      },
-      error: (err) => {
-        this.toastService.error('No se pudo actualizar el estado del premio');
-      },
-    });
+  getAvailabilityLabel(reward: LoyaltyRewardDto): string {
+    const available = this.isCurrentlyAvailable(reward);
+    return available ? 'Disponible ahora' : 'No disponible';
   }
 
-  /**
-   * Crear nuevo premio
-   */
+  isCurrentlyAvailable(reward: LoyaltyRewardDto): boolean {
+    if (typeof reward.isCurrentlyAvailable === 'boolean') {
+      return reward.isCurrentlyAvailable;
+    }
+
+    if (!reward.isActive) {
+      return false;
+    }
+
+    const now = Date.now();
+    const from = reward.availableFrom
+      ? new Date(reward.availableFrom).getTime()
+      : null;
+    const until = reward.availableUntil
+      ? new Date(reward.availableUntil).getTime()
+      : null;
+
+    if (from !== null && now < from) {
+      return false;
+    }
+
+    if (until !== null && now > until) {
+      return false;
+    }
+
+    return true;
+  }
+
   createReward(): void {
     this.router.navigate(['/tenant-admin/loyalty/rewards/new']);
   }
 
-  /**
-   * Editar premio
-   */
   editReward(reward: LoyaltyRewardDto): void {
     this.router.navigate(['/tenant-admin/loyalty/rewards', reward.id, 'edit']);
   }
 
-  /**
-   * Eliminar premio
-   */
   deleteReward(reward: LoyaltyRewardDto): void {
-    if (confirm(`¿Estás seguro de eliminar el premio "${reward.name}"?`)) {
-      this.loyaltyAdminService.deleteReward(reward.id).subscribe({
-        next: () => {
-          this.toastService.success('Premio eliminado exitosamente');
-          this.loadRewards();
-        },
-        error: (err) => {
-          this.toastService.error('No se pudo eliminar el premio');
-        },
+    this.confirmationDialog
+      .confirmDelete(
+        reward.name,
+        'Si el premio tiene canjes, el backend aplicará desactivación (soft delete).'
+      )
+      .subscribe((confirmed) => {
+        if (!confirmed) {
+          return;
+        }
+
+        this.loyaltyAdminService.deleteReward(reward.id).subscribe({
+          next: () => {
+            this.toastService.success(
+              'Premio eliminado/desactivado correctamente'
+            );
+            this.loadRewards();
+          },
+          error: () => {
+            this.toastService.error('No se pudo eliminar el premio');
+          },
+        });
       });
+  }
+
+  trackByRewardId(_: number, reward: LoyaltyRewardDto): string {
+    return reward.id;
+  }
+
+  private toIsoStart(dateValue: string): string | undefined {
+    if (!dateValue) {
+      return undefined;
     }
+
+    return `${dateValue}T00:00:00Z`;
+  }
+
+  private toIsoEnd(dateValue: string): string | undefined {
+    if (!dateValue) {
+      return undefined;
+    }
+
+    return `${dateValue}T23:59:59Z`;
   }
 }

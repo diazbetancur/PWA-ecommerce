@@ -1,0 +1,133 @@
+<div class="dialog-shell">
+  <div class="dialog-header">
+    <h2>
+      @if (selectionMode() === 'multiple') { Seleccionar productos } @else {
+      Seleccionar producto }
+    </h2>
+    <button type="button" class="btn btn-secondary" (click)="close()">✕</button>
+  </div>
+
+  <div class="filters-row">
+    <div class="field">
+      <label for="searchTerm">Buscar por nombre</label>
+      <input
+        id="searchTerm"
+        type="text"
+        class="form-control"
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="search()"
+        placeholder="Nombre del producto"
+      />
+    </div>
+
+    <div class="field">
+      <label for="categoryId">Categoría</label>
+      <select
+        id="categoryId"
+        class="form-control"
+        [(ngModel)]="selectedCategoryId"
+        (change)="onCategoryChange()"
+      >
+        <option value="">Todas</option>
+        @for (category of categories(); track category.id) {
+        <option [value]="category.id">{{ category.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn btn-primary" (click)="search()">
+        Buscar
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+  <div class="loading-state">Cargando productos...</div>
+  } @else if (products().length === 0) {
+  <div class="empty-state">
+    No se encontraron productos con los filtros actuales.
+  </div>
+  } @else {
+  <div class="products-table-wrap">
+    <table class="products-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Nombre</th>
+          <th>SKU</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of products(); track product.id) {
+        <tr [class.selected]="isSelected(product.id)">
+          <td>
+            @if (selectionMode() === 'single') {
+            <input
+              [attr.id]="'select-product-' + product.id"
+              type="radio"
+              name="selectedProduct"
+              [checked]="isSelected(product.id)"
+              (change)="toggleProduct(product)"
+              title="Seleccionar producto"
+            />
+            } @else {
+            <input
+              [attr.id]="'select-product-' + product.id"
+              type="checkbox"
+              [checked]="isSelected(product.id)"
+              (change)="toggleProduct(product)"
+              title="Seleccionar producto"
+            />
+            }
+            <label class="sr-only" [attr.for]="'select-product-' + product.id">
+              Seleccionar {{ product.name }}
+            </label>
+          </td>
+          <td>{{ product.name }}</td>
+          <td>{{ product.sku || 'N/A' }}</td>
+          <td>{{ formatPrice(product.price) }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (totalPages() > 1) {
+  <div class="pagination">
+    <button
+      type="button"
+      class="btn btn-secondary"
+      [disabled]="page() === 1"
+      (click)="goToPage(page() - 1)"
+    >
+      ←
+    </button>
+    <span>Página {{ page() }} de {{ totalPages() }}</span>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      [disabled]="page() === totalPages()"
+      (click)="goToPage(page() + 1)"
+    >
+      →
+    </button>
+  </div>
+  } }
+
+  <div class="dialog-actions">
+    <button type="button" class="btn btn-secondary" (click)="close()">
+      Cancelar
+    </button>
+    <button
+      type="button"
+      class="btn btn-primary"
+      [disabled]="selectedProductIds().length === 0"
+      (click)="confirmSelection()"
+    >
+      @if (selectionMode() === 'multiple') { Usar productos seleccionados }
+      @else { Usar producto }
+    </button>
+  </div>
+</div>

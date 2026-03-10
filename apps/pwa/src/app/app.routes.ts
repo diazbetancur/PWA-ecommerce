@@ -19,6 +19,12 @@ export const appRoutes: Route[] = [
         loadChildren: () => import('@pwa/catalog').then((m) => m.catalogRoutes),
       },
       {
+        path: 'account/loyalty/redemptions',
+        canActivate: [AuthGuard],
+        loadComponent: () =>
+          import('@pwa/catalog').then((m) => m.LoyaltyRedemptionsPageComponent),
+      },
+      {
         path: 'account',
         loadChildren: () =>
           import('@pwa/features-account').then((m) => m.featuresAccountRoutes),
@@ -31,7 +37,6 @@ export const appRoutes: Route[] = [
       },
       {
         path: 'loyalty',
-        canActivate: [AuthGuard],
         loadChildren: () => import('@pwa/catalog').then((m) => m.loyaltyRoutes),
       },
     ],

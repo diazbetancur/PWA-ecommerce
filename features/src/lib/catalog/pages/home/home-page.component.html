@@ -159,6 +159,7 @@
         @for (product of featuredProducts(); track product.id) {
         <app-product-card
           [product]="mapProductToCard(product)"
+          [openQuickViewOnCardClick]="true"
           (addToCart)="onAddToCart($event)"
           (quickView)="onQuickView($event)"
         />
@@ -182,4 +183,17 @@
       }
     </section>
   </div>
+
+  <lib-product-quick-view-modal
+    [isOpen]="isQuickViewOpen()"
+    [isLoading]="isQuickViewLoading()"
+    [product]="quickViewProduct()"
+    [quantity]="quickViewQuantity()"
+    [isFavorite]="quickViewIsFavorite()"
+    (closed)="closeQuickView()"
+    (addToCart)="addToCartFromQuickView()"
+    (increment)="incrementQuickViewQuantity()"
+    (decrement)="decrementQuickViewQuantity()"
+    (toggleFavorite)="toggleQuickViewFavorite()"
+  ></lib-product-quick-view-modal>
 </div>

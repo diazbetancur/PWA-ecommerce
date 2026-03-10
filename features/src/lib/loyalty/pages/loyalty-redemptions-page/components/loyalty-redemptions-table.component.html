@@ -1,0 +1,76 @@
+<section class="table-shell" aria-label="Mis premios redimidos">
+  <table class="desktop-table">
+    <thead>
+      <tr>
+        <th>Premio</th>
+        <th>Tipo</th>
+        <th>Puntos usados</th>
+        <th>Estado</th>
+        <th>Código</th>
+        <th>Fecha de canje</th>
+        <th>Fecha de expiración</th>
+        <th>Fecha de entrega</th>
+        <th>Pedido</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of items(); track item.id) {
+      <tr>
+        <td>{{ item.rewardName }}</td>
+        <td>{{ getRewardTypeLabel(item.rewardType) }}</td>
+        <td>{{ item.pointsSpent | number : '1.0-0' }}</td>
+        <td>
+          <lib-loyalty-redemption-status-badge [status]="item.status" />
+        </td>
+        <td>{{ couponCodeValue(item.couponCode) }}</td>
+        <td>{{ formatRedeemedDate(item.redeemedAt) }}</td>
+        <td>{{ formatRedeemedDate(item.expiresAt) }}</td>
+        <td>{{ deliveredAtValue(item.deliveredAt) }}</td>
+        <td>{{ orderNumberValue(item.orderNumber) }}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+
+  <div class="mobile-list">
+    @for (item of items(); track item.id) {
+    <article class="mobile-card">
+      <header>
+        <h3>{{ item.rewardName }}</h3>
+        <lib-loyalty-redemption-status-badge [status]="item.status" />
+      </header>
+
+      <dl>
+        <div>
+          <dt>Tipo</dt>
+          <dd>{{ getRewardTypeLabel(item.rewardType) }}</dd>
+        </div>
+        <div>
+          <dt>Puntos usados</dt>
+          <dd>{{ item.pointsSpent | number : '1.0-0' }}</dd>
+        </div>
+        <div>
+          <dt>Código</dt>
+          <dd>{{ couponCodeValue(item.couponCode) }}</dd>
+        </div>
+        <div>
+          <dt>Fecha de canje</dt>
+          <dd>{{ formatRedeemedDate(item.redeemedAt) }}</dd>
+        </div>
+        <div>
+          <dt>Fecha de expiración</dt>
+          <dd>{{ formatDate(item.expiresAt) }}</dd>
+        </div>
+        <div>
+          <dt>Fecha de entrega</dt>
+          <dd>{{ deliveredAtValue(item.deliveredAt) }}</dd>
+        </div>
+        <div>
+          <dt>Pedido</dt>
+          <dd>{{ orderNumberValue(item.orderNumber) }}</dd>
+        </div>
+      </dl>
+    </article>
+    }
+  </div>
+</section>

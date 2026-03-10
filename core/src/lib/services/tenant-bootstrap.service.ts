@@ -125,7 +125,6 @@ export class TenantBootstrapService {
         return;
       }
 
-
       if (this.config.enableCache) {
         const cached = this.getCachedConfig(strategy.value);
         if (cached) {
@@ -161,7 +160,6 @@ export class TenantBootstrapService {
   }
 
   private resolveTenantStrategy(): TenantResolutionStrategy {
-
     const urlParams = new URLSearchParams(this.document.location.search);
     const queryTenant = urlParams.get('tenant');
 
@@ -217,8 +215,7 @@ export class TenantBootstrapService {
             priority: 1,
           };
         }
-      } catch {
-      }
+      } catch {}
     }
 
     const hostname = this.document.location.hostname;

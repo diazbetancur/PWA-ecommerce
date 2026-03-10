@@ -12,6 +12,8 @@ import {
   LoyaltyRewardDto,
   PagedLoyaltyRedemptionsResponse,
   PagedLoyaltyRewardsResponse,
+  PointsAdjustmentFilters,
+  PointsAdjustmentResponse,
   UpdateLoyaltyConfigRequest,
   UpdateLoyaltyRewardRequest,
   UpdateRedemptionStatusRequest,
@@ -149,6 +151,27 @@ export class LoyaltyAdminService {
     }
     if (query.rewardType) {
       params = params.set('rewardType', query.rewardType);
+    }
+    if (query.search) {
+      params = params.set('search', query.search);
+    }
+    if (query.availableFrom) {
+      params = params.set('availableFrom', query.availableFrom);
+    }
+    if (query.availableUntil) {
+      params = params.set('availableUntil', query.availableUntil);
+    }
+    if (query.createdFrom) {
+      params = params.set('createdFrom', query.createdFrom);
+    }
+    if (query.createdTo) {
+      params = params.set('createdTo', query.createdTo);
+    }
+    if (query.isCurrentlyAvailable !== undefined) {
+      params = params.set(
+        'isCurrentlyAvailable',
+        query.isCurrentlyAvailable.toString()
+      );
     }
 
     return this.apiClient.get<PagedLoyaltyRewardsResponse>(
@@ -429,6 +452,32 @@ omer(redemptionId);
     return this.apiClient.post<AdjustPointsResponse>(
       `${this.baseUrl}/points/adjust`,
       request
+    );
+  }
+
+  /**
+   * Obtiene historial de ajustes manuales de puntos
+   */
+  listPointsAdjustments(
+    filters: PointsAdjustmentFilters
+  ): Observable<PointsAdjustmentResponse> {
+    let params = new HttpParams()
+      .set('page', filters.page.toString())
+      .set('pageSize', filters.pageSize.toString());
+
+    if (filters.search) {
+      params = params.set('search', filters.search);
+    }
+    if (filters.fromDate) {
+      params = params.set('fromDate', filters.fromDate);
+    }
+    if (filters.toDate) {
+      params = params.set('toDate', filters.toDate);
+    }
+
+    return this.apiClient.get<PointsAdjustmentResponse>(
+      `${this.baseUrl}/points/adjustments`,
+      { params }
     );
   }
 

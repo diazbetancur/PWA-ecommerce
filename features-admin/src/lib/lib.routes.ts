@@ -147,6 +147,26 @@ export const featuresAdminRoutes: Route[] = [
         },
       },
       {
+        path: 'rewards/new',
+        loadComponent: () =>
+          import('./pages/loyalty/reward-form/reward-form.component').then(
+            (m) => m.RewardFormComponent
+          ),
+        data: {
+          title: 'Crear Premio',
+        },
+      },
+      {
+        path: 'rewards/:id/edit',
+        loadComponent: () =>
+          import('./pages/loyalty/reward-form/reward-form.component').then(
+            (m) => m.RewardFormComponent
+          ),
+        data: {
+          title: 'Editar Premio',
+        },
+      },
+      {
         path: 'rewards',
         loadComponent: () =>
           import('./pages/loyalty/rewards-list/rewards-list.component').then(
@@ -167,13 +187,23 @@ export const featuresAdminRoutes: Route[] = [
         },
       },
       {
+        path: 'points-adjustments',
+        loadComponent: () =>
+          import(
+            './pages/loyalty/points-adjustments-page/loyalty-points-adjustments-page.component'
+          ).then((m) => m.LoyaltyPointsAdjustmentsPageComponent),
+        data: {
+          title: 'Historial de Ajustes de Puntos',
+        },
+      },
+      {
         path: 'points-adjustment',
         loadComponent: () =>
           import(
             './pages/loyalty/points-adjustment/points-adjustment.component'
           ).then((m) => m.PointsAdjustmentComponent),
         data: {
-          title: 'Ajustar Puntos',
+          title: 'Hacer Ajuste de Puntos',
         },
       },
       {

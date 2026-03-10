@@ -1,0 +1,83 @@
+.table-shell {
+  border: 1px solid var(--tenant-border-color, #e5e7eb);
+  border-radius: 14px;
+  background: var(--tenant-background-color, #fff);
+  overflow: hidden;
+}
+
+.desktop-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.desktop-table th,
+.desktop-table td {
+  text-align: left;
+  padding: 0.75rem 0.8rem;
+  border-bottom: 1px solid var(--tenant-border-color, #eef2f7);
+  font-size: 0.86rem;
+  color: var(--tenant-text-color, #1f2937);
+}
+
+.desktop-table th {
+  background: var(--tenant-surface-color, #f8fafc);
+  color: var(--tenant-text-muted-color, #64748b);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.mobile-list {
+  display: none;
+}
+
+.mobile-card {
+  padding: 0.85rem;
+  border-bottom: 1px solid var(--tenant-border-color, #eef2f7);
+}
+
+.mobile-card:last-child {
+  border-bottom: none;
+}
+
+.mobile-card header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.65rem;
+}
+
+.mobile-card h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--tenant-text-color, #1f2937);
+}
+
+.mobile-card dl {
+  margin: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.mobile-card dt {
+  font-size: 0.72rem;
+  color: var(--tenant-text-muted-color, #6b7280);
+  text-transform: uppercase;
+}
+
+.mobile-card dd {
+  margin: 0.15rem 0 0;
+  color: var(--tenant-text-color, #0f172a);
+  font-size: 0.84rem;
+}
+
+@media (max-width: 960px) {
+  .desktop-table {
+    display: none;
+  }
+
+  .mobile-list {
+    display: block;
+  }
+}

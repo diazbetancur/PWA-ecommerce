@@ -38,6 +38,7 @@ export class ProductCardComponent {
   readonly product = input.required<ProductCardData>();
   readonly showStock = input<boolean>(false);
   readonly showStockBadge = input<boolean>(true);
+  readonly openQuickViewOnCardClick = input<boolean>(false);
 
   // Outputs
   readonly addToCart = output<ProductCardData>();
@@ -85,12 +86,41 @@ export class ProductCardComponent {
   });
 
   // Event handlers
-  onAddToCart(): void {
+  onAddToCart(event?: Event): void {
+    event?.stopPropagation();
     this.addToCart.emit(this.product());
   }
 
-  onQuickView(): void {
+  onQuickView(event?: Event): void {
+    event?.stopPropagation();
     this.quickView.emit(this.product());
+  }
+
+  onCardClick(event: MouseEvent): void {
+    if (!this.openQuickViewOnCardClick()) {
+      return;
+    }
+
+    const target = event.target as HTMLElement;
+    if (
+      target.closest('.add-to-cart-btn') ||
+      target.closest('.quick-view-btn')
+    ) {
+      return;
+    }
+
+    this.quickView.emit(this.product());
+  }
+
+  onCardKeydown(event: KeyboardEvent): void {
+    if (!this.openQuickViewOnCardClick()) {
+      return;
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.quickView.emit(this.product());
+    }
   }
 
   onImageError(event: Event): void {

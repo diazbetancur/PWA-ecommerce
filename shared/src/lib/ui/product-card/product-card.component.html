@@ -1,4 +1,15 @@
-<article class="product-card" [style.--primary-color]="primaryColor()">
+<article
+  class="product-card"
+  [class.quick-view-enabled]="openQuickViewOnCardClick()"
+  [style.--primary-color]="primaryColor()"
+  [attr.role]="openQuickViewOnCardClick() ? 'button' : null"
+  [attr.tabindex]="openQuickViewOnCardClick() ? 0 : null"
+  [attr.aria-label]="
+    openQuickViewOnCardClick() ? 'Ver detalle de ' + product().name : null
+  "
+  (click)="onCardClick($event)"
+  (keydown)="onCardKeydown($event)"
+>
   <!-- Imagen del producto -->
   <div class="product-image-container">
     <img
@@ -17,8 +28,9 @@
     <!-- Overlay de acciones al hover -->
     <div class="product-overlay">
       <button
+        type="button"
         class="quick-view-btn"
-        (click)="onQuickView()"
+        (click)="onQuickView($event)"
         [attr.aria-label]="'Vista rápida de ' + product().name"
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -37,10 +49,25 @@
       {{ product().name }}
     </h3>
 
+    @if (product().shortDescription) {
+    <p
+      class="product-short-description"
+      [title]="product().shortDescription || ''"
+    >
+      {{ product().shortDescription }}
+    </p>
+    }
+
     <div class="product-price-section">
       <span class="product-price">
         {{ product().price | tenantCurrency }}
       </span>
+
+      @if (product().compareAtPrice != null) {
+      <span class="compare-at-price">
+        {{ product().compareAtPrice | tenantCurrency }}
+      </span>
+      }
 
       <!-- @if (showStock() && isInStock()) {
       <span class="stock-info"> {{ product().stock }} disponibles </span>
@@ -51,8 +78,9 @@
     <div class="product-actions">
       @if (isInStock() || !product().stock) {
       <button
+        type="button"
         class="add-to-cart-btn"
-        (click)="onAddToCart()"
+        (click)="onAddToCart($event)"
         [attr.aria-label]="'Agregar ' + product().name + ' al carrito'"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -63,15 +91,17 @@
         Agregar
       </button>
       } @else {
-      <button class="out-of-stock-btn" disabled>Sin Stock</button>
+      <button type="button" class="out-of-stock-btn" disabled>Sin Stock</button>
       }
     </div>
   </div>
 
   <!-- Link invisible para navegación -->
+  @if (!openQuickViewOnCardClick()) {
   <a
     [routerLink]="['/product', product().id]"
     class="product-link"
     [attr.aria-label]="'Ver detalles de ' + product().name"
   ></a>
+  }
 </article>

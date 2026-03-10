@@ -1,0 +1,176 @@
+<div class="cart-page">
+  <div class="container">
+    <header class="cart-header">
+      <h1>Carrito de compras</h1>
+      <button type="button" class="link-btn" (click)="continueShopping()">
+        Seguir comprando
+      </button>
+    </header>
+
+    @if (cartLines().length === 0) {
+    <section class="empty-state">
+      <h2>Tu carrito está vacío</h2>
+      <p>Agrega productos desde el catálogo para continuar.</p>
+      <button type="button" class="primary-btn" (click)="continueShopping()">
+        Ir al catálogo
+      </button>
+    </section>
+    } @else {
+    <div class="cart-layout">
+      <section class="cart-lines">
+        @for (line of cartLines(); track line.productId) {
+        <article class="cart-line">
+          <img
+            [src]="line.imageUrl || '/assets/images/product-placeholder.webp'"
+            [alt]="line.name"
+            title="Producto"
+            class="line-image"
+            loading="lazy"
+          />
+
+          <div class="line-info">
+            <h3>{{ line.name }}</h3>
+            <p>{{ line.unitPrice | tenantCurrency }} c/u</p>
+          </div>
+
+          <fieldset class="line-qty">
+            <legend class="sr-only">Cantidad</legend>
+            @if (line.quantity === 1) {
+            <button
+              type="button"
+              class="qty-btn"
+              (click)="remove(line.productId)"
+              aria-label="Eliminar producto"
+              title="Eliminar"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M8 6V4h8v2" />
+                <path d="M19 6l-1 14H6L5 6" />
+                <line x1="10" y1="11" x2="10" y2="17" />
+                <line x1="14" y1="11" x2="14" y2="17" />
+              </svg>
+            </button>
+            } @else {
+            <button
+              type="button"
+              class="qty-btn"
+              (click)="decrement(line.productId)"
+              aria-label="Disminuir cantidad"
+              title="Disminuir"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+            }
+
+            <span>{{ line.quantity }}</span>
+
+            <button
+              type="button"
+              class="qty-btn"
+              (click)="increment(line.productId)"
+              aria-label="Aumentar cantidad"
+              title="Aumentar"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+          </fieldset>
+
+          <p class="line-total">{{ line.quantity * line.unitPrice | tenantCurrency }}</p>
+        </article>
+        }
+      </section>
+
+      <aside class="checkout-panel">
+        <section class="panel-card">
+          <h3>Cupón</h3>
+          <div class="coupon-row">
+            <input
+              type="text"
+              [value]="couponCode()"
+              (input)="couponCode.set($any($event.target).value)"
+              placeholder="Ingresa tu cupón"
+            />
+            <button type="button" class="secondary-btn" (click)="applyCoupon()">
+              Aplicar
+            </button>
+          </div>
+          @if (couponMessage()) {
+          <p class="coupon-message" [class.ok]="couponApplied()">{{ couponMessage() }}</p>
+          }
+        </section>
+
+        <section class="panel-card">
+          <h3>Entrega</h3>
+          <div class="choice-list">
+            <button
+              type="button"
+              class="choice-btn"
+              [class.active]="deliveryMode() === 'pickup'"
+              (click)="deliveryMode.set('pickup')"
+            >
+              Recogida en tienda
+            </button>
+            <button
+              type="button"
+              class="choice-btn"
+              [class.active]="deliveryMode() === 'delivery'"
+              (click)="deliveryMode.set('delivery')"
+            >
+              Envío a domicilio
+            </button>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <h3>Pago</h3>
+          <div class="choice-list">
+            <button
+              type="button"
+              class="choice-btn"
+              [class.active]="paymentMode() === 'gateway-card'"
+              (click)="paymentMode.set('gateway-card')"
+            >
+              Plataforma - Tarjeta
+            </button>
+            <button
+              type="button"
+              class="choice-btn"
+              [class.active]="paymentMode() === 'gateway-pse'"
+              (click)="paymentMode.set('gateway-pse')"
+            >
+              Plataforma - PSE
+            </button>
+          </div>
+        </section>
+
+        <section class="panel-card totals-card">
+          <div class="total-row">
+            <span>Productos</span>
+            <strong>{{ totalItems() }}</strong>
+          </div>
+          <div class="total-row">
+            <span>Subtotal</span>
+            <strong>{{ subtotal() | tenantCurrency }}</strong>
+          </div>
+          <div class="total-row">
+            <span>Envío</span>
+            <strong>{{ shippingCost() | tenantCurrency }}</strong>
+          </div>
+          <div class="total-row grand">
+            <span>Total</span>
+            <strong>{{ grandTotal() | tenantCurrency }}</strong>
+          </div>
+
+          <button type="button" class="pay-btn" (click)="payNow()">Pagar</button>
+        </section>
+      </aside>
+    </div>
+    }
+  </div>
+</div>

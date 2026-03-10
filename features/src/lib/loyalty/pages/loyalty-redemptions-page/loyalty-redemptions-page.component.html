@@ -1,0 +1,58 @@
+<div class="redemptions-page">
+  <header class="page-header">
+    <h1>Mis premios</h1>
+    <p>
+      Consulta el historial de premios redimidos y el estado de tus cupones.
+    </p>
+  </header>
+
+  <section class="filters-shell">
+    <lib-loyalty-redemptions-filters (applyFilters)="onApplyFilters($event)" />
+  </section>
+
+  @if (isLoading()) {
+  <section class="state-shell" aria-live="polite">
+    <div class="loader"></div>
+    <p>Cargando premios redimidos...</p>
+  </section>
+  } @else if (error()) {
+  <section class="state-shell error" role="alert">
+    <p>{{ error() }}</p>
+    <button type="button" class="btn-primary" (click)="loadRedemptions()">
+      Reintentar
+    </button>
+  </section>
+  } @else if (!hasItems()) {
+  <section class="state-shell empty">
+    <p>Aún no tienes premios redimidos.</p>
+  </section>
+  } @else {
+  <lib-loyalty-redemptions-table [items]="redemptions()" />
+
+  @if (showPagination()) {
+  <nav class="pagination" aria-label="Paginación de premios redimidos">
+    <button
+      type="button"
+      class="btn-secondary"
+      [disabled]="currentPage() === 1"
+      (click)="goToPage(currentPage() - 1)"
+    >
+      Anterior
+    </button>
+
+    <span>
+      Página {{ currentPage() }} de {{ totalPages() }} ·
+      {{ totalCount() }} registros
+    </span>
+
+    <button
+      type="button"
+      class="btn-secondary"
+      [disabled]="currentPage() === totalPages()"
+      (click)="goToPage(currentPage() + 1)"
+    >
+      Siguiente
+    </button>
+  </nav>
+  } }
+</div>

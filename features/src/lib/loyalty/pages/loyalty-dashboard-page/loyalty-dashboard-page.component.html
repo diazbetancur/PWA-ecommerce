@@ -1,0 +1,44 @@
+<div class="dashboard-page">
+  <header class="dashboard-header">
+    <h1>Programa de lealtad</h1>
+    <p>Consulta tus beneficios y tus últimos movimientos de puntos.</p>
+  </header>
+
+  @if (isLoading()) {
+  <section class="skeleton-grid" aria-hidden="true">
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+  </section>
+  <section class="skeleton-list" aria-hidden="true">
+    <div class="skeleton-line"></div>
+    <div class="skeleton-line"></div>
+    <div class="skeleton-line"></div>
+  </section>
+  } @if (error()) {
+  <section class="error-box" role="alert">
+    <p>{{ error() }}</p>
+    <button type="button" class="btn-primary" (click)="ngOnInit()">
+      Reintentar
+    </button>
+  </section>
+  } @if (!isLoading() && dashboard()) {
+  <section class="summary-grid">
+    <lib-loyalty-summary-card
+      [title]="'Tienes puntos disponibles'"
+      [value]="dashboard()!.balance"
+      [variant]="'primary'"
+    />
+
+    <lib-loyalty-summary-card
+      [title]="'Puntos próximos a vencer'"
+      [value]="dashboard()!.pointsExpiringIn60Days || 0"
+      [variant]="'secondary'"
+    />
+  </section>
+
+  <lib-loyalty-transactions-preview
+    [transactions]="lastTransactions()"
+    (viewAll)="goToHistory()"
+  />
+  }
+</div>

@@ -1,0 +1,57 @@
+@if (adjustment) {
+<div class="modal-overlay" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Detalle del ajuste</h3>
+      <button type="button" class="btn-close" (click)="close()">✕</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="detail-row">
+        <span class="label">Usuario</span>
+        <span class="value">{{ adjustment.userEmail }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Ajustado por</span>
+        <span class="value">{{ adjustment.adjustedByEmail }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Puntos</span>
+        <span class="value">{{ adjustment.points }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Tipo</span>
+        <span class="value">{{ adjustment.transactionType }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Fecha ajuste</span>
+        <span class="value">{{
+          adjustment.createdAt | date : 'dd/MM/yyyy HH:mm'
+        }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Observaciones</span>
+        <span class="value">{{ adjustment.observations || '-' }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Ticket</span>
+        <span class="value">{{ adjustment.ticketNumber || '-' }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Expira</span>
+        <span class="value">{{
+          adjustment.expiresAt
+            ? (adjustment.expiresAt | date : 'dd/MM/yyyy HH:mm')
+            : '-'
+        }}</span>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn-secondary" (click)="close()">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+}

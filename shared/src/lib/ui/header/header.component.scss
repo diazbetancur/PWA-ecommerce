@@ -103,6 +103,133 @@
   position: relative;
 }
 
+.cart-wrapper {
+  position: relative;
+}
+
+.cart-summary {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(380px, 90vw);
+  padding: 10px;
+  border-radius: 14px;
+  background: var(--tenant-background-color, #fff);
+  border: 1px solid var(--tenant-outline, #e5e7eb);
+  box-shadow: 0 14px 34px rgba(17, 24, 39, 0.16);
+  z-index: 70;
+}
+
+.summary-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-color, #374151);
+  cursor: pointer;
+}
+
+.summary-product {
+  display: flex;
+  gap: 10px;
+  padding-right: 18px;
+}
+
+.summary-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--tenant-surface-color, #f9fafb);
+}
+
+.summary-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.summary-name,
+.summary-meta,
+.summary-line-total,
+.summary-totals {
+  margin: 0;
+}
+
+.summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.summary-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-color, #374151);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.summary-meta {
+  margin-top: 2px;
+  font-size: 0.76rem;
+  color: var(--secondary-color, #64748b);
+}
+
+.summary-line-total {
+  margin-left: auto;
+  text-align: right;
+  flex-shrink: 0;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--tenant-text-color, #111827);
+}
+
+.summary-footer {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--tenant-outline, #e5e7eb);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.summary-totals {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.summary-count {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-color, #374151);
+}
+
+.summary-total {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--tenant-text-color, #111827);
+}
+
+.summary-view-cart {
+  text-decoration: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--tenant-primary-color, #3b82f6);
+  color: var(--tenant-on-primary, #fff);
+}
+
 .cart-badge {
   position: absolute;
   top: 0;

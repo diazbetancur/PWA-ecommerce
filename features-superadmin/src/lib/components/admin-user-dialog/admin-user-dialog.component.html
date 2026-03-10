@@ -14,18 +14,18 @@
   <mat-dialog-content class="dialog-content">
     <!-- Success Message -->
     @if (successMessage()) {
-      <div class="success-banner">
-        <mat-icon>check_circle</mat-icon>
-        <p [innerHTML]="successMessage()"></p>
-      </div>
+    <div class="success-banner">
+      <mat-icon>check_circle</mat-icon>
+      <p [innerHTML]="successMessage()"></p>
+    </div>
     }
 
     <!-- Error Message -->
     @if (error()) {
-      <div class="error-banner">
-        <mat-icon>error</mat-icon>
-        <p>{{ error() }}</p>
-      </div>
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
     }
 
     <!-- Form -->
@@ -42,7 +42,7 @@
         />
         <mat-icon matPrefix>email</mat-icon>
         @if (hasError('email')) {
-          <mat-error>{{ getFieldError('email') }}</mat-error>
+        <mat-error>{{ getFieldError('email') }}</mat-error>
         }
       </mat-form-field>
 
@@ -57,73 +57,72 @@
         />
         <mat-icon matPrefix>person</mat-icon>
         @if (hasError('fullName')) {
-          <mat-error>{{ getFieldError('fullName') }}</mat-error>
+        <mat-error>{{ getFieldError('fullName') }}</mat-error>
         }
       </mat-form-field>
 
       <!-- Contraseña (solo en modo creación) -->
       @if (!isEditMode) {
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Contraseña Temporal</mat-label>
-          <input
-            matInput
-            type="password"
-            formControlName="password"
-            placeholder="Mínimo 8 caracteres"
-            autocomplete="new-password"
-          />
-          <mat-icon matPrefix>lock</mat-icon>
-          @if (hasError('password')) {
-            <mat-error>{{ getFieldError('password') }}</mat-error>
-          }
-          <mat-hint>Mínimo 8 caracteres. El usuario deberá cambiarla en el primer login.</mat-hint>
-        </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Contraseña Temporal</mat-label>
+        <input
+          matInput
+          type="password"
+          formControlName="password"
+          placeholder="Mínimo 8 caracteres"
+          autocomplete="new-password"
+        />
+        <mat-icon matPrefix>lock</mat-icon>
+        @if (hasError('password')) {
+        <mat-error>{{ getFieldError('password') }}</mat-error>
+        }
+        <mat-hint
+          >Mínimo 8 caracteres. El usuario deberá cambiarla en el primer
+          login.</mat-hint
+        >
+      </mat-form-field>
 
-        <!-- Roles (solo en modo creación) -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Roles</mat-label>
-          <mat-select
-            formControlName="roleNames"
-            multiple
-            placeholder="Seleccione al menos un rol"
-          >
-            @for (role of roleOptions; track role) {
-              <mat-option [value]="role">
-                <div class="role-option">
-                  <span class="role-name">{{ roleLabels[role].label }}</span>
-                  <span class="role-description">{{ roleLabels[role].description }}</span>
-                </div>
-              </mat-option>
-            }
-          </mat-select>
-          <mat-icon matPrefix>admin_panel_settings</mat-icon>
-          @if (hasError('roleNames')) {
-            <mat-error>{{ getFieldError('roleNames') }}</mat-error>
+      <!-- Roles (solo en modo creación) -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Roles</mat-label>
+        <mat-select
+          formControlName="roleNames"
+          multiple
+          placeholder="Seleccione al menos un rol"
+        >
+          @for (role of roleOptions; track role) {
+          <mat-option [value]="role">
+            <div class="role-option">
+              <span class="role-name">{{ roleLabels[role].label }}</span>
+              <span class="role-description">{{
+                roleLabels[role].description
+              }}</span>
+            </div>
+          </mat-option>
           }
-        </mat-form-field>
+        </mat-select>
+        <mat-icon matPrefix>admin_panel_settings</mat-icon>
+        @if (hasError('roleNames')) {
+        <mat-error>{{ getFieldError('roleNames') }}</mat-error>
+        }
+      </mat-form-field>
       }
 
       <!-- Estado Activo/Inactivo (solo en modo edición) -->
       @if (isEditMode) {
-        <div class="checkbox-field">
-          <mat-checkbox formControlName="isActive">
-            Usuario activo
-          </mat-checkbox>
-          <p class="field-hint">
-            Los usuarios inactivos no podrán iniciar sesión en el sistema.
-          </p>
-        </div>
+      <div class="checkbox-field">
+        <mat-checkbox formControlName="isActive"> Usuario activo </mat-checkbox>
+        <p class="field-hint">
+          Los usuarios inactivos no podrán iniciar sesión en el sistema.
+        </p>
+      </div>
       }
     </form>
   </mat-dialog-content>
 
   <!-- Actions -->
   <mat-dialog-actions class="dialog-actions">
-    <button
-      mat-button
-      (click)="cancel()"
-      [disabled]="isSaving()"
-    >
+    <button mat-button (click)="cancel()" [disabled]="isSaving()">
       Cancelar
     </button>
     <button
@@ -134,14 +133,19 @@
       class="save-button"
     >
       @if (isSaving()) {
-        <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+      <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+      } @if (!isSaving()) {
+      <ng-container matButtonIcon>
+        <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
+      </ng-container>
       }
-      @if (!isSaving()) {
-        <ng-container matButtonIcon>
-          <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
-        </ng-container>
-      }
-      <span>{{ isSaving() ? 'Guardando...' : (isEditMode ? 'Guardar Cambios' : 'Crear Usuario') }}</span>
+      <span>{{
+        isSaving()
+          ? 'Guardando...'
+          : isEditMode
+          ? 'Guardar Cambios'
+          : 'Crear Usuario'
+      }}</span>
     </button>
   </mat-dialog-actions>
 </div>

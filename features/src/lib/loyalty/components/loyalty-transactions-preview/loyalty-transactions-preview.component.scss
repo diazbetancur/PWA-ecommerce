@@ -1,0 +1,34 @@
+.preview {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.preview__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.preview__header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.preview__link {
+  border: none;
+  background: transparent;
+  color: var(--tenant-accent-color, #ef4444);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.preview__link:hover {
+  text-decoration: underline;
+}

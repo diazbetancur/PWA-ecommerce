@@ -23,10 +23,10 @@
 
     <!-- Error Message -->
     @if (error()) {
-      <div class="error-banner">
-        <mat-icon>error</mat-icon>
-        <p>{{ error() }}</p>
-      </div>
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <p>{{ error() }}</p>
+    </div>
     }
 
     <!-- Roles List -->
@@ -38,26 +38,26 @@
 
       <div class="roles-list">
         @for (role of roleOptions(); track role.name) {
-          <div class="role-item" [class.role-selected]="role.selected">
-            <mat-checkbox
-              [(ngModel)]="role.selected"
-              (change)="onRoleToggle()"
-              [color]="'primary'"
-            >
-              <div class="role-content">
-                <div class="role-header">
-                  <span class="role-label">{{ role.label }}</span>
-                  <span
-                    class="role-badge"
-                    [style.background-color]="getRoleBadgeColor(role.color)"
-                  >
-                    {{ role.name }}
-                  </span>
-                </div>
-                <p class="role-description">{{ role.description }}</p>
+        <div class="role-item" [class.role-selected]="role.selected">
+          <mat-checkbox
+            [(ngModel)]="role.selected"
+            (change)="onRoleToggle()"
+            [color]="'primary'"
+          >
+            <div class="role-content">
+              <div class="role-header">
+                <span class="role-label">{{ role.label }}</span>
+                <span
+                  class="role-badge"
+                  [style.background-color]="getRoleBadgeColor(role.color)"
+                >
+                  {{ role.name }}
+                </span>
               </div>
-            </mat-checkbox>
-          </div>
+              <p class="role-description">{{ role.description }}</p>
+            </div>
+          </mat-checkbox>
+        </div>
         }
       </div>
     </div>
@@ -65,11 +65,7 @@
 
   <!-- Actions -->
   <mat-dialog-actions class="dialog-actions">
-    <button
-      mat-button
-      (click)="cancel()"
-      [disabled]="isSaving()"
-    >
+    <button mat-button (click)="cancel()" [disabled]="isSaving()">
       Cancelar
     </button>
     <button
@@ -80,12 +76,11 @@
       class="save-button"
     >
       @if (isSaving()) {
-        <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
-      }
-      @if (!isSaving()) {
-        <ng-container matButtonIcon>
-          <mat-icon>save</mat-icon>
-        </ng-container>
+      <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+      } @if (!isSaving()) {
+      <ng-container matButtonIcon>
+        <mat-icon>save</mat-icon>
+      </ng-container>
       }
       <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}</span>
     </button>

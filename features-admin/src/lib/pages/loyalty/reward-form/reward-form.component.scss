@@ -1,0 +1,226 @@
+.reward-form-page {
+  padding: 20px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0;
+    color: var(--tenant-text-color, #1f2937);
+  }
+
+  p {
+    margin: 0.35rem 0 0;
+    color: var(--tenant-text-muted-color, #6b7280);
+  }
+}
+
+.back-btn {
+  background: var(--tenant-surface-color, #fff);
+  border: 1px solid var(--tenant-border-color, #d1d5db);
+  color: var(--tenant-text-color, #1f2937);
+  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+  cursor: pointer;
+}
+
+.reward-form {
+  background: var(--tenant-surface-color, #fff);
+  border: 1px solid var(--tenant-border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.section {
+  margin-bottom: 1.4rem;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--tenant-border-color, #eceff3);
+
+  h2 {
+    margin: 0 0 0.9rem;
+    font-size: 1.05rem;
+    color: var(--tenant-text-color, #1f2937);
+  }
+
+  &:last-of-type {
+    margin-bottom: 0;
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+.grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  label {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--tenant-text-color, #374151);
+  }
+}
+
+.form-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--tenant-text-color, #374151);
+}
+
+.form-control {
+  width: 100%;
+  border: 1px solid var(--tenant-border-color, #d1d5db);
+  border-radius: 8px;
+  padding: 0.6rem 0.7rem;
+  color: var(--tenant-text-color, #111827);
+  background: var(--tenant-surface-color, #fff);
+
+  &:focus {
+    outline: none;
+    border-color: var(--tenant-primary-color, #2563eb);
+    box-shadow: 0 0 0 2px var(--tenant-primary-light, rgba(37, 99, 235, 0.15));
+  }
+}
+
+.product-picker-row {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.selected-product {
+  margin-top: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--tenant-border-color, #d1d5db);
+  border-radius: 8px;
+  background: var(--tenant-primary-light, #f8fafc);
+
+  strong {
+    color: var(--tenant-text-color, #1f2937);
+  }
+
+  span {
+    font-size: 0.82rem;
+    color: var(--tenant-text-muted-color, #6b7280);
+  }
+}
+
+.selected-products-list {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.55rem;
+
+  .selected-product {
+    margin-top: 0;
+  }
+}
+
+.field-hint {
+  margin: 0.45rem 0 0;
+  color: var(--tenant-text-muted-color, #6b7280);
+  font-size: 0.84rem;
+}
+
+.form-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+}
+
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: var(--tenant-primary-color, #2563eb);
+  color: var(--tenant-on-primary, #fff);
+}
+
+.btn-secondary {
+  background: var(--tenant-primary-light, #f3f4f6);
+  color: var(--tenant-text-color, #374151);
+  border: 1px solid var(--tenant-border-color, #d1d5db);
+}
+
+.loading-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: var(--tenant-surface-color, #fff);
+  border: 1px solid var(--tenant-border-color, #e5e7eb);
+  border-radius: 12px;
+  color: var(--tenant-text-muted-color, #6b7280);
+}
+
+.spinner {
+  width: 42px;
+  height: 42px;
+  border: 3px solid var(--tenant-border-color, #d1d5db);
+  border-top-color: var(--tenant-primary-color, #2563eb);
+  border-radius: 50%;
+  margin: 0 auto 0.75rem;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner-sm {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: var(--tenant-on-primary, #fff);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .grid-2,
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+}

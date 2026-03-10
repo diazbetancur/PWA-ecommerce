@@ -24,26 +24,77 @@
       >
       <a routerLink="/catalog" routerLinkActive="active">Productos</a>
       <a routerLink="/categories" routerLinkActive="active">Categorías</a>
+      @if (showRewardsCatalogMenu()) {
+      <a routerLink="/loyalty/rewards" routerLinkActive="active">Premios</a>
+      }
     </nav>
 
     <!-- Actions -->
     <div class="header-actions">
       <!-- Cart -->
-      <a routerLink="/cart" class="action-btn cart-btn" aria-label="Carrito">
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            d="M9 22a1 1 0 100-2 1 1 0 000 2zM20 22a1 1 0 100-2 1 1 0 000 2zM1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"
-          />
-        </svg>
-        @if (cartCount() > 0) {
-        <span class="cart-badge">{{ cartCount() }}</span>
+      <div class="cart-wrapper">
+        <a routerLink="/cart" class="action-btn cart-btn" aria-label="Carrito">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M9 22a1 1 0 100-2 1 1 0 000 2zM20 22a1 1 0 100-2 1 1 0 000 2zM1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"
+            />
+          </svg>
+          @if (cartCount() > 0) {
+          <span class="cart-badge">{{ cartCount() }}</span>
+          }
+        </a>
+
+        @if (showCartSummary() && lastAddedItem(); as lastItem) {
+        <div class="cart-summary">
+          <button
+            type="button"
+            class="summary-close"
+            (click)="closeCartSummary($event)"
+            aria-label="Cerrar resumen"
+            title="Cerrar"
+          >
+            ×
+          </button>
+
+          <div class="summary-product">
+            <img
+              [src]="
+                lastItem.imageUrl || '/assets/images/product-placeholder.webp'
+              "
+              [alt]="lastItem.name"
+              title="Producto agregado"
+              class="summary-image"
+              loading="lazy"
+            />
+
+            <div class="summary-text">
+              <div class="summary-head">
+                <p class="summary-name">{{ lastItem.name }}</p>
+                <p class="summary-line-total">
+                  {{ formatMoney(lastItem.quantity * lastItem.unitPrice) }}
+                </p>
+              </div>
+              <p class="summary-meta">
+                {{ lastItem.quantity }} x {{ formatMoney(lastItem.unitPrice) }}
+              </p>
+            </div>
+          </div>
+
+          <div class="summary-footer">
+            <p class="summary-totals">
+              <span class="summary-count">{{ cartCount() }} productos</span>
+              <span class="summary-total">{{ formatMoney(cartTotal()) }}</span>
+            </p>
+            <a routerLink="/cart" class="summary-view-cart">Ver carrito</a>
+          </div>
+        </div>
         }
-      </a>
+      </div>
 
       <!-- User -->
       @if (isAuthenticated()) {
@@ -69,9 +120,15 @@
             >Mi Perfil</a
           >
           <a routerLink="/orders" (click)="closeUserMenu()">Mis Pedidos</a>
+          @if (showLoyaltyMenu()) {
+          <a routerLink="/account/loyalty/redemptions" (click)="closeUserMenu()"
+            >Mis premios</a
+          >
+          } @if (showLoyaltyMenu()) {
           <a routerLink="/loyalty/account" (click)="closeUserMenu()"
             >💎 Programa de Lealtad</a
           >
+          }
           <button class="logout-btn" (click)="logout()">Cerrar Sesión</button>
         </div>
         }
@@ -156,6 +213,25 @@
       </svg>
       Categorías
     </a>
+    @if (showRewardsCatalogMenu()) {
+    <a
+      routerLink="/loyalty/rewards"
+      (click)="closeMobileMenu()"
+      routerLinkActive="active"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z"
+        />
+      </svg>
+      Premios
+    </a>
+    }
     <a routerLink="/cart" (click)="closeMobileMenu()" routerLinkActive="active">
       <svg
         viewBox="0 0 24 24"
@@ -201,6 +277,24 @@
       </svg>
       Mis Pedidos
     </a>
+    @if (showLoyaltyMenu()) {
+    <a
+      routerLink="/account/loyalty/redemptions"
+      (click)="closeMobileMenu()"
+      routerLinkActive="active"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <rect x="3" y="8" width="18" height="13" rx="2" />
+        <path d="M12 8V3" />
+        <path d="M8 5l4-2 4 2" />
+      </svg>
+      Mis premios
+    </a>
     <a
       routerLink="/loyalty/account"
       (click)="closeMobileMenu()"
@@ -218,6 +312,7 @@
       </svg>
       💎 Programa de Lealtad
     </a>
+    }
     <button class="mobile-logout" (click)="logout(); closeMobileMenu()">
       <svg
         viewBox="0 0 24 24"

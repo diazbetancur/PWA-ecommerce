@@ -9,7 +9,11 @@ import {
   signal,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { TenantContextService } from '@pwa/core';
+import {
+  AuthService,
+  PublicCartUiService,
+  TenantContextService,
+} from '@pwa/core';
 import { AccountService, TenantAuthModalService } from '@pwa/features-account';
 
 type HeaderThemeConfig = {
@@ -38,13 +42,18 @@ type HeaderThemeConfig = {
 export class HeaderComponent {
   private readonly tenantContext = inject(TenantContextService);
   private readonly accountService = inject(AccountService);
+  private readonly coreAuth = inject(AuthService);
   private readonly tenantAuthModal = inject(TenantAuthModalService);
+  private readonly publicCartUi = inject(PublicCartUiService);
   private readonly renderer = inject(Renderer2);
   private readonly document = inject(DOCUMENT);
 
   isMobileMenuOpen = signal(false);
   isUserMenuOpen = signal(false);
-  cartCount = signal(0); // TODO: Conectar con CartService
+  readonly cartCount = this.publicCartUi.totalItems;
+  readonly cartTotal = this.publicCartUi.totalAmount;
+  readonly lastAddedItem = this.publicCartUi.lastAddedLine;
+  readonly showCartSummary = this.publicCartUi.summaryVisible;
 
   logoUrl = computed(() => {
     const config = this.tenantContext.getCurrentTenantConfig();
@@ -69,6 +78,32 @@ export class HeaderComponent {
   });
 
   isAuthenticated = computed(() => this.accountService.state().isAuthenticated);
+
+  showRewardsCatalogMenu = computed(() => {
+    const config = this.tenantContext.getCurrentTenantConfig();
+    return config?.appFeatures?.enableLoyalty === true;
+  });
+
+  showLoyaltyMenu = computed(() => {
+    if (!this.isAuthenticated()) {
+      return false;
+    }
+
+    const roles = this.coreAuth.claims?.roles || [];
+    const isCustomer = roles.some((role) => role?.toLowerCase() === 'customer');
+
+    if (!isCustomer) {
+      return true;
+    }
+
+    const loyaltyEnabled = this.coreAuth.claims?.features?.['loyaltyEnabled'];
+    return loyaltyEnabled !== false;
+  });
+
+  currencyCode = computed(() => {
+    const config = this.tenantContext.getCurrentTenantConfig();
+    return config?.currency || 'COP';
+  });
 
   constructor() {
     effect(() => {
@@ -164,5 +199,19 @@ export class HeaderComponent {
     await this.accountService.logout();
     this.closeUserMenu();
     this.closeMobileMenu();
+  }
+
+  closeCartSummary(event?: Event): void {
+    event?.stopPropagation();
+    this.publicCartUi.hideSummary();
+  }
+
+  formatMoney(value: number): string {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: this.currencyCode(),
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(value);
   }
 }

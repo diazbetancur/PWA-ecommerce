@@ -1,0 +1,38 @@
+<div class="points-adjustments-page">
+  <div class="page-header">
+    <div>
+      <h1>Historial de Ajustes de Puntos</h1>
+      <p>Consulta los ajustes manuales realizados por administradores</p>
+    </div>
+
+    <button
+      type="button"
+      class="btn-make-adjustment"
+      (click)="goToMakeAdjustment()"
+    >
+      Hacer ajuste
+    </button>
+  </div>
+
+  <section class="filters-wrapper">
+    <lib-loyalty-adjustments-filters (applyFilters)="onApplyFilters($event)" />
+  </section>
+
+  <section class="table-wrapper">
+    <lib-loyalty-adjustments-table
+      [items]="adjustments()"
+      [isLoading]="isLoading()"
+      [error]="error()"
+      [currentPage]="currentPage()"
+      [totalPages]="totalPages()"
+      [totalCount]="totalCount()"
+      (pageChange)="onPageChange($event)"
+      (viewDetail)="onViewDetail($event)"
+    />
+  </section>
+
+  <lib-loyalty-adjustment-detail-modal
+    [adjustment]="selectedAdjustment()"
+    (closeModal)="closeDetailModal()"
+  />
+</div>

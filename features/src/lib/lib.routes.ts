@@ -1,10 +1,6 @@
 import { Route } from '@angular/router';
-import { CatalogPageComponent, CategoriesPageComponent } from './catalog/pages';
 
-export const catalogRoutes: Route[] = [
-  { path: '', component: CatalogPageComponent },
-  { path: 'categories', component: CategoriesPageComponent },
-];
+export { catalogRoutes } from './catalog/catalog.routes';
 
 /**
  * 💎 Rutas del Programa de Lealtad (Usuario)
@@ -20,6 +16,46 @@ export const loyaltyRoutes: Route[] = [
   },
   {
     path: 'account',
+    loadComponent: () =>
+      import(
+        './loyalty/pages/loyalty-dashboard-page/loyalty-dashboard-page.component'
+      ).then((m) => m.LoyaltyDashboardPageComponent),
+    data: {
+      title: 'Mi Cuenta de Lealtad',
+    },
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import(
+        './loyalty/pages/loyalty-dashboard-page/loyalty-dashboard-page.component'
+      ).then((m) => m.LoyaltyDashboardPageComponent),
+    data: {
+      title: 'Mi Cuenta de Lealtad',
+    },
+  },
+  {
+    path: 'transactions',
+    loadComponent: () =>
+      import(
+        './loyalty/pages/loyalty-transactions-history-page/loyalty-transactions-history-page.component'
+      ).then((m) => m.LoyaltyTransactionsHistoryPageComponent),
+    data: {
+      title: 'Historial de Puntos',
+    },
+  },
+  {
+    path: 'transactions-legacy',
+    loadComponent: () =>
+      import(
+        './loyalty/pages/transactions-history/transactions-history.component'
+      ).then((m) => m.TransactionsHistoryComponent),
+    data: {
+      title: 'Historial de Puntos (Legacy)',
+    },
+  },
+  {
+    path: 'legacy-account',
     loadComponent: () =>
       import('./loyalty/pages/loyalty-account/loyalty-account.component').then(
         (m) => m.LoyaltyAccountComponent
@@ -41,21 +77,11 @@ export const loyaltyRoutes: Route[] = [
   {
     path: 'redemptions',
     loadComponent: () =>
-      import('./loyalty/pages/my-redemptions/my-redemptions.component').then(
-        (m) => m.MyRedemptionsComponent
-      ),
-    data: {
-      title: 'Mis Canjes',
-    },
-  },
-  {
-    path: 'transactions',
-    loadComponent: () =>
       import(
-        './loyalty/pages/transactions-history/transactions-history.component'
-      ).then((m) => m.TransactionsHistoryComponent),
+        './loyalty/pages/loyalty-redemptions-page/loyalty-redemptions-page.component'
+      ).then((m) => m.LoyaltyRedemptionsPageComponent),
     data: {
-      title: 'Historial de Puntos',
+      title: 'Mis Premios',
     },
   },
 ];

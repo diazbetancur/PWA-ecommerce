@@ -7,6 +7,7 @@ export * from './api-client.service';
 export * from './app-env.service';
 export * from './manifest.service';
 export * from './product.service';
+export * from './public-cart-ui.service';
 export * from './public-product.service';
 export * from './seo.service';
 export * from './tenant-admin-menu.service';

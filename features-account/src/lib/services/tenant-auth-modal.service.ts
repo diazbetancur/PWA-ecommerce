@@ -2,12 +2,17 @@ import { inject, Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TenantAuthModalComponent } from '../components/tenant-auth-modal/tenant-auth-modal.component';
 
+export interface TenantAuthModalOptions {
+  redirectAfterAuth?: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class TenantAuthModalService {
   private readonly dialog = inject(MatDialog);
 
   open(
-    initialTab: 'login' | 'register' = 'login'
+    initialTab: 'login' | 'register' = 'login',
+    options?: TenantAuthModalOptions
   ): MatDialogRef<TenantAuthModalComponent> {
     const dialogRef = this.dialog.open(TenantAuthModalComponent, {
       width: '560px',
@@ -15,6 +20,10 @@ export class TenantAuthModalService {
       autoFocus: false,
       panelClass: 'tenant-auth-modal-panel',
       disableClose: false,
+      data: {
+        initialTab,
+        redirectAfterAuth: options?.redirectAfterAuth ?? true,
+      },
     });
 
     dialogRef.componentInstance.selectTab(initialTab);

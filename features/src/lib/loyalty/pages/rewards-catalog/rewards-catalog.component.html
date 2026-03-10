@@ -1,161 +1,168 @@
-<div class="rewards-catalog-page">
-  <!-- Header -->
-  <div class="page-header">
-    <h1>🎁 Catálogo de Premios</h1>
-    <p>Canjea tus puntos por productos y descuentos exclusivos</p>
-  </div>
+<div class="rewards-page">
+  <header class="page-header">
+    <h1>Premios</h1>
+    <p>Redime tus puntos por beneficios y descuentos disponibles.</p>
+  </header>
 
-  <!-- Filters -->
-  <div class="filters-section">
-    <div class="filter-group">
-      <label for="rewardType">Tipo de Premio:</label>
-      <select
-        id="rewardType"
-        [(ngModel)]="selectedType"
-        (change)="onFilterChange()"
-        class="form-select"
-      >
-        <option value="">Todos</option>
-        <option value="PRODUCT">Productos</option>
-        <option value="DISCOUNT_PERCENTAGE">Descuentos %</option>
-        <option value="DISCOUNT_FIXED">Descuentos Fijos</option>
-        <option value="FREE_SHIPPING">Envío Gratis</option>
-      </select>
-    </div>
-
-    <div class="filter-group">
-      <label for="sortBy">Ordenar por:</label>
-      <select
-        id="sortBy"
-        [(ngModel)]="sortBy"
-        (change)="sortRewards()"
-        class="form-select"
-      >
-        <option value="points-asc">Puntos: Menor a Mayor</option>
-        <option value="points-desc">Puntos: Mayor a Menor</option>
-        <option value="name-asc">Nombre: A-Z</option>
-        <option value="name-desc">Nombre: Z-A</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- Loading State -->
   @if (isLoading()) {
-  <div class="loading-container">
+  <section class="state-box">
     <div class="spinner"></div>
     <p>Cargando premios...</p>
-  </div>
-  }
-
-  <!-- Error State -->
-  @if (error()) {
-  <div class="alert alert-danger"><strong>Error:</strong> {{ error() }}</div>
-  }
-
-  <!-- Rewards Grid -->
-  @if (!isLoading() && displayedRewards().length > 0) {
-  <div class="rewards-grid">
-    @for (reward of displayedRewards(); track reward.id) {
-    <div class="reward-card" [class.out-of-stock]="isOutOfStock(reward)">
-      <!-- Image -->
-      <div class="reward-image">
-        @if (reward.imageUrl) {
-        <img [src]="reward.imageUrl" [alt]="reward.name" />
-        } @else {
-        <div class="placeholder-image">
-          {{ getRewardIcon(reward.rewardType) }}
-        </div>
-        }
-
-        <!-- Stock Badge -->
-        @if (isOutOfStock(reward)) {
-        <div class="stock-badge out">Agotado</div>
-        } @else if (isLowStock(reward)) {
-        <div class="stock-badge low">¡Últimas unidades!</div>
-        }
-
-        <!-- Type Badge -->
-        <div class="type-badge">
-          {{ getRewardTypeLabel(reward.rewardType) }}
-        </div>
+  </section>
+  } @else if (error()) {
+  <section class="state-box error" role="alert">
+    <p>{{ error() }}</p>
+    <button type="button" class="btn-secondary" (click)="loadRewards()">
+      Reintentar
+    </button>
+  </section>
+  } @else if (rewards().length === 0) {
+  <section class="state-box">
+    <p>No hay premios disponibles en este momento.</p>
+  </section>
+  } @else {
+  <section class="rewards-list" aria-label="Listado de premios">
+    @for (reward of rewards(); track reward.id) {
+    <article class="reward-card">
+      <div class="reward-image-wrap">
+        <img
+          [src]="reward.imageUrl || '/assets/images/product-placeholder.webp'"
+          [alt]="reward.name"
+          [title]="reward.name"
+          class="reward-image"
+          loading="lazy"
+        />
       </div>
 
-      <!-- Content -->
       <div class="reward-content">
-        <h3 class="reward-name">{{ reward.name }}</h3>
-        <p class="reward-description">{{ reward.description }}</p>
-
-        <!-- Reward Value -->
-        @if (reward.discountValue) {
-        <div class="reward-value">
-          <span class="value-icon">💰</span>
-          <span class="value-text">
-            @if (reward.rewardType === 'DISCOUNT_PERCENTAGE') {
-            {{ reward.discountValue }}% de descuento } @else {
-            {{ reward.discountValue | currency : 'USD' : 'symbol' : '1.2-2' }}
-            de descuento }
-          </span>
+        <h2>{{ reward.name }}</h2>
+        <p>{{ getPreviewDescription(reward) }}</p>
+        <div class="reward-meta">
+          <span class="type-chip">{{
+            getRewardTypeLabel(reward.rewardType)
+          }}</span>
+          <strong class="points"
+            >{{ reward.pointsCost | number : '1.0-0' }} pts</strong
+          >
         </div>
-        }
-
-        <!-- Points Cost -->
-        <div class="points-cost">
-          <span class="icon">💎</span>
-          <span class="cost">{{ reward.pointsCost | number : '1.0-0' }}</span>
-          <span class="label">puntos</span>
-        </div>
-
-        <!-- Action Button -->
-        <button
-          class="redeem-btn"
-          [disabled]="isOutOfStock(reward)"
-          (click)="redeemReward(reward)"
-        >
-          @if (isOutOfStock(reward)) { Agotado } @else { Canjear Ahora }
-        </button>
-
-        <!-- Validity Info -->
-        @if (reward.validityDays) {
-        <div class="validity-info">
-          ⏰ Válido por {{ reward.validityDays }} días
-        </div>
-        }
       </div>
-    </div>
-    }
-  </div>
 
-  <!-- Pagination -->
-  @if (totalPages() > 1) {
-  <div class="pagination">
+      <div class="reward-actions">
+        <button
+          type="button"
+          class="btn-secondary"
+          (click)="openDetail(reward)"
+        >
+          Ver detalle
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="!isRewardRedeemable(reward) || isRedeeming(reward.id)"
+          (click)="redeemFromCard(reward)"
+        >
+          @if (isRedeeming(reward.id)) { Redimiendo... } @else { Redimir }
+        </button>
+      </div>
+    </article>
+    }
+  </section>
+
+  @if (canShowPagination()) {
+  <nav class="pagination" aria-label="Paginación de premios">
     <button
-      class="page-btn"
+      type="button"
+      class="btn-secondary"
       [disabled]="currentPage() === 1"
       (click)="goToPage(currentPage() - 1)"
     >
-      ← Anterior
+      Anterior
     </button>
 
-    <span class="page-info">
-      Página {{ currentPage() }} de {{ totalPages() }}
-    </span>
+    <span
+      >Página {{ currentPage() }} de {{ totalPages() }} ·
+      {{ totalItems() }} registros</span
+    >
 
     <button
-      class="page-btn"
+      type="button"
+      class="btn-secondary"
       [disabled]="currentPage() === totalPages()"
       (click)="goToPage(currentPage() + 1)"
     >
-      Siguiente →
+      Siguiente
     </button>
-  </div>
-  } }
+  </nav>
+  } } @if (selectedReward(); as reward) {
+  <div
+    class="modal-backdrop"
+    tabindex="0"
+    (click)="closeDetail()"
+    (keydown)="onBackdropKeydown($event)"
+  >
+    <section
+      class="detail-modal"
+      tabindex="0"
+      aria-label="Detalle de premio"
+      (click)="stopModalClose($event)"
+      (keydown)="onModalKeydown($event)"
+    >
+      <img
+        [src]="reward.imageUrl || '/assets/images/product-placeholder.webp'"
+        [alt]="reward.name"
+        [title]="reward.name"
+        class="modal-image"
+        loading="lazy"
+      />
 
-  <!-- Empty State -->
-  @if (!isLoading() && displayedRewards().length === 0) {
-  <div class="empty-state">
-    <div class="empty-icon">🎁</div>
-    <h3>No hay premios disponibles</h3>
-    <p>Vuelve pronto para ver nuevos premios en el catálogo</p>
+      <div class="modal-content">
+        <h3>{{ reward.name }}</h3>
+        <p>{{ getPreviewDescription(reward) }}</p>
+
+        <dl>
+          <div>
+            <dt>Costo en puntos</dt>
+            <dd>{{ reward.pointsCost | number : '1.0-0' }} pts</dd>
+          </div>
+          <div>
+            <dt>Tipo</dt>
+            <dd>{{ getRewardTypeLabel(reward.rewardType) }}</dd>
+          </div>
+          <div>
+            <dt>Descuento</dt>
+            <dd>{{ getDiscountDetail(reward) }}</dd>
+          </div>
+          <div>
+            <dt>Disponibilidad</dt>
+            <dd>
+              @if (isRewardRedeemable(reward)) { Disponible } @else { No
+              disponible }
+            </dd>
+          </div>
+          <div>
+            <dt>Vigencia</dt>
+            <dd>
+              {{ formatDateTime(reward.availableFrom) }} -
+              {{ formatDateTime(reward.availableUntil) }}
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <footer class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="closeDetail()">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn-primary"
+          [disabled]="!isRewardRedeemable(reward) || isRedeeming(reward.id)"
+          (click)="redeemFromModal()"
+        >
+          @if (isRedeeming(reward.id)) { Redimiendo... } @else { Redimir }
+        </button>
+      </footer>
+    </section>
   </div>
   }
 </div>

@@ -1,15 +1,17 @@
+import { HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { ApiClientService } from '@pwa/core';
 import { Observable } from 'rxjs';
 import {
-  LoyaltyAccountSummaryDto,
-  GetLoyaltyTransactionsQuery,
-  PagedLoyaltyTransactionsResponse,
-  GetLoyaltyRewardsQuery,
-  PagedLoyaltyRewardsResponse,
-  RedeemRewardResponse,
   GetLoyaltyRedemptionsQuery,
-  PagedLoyaltyRedemptionsResponse,
+  GetLoyaltyRewardsQuery,
+  GetLoyaltyTransactionsQuery,
+  LoyaltyAccountSummaryDto,
+  LoyaltyRedemptionsFilters,
+  LoyaltyRedemptionsResponse,
+  PagedLoyaltyRewardsResponse,
+  PagedLoyaltyTransactionsResponse,
+  RedeemRewardResponse,
 } from '../models/loyalty.models';
 
 /**
@@ -36,7 +38,7 @@ import {
   providedIn: 'root',
 })
 export class LoyaltyService {
-  private readonly http = inject(HttpClient);
+  private readonly apiClient = inject(ApiClientService);
   private readonly baseUrl = '/me/loyalty';
 
   /**
@@ -60,8 +62,12 @@ export class LoyaltyService {
    * });
    * ```
    */
+  getDashboard(): Observable<LoyaltyAccountSummaryDto> {
+    return this.apiClient.get<LoyaltyAccountSummaryDto>(this.baseUrl);
+  }
+
   getMyAccount(): Observable<LoyaltyAccountSummaryDto> {
-    return this.http.get<LoyaltyAccountSummaryDto>(this.baseUrl);
+    return this.getDashboard();
   }
 
   /**
@@ -93,7 +99,7 @@ export class LoyaltyService {
    * });
    * ```
    */
-  getMyTransactions(
+  getTransactions(
     query: GetLoyaltyTransactionsQuery
   ): Observable<PagedLoyaltyTransactionsResponse> {
     let params = new HttpParams()
@@ -110,10 +116,16 @@ export class LoyaltyService {
       params = params.set('toDate', query.toDate);
     }
 
-    return this.http.get<PagedLoyaltyTransactionsResponse>(
+    return this.apiClient.get<PagedLoyaltyTransactionsResponse>(
       `${this.baseUrl}/transactions`,
       { params }
     );
+  }
+
+  getMyTransactions(
+    query: GetLoyaltyTransactionsQuery
+  ): Observable<PagedLoyaltyTransactionsResponse> {
+    return this.getTransactions(query);
   }
 
   /**
@@ -155,7 +167,7 @@ export class LoyaltyService {
       params = params.set('rewardType', query.rewardType);
     }
 
-    return this.http.get<PagedLoyaltyRewardsResponse>(
+    return this.apiClient.get<PagedLoyaltyRewardsResponse>(
       `${this.baseUrl}/rewards`,
       { params }
     );
@@ -193,7 +205,7 @@ export class LoyaltyService {
    * ```
    */
   redeemReward(rewardId: string): Observable<RedeemRewardResponse> {
-    return this.http.post<RedeemRewardResponse>(
+    return this.apiClient.post<RedeemRewardResponse>(
       `${this.baseUrl}/rewards/${rewardId}/redeem`,
       {}
     );
@@ -234,7 +246,7 @@ export class LoyaltyService {
    */
   getMyRedemptions(
     query: GetLoyaltyRedemptionsQuery
-  ): Observable<PagedLoyaltyRedemptionsResponse> {
+  ): Observable<LoyaltyRedemptionsResponse> {
     let params = new HttpParams()
       .set('page', query.page.toString())
       .set('pageSize', query.pageSize.toString());
@@ -249,9 +261,15 @@ export class LoyaltyService {
       params = params.set('toDate', query.toDate);
     }
 
-    return this.http.get<PagedLoyaltyRedemptionsResponse>(
+    return this.apiClient.get<LoyaltyRedemptionsResponse>(
       `${this.baseUrl}/redemptions`,
       { params }
     );
+  }
+
+  getRedemptions(
+    query: LoyaltyRedemptionsFilters
+  ): Observable<LoyaltyRedemptionsResponse> {
+    return this.getMyRedemptions(query);
   }
 }

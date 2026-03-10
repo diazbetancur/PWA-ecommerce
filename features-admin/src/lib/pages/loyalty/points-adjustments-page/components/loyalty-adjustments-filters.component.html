@@ -1,0 +1,47 @@
+<form class="filters-container" [formGroup]="filtersForm" (ngSubmit)="apply()">
+  <div class="filter-group">
+    <label for="search">Usuario (email)</label>
+    <input
+      id="search"
+      type="text"
+      class="form-input"
+      formControlName="search"
+      placeholder="Correo electrónico"
+    />
+    @if (filtersForm.controls.search.touched &&
+    filtersForm.controls.search.invalid) {
+    <small class="field-error">Ingresa un email válido.</small>
+    }
+  </div>
+
+  <div class="filter-group">
+    <label for="fromDate">Desde</label>
+    <input
+      id="fromDate"
+      type="date"
+      class="form-input"
+      formControlName="fromDate"
+    />
+  </div>
+
+  <div class="filter-group">
+    <label for="toDate">Hasta</label>
+    <input
+      id="toDate"
+      type="date"
+      class="form-input"
+      formControlName="toDate"
+    />
+  </div>
+
+  <div class="filter-actions">
+    <button type="submit" class="btn-primary">Filtrar</button>
+    <button type="button" class="btn-secondary" (click)="clear()">
+      Limpiar
+    </button>
+  </div>
+</form>
+
+@if (dateError()) {
+<small class="field-error date-error">{{ dateError() }}</small>
+}

@@ -1,3 +1,4 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
   computed,
   effect,
@@ -7,7 +8,6 @@ import {
   signal,
   Signal,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import type {
   IosBannerState,
   PlatformInfo,
@@ -261,8 +261,7 @@ export class PwaInstallService {
         dismissedPermanently: true,
         dismissedAt,
       });
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   /**

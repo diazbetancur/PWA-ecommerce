@@ -1,14 +1,14 @@
-import { Injectable, inject } from '@angular/core';
 import {
+  HttpEvent,
+  HttpHandler,
   HttpInterceptor,
   HttpRequest,
-  HttpHandler,
-  HttpEvent,
 } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { TenantContextService } from '../services/tenant-context.service';
 import { AppEnvService } from '../services/app-env.service';
+import { TenantContextService } from '../services/tenant-context.service';
 
 /**
  * Interceptor que automáticamente añade headers de tenant a todas las requests HTTP

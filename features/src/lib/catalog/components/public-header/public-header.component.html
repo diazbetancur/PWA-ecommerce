@@ -4,7 +4,12 @@
     @if (tenantLogo()) {
     <div class="logo-section">
       <a routerLink="/" class="logo-link">
-        <img [src]="tenantLogo()" [alt]="tenantName()" class="logo" />
+        <img
+          [src]="tenantLogo()"
+          [alt]="tenantName()"
+          title="Logo tienda"
+          class="logo"
+        />
       </a>
     </div>
     }
@@ -35,16 +40,69 @@
     <!-- Actions -->
     <div class="actions-section">
       <!-- Cart -->
-      <button
-        mat-icon-button
-        class="cart-button"
-        (click)="goToCart()"
-        aria-label="Ver carrito"
-      >
-        <mat-icon [matBadge]="cartItemCount()" matBadgeColor="accent"
-          >shopping_cart</mat-icon
+      <div class="cart-wrapper">
+        <button
+          mat-icon-button
+          class="cart-button"
+          (click)="goToCart()"
+          aria-label="Ver carrito"
         >
-      </button>
+          <mat-icon [matBadge]="cartItemCount()" matBadgeColor="accent"
+            >shopping_cart</mat-icon
+          >
+        </button>
+
+        @if (showCartSummary() && lastAddedItem(); as lastItem) {
+        <div class="cart-summary">
+          <button
+            type="button"
+            class="summary-close"
+            (click)="closeCartSummary($event)"
+            aria-label="Cerrar resumen"
+            title="Cerrar"
+          >
+            ×
+          </button>
+
+          <div class="summary-product">
+            <img
+              [src]="
+                lastItem.imageUrl || '/assets/images/product-placeholder.webp'
+              "
+              [alt]="lastItem.name"
+              title="Producto agregado"
+              class="summary-image"
+              loading="lazy"
+            />
+
+            <div class="summary-text">
+              <p class="summary-name">{{ lastItem.name }}</p>
+              <p class="summary-meta">
+                {{ lastItem.quantity }} x
+                {{ lastItem.unitPrice | tenantCurrency }}
+              </p>
+              <p class="summary-line-total">
+                {{ lastItem.quantity * lastItem.unitPrice | tenantCurrency }}
+              </p>
+            </div>
+          </div>
+
+          <div class="summary-footer">
+            <p class="summary-totals">
+              {{ cartItemCount() }} productos ·
+              {{ cartTotal() | tenantCurrency }}
+            </p>
+            <button
+              type="button"
+              class="summary-view-cart"
+              (click)="goToCart()"
+            >
+              Ver carrito
+            </button>
+          </div>
+        </div>
+        }
+      </div>
 
       <!-- Auth -->
       @if (isLoggedIn()) {

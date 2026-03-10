@@ -130,7 +130,7 @@ export class TenantAdminMenuService {
       module: 'loyalty',
       label: 'Ajustar Puntos',
       icon: 'tune',
-      route: '/tenant-admin/loyalty/points-adjustment',
+      route: '/tenant-admin/loyalty/points-adjustments',
       order: 4,
       parentModule: 'loyalty',
     },

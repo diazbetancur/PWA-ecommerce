@@ -1,10 +1,6 @@
-import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  CatalogService,
-  CatalogProduct,
-  CatalogApiResponse,
-} from '@pwa/features';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { CatalogService, ProductsResponse, ProductSummary } from '@pwa/catalog';
 import { TenantContextService } from '@pwa/core';
 
 @Component({
@@ -203,7 +199,7 @@ export class ProductListExampleComponent implements OnInit {
   private readonly tenantContext = inject(TenantContextService);
 
   // Signals para el estado del componente
-  readonly products = signal<CatalogProduct[]>([]);
+  readonly products = signal<ProductSummary[]>([]);
   readonly isLoading = signal<boolean>(false);
   readonly error = signal<string | null>(null);
   readonly currentPage = signal<number>(1);
@@ -240,7 +236,7 @@ export class ProductListExampleComponent implements OnInit {
     this.error.set(null);
 
     this.catalogService.getFeaturedProducts(12).subscribe({
-      next: (response: CatalogApiResponse<CatalogProduct>) => {
+      next: (response: ProductsResponse) => {
         if (response.success) {
           this.products.set(response.data);
         } else {
@@ -248,8 +244,10 @@ export class ProductListExampleComponent implements OnInit {
         }
         this.isLoading.set(false);
       },
-      error: (err) => {
-        this.error.set('Error de conexión: ' + err.message);
+      error: (err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : 'Error desconocido';
+        this.error.set('Error de conexión: ' + message);
         this.isLoading.set(false);
       },
     });
@@ -265,7 +263,7 @@ export class ProductListExampleComponent implements OnInit {
     const nextPage = this.currentPage() + 1;
 
     this.catalogService.getProducts(nextPage, 12).subscribe({
-      next: (response: CatalogApiResponse<CatalogProduct>) => {
+      next: (response: ProductsResponse) => {
         if (response.success) {
           // Agregar productos a la lista existente
           this.products.update((current) => [...current, ...response.data]);
@@ -275,8 +273,10 @@ export class ProductListExampleComponent implements OnInit {
         }
         this.isLoading.set(false);
       },
-      error: (err) => {
-        this.error.set('Error cargando más productos: ' + err.message);
+      error: (err: unknown) => {
+        const message =
+          err instanceof Error ? err.message : 'Error desconocido';
+        this.error.set('Error cargando más productos: ' + message);
         this.isLoading.set(false);
       },
     });
@@ -294,7 +294,7 @@ export class ProductListExampleComponent implements OnInit {
    * Construye la URL de imagen usando el servicio de catálogo
    */
   buildProductImageUrl(imageUrl: string): string {
-    return this.catalogService.buildImageUrl(imageUrl);
+    return imageUrl;
   }
 
   /**
@@ -315,6 +315,6 @@ export class ProductListExampleComponent implements OnInit {
    * Verifica si estamos en modo desarrollo
    */
   isDevelopment(): boolean {
-    return !globalThis?.['ng']?.['ɵglobal']?.['production'];
+    return true;
   }
 }

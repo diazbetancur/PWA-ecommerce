@@ -31,6 +31,11 @@ export enum RewardType {
   FREE_SHIPPING = 'FREE_SHIPPING', // Envío gratis
 }
 
+export enum SingleProductSelectionRule {
+  MOST_EXPENSIVE = 'MOST_EXPENSIVE',
+  CHEAPEST = 'CHEAPEST',
+}
+
 /**
  * Estados de un canje de premio
  */
@@ -142,16 +147,34 @@ export interface LoyaltyRewardDto {
   discountValue?: number;
   /** ID del producto asociado (si aplica) */
   productId?: string | null;
+  /** IDs de productos asociados (si aplica) */
+  productIds?: string[] | null;
   /** Nombre del producto (si aplica) */
   productName?: string | null;
+  /** Si aplica a todos los productos elegibles */
+  appliesToAllEligibleProducts?: boolean;
+  /** Regla de selección cuando no aplica a todos */
+  singleProductSelectionRule?: SingleProductSelectionRule | string | null;
   /** URL de la imagen */
   imageUrl?: string;
   /** Stock disponible (null = ilimitado) */
   stock?: number | null;
+  /** Cantidad de cupones (alias funcional de stock) */
+  couponQuantity?: number | null;
+  /** Cupones emitidos */
+  couponsIssued?: number;
+  /** Cupones disponibles */
+  couponsAvailable?: number;
   /** Si el premio está activo */
   isActive: boolean;
   /** Días de validez del cupón/premio (null = sin expiración) */
   validityDays?: number | null;
+  /** Fecha inicio de vigencia */
+  availableFrom?: string | null;
+  /** Fecha fin de vigencia */
+  availableUntil?: string | null;
+  /** Disponible actualmente (activo + ventana de vigencia) */
+  isCurrentlyAvailable?: boolean;
   /** Términos y condiciones */
   termsAndConditions?: string;
   /** Orden de visualización en el catálogo */
@@ -176,16 +199,26 @@ export interface CreateLoyaltyRewardRequest {
   pointsCost: number;
   /** Valor del descuento (requerido para tipos DISCOUNT_*) */
   discountValue?: number;
-  /** ID del producto (requerido para tipo PRODUCT) */
-  productId?: string | null;
+  /** IDs de productos asociados (PRODUCT o DISCOUNT_FIXED) */
+  productIds?: string[] | null;
+  /** Si aplica a todos los productos elegibles */
+  appliesToAllEligibleProducts?: boolean;
+  /** Regla de selección cuando no aplica a todos */
+  singleProductSelectionRule?: SingleProductSelectionRule | string | null;
   /** URL de la imagen */
   imageUrl?: string;
   /** Stock disponible (null = ilimitado) */
   stock?: number | null;
+  /** Cantidad de cupones (alias funcional de stock) */
+  couponQuantity?: number | null;
   /** Si el premio está activo */
   isActive: boolean;
   /** Días de validez */
   validityDays?: number | null;
+  /** Fecha inicio de vigencia */
+  availableFrom?: string | null;
+  /** Fecha fin de vigencia */
+  availableUntil?: string | null;
   /** Términos y condiciones */
   termsAndConditions?: string;
   /** Orden de visualización */
@@ -210,6 +243,18 @@ export interface GetLoyaltyRewardsQuery {
   isActive?: boolean;
   /** Filtrar por tipo de premio */
   rewardType?: RewardType | string;
+  /** Buscar por nombre/descrición */
+  search?: string;
+  /** Filtrar por vigencia desde */
+  availableFrom?: string;
+  /** Filtrar por vigencia hasta */
+  availableUntil?: string;
+  /** Filtrar fecha de creación desde */
+  createdFrom?: string;
+  /** Filtrar fecha de creación hasta */
+  createdTo?: string;
+  /** Filtrar por disponibilidad actual */
+  isCurrentlyAvailable?: boolean;
 }
 
 /**
@@ -224,6 +269,8 @@ export interface PagedLoyaltyRewardsResponse {
   pageSize: number;
   /** Total de items */
   totalItems: number;
+  /** Total de items (algunos endpoints responden totalCount) */
+  totalCount?: number;
   /** Total de páginas */
   totalPages: number;
 }
@@ -367,6 +414,66 @@ export interface AdjustPointsResponse {
   reason?: string;
   referenceId?: string;
   adjustedAt?: string;
+}
+
+/**
+ * Registro de ajuste manual de puntos (historial admin)
+ */
+export interface PointsAdjustment {
+  /** ID de la transacción */
+  transactionId: string;
+  /** ID del usuario afectado */
+  userId: string;
+  /** Email del usuario afectado */
+  userEmail: string;
+  /** ID del admin que realizó el ajuste */
+  adjustedByUserId: string;
+  /** Email del admin que realizó el ajuste */
+  adjustedByEmail: string;
+  /** Puntos ajustados */
+  points: number;
+  /** Tipo de transacción */
+  transactionType: string;
+  /** Observaciones del ajuste */
+  observations?: string | null;
+  /** Número de ticket relacionado */
+  ticketNumber?: string | null;
+  /** Fecha de expiración (si aplica) */
+  expiresAt?: string | null;
+  /** Fecha de creación del ajuste */
+  createdAt: string;
+}
+
+/**
+ * Filtros para historial de ajustes de puntos
+ */
+export interface PointsAdjustmentFilters {
+  /** Número de página */
+  page: number;
+  /** Tamaño de página */
+  pageSize: number;
+  /** Buscar por email de usuario */
+  search?: string;
+  /** Fecha inicial (ISO UTC) */
+  fromDate?: string;
+  /** Fecha final (ISO UTC) */
+  toDate?: string;
+}
+
+/**
+ * Respuesta paginada de historial de ajustes de puntos
+ */
+export interface PointsAdjustmentResponse {
+  /** Lista de ajustes */
+  items: PointsAdjustment[];
+  /** Total de registros */
+  totalCount: number;
+  /** Página actual */
+  page: number;
+  /** Tamaño de página */
+  pageSize: number;
+  /** Total de páginas */
+  totalPages: number;
 }
 
 // ==================== TIPOS AUXILIARES ====================

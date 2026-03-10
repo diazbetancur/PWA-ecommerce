@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
+  MAT_DIALOG_DATA,
   MatDialog,
   MatDialogModule,
   MatDialogRef,
@@ -15,6 +16,11 @@ import {
   UserModeService,
 } from '@pwa/core';
 import { AccountService } from '../../services';
+
+interface TenantAuthModalData {
+  initialTab?: 'login' | 'register';
+  redirectAfterAuth?: boolean;
+}
 
 @Component({
   selector: 'lib-tenant-auth-modal',
@@ -33,6 +39,12 @@ export class TenantAuthModalComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly dialogRef = inject(MatDialogRef<TenantAuthModalComponent>);
+  private readonly modalData = inject<TenantAuthModalData | null>(
+    MAT_DIALOG_DATA,
+    {
+      optional: true,
+    }
+  );
 
   readonly activeTab = signal<'login' | 'register'>('login');
   readonly showForgotPassword = signal(false);
@@ -72,6 +84,11 @@ export class TenantAuthModalComponent {
   });
 
   constructor() {
+    const initialTab = this.modalData?.initialTab;
+    if (initialTab === 'login' || initialTab === 'register') {
+      this.activeTab.set(initialTab);
+    }
+
     effect(() => {
       this.isLoading.set(this.accountService.state().isLoading);
     });
@@ -115,7 +132,9 @@ export class TenantAuthModalComponent {
       const values = this.loginForm.getRawValue();
       await this.accountService.login(values);
       this.dialogRef.close(true);
-      await this.navigateAfterAuth();
+      if (this.shouldRedirectAfterAuth()) {
+        await this.navigateAfterAuth();
+      }
     } catch (error) {
       this.errorMessage.set(
         error instanceof Error ? error.message : 'Error al iniciar sesión'
@@ -146,12 +165,18 @@ export class TenantAuthModalComponent {
       const values = this.registerForm.getRawValue();
       await this.accountService.register(values);
       this.dialogRef.close(true);
-      await this.navigateAfterAuth();
+      if (this.shouldRedirectAfterAuth()) {
+        await this.navigateAfterAuth();
+      }
     } catch (error) {
       this.errorMessage.set(
         error instanceof Error ? error.message : 'Error al crear cuenta'
       );
     }
+  }
+
+  private shouldRedirectAfterAuth(): boolean {
+    return this.modalData?.redirectAfterAuth !== false;
   }
 
   async submitForgotPassword(): Promise<void> {

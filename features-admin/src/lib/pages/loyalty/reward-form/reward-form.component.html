@@ -1,0 +1,258 @@
+<div class="reward-form-page">
+  <div class="page-header">
+    <button class="back-btn" type="button" (click)="goBack()">← Volver</button>
+    <div>
+      <h1>🎁 {{ pageTitle() }}</h1>
+      <p>
+        Configura el premio según reglas de vigencia, cupones y costo en puntos.
+      </p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando premio...</p>
+  </div>
+  } @else {
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+    class="reward-form"
+    novalidate
+  >
+    @if (submitFeedback()) {
+    <div class="error-message" role="alert">
+      {{ submitFeedback() }}
+    </div>
+    }
+
+    <div class="section">
+      <h2>Información básica</h2>
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label for="name">Nombre *</label>
+          <input
+            id="name"
+            type="text"
+            class="form-control"
+            formControlName="name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="rewardType">Tipo *</label>
+          <select
+            id="rewardType"
+            class="form-control"
+            formControlName="rewardType"
+            (change)="onRewardTypeChange()"
+          >
+            @for (option of rewardTypeOptions; track option[0]) {
+            <option [value]="option[0]">{{ option[1] }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group full-width">
+          <label for="description">Descripción *</label>
+          <textarea
+            id="description"
+            class="form-control"
+            rows="4"
+            formControlName="description"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Reglas de canje</h2>
+      <div class="grid grid-3">
+        <div class="form-group">
+          <label for="pointsCost">Costo en puntos *</label>
+          <input
+            id="pointsCost"
+            type="number"
+            min="1"
+            class="form-control"
+            formControlName="pointsCost"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="couponQuantity">Cantidad de cupones</label>
+          <input
+            id="couponQuantity"
+            type="number"
+            min="0"
+            class="form-control"
+            formControlName="couponQuantity"
+            placeholder="Vacío = ilimitado"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="validityDays">Días de validez</label>
+          <input
+            id="validityDays"
+            type="number"
+            min="0"
+            class="form-control"
+            formControlName="validityDays"
+            placeholder="Vacío = sin expiración"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Vigencia</h2>
+      <div class="grid grid-2">
+        <div class="form-group">
+          <label for="availableFrom">Disponible desde</label>
+          <input
+            id="availableFrom"
+            type="datetime-local"
+            class="form-control"
+            formControlName="availableFrom"
+            [attr.min]="isEditMode() ? null : minAvailableDateTime()"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="availableUntil">Disponible hasta</label>
+          <input
+            id="availableUntil"
+            type="datetime-local"
+            class="form-control"
+            formControlName="availableUntil"
+            [attr.min]="isEditMode() ? null : minAvailableDateTime()"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Datos por tipo de premio</h2>
+      <div class="grid grid-2">
+        @if (isDiscountReward()) {
+        <div class="form-group">
+          <label for="discountValue">Valor descuento</label>
+          <input
+            id="discountValue"
+            type="number"
+            min="0"
+            class="form-control"
+            formControlName="discountValue"
+            placeholder="Requerido para DISCOUNT_PERCENTAGE"
+          />
+        </div>
+        <div class="form-group">
+          <label for="appliesToAllEligibleProducts">Aplicar descuento</label>
+          <select
+            id="appliesToAllEligibleProducts"
+            class="form-control"
+            formControlName="appliesToAllEligibleProducts"
+            (change)="onAppliesScopeChange()"
+          >
+            <option [ngValue]="true">A todos los productos elegibles</option>
+            <option [ngValue]="false">Solo a 1 producto elegible</option>
+          </select>
+        </div>
+
+        @if (!form.value.appliesToAllEligibleProducts) {
+        <div class="form-group full-width">
+          <label for="singleProductSelectionRule">Regla de selección *</label>
+          <select
+            id="singleProductSelectionRule"
+            class="form-control"
+            formControlName="singleProductSelectionRule"
+          >
+            <option [ngValue]="null">Selecciona una opción</option>
+            @for (option of singleProductSelectionRuleOptions; track option[0])
+            {
+            <option [ngValue]="option[0]">{{ option[1] }}</option>
+            }
+          </select>
+        </div>
+        } } @if (requiresProductSelection()) {
+        <div class="form-group full-width">
+          <span class="form-label">Producto(s) aplicables</span>
+          <div class="product-picker-row">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="openProductSelector()"
+            >
+              @if (isProductReward()) { Buscar y seleccionar producto } @else {
+              Buscar y seleccionar productos (opcional) }
+            </button>
+
+            @if (selectedProducts().length > 0) {
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="clearProductSelection()"
+            >
+              Limpiar selección
+            </button>
+            }
+          </div>
+
+          @if (selectedProducts().length > 0) {
+          <div class="selected-products-list">
+            @for (item of selectedProducts(); track item.productId) {
+            <div class="selected-product">
+              <strong>{{ item.productName || 'Producto seleccionado' }}</strong>
+              <span>ID: {{ item.productId }}</span>
+            </div>
+            }
+          </div>
+          } @else {
+          <p class="field-hint">
+            @if (isProductReward()) { Debes seleccionar 1 producto para el tipo
+            PRODUCT. } @if (isDiscountReward()) { Aquí puedes seleccionar el o
+            los productos sobre los cuales puedes aplicar. Si no seleccionas
+            nada, aplicará para todos los productos. }
+          </p>
+          }
+        </div>
+        }
+
+        <div class="form-group full-width">
+          <label for="imageUrl">URL imagen</label>
+          <input
+            id="imageUrl"
+            type="url"
+            class="form-control"
+            formControlName="imageUrl"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="termsAndConditions">Términos y condiciones</label>
+          <textarea
+            id="termsAndConditions"
+            rows="3"
+            class="form-control"
+            formControlName="termsAndConditions"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="goBack()">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+        @if (isSaving()) {
+        <span class="spinner-sm"></span>
+        }
+        {{ submitLabel() }}
+      </button>
+    </div>
+  </form>
+  }
+</div>

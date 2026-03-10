@@ -124,7 +124,7 @@ export class LoyaltyDashboardComponent implements OnInit {
   }
 
   navigateToPointsAdjustment(): void {
-    this.router.navigate(['/tenant-admin/loyalty/points-adjustment']);
+    this.router.navigate(['/tenant-admin/loyalty/points-adjustments']);
   }
   navigateToConfig(): void {
     this.router.navigate(['/tenant-admin/loyalty/config']);
