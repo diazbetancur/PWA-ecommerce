@@ -27,7 +27,7 @@ export class App implements OnInit {
           .then(() => {
             this.dynamicPwaAssets.applyBranding(branding);
           })
-          .catch((error) => {
+          .catch(() => {
             // Aplicar de todas formas aunque fallen algunas imágenes
             this.dynamicPwaAssets.applyBranding(branding);
           });
