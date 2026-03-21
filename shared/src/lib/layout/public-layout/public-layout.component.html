@@ -1,8 +1,14 @@
-<a class="skip-link" href="#main">Ir al contenido</a>
-<app-header />
-<main id="main" role="main" tabindex="-1">
-  <router-outlet />
-</main>
-<app-footer />
-<app-whatsapp-button />
-<lib-toast-container />
+<div
+  class="public-layout"
+  [style.--watermark-image]="watermarkBackgroundImage()"
+  [style.--tenant-bg-color]="tenantBackgroundColor()"
+>
+  <a class="skip-link" href="#main">Ir al contenido</a>
+  <app-header />
+  <main id="main" role="main" tabindex="-1">
+    <router-outlet />
+  </main>
+  <app-footer />
+  <app-whatsapp-button />
+  <lib-toast-container />
+</div>

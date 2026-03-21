@@ -1,7 +1,29 @@
-:host {
+.public-layout {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+  background-color: var(--tenant-bg-color, var(--bg-color, #f8fafc));
+}
+
+.public-layout::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background-image: var(--watermark-image, none);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: min(76vw, 76vh);
+  opacity: 0.1;
+  mix-blend-mode: multiply;
+}
+
+.public-layout > * {
+  position: relative;
+  z-index: 2;
 }
 
 .skip-link {
@@ -28,4 +50,18 @@
 
 main {
   flex: 1;
+}
+
+@media (max-width: 768px) {
+  .public-layout::before {
+    background-size: min(80vw, 80vh);
+    opacity: 0.065;
+  }
+}
+
+@media (min-width: 1440px) {
+  .public-layout::before {
+    background-size: min(70vw, 70vh);
+    opacity: 0.055;
+  }
 }
