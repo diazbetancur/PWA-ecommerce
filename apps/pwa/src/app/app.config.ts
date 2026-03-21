@@ -40,6 +40,7 @@ import {
   PushService,
   SeoService,
   TenantConfigService,
+  TenantResolutionService,
   ThemeService,
   TranslocoHttpLoader,
   UserModeService,
@@ -68,8 +69,12 @@ export const appConfig: ApplicationConfig = {
     {
       provide: APP_INITIALIZER,
       multi: true,
-      deps: [TenantConfigService],
-      useFactory: (svc: TenantConfigService) => () => svc.load(),
+      deps: [TenantResolutionService, TenantConfigService],
+      useFactory:
+        (resolver: TenantResolutionService, svc: TenantConfigService) => () => {
+          resolver.resolveTenant();
+          return svc.load();
+        },
     },
     {
       provide: APP_INITIALIZER,

@@ -14,5 +14,8 @@ export * from './tenant-admin-menu.service';
 export * from './tenant-bootstrap.service';
 export * from './tenant-config.service';
 export * from './tenant-context.service';
+export * from './tenant-resolution.service';
+export * from './tenant-storage.service';
+export * from './tenant-url.service';
 export * from './theme.service';
 export * from './user-mode.service';

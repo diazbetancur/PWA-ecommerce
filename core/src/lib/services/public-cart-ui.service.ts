@@ -1,6 +1,7 @@
 import { HttpHeaders } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { ApiClientService } from './api-client.service';
+import { TenantStorageService } from './tenant-storage.service';
 
 export interface PublicCartLine {
   id?: string;
@@ -39,6 +40,7 @@ interface UpdateCartItemRequest {
 })
 export class PublicCartUiService {
   private readonly apiClient = inject(ApiClientService);
+  private readonly tenantStorage = inject(TenantStorageService);
 
   private readonly SESSION_KEY = 'public_cart_session_id';
   private readonly linesState = signal<Record<string, PublicCartLine>>({});
@@ -279,7 +281,7 @@ export class PublicCartUiService {
   }
 
   private getOrCreateSessionId(): string {
-    const existing = globalThis.localStorage?.getItem(this.SESSION_KEY);
+    const existing = this.tenantStorage.get(this.SESSION_KEY);
     if (existing && existing.trim().length > 0) {
       return existing;
     }
@@ -287,7 +289,7 @@ export class PublicCartUiService {
     const generated =
       globalThis.crypto?.randomUUID?.() ??
       `web-session-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    globalThis.localStorage?.setItem(this.SESSION_KEY, generated);
+    this.tenantStorage.set(this.SESSION_KEY, generated);
     return generated;
   }
 

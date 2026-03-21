@@ -78,6 +78,6 @@ export class TenantAdminMenuComponent {
 
   logout(): void {
     this.authService.clear();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/account/login']);
   }
 }

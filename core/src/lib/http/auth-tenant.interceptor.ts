@@ -5,14 +5,23 @@ import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { APP_ENV, AppEnv } from '../config/app-env.token';
 import { TenantConfigService } from '../services/tenant-config.service';
+import { TenantResolutionService } from '../services/tenant-resolution.service';
 
 export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
   const auth = inject(AuthService);
-  const tenantConfigService = inject(TenantConfigService);
+  const tenantConfig = inject(TenantConfigService);
+  const tenantResolution = inject(TenantResolutionService);
   const env = inject<AppEnv>(APP_ENV);
   const router = inject(Router);
 
   let headers = req.headers;
+  let url = req.url;
+
+  const resolvedTenantSlug =
+    tenantResolution.getTenantSlug() ||
+    tenantConfig.tenantSlug ||
+    auth.claims?.tenant_slug ||
+    null;
 
   // Agregar Authorization header si existe token
   if (auth.token) {
@@ -20,53 +29,35 @@ export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   // Agregar X-Tenant-Slug header
-  if (env.useTenantHeader) {
-    // Primero intentar obtener de TenantConfigService
-    let tenantSlug = tenantConfigService.tenantSlug;
-
-    // Si no hay tenant en el servicio, intentar leer del query parameter
-    if (!tenantSlug) {
-      const search = globalThis.location?.search ?? '';
-      const qp = new URLSearchParams(search);
-      const t = qp.get('tenant');
-      if (t && t.trim() !== '') {
-        tenantSlug = t;
-      }
-    }
-
-    // Si finalmente tenemos un tenant, agregarlo al header
-    if (tenantSlug) {
-      headers = headers.set('X-Tenant-Slug', tenantSlug);
-      // Log solo en modo desarrollo y si es necesario
-      // void ('[authTenantInterceptor] Adding X-Tenant-Slug:', tenantSlug);
-    }
+  if (env.useTenantHeader && resolvedTenantSlug) {
+    headers = headers.set('X-Tenant-Slug', resolvedTenantSlug);
   }
 
-  return next(req.clone({ headers })).pipe(
-    catchError((e) => {
-      // Solo log de errores críticos (401, 403, 500)
-      if (e?.status === 401 || e?.status === 403 || e?.status >= 500) {
-      }
+  // Fallback compatible con backend actual:
+  // si el endpoint requiere tenant, enviar tambien ?tenant=... cuando no existe.
+  if (
+    resolvedTenantSlug &&
+    requiresTenantContext(req.url) &&
+    !hasTenantQueryParam(req.url)
+  ) {
+    url = appendTenantQueryParam(req.url, resolvedTenantSlug);
+  }
 
+  return next(req.clone({ headers, url })).pipe(
+    catchError((e) => {
       // 401 = No autenticado (token inválido/expirado) -> Desloguear
       if (e?.status === 401) {
         auth.clear();
 
-        // Obtener tenant del query parameter o del servicio
-        let tenantSlug = tenantConfigService.tenantSlug;
-        if (!tenantSlug) {
-          const search = globalThis.location?.search ?? '';
-          const qp = new URLSearchParams(search);
-          const t = qp.get('tenant');
-          if (t && t.trim() !== '') {
-            tenantSlug = t;
-          }
-        }
+        // Obtener tenant desde el resolver central (sin leer query params)
+        const tenantSlug =
+          resolvedTenantSlug || tenantResolution.getTenantSlug();
+        const isAdminContext = tenantResolution.isAdminContext();
 
-        // Si hay tenant, redirigir al login del tenant preservando el query param
+        // Si hay tenant, redirigir al login tenant-aware preservando compatibilidad temporal
         // Si no hay tenant, redirigir al login admin
-        if (tenantSlug) {
-          router.navigateByUrl(`/login?tenant=${tenantSlug}`);
+        if (tenantSlug && !isAdminContext) {
+          router.navigateByUrl(`/account/login?tenant=${tenantSlug}`);
         } else {
           router.navigateByUrl('/admin/login');
         }
@@ -79,3 +70,47 @@ export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
     })
   );
 };
+
+function requiresTenantContext(url: string): boolean {
+  if (!url.includes('/api/')) {
+    return false;
+  }
+
+  if (url.includes('/api/public/') || url.includes('/api/health')) {
+    return false;
+  }
+
+  if (url.includes('/api/admin/')) {
+    return false;
+  }
+
+  return true;
+}
+
+function hasTenantQueryParam(url: string): boolean {
+  try {
+    const parsed = new URL(url, globalThis.location?.origin || 'http://local');
+    return (
+      parsed.searchParams.has('tenant') || parsed.searchParams.has('store')
+    );
+  } catch {
+    return /[?&](tenant|store)=/.test(url);
+  }
+}
+
+function appendTenantQueryParam(url: string, tenantSlug: string): string {
+  try {
+    const parsed = new URL(url, globalThis.location?.origin || 'http://local');
+    parsed.searchParams.set('tenant', tenantSlug);
+
+    // Preservar formato relativo cuando la URL original no es absoluta.
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    }
+
+    return parsed.toString();
+  } catch {
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}tenant=${encodeURIComponent(tenantSlug)}`;
+  }
+}

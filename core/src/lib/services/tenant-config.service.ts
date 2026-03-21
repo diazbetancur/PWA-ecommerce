@@ -7,6 +7,7 @@ import { BrandingConfig, TenantConfig, ThemeConfig } from '../models/types';
 import { ApiClientService } from './api-client.service';
 import { ManifestService } from './manifest.service';
 import { SeoService } from './seo.service';
+import { TenantResolutionService } from './tenant-resolution.service';
 import { ThemeService } from './theme.service';
 
 @Injectable({ providedIn: 'root' })
@@ -17,6 +18,7 @@ export class TenantConfigService {
   private readonly theme = inject(ThemeService);
   private readonly manifest = inject(ManifestService);
   private readonly seo = inject(SeoService);
+  private readonly tenantResolution = inject(TenantResolutionService);
   private readonly env: AppEnv = inject(APP_ENV);
 
   private _config?: TenantConfig;
@@ -31,13 +33,13 @@ export class TenantConfigService {
   }
 
   async load(reapply = false): Promise<void> {
-    const search = globalThis.location?.search ?? '';
     let override: string | null = this._overrideSlug ?? null;
 
     if (!override) {
-      const qp = new URLSearchParams(search);
-      const t = qp.get('tenant');
-      if (t && t.trim() !== '') override = t;
+      const resolvedSlug = this.tenantResolution.getTenantSlug();
+      if (resolvedSlug && resolvedSlug.trim() !== '') {
+        override = resolvedSlug;
+      }
     }
 
     if (!override) {

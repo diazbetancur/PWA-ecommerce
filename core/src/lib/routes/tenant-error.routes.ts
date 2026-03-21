@@ -3,6 +3,7 @@ import { CanActivateFn, Router, Routes } from '@angular/router';
 import { TenantDebugComponent } from '../components/tenant-debug/tenant-debug.component';
 import { TenantNotFoundComponent } from '../components/tenant-not-found/tenant-not-found.component';
 import { TenantConfigService } from '../services/tenant-config.service';
+import { TenantResolutionService } from '../services/tenant-resolution.service';
 
 /**
  * Rutas para manejo de errores y debug de tenant
@@ -39,7 +40,14 @@ export const TENANT_ERROR_ROUTES: Routes = [
  */
 export const tenantGuard: CanActivateFn = () => {
   const tenantConfig = inject(TenantConfigService);
+  const tenantResolution = inject(TenantResolutionService);
   const router = inject(Router);
+
+  // Verificar tenant desde la fuente unica de verdad
+  if (!tenantResolution.hasTenant()) {
+    // Redirigir al login administrativo cuando no hay tenant
+    return router.createUrlTree(['/admin']);
+  }
 
   // Verificar si hay tenant cargado
   if (!tenantConfig.config || !tenantConfig.tenantSlug) {

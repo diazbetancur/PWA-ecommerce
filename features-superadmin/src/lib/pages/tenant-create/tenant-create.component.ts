@@ -9,6 +9,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TenantUrlService } from '@pwa/core';
 import {
   CreateTenantError,
   CreateTenantResponse,
@@ -68,6 +69,7 @@ export class TenantCreateComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly tenantService = inject(TenantAdminService);
   private readonly router = inject(Router);
+  private readonly tenantUrlService = inject(TenantUrlService);
 
   // Expose enum to template
   readonly TenantPlan = TenantPlan;
@@ -110,7 +112,7 @@ export class TenantCreateComponent implements OnInit {
     try {
       const plans = await this.tenantService.getPlans();
       this.plans.set(plans);
-    } catch (err) {
+    } catch {
       this.error.set('Error al cargar los planes disponibles');
     } finally {
       this.isLoadingPlans.set(false);
@@ -185,9 +187,9 @@ export class TenantCreateComponent implements OnInit {
     const tenant = this.createdTenant();
     if (!tenant) return '';
 
-    // En desarrollo usa localhost, en producción usaría el dominio real
-    const baseUrl = window.location.origin;
-    return `${baseUrl}?tenant=${tenant.slug}`;
+    return this.tenantUrlService.buildStorefrontAccessUrl(tenant.slug, {
+      path: '/',
+    });
   }
 
   openAccessUrl(): void {
@@ -205,7 +207,8 @@ export class TenantCreateComponent implements OnInit {
           this.showCopiedToast.set(false);
         }, 2000);
       },
-      (err) => {
+      () => {
+        this.showCopiedToast.set(false);
       }
     );
   }
