@@ -5,6 +5,8 @@ import { type TenantBranding } from '../models/pwa-branding.types';
 import { TenantConfig } from '../models/types';
 import { TenantBootstrapService } from './tenant-bootstrap.service';
 import { TenantConfigService } from './tenant-config.service';
+import { TenantResolutionService } from './tenant-resolution.service';
+import { TenantStorageService } from './tenant-storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,14 +14,23 @@ import { TenantConfigService } from './tenant-config.service';
 export class TenantContextService {
   private readonly tenantBootstrap = inject(TenantBootstrapService);
   private readonly tenantConfigService = inject(TenantConfigService);
+  private readonly tenantResolution = inject(TenantResolutionService);
+  private readonly tenantStorage = inject(TenantStorageService);
 
   private readonly resolvedConfig = computed<TenantConfig | null>(() => {
+    // Fuente principal: config cargada por APP_INITIALIZER + resolver central.
+    const configFromInitializer = this.tenantConfigService.config;
+    if (configFromInitializer) {
+      return configFromInitializer;
+    }
+
+    // Compatibilidad temporal: usar bootstrap solo cuando tenga un tenant real.
     const bootstrapConfig = this.tenantBootstrap.currentTenant();
-    if (bootstrapConfig) {
+    if (bootstrapConfig && bootstrapConfig.tenant.slug !== 'default') {
       return bootstrapConfig;
     }
 
-    return this.tenantConfigService.config ?? null;
+    return null;
   });
 
   readonly tenantSlug = computed(
@@ -130,15 +141,11 @@ export class TenantContextService {
 
   setGeneralAdminMode(): void {
     this.tenantBootstrap['_currentTenant'].set(null);
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('admin-mode', 'general');
-    }
+    this.tenantStorage.set('admin_mode', 'general', this.getStorageScope());
   }
 
   exitGeneralAdminMode(): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('admin-mode');
-    }
+    this.tenantStorage.remove('admin_mode', this.getStorageScope());
   }
 
   shouldIncludeTenantHeaders(url: string): boolean {
@@ -172,13 +179,17 @@ export class TenantContextService {
         reject(new Error('Timeout esperando que el tenant esté listo'));
       }, timeoutMs);
 
-      const subscription = this.tenantConfig$.subscribe((config) => {
-        if (config !== null) {
+      const interval = setInterval(() => {
+        if (this.isTenantReady()) {
           clearTimeout(timeout);
-          subscription.unsubscribe();
+          clearInterval(interval);
           resolve();
         }
-      });
+      }, 50);
     });
+  }
+
+  private getStorageScope(): 'tenant' | 'global' {
+    return this.tenantResolution.isAdminContext() ? 'global' : 'tenant';
   }
 }

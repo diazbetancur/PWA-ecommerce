@@ -102,6 +102,22 @@
   <!-- Products Section -->
   <main class="products-section">
     <div class="container">
+      @if (showBackToCategories()) {
+      <div class="catalog-navigation-top">
+        <button class="back-to-categories-btn" (click)="goBackToCategories()">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          Volver a categorías
+        </button>
+      </div>
+      }
+
       <!-- Results Info -->
       @if (!isLoading() && products().length > 0) {
       <div class="results-info">

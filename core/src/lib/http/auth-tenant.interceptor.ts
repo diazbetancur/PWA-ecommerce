@@ -29,7 +29,7 @@ export const authTenantInterceptor: HttpInterceptorFn = (req, next) => {
   }
 
   // Agregar X-Tenant-Slug header
-  if (env.useTenantHeader && resolvedTenantSlug) {
+  if (env.useTenantHeader && resolvedTenantSlug && !isAdminApi(req.url)) {
     headers = headers.set('X-Tenant-Slug', resolvedTenantSlug);
   }
 
@@ -85,6 +85,10 @@ function requiresTenantContext(url: string): boolean {
   }
 
   return true;
+}
+
+function isAdminApi(url: string): boolean {
+  return url.includes('/api/admin/');
 }
 
 function hasTenantQueryParam(url: string): boolean {

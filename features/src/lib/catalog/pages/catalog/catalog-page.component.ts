@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 import {
@@ -61,6 +61,8 @@ export class CatalogPageComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly tenantContext = inject(TenantContextService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly location = inject(Location);
 
   readonly searchControl = new FormControl<string>('');
 
@@ -69,6 +71,7 @@ export class CatalogPageComponent implements OnInit {
   readonly categories = signal<StoreCategoryDto[]>([]);
   readonly products = signal<StoreProductDto[]>([]);
   readonly selectedCategory = signal<string | null>(null);
+  readonly navigationSource = signal<string | null>(null);
   readonly isLoading = signal(true);
   readonly isLoadingMore = signal(false);
   readonly currentFilters = signal<ProductFilters>({});
@@ -105,6 +108,13 @@ export class CatalogPageComponent implements OnInit {
   readonly showLoadMore = computed(() => {
     const p = this.pagination();
     return p.page < p.totalPages && !this.isLoading();
+  });
+
+  readonly showBackToCategories = computed(() => {
+    return (
+      this.navigationSource() === 'home-categories' &&
+      !!this.currentFilters().category
+    );
   });
 
   readonly quickViewProduct = computed<QuickViewProductData | null>(() => {
@@ -156,12 +166,25 @@ export class CatalogPageComponent implements OnInit {
 
   private setupQueryParams(): void {
     this.route.queryParams.subscribe((params) => {
-      if (params['category']) {
-        this.currentFilters.update((f) => ({
-          ...f,
-          category: params['category'],
-        }));
-      }
+      this.navigationSource.set(params['from'] || null);
+      const categoryFromQuery = params['category'] || null;
+      this.selectedCategory.set(categoryFromQuery);
+
+      this.currentFilters.update((f) => ({
+        ...f,
+        category: categoryFromQuery || undefined,
+      }));
+    });
+  }
+
+  goBackToCategories(): void {
+    if (window.history.length > 1) {
+      this.location.back();
+      return;
+    }
+
+    this.router.navigate(['/'], {
+      fragment: 'categorias',
     });
   }
 

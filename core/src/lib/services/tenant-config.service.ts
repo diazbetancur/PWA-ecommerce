@@ -92,13 +92,6 @@ export class TenantConfigService {
   async switchTenant(slug: string): Promise<void> {
     this._overrideSlug = slug;
     await this.load(true);
-    try {
-      const url = new URL(globalThis.location.href);
-      url.searchParams.set('tenant', slug);
-      globalThis.history.replaceState({}, '', url.toString());
-    } catch {
-      // ignore URL update errors
-    }
   }
 
   private applyDynamic(_triggeredBySwitch: boolean): void {

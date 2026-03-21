@@ -1,42 +1,7 @@
 <div class="categories-page">
-  <!-- Search Bar -->
-  <div class="search-container">
-    <div class="search-wrapper">
-      <svg
-        class="search-icon"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-      >
-        <circle cx="11" cy="11" r="8" />
-        <path d="M21 21l-4.35-4.35" />
-      </svg>
-      <input
-        [formControl]="searchControl"
-        type="text"
-        placeholder="Buscar categorías..."
-        class="search-input"
-      />
-      @if (searchControl.value) {
-      <button
-        class="clear-search"
-        (click)="clearSearch()"
-        aria-label="Limpiar búsqueda"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-      }
-    </div>
-  </div>
+  <header class="categories-header">
+    <h1>Categorías</h1>
+  </header>
 
   <!-- Loading State -->
   @if (loading()) {
@@ -56,9 +21,9 @@
   }
 
   <!-- Categories Grid -->
-  @if (!loading() && displayedCategories().length > 0) {
+  @if (!loading() && categories().length > 0) {
   <div class="categories-grid">
-    @for (category of displayedCategories(); track category.id) {
+    @for (category of categories(); track category.id) {
     <button
       class="category-card"
       (click)="goToCategory(category.slug)"
@@ -85,22 +50,14 @@
       </div>
       <div class="category-content">
         <h3 class="category-name">{{ category.name }}</h3>
-        <p class="category-count">{{ category.productCount }} productos</p>
       </div>
     </button>
     }
   </div>
-
-  <!-- Loading More Indicator -->
-  @if (loadingMore()) {
-  <div class="loading-more">
-    <div class="spinner"></div>
-    <p>Cargando más categorías...</p>
-  </div>
-  } }
+  }
 
   <!-- Empty State -->
-  @if (!loading() && displayedCategories().length === 0) {
+  @if (!loading() && categories().length === 0) {
   <div class="empty-state">
     <svg
       class="empty-icon"
@@ -114,14 +71,8 @@
       <rect x="14" y="14" width="7" height="7" />
       <rect x="3" y="14" width="7" height="7" />
     </svg>
-    @if (searchControl.value) {
-    <h3>No se encontraron categorías</h3>
-    <p>Intenta con otros términos de búsqueda</p>
-    <button class="retry-btn" (click)="clearSearch()">Limpiar búsqueda</button>
-    } @else {
     <h3>No hay categorías disponibles</h3>
     <p>No hay categorías disponibles en este momento</p>
-    }
   </div>
   }
 </div>

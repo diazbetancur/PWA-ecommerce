@@ -1,6 +1,11 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiClientService, AuthService as CoreAuthService } from '@pwa/core';
+import {
+  ApiClientService,
+  AuthService as CoreAuthService,
+  TenantResolutionService,
+  TenantStorageService,
+} from '@pwa/core';
 import { firstValueFrom } from 'rxjs';
 import {
   AuthState,
@@ -17,6 +22,8 @@ import {
 export class AccountService {
   private readonly apiClient = inject(ApiClientService);
   private readonly coreAuth = inject(CoreAuthService);
+  private readonly tenantResolution = inject(TenantResolutionService);
+  private readonly tenantStorage = inject(TenantStorageService);
   private readonly router = inject(Router);
 
   private readonly _state = signal<AuthState>({
@@ -215,9 +222,7 @@ export class AccountService {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
     try {
-      const user = await firstValueFrom(
-        this.apiClient.get<User>('/auth/me')
-      );
+      const user = await firstValueFrom(this.apiClient.get<User>('/auth/me'));
 
       this._state.update((s) => ({
         ...s,
@@ -299,21 +304,18 @@ export class AccountService {
   }
 
   private saveRefreshToken(token: string): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem('refresh_token', token);
-    }
+    this.tenantStorage.set('refresh_token', token, this.getStorageScope());
   }
 
   private getRefreshToken(): string | null {
-    if (typeof localStorage !== 'undefined') {
-      return localStorage.getItem('refresh_token');
-    }
-    return null;
+    return this.tenantStorage.get('refresh_token', this.getStorageScope());
   }
 
   private clearRefreshToken(): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('refresh_token');
-    }
+    this.tenantStorage.remove('refresh_token', this.getStorageScope());
+  }
+
+  private getStorageScope(): 'tenant' | 'global' {
+    return this.tenantResolution.isAdminContext() ? 'global' : 'tenant';
   }
 }

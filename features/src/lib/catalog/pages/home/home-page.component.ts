@@ -105,6 +105,10 @@ export class HomePageComponent implements OnInit {
     return cats.length > 1;
   });
 
+  readonly categorySkeletonItems = computed(() =>
+    Array.from({ length: 6 }, (_, index) => index)
+  );
+
   /**
    * Computed: Determina si hay algún loading activo
    */
@@ -300,6 +304,15 @@ export class HomePageComponent implements OnInit {
   goToCategory(categorySlug: string): void {
     this.router.navigate(['/catalog'], {
       queryParams: { category: categorySlug },
+    });
+  }
+
+  goToCategoryExplorer(categorySlug: string): void {
+    this.router.navigate(['/catalog'], {
+      queryParams: {
+        category: categorySlug,
+        from: 'home-categories',
+      },
     });
   }
 

@@ -72,7 +72,7 @@ export class AdminShellComponent {
    */
   logout(): void {
     this.authService.clear();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/admin/login']);
   }
 
   /**

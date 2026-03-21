@@ -294,15 +294,13 @@ export class TenantAuthModalComponent {
     );
     const isSuperAdmin = normalizedRoles.includes('superadmin') || isAdminFlag;
 
-    const navExtras = { queryParamsHandling: 'preserve' as const };
-
     if (isSuperAdmin && hasTenantInToken) {
-      await this.router.navigate(['/tenant-admin'], navExtras);
+      await this.router.navigate(['/tenant-admin']);
       return;
     }
 
     if (isSuperAdmin && !hasTenantInToken) {
-      await this.router.navigate(['/admin'], navExtras);
+      await this.router.navigate(['/admin']);
       return;
     }
 
@@ -317,26 +315,26 @@ export class TenantAuthModalComponent {
       const selectedMode = await firstValueFrom(dialogRef.afterClosed());
 
       if (selectedMode === 'customer') {
-        await this.router.navigate(['/'], navExtras);
+        await this.router.navigate(['/']);
         return;
       }
 
       if (selectedMode === 'employee') {
-        await this.router.navigate(['/tenant-admin'], navExtras);
+        await this.router.navigate(['/tenant-admin']);
         return;
       }
     }
 
     if (this.userModeService.isCustomerOnly()) {
-      await this.router.navigate(['/'], navExtras);
+      await this.router.navigate(['/']);
       return;
     }
 
     if (this.userModeService.hasEmployeeRoles()) {
-      await this.router.navigate(['/tenant-admin'], navExtras);
+      await this.router.navigate(['/tenant-admin']);
       return;
     }
 
-    await this.router.navigate(['/'], navExtras);
+    await this.router.navigate(['/']);
   }
 }

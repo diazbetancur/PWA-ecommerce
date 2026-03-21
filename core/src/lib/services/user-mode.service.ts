@@ -12,12 +12,16 @@
 
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
+import { TenantResolutionService } from './tenant-resolution.service';
+import { TenantStorageService } from './tenant-storage.service';
 
 export type UserMode = 'customer' | 'employee';
 
 @Injectable({ providedIn: 'root' })
 export class UserModeService {
   private readonly authService = inject(AuthService);
+  private readonly tenantResolution = inject(TenantResolutionService);
+  private readonly tenantStorage = inject(TenantStorageService);
 
   // Modo actual seleccionado por el usuario
   private readonly _selectedMode = signal<UserMode | null>(null);
@@ -160,15 +164,14 @@ export class UserModeService {
   private readonly STORAGE_KEY = 'user_mode';
 
   private saveToStorage(mode: UserMode): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(this.STORAGE_KEY, mode);
-    }
+    this.tenantStorage.set(this.STORAGE_KEY, mode, this.getStorageScope());
   }
 
   private loadFromStorage(): UserMode | null {
-    if (typeof localStorage === 'undefined') return null;
-
-    const stored = localStorage.getItem(this.STORAGE_KEY);
+    const stored = this.tenantStorage.get(
+      this.STORAGE_KEY,
+      this.getStorageScope()
+    );
     if (stored === 'customer' || stored === 'employee') {
       return stored;
     }
@@ -177,8 +180,10 @@ export class UserModeService {
   }
 
   private clearStorage(): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(this.STORAGE_KEY);
-    }
+    this.tenantStorage.remove(this.STORAGE_KEY, this.getStorageScope());
+  }
+
+  private getStorageScope(): 'tenant' | 'global' {
+    return this.tenantResolution.isAdminContext() ? 'global' : 'tenant';
   }
 }

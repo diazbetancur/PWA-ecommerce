@@ -18,6 +18,9 @@ import {
 } from '../interfaces/tenant-resolution.interface';
 import { TenantConfig } from '../models/types';
 import { ApiClientService } from './api-client.service';
+import { TenantConfigService } from './tenant-config.service';
+import { TenantResolutionService } from './tenant-resolution.service';
+import { TenantStorageService } from './tenant-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class TenantBootstrapService {
@@ -26,6 +29,9 @@ export class TenantBootstrapService {
   private readonly title = inject(Title);
   private readonly document = inject(DOCUMENT);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly tenantConfigService = inject(TenantConfigService);
+  private readonly tenantResolution = inject(TenantResolutionService);
+  private readonly tenantStorage = inject(TenantStorageService);
 
   private readonly config: TenantBootstrapConfig = {
     defaultTenantSlug: '',
@@ -33,7 +39,7 @@ export class TenantBootstrapService {
     maxRetries: 2,
     enableCache: true,
     cacheTTL: 300000,
-    enabledStrategies: ['query', 'subdomain', 'hostname', 'default'],
+    enabledStrategies: ['subdomain', 'hostname', 'default'],
     redirectOnNotFound: true,
     errorRedirectUrl: '/tenant/not-found',
   };
@@ -111,17 +117,24 @@ export class TenantBootstrapService {
     this._error.set(null);
 
     try {
+      // Si APP_INITIALIZER ya resolvió tenant, nunca sobreescribir ese contexto.
+      const resolvedByInitializer = this.tenantConfigService.config;
+      if (resolvedByInitializer) {
+        this._currentTenant.set(resolvedByInitializer);
+        this._tenantConfig$.next(resolvedByInitializer);
+        this._status.set('resolved');
+        return;
+      }
+
       const strategy = this.resolveTenantStrategy();
       this._resolvedStrategy.set(strategy);
       this._attemptedSlug.set(strategy.value);
 
       if (!strategy.value || strategy.value.trim() === '') {
-        this.setDefaultTenantConfig();
+        this._currentTenant.set(null);
+        this._tenantConfig$.next(null);
         this._status.set('resolved');
-        this._isLoading.set(false);
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('admin-mode', 'general');
-        }
+        this.tenantStorage.set('admin_mode', 'general', 'global');
         return;
       }
 
@@ -160,62 +173,14 @@ export class TenantBootstrapService {
   }
 
   private resolveTenantStrategy(): TenantResolutionStrategy {
-    const urlParams = new URLSearchParams(this.document.location.search);
-    const queryTenant = urlParams.get('tenant');
-
-    if (queryTenant) {
+    const slugFromCentralResolver = this.tenantResolution.getTenantSlug();
+    if (slugFromCentralResolver) {
       return {
-        type: 'query',
-        value: queryTenant,
-        source: `query parameter: ?tenant=${queryTenant}`,
+        type: 'subdomain',
+        value: slugFromCentralResolver,
+        source: `central resolver: ${slugFromCentralResolver}`,
         priority: 1,
       };
-    }
-
-    // Intentar obtener tenant del token JWT si existe
-
-    // CRÍTICO: Verificar que localStorage esté disponible (solo en navegador)
-    if (
-      !isPlatformBrowser(this.platformId) ||
-      globalThis.localStorage === undefined
-    ) {
-      return {
-        type: 'default',
-        value: '',
-        source: 'default configuration (localStorage not available)',
-        priority: 4,
-      };
-    }
-
-    // El token puede estar en dos lugares dependiendo del tipo de usuario:
-    // 1. 'superadmin_token' para SuperAdmin
-    // 2. 'mtkn_{tenant}' para usuarios de tenant
-    // Primero intentar con superadmin, luego buscar cualquier token de tenant
-    let token = globalThis.localStorage.getItem('superadmin_token');
-
-    if (!token) {
-      // Buscar cualquier token que empiece con 'mtkn_'
-      const keys = Object.keys(globalThis.localStorage);
-      const tenantKey = keys.find((k) => k.startsWith('mtkn_'));
-      if (tenantKey) {
-        token = globalThis.localStorage.getItem(tenantKey);
-      }
-    }
-
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        const tenantSlugFromToken = payload.tenant_slug;
-
-        if (tenantSlugFromToken) {
-          return {
-            type: 'query',
-            value: tenantSlugFromToken,
-            source: `JWT token: tenant_slug=${tenantSlugFromToken}`,
-            priority: 1,
-          };
-        }
-      } catch {}
     }
 
     const hostname = this.document.location.hostname;

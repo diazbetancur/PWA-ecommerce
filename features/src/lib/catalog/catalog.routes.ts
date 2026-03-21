@@ -15,6 +15,14 @@ export const catalogRoutes: Routes = [
     title: 'Catálogo de Productos',
   },
   {
+    path: 'categories',
+    loadComponent: () =>
+      import('./pages/categories/categories-page.component').then(
+        (m) => m.CategoriesPageComponent
+      ),
+    title: 'Categorías',
+  },
+  {
     path: 'product/:id',
     loadComponent: () =>
       import('./pages/product-details/product-details.component').then(
@@ -35,7 +43,9 @@ export const catalogRoutes: Routes = [
   {
     path: 'cart',
     loadComponent: () =>
-      import('./pages/cart/cart-page.component').then((m) => m.CartPageComponent),
+      import('./pages/cart/cart-page.component').then(
+        (m) => m.CartPageComponent
+      ),
     title: 'Carrito de compras',
   },
 ];

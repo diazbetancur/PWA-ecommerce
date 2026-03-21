@@ -49,25 +49,29 @@
       {{ product().name }}
     </h3>
 
-    @if (product().shortDescription) {
     <p
       class="product-short-description"
       [title]="product().shortDescription || ''"
     >
-      {{ product().shortDescription }}
+      {{ product().shortDescription || ' ' }}
     </p>
-    }
 
     <div class="product-price-section">
-      <span class="product-price">
-        {{ product().price | tenantCurrency }}
-      </span>
-
       @if (product().compareAtPrice != null) {
       <span class="compare-at-price">
         {{ product().compareAtPrice | tenantCurrency }}
       </span>
+      } @else {
+      <span
+        class="compare-at-price compare-at-price--placeholder"
+        aria-hidden="true"
+        >{{ product().price | tenantCurrency }}</span
+      >
       }
+
+      <span class="product-price">
+        {{ product().price | tenantCurrency }}
+      </span>
 
       <!-- @if (showStock() && isInStock()) {
       <span class="stock-info"> {{ product().stock }} disponibles </span>

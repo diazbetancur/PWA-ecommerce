@@ -73,11 +73,11 @@
       </div>
     </section>
 
-    <!-- Categories Section -->
+    <!-- Categories Section (Compact Strip) -->
     @if (shouldShowCategories()) {
-    <section class="categories-section">
+    <section class="categories-section" aria-label="Categorías destacadas">
       <div class="section-header">
-        <h2 class="section-title">Categorías</h2>
+        <h2 class="section-title">Explora rápido</h2>
         <button class="see-all-btn" (click)="goToCatalog()">
           Ver todas
           <svg
@@ -91,25 +91,37 @@
           </svg>
         </button>
       </div>
-      <div class="categories-grid">
+
+      @if (isLoadingCategories()) {
+      <div class="category-strip-skeleton" aria-hidden="true">
+        @for (item of categorySkeletonItems(); track item) {
+        <div class="skeleton-category-item">
+          <div class="skeleton-circle"></div>
+          <div class="skeleton-label"></div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="categories-strip">
         @for (category of categories(); track category.id) {
         <button
-          class="category-card"
+          class="category-chip"
           (click)="goToCategory(category.slug)"
           [title]="category.name"
+          [attr.aria-label]="'Ver productos de ' + category.name"
         >
-          <div class="category-image-wrapper">
+          <div class="category-chip-image-wrapper">
             @if (category.imageUrl) {
             <img
               [src]="category.imageUrl"
               [alt]="category.name"
-              class="category-image"
+              class="category-chip-image"
               loading="lazy"
             />
             } @else {
-            <div class="category-placeholder">
+            <div class="category-chip-placeholder">
               <svg
-                class="category-icon"
+                class="category-chip-icon"
                 viewBox="0 0 24 24"
                 fill="currentColor"
               >
@@ -120,10 +132,11 @@
             </div>
             }
           </div>
-          <div class="category-info">
-            <span class="category-name">{{ category.name }}</span>
+
+          <div class="category-chip-info">
+            <span class="category-chip-name">{{ category.name }}</span>
             @if (category.productCount > 0) {
-            <span class="category-count"
+            <span class="category-chip-count"
               >{{ category.productCount }} productos</span
             >
             }
@@ -131,6 +144,82 @@
         </button>
         }
       </div>
+      }
+    </section>
+
+    <!-- Categories Explorer Section -->
+    <section
+      id="categorias"
+      class="categories-explorer-section"
+      aria-label="Categorías"
+    >
+      <div class="section-header">
+        <h2 class="section-title">Categorías</h2>
+      </div>
+
+      @if (isLoadingCategories()) {
+      <div class="categories-explorer-grid categories-explorer-grid--loading">
+        @for (item of categorySkeletonItems(); track item) {
+        <div class="explorer-skeleton-card" aria-hidden="true">
+          <div class="explorer-skeleton-image"></div>
+          <div
+            class="explorer-skeleton-line explorer-skeleton-line--title"
+          ></div>
+          <div
+            class="explorer-skeleton-line explorer-skeleton-line--meta"
+          ></div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="categories-explorer-grid">
+        @for (category of categories(); track category.id) {
+        <button
+          class="category-explorer-card"
+          [title]="category.name"
+          [attr.aria-label]="
+            'Explorar ' +
+            category.name +
+            ' (' +
+            (category.productCount || 0) +
+            ' productos)'
+          "
+          (click)="goToCategoryExplorer(category.slug)"
+        >
+          <div class="category-explorer-image-wrapper">
+            @if (category.imageUrl) {
+            <img
+              [src]="category.imageUrl"
+              [alt]="category.name"
+              class="category-explorer-image"
+              loading="lazy"
+            />
+            } @else {
+            <div class="category-explorer-placeholder">
+              <svg
+                class="category-explorer-icon"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path
+                  d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM9 9H5V5h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 6h-4V5h4v4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6H5v-4h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6h-4v-4h4v4z"
+                />
+              </svg>
+            </div>
+            }
+            <span class="category-explorer-badge"
+              >{{ category.productCount || 0 }} productos</span
+            >
+          </div>
+
+          <div class="category-explorer-content">
+            <span class="category-explorer-name">{{ category.name }}</span>
+            <span class="category-explorer-cta">Ver productos</span>
+          </div>
+        </button>
+        }
+      </div>
+      }
     </section>
     }
 
