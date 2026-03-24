@@ -79,6 +79,14 @@ export class TenantAdminMenuService {
       order: 2,
       parentModule: 'catalog',
     },
+    'catalog.banners': {
+      module: 'catalog',
+      label: 'Banners',
+      icon: 'campaign',
+      route: '/tenant-admin/catalog/banners',
+      order: 3,
+      parentModule: 'catalog',
+    },
     orders: {
       module: 'orders',
       label: 'Pedidos',

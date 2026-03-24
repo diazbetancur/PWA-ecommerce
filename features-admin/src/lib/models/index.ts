@@ -3,6 +3,7 @@
  * Barrel export for all admin-related models
  */
 
+export * from './banner.model';
 export * from './category.model';
 export * from './loyalty.models';
 export * from './rbac.model';

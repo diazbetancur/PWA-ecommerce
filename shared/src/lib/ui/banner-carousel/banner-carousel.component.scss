@@ -32,14 +32,14 @@
 .banner-image {
   width: 100%;
   height: auto;
-  aspect-ratio: 21/9;
+  aspect-ratio: 42/9;
   object-fit: cover;
   display: block;
 }
 
 @media (max-width: 640px) {
   .banner-image {
-    aspect-ratio: 16/9;
+    aspect-ratio: 32/9;
   }
 }
 
@@ -86,8 +86,10 @@
 }
 
 .banner-button {
-  display: inline-block;
-  margin-top: 1rem;
+  position: absolute;
+  right: 2rem;
+  bottom: 2rem;
+  display: inline-flex;
   padding: 0.625rem 1.5rem;
   background: var(--primary-color, #3b82f6);
   color: #fff;
@@ -104,6 +106,8 @@
 
 @media (max-width: 640px) {
   .banner-button {
+    right: 1rem;
+    bottom: 1rem;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
   }

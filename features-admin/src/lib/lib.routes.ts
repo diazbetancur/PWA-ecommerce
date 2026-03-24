@@ -96,6 +96,40 @@ export const featuresAdminRoutes: Route[] = [
           title: 'Editar Producto',
         },
       },
+      // Banners
+      {
+        path: 'banners',
+        loadComponent: () =>
+          import('./pages/banners/banners-list/banners-list.component').then(
+            (m) => m.BannersListComponent
+          ),
+        canActivate: [modulePermissionGuard('catalog')],
+        data: {
+          title: 'Banners',
+        },
+      },
+      {
+        path: 'banners/create',
+        loadComponent: () =>
+          import('./pages/banners/banners-form/banners-form.component').then(
+            (m) => m.BannersFormComponent
+          ),
+        canActivate: [modulePermissionGuard('catalog')],
+        data: {
+          title: 'Nuevo Banner',
+        },
+      },
+      {
+        path: 'banners/:id/edit',
+        loadComponent: () =>
+          import('./pages/banners/banners-form/banners-form.component').then(
+            (m) => m.BannersFormComponent
+          ),
+        canActivate: [modulePermissionGuard('catalog')],
+        data: {
+          title: 'Editar Banner',
+        },
+      },
     ],
   },
 

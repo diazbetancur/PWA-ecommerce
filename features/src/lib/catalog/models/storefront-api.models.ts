@@ -14,11 +14,12 @@ export interface StoreBannerDto {
   id: string;
   title: string;
   subtitle?: string | null;
-  imageUrlDesktop: string;
+  imageUrl?: string | null;
+  imageUrlDesktop?: string | null;
   imageUrlMobile?: string | null;
   targetUrl?: string | null;
   buttonText?: string | null;
-  position: 'hero' | 'sidebar' | 'footer' | 'promo';
+  position: 'hero' | 'secondary' | 'sidebar' | 'popup' | 'footer' | 'promo';
 }
 
 // ============================================

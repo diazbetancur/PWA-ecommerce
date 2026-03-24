@@ -11,6 +11,10 @@ export * from './categories/categories-list/categories-list.component';
 export * from './products/products-form/product-form.component';
 export * from './products/products-list/products-list.component';
 
+// Banners
+export * from './banners/banners-form/banners-form.component';
+export * from './banners/banners-list/banners-list.component';
+
 // Stores
 export * from './stores/migrate-stock/migrate-stock.component';
 export * from './stores/product-stock-by-stores/product-stock-by-stores.component';

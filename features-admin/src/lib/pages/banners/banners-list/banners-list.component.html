@@ -1,0 +1,150 @@
+<div class="banners-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <div class="header-content">
+          <div class="title-section">
+            <mat-icon>campaign</mat-icon>
+            <h1>Banners</h1>
+          </div>
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="filters-section">
+        <input
+          type="text"
+          class="simple-search"
+          [(ngModel)]="searchValue"
+          (input)="onSearchChanged(searchValue())"
+          placeholder="Buscar banners..."
+        />
+
+        @if (canCreate()) {
+        <app-button
+          variant="primary"
+          icon="add"
+          (clicked)="createBanner()"
+          class="create-button"
+        >
+          Nuevo Banner
+        </app-button>
+        }
+      </div>
+
+      @if (loading()) {
+      <div class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Cargando banners...</p>
+      </div>
+      } @if (!loading() && banners().length > 0) {
+      <div class="table-container">
+        <table mat-table [dataSource]="banners()" class="banners-table">
+          <ng-container matColumnDef="title">
+            <th mat-header-cell *matHeaderCellDef>Banner</th>
+            <td mat-cell *matCellDef="let banner">
+              <div class="banner-info">
+                @if (banner.imageUrl) {
+                <img
+                  [src]="banner.imageUrl"
+                  [alt]="banner.title"
+                  class="banner-thumb"
+                />
+                }
+                <div class="banner-meta">
+                  <strong>{{ banner.title }}</strong>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="position">
+            <th mat-header-cell *matHeaderCellDef>Posición</th>
+            <td mat-cell *matCellDef="let banner">
+              <span class="position-chip">{{ banner.position }}</span>
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="displayOrder">
+            <th mat-header-cell *matHeaderCellDef>Orden</th>
+            <td mat-cell *matCellDef="let banner">{{ banner.displayOrder }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="active">
+            <th mat-header-cell *matHeaderCellDef>Estado</th>
+            <td mat-cell *matCellDef="let banner">
+              @if (banner.isActive) {
+              <span class="status-badge active">
+                <mat-icon>check_circle</mat-icon>
+                Activo
+              </span>
+              } @else {
+              <span class="status-badge inactive">
+                <mat-icon>cancel</mat-icon>
+                Inactivo
+              </span>
+              }
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="period">
+            <th mat-header-cell *matHeaderCellDef>Vigencia</th>
+            <td mat-cell *matCellDef="let banner">
+              {{ formatDateRange(banner.startDate, banner.endDate) }}
+            </td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Button Actions</th>
+            <td mat-cell *matCellDef="let banner">
+              <div class="actions-cell">
+                @if (canUpdate()) {
+                <button
+                  mat-icon-button
+                  (click)="editBanner(banner)"
+                  matTooltip="Editar"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                } @if (canDelete()) {
+                <button
+                  mat-icon-button
+                  color="warn"
+                  (click)="deleteBanner(banner)"
+                  matTooltip="Eliminar"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        [length]="totalCount()"
+        [pageSize]="pageSize()"
+        [pageSizeOptions]="pageSizeOptions"
+        [pageIndex]="page() - 1"
+        (page)="onPageChange($event)"
+        showFirstLastButtons
+      ></mat-paginator>
+      } @if (!loading() && banners().length === 0) {
+      <div class="empty-state">
+        <mat-icon>campaign</mat-icon>
+        <h2>No hay banners</h2>
+        <p>
+          @if (searchValue()) { No se encontraron banners con "{{
+            searchValue()
+          }}". } @else { Comienza creando tu primer banner. }
+        </p>
+      </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -3,6 +3,7 @@
  * Barrel export for all admin-related services
  */
 
+export * from './banner.service';
 export * from './category.service';
 export * from './loyalty-admin.service';
 export * from './permission.service';

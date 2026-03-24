@@ -1,0 +1,200 @@
+<div class="banner-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <div class="header-content">
+          <div class="title-section">
+            <mat-icon>{{ isEditMode() ? 'edit' : 'add' }}</mat-icon>
+            <h3>{{ pageTitle() }}</h3>
+          </div>
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading() && isEditMode()) {
+      <div class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Cargando banner...</p>
+      </div>
+      } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="banner-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Título</mat-label>
+          <input
+            matInput
+            formControlName="title"
+            placeholder="Ej: Summer Sale"
+            required
+          />
+          @if (form.get('title')?.invalid && form.get('title')?.touched) {
+          <mat-error>{{ getErrorMessage('title') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Subtítulo</mat-label>
+          <input
+            matInput
+            formControlName="subtitle"
+            placeholder="Ej: Hasta 40%"
+          />
+          @if (form.get('subtitle')?.invalid && form.get('subtitle')?.touched) {
+          <mat-error>{{ getErrorMessage('subtitle') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Orden</mat-label>
+          <input
+            matInput
+            type="number"
+            min="1"
+            formControlName="displayOrder"
+          />
+          @if (form.get('displayOrder')?.invalid &&
+          form.get('displayOrder')?.touched) {
+          <mat-error>{{ getErrorMessage('displayOrder') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="two-columns">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha inicio</mat-label>
+            <input
+              matInput
+              [matDatepicker]="startPicker"
+              formControlName="startDate"
+            />
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="startPicker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha fin</mat-label>
+            <input
+              matInput
+              [matDatepicker]="endPicker"
+              formControlName="endDate"
+            />
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="endPicker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Target URL</mat-label>
+          <input
+            matInput
+            formControlName="targetUrl"
+            placeholder="/promos/summer"
+          />
+          @if (form.get('targetUrl')?.invalid && form.get('targetUrl')?.touched)
+          {
+          <mat-error>{{ getErrorMessage('targetUrl') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Texto del botón</mat-label>
+          <input matInput formControlName="buttonText" placeholder="Comprar" />
+          @if (form.get('buttonText')?.invalid &&
+          form.get('buttonText')?.touched) {
+          <mat-error>{{ getErrorMessage('buttonText') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="image-upload-field full-width">
+          <label class="upload-label" for="banner-image-input">
+            Imagen del Banner {{ isEditMode() ? '(opcional)' : '(requerida)' }}
+          </label>
+          <input
+            #bannerImageInput
+            id="banner-image-input"
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+          />
+          <p class="upload-hint">
+            Si no seleccionas imagen en edición, se conserva la actual.
+          </p>
+          @if (selectedImageFile()) {
+          <p class="upload-selected-file">
+            Archivo: {{ selectedImageFile()!.name }}
+          </p>
+          <button
+            type="button"
+            class="clear-image-btn"
+            (click)="clearSelectedImage(bannerImageInput)"
+          >
+            Quitar imagen seleccionada
+          </button>
+          }
+        </div>
+
+        @if (hasImagePreview()) {
+        <div class="image-preview">
+          <p class="preview-label">Vista previa:</p>
+          <img
+            [src]="displayPreviewUrl()"
+            alt="Preview"
+            class="preview-image"
+          />
+        </div>
+        }
+
+        <div class="checkbox-field">
+          <mat-checkbox formControlName="isActive">
+            Banner activo
+          </mat-checkbox>
+        </div>
+
+        @if (isEditMode() && banner()) {
+        <div class="info-section">
+          <h3>Información Adicional</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">ID:</span>
+              <code>{{ banner()!.id }}</code>
+            </div>
+            @if (banner()!.createdAt) {
+            <div class="info-item">
+              <span class="info-label">Creado:</span>
+              <span>{{ banner()!.createdAt | date : 'short' }}</span>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <div class="form-actions">
+          <app-button
+            type="button"
+            variant="secondary"
+            (clicked)="cancel()"
+            [disabled]="loading()"
+          >
+            Cancelar
+          </app-button>
+
+          <app-button
+            type="submit"
+            variant="primary"
+            [disabled]="form.invalid || loading()"
+            [loading]="loading()"
+            icon="save"
+          >
+            {{ submitButtonText() }}
+          </app-button>
+        </div>
+      </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>
