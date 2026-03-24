@@ -235,6 +235,7 @@ export interface ProductResponse {
   updatedAt: string | null;
   categories: any[]; // Array de categorías del producto
   images: string[]; // Array de URLs de imágenes adicionales
+  videos?: string[]; // Array de URLs de videos
   storeStock?: StoreStockDto[]; // Distribución de stock por tiendas
 }
 
@@ -278,6 +279,9 @@ export interface CreateProductDto {
   tags?: string;
   brand?: string;
   mainImageUrl?: string;
+  mainImage?: File;
+  images?: File[];
+  videos?: File[];
   categoryIds?: string[];
   metaTitle?: string;
   metaDescription?: string;
@@ -301,6 +305,9 @@ export interface UpdateProductDto {
   tags?: string;
   brand?: string;
   mainImageUrl?: string;
+  mainImage?: File;
+  images?: File[];
+  videos?: File[];
   categoryIds?: string[];
   metaTitle?: string;
   metaDescription?: string;

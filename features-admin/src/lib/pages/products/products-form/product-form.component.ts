@@ -79,6 +79,10 @@ export class ProductFormComponent implements OnInit {
   readonly productId = signal<string | null>(null);
   readonly product = signal<ProductResponse | null>(null);
   readonly selectedCategories = signal<CategoryListItem[]>([]);
+  readonly selectedMainImageFile = signal<File | null>(null);
+  readonly selectedAdditionalImageFiles = signal<File[]>([]);
+  readonly selectedVideoFiles = signal<File[]>([]);
+  readonly mainImagePreviewUrl = signal<string | null>(null);
 
   // Stock distribution state
   readonly availableStores = signal<StoreDto[]>([]);
@@ -114,6 +118,20 @@ export class ProductFormComponent implements OnInit {
     () => this.totalDistributedStock() <= this.totalStock()
   );
 
+  readonly existingMainImageUrl = computed(
+    () => this.product()?.mainImageUrl || null
+  );
+
+  readonly existingImageUrls = computed(() => this.product()?.images || []);
+
+  readonly existingVideoUrls = computed(() => this.product()?.videos || []);
+
+  readonly displayMainImageUrl = computed(
+    () => this.mainImagePreviewUrl() || this.existingMainImageUrl()
+  );
+
+  private createdMainImageObjectUrl: string | null = null;
+
   constructor() {
     this.form = this.fb.group({
       name: [
@@ -135,11 +153,14 @@ export class ProductFormComponent implements OnInit {
       isFeatured: [false],
       tags: [''],
       brand: ['', [Validators.maxLength(100)]],
-      mainImageUrl: [''],
       categoryIds: [[] as string[]],
       metaTitle: ['', [Validators.maxLength(200)]],
       metaDescription: ['', [Validators.maxLength(500)]],
     });
+  }
+
+  ngOnDestroy(): void {
+    this.revokeMainImageObjectUrl();
   }
 
   openCategorySelector(): void {
@@ -234,7 +255,6 @@ export class ProductFormComponent implements OnInit {
           isFeatured: product.isFeatured,
           tags: product.tags || '',
           brand: product.brand || '',
-          mainImageUrl: product.mainImageUrl || '',
           categoryIds: product.categories?.map((cat: any) => cat.id) || [],
           metaTitle: product.metaTitle || '',
           metaDescription: product.metaDescription || '',
@@ -270,6 +290,15 @@ export class ProductFormComponent implements OnInit {
 
     const formValue = {
       ...this.form.value,
+      mainImage: this.selectedMainImageFile() || undefined,
+      images:
+        this.selectedAdditionalImageFiles().length > 0
+          ? this.selectedAdditionalImageFiles()
+          : undefined,
+      videos:
+        this.selectedVideoFiles().length > 0
+          ? this.selectedVideoFiles()
+          : undefined,
       initialStoreStock:
         this.storeStockDistribution().length > 0
           ? this.storeStockDistribution()
@@ -323,6 +352,52 @@ export class ProductFormComponent implements OnInit {
     this.router.navigate(['/tenant-admin/catalog/products']);
   }
 
+  onMainImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] || null;
+
+    if (!file) {
+      this.selectedMainImageFile.set(null);
+      this.mainImagePreviewUrl.set(null);
+      this.revokeMainImageObjectUrl();
+      return;
+    }
+
+    this.selectedMainImageFile.set(file);
+    this.revokeMainImageObjectUrl();
+    this.createdMainImageObjectUrl = URL.createObjectURL(file);
+    this.mainImagePreviewUrl.set(this.createdMainImageObjectUrl);
+  }
+
+  onAdditionalImagesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files || []);
+    this.selectedAdditionalImageFiles.set(files);
+  }
+
+  onVideosSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files || []);
+    this.selectedVideoFiles.set(files);
+  }
+
+  clearMainImage(fileInput: HTMLInputElement): void {
+    fileInput.value = '';
+    this.selectedMainImageFile.set(null);
+    this.mainImagePreviewUrl.set(null);
+    this.revokeMainImageObjectUrl();
+  }
+
+  clearAdditionalImages(fileInput: HTMLInputElement): void {
+    fileInput.value = '';
+    this.selectedAdditionalImageFiles.set([]);
+  }
+
+  clearVideos(fileInput: HTMLInputElement): void {
+    fileInput.value = '';
+    this.selectedVideoFiles.set([]);
+  }
+
   // Helpers para errores en template
   getErrorMessage(fieldName: string): string {
     const control = this.form.get(fieldName);
@@ -351,7 +426,8 @@ export class ProductFormComponent implements OnInit {
       next: (stores) => {
         this.availableStores.set(stores);
       },
-      error: (error) => {
+      error: () => {
+        this.availableStores.set([]);
       },
     });
   }
@@ -469,5 +545,12 @@ export class ProductFormComponent implements OnInit {
     return this.availableStores().filter(
       (store) => !distributedStoreIds.includes(store.id)
     );
+  }
+
+  private revokeMainImageObjectUrl(): void {
+    if (this.createdMainImageObjectUrl) {
+      URL.revokeObjectURL(this.createdMainImageObjectUrl);
+      this.createdMainImageObjectUrl = null;
+    }
   }
 }

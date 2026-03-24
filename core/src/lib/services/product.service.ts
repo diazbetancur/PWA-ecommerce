@@ -70,6 +70,13 @@ export class ProductService {
    * Requiere: catalog.canCreate
    */
   create(product: CreateProductDto): Observable<ProductResponse> {
+    if (this.hasMediaFiles(product)) {
+      return this.apiClient.post<ProductResponse>(
+        this.baseUrl,
+        this.buildFormData(product)
+      );
+    }
+
     return this.apiClient.post<ProductResponse>(this.baseUrl, product);
   }
 
@@ -78,10 +85,91 @@ export class ProductService {
    * Requiere: catalog.canUpdate
    */
   update(id: string, product: UpdateProductDto): Observable<ProductResponse> {
+    if (this.hasMediaFiles(product)) {
+      return this.apiClient.put<ProductResponse>(
+        `${this.baseUrl}/${id}`,
+        this.buildFormData(product)
+      );
+    }
+
     return this.apiClient.put<ProductResponse>(
       `${this.baseUrl}/${id}`,
       product
     );
+  }
+
+  private hasMediaFiles(product: CreateProductDto | UpdateProductDto): boolean {
+    return !!(
+      product.mainImage ||
+      (product.images && product.images.length > 0) ||
+      (product.videos && product.videos.length > 0)
+    );
+  }
+
+  private buildFormData(
+    product: CreateProductDto | UpdateProductDto
+  ): FormData {
+    const formData = new FormData();
+
+    if (product.name !== undefined) formData.append('name', product.name);
+    if (product.sku !== undefined) formData.append('sku', product.sku || '');
+    if (product.description !== undefined)
+      formData.append('description', product.description || '');
+    if (product.shortDescription !== undefined)
+      formData.append('shortDescription', product.shortDescription || '');
+    if (product.price !== undefined)
+      formData.append('price', String(product.price));
+    if (product.compareAtPrice !== undefined)
+      formData.append('compareAtPrice', String(product.compareAtPrice ?? ''));
+    if (product.stock !== undefined)
+      formData.append('stock', String(product.stock));
+    if (product.trackInventory !== undefined)
+      formData.append('trackInventory', String(product.trackInventory));
+    if (product.isActive !== undefined)
+      formData.append('isActive', String(product.isActive));
+    if (product.isFeatured !== undefined)
+      formData.append('isFeatured', String(product.isFeatured));
+    if (product.tags !== undefined) formData.append('tags', product.tags || '');
+    if (product.brand !== undefined)
+      formData.append('brand', product.brand || '');
+    if (product.metaTitle !== undefined)
+      formData.append('metaTitle', product.metaTitle || '');
+    if (product.metaDescription !== undefined)
+      formData.append('metaDescription', product.metaDescription || '');
+
+    if (product.categoryIds && product.categoryIds.length > 0) {
+      for (const categoryId of product.categoryIds) {
+        formData.append('categoryIds', categoryId);
+      }
+    }
+
+    if (product.initialStoreStock && product.initialStoreStock.length > 0) {
+      product.initialStoreStock.forEach((item, index) => {
+        formData.append(`initialStoreStock[${index}].storeId`, item.storeId);
+        formData.append(
+          `initialStoreStock[${index}].stock`,
+          String(item.stock)
+        );
+      });
+    }
+
+    if (product.mainImage) {
+      formData.append('mainImage', product.mainImage);
+    }
+
+    if (product.images && product.images.length > 0) {
+      for (const image of product.images) {
+        formData.append('images', image);
+      }
+    }
+
+    if (product.videos && product.videos.length > 0) {
+      for (const video of product.videos) {
+        formData.append('videos', video);
+      }
+    }
+
+    return formData;
   }
 
   /**

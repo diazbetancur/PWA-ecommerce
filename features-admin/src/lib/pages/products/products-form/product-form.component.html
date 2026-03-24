@@ -274,10 +274,111 @@
         <div class="form-section">
           <h2>Imagen y Categorización</h2>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>URL de Imagen Principal</mat-label>
-            <input matInput formControlName="mainImageUrl" />
-          </mat-form-field>
+          <div class="media-upload-grid">
+            <div class="image-upload-field full-width">
+              <label class="upload-label" for="product-main-image-input">
+                Imagen Principal
+              </label>
+              <input
+                #productMainImageInput
+                id="product-main-image-input"
+                type="file"
+                accept="image/*"
+                (change)="onMainImageSelected($event)"
+              />
+              <p class="upload-hint">
+                Se enviará como <strong>mainImage</strong>. Si no seleccionas
+                una nueva en edición, se conserva la actual.
+              </p>
+
+              @if (selectedMainImageFile()) {
+              <p class="upload-selected-file">
+                Archivo: {{ selectedMainImageFile()!.name }}
+              </p>
+              <button
+                type="button"
+                class="clear-media-btn"
+                (click)="clearMainImage(productMainImageInput)"
+              >
+                Quitar imagen principal seleccionada
+              </button>
+              } @if (displayMainImageUrl()) {
+              <div class="main-image-preview">
+                <p class="preview-label">Preview imagen principal</p>
+                <img [src]="displayMainImageUrl()" alt="Main image preview" />
+              </div>
+              }
+            </div>
+
+            <div class="image-upload-field full-width">
+              <label class="upload-label" for="product-images-input">
+                Imágenes Adicionales
+              </label>
+              <input
+                #productImagesInput
+                id="product-images-input"
+                type="file"
+                accept="image/*"
+                multiple
+                (change)="onAdditionalImagesSelected($event)"
+              />
+              <p class="upload-hint">
+                Se enviarán como <strong>images</strong> (múltiple).
+              </p>
+
+              @if (selectedAdditionalImageFiles().length > 0) {
+              <p class="upload-selected-file">
+                {{ selectedAdditionalImageFiles().length }} imagen(es)
+                seleccionada(s)
+              </p>
+              <button
+                type="button"
+                class="clear-media-btn"
+                (click)="clearAdditionalImages(productImagesInput)"
+              >
+                Quitar imágenes adicionales
+              </button>
+              } @if (isEditMode() && existingImageUrls().length > 0) {
+              <p class="existing-media-label">
+                Imágenes actuales: {{ existingImageUrls().length }}
+              </p>
+              }
+            </div>
+
+            <div class="image-upload-field full-width">
+              <label class="upload-label" for="product-videos-input">
+                Videos
+              </label>
+              <input
+                #productVideosInput
+                id="product-videos-input"
+                type="file"
+                accept="video/*"
+                multiple
+                (change)="onVideosSelected($event)"
+              />
+              <p class="upload-hint">
+                Se enviarán como <strong>videos</strong> (múltiple).
+              </p>
+
+              @if (selectedVideoFiles().length > 0) {
+              <p class="upload-selected-file">
+                {{ selectedVideoFiles().length }} video(s) seleccionado(s)
+              </p>
+              <button
+                type="button"
+                class="clear-media-btn"
+                (click)="clearVideos(productVideosInput)"
+              >
+                Quitar videos
+              </button>
+              } @if (isEditMode() && existingVideoUrls().length > 0) {
+              <p class="existing-media-label">
+                Videos actuales: {{ existingVideoUrls().length }}
+              </p>
+              }
+            </div>
+          </div>
 
           <!-- Selector de Categorías -->
           <div class="category-selector-wrapper">
