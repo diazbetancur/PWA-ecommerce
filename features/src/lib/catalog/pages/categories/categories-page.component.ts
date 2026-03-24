@@ -66,8 +66,6 @@ export class CategoriesPageComponent implements OnInit {
   }
 
   goToCategory(categorySlug: string): void {
-    this.router.navigate(['/catalog'], {
-      queryParams: { category: categorySlug },
-    });
+    this.router.navigate(['/categories', categorySlug, 'products']);
   }
 }

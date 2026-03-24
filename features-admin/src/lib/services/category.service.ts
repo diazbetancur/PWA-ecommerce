@@ -9,8 +9,9 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { ApiClientService } from '@pwa/core';
+import { ApiClientService, AppEnvService } from '@pwa/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   CategoryListParams,
   CategoryListResponse,
@@ -22,6 +23,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class CategoryService {
   private readonly apiClient = inject(ApiClientService);
+  private readonly env = inject(AppEnvService);
 
   /**
    * Listar categorías con paginación y filtros
@@ -36,24 +38,27 @@ export class CategoryService {
       queryParams['isActive'] = params.isActive;
     if (params?.parentId) queryParams['parentId'] = params.parentId;
 
-    return this.apiClient.getWithParams<CategoryListResponse>(
-      '/api/categories',
-      queryParams
-    );
+    return this.apiClient
+      .getWithParams<CategoryListResponse>('/api/categories', queryParams)
+      .pipe(map((response) => this.normalizeCategoryListResponse(response)));
   }
 
   /**
    * Obtener categoría por ID
    */
   getById(id: string): Observable<CategoryResponse> {
-    return this.apiClient.get<CategoryResponse>(`/api/categories/${id}`);
+    return this.apiClient
+      .get<CategoryResponse>(`/api/categories/${id}`)
+      .pipe(map((response) => this.normalizeCategoryResponse(response)));
   }
 
   /**
    * Obtener categoría por slug
    */
   getBySlug(slug: string): Observable<CategoryResponse> {
-    return this.apiClient.get<CategoryResponse>(`/api/categories/slug/${slug}`);
+    return this.apiClient
+      .get<CategoryResponse>(`/api/categories/slug/${slug}`)
+      .pipe(map((response) => this.normalizeCategoryResponse(response)));
   }
 
   /**
@@ -61,7 +66,9 @@ export class CategoryService {
    * Requiere permiso "create" en módulo "categories"
    */
   create(request: CreateCategoryRequest): Observable<CategoryResponse> {
-    return this.apiClient.post<CategoryResponse>('/api/categories', request);
+    return this.apiClient
+      .post<CategoryResponse>('/api/categories', this.buildFormData(request))
+      .pipe(map((response) => this.normalizeCategoryResponse(response)));
   }
 
   /**
@@ -72,10 +79,12 @@ export class CategoryService {
     id: string,
     request: UpdateCategoryRequest
   ): Observable<CategoryResponse> {
-    return this.apiClient.put<CategoryResponse>(
-      `/api/categories/${id}`,
-      request
-    );
+    return this.apiClient
+      .put<CategoryResponse>(
+        `/api/categories/${id}`,
+        this.buildFormData(request)
+      )
+      .pipe(map((response) => this.normalizeCategoryResponse(response)));
   }
 
   /**
@@ -85,5 +94,80 @@ export class CategoryService {
    */
   delete(id: string): Observable<void> {
     return this.apiClient.delete<void>(`/api/categories/${id}`);
+  }
+
+  private buildFormData(
+    request: CreateCategoryRequest | UpdateCategoryRequest
+  ): FormData {
+    const formData = new FormData();
+
+    if (request.name !== undefined) {
+      formData.append('name', request.name);
+    }
+
+    if (request.description !== undefined) {
+      formData.append('description', request.description ?? '');
+    }
+
+    if (request.isActive !== undefined) {
+      formData.append('isActive', String(request.isActive));
+    }
+
+    if (request.parentId) {
+      formData.append('parentId', request.parentId);
+    }
+
+    if (request.image) {
+      formData.append('image', request.image);
+    }
+
+    return formData;
+  }
+
+  private normalizeCategoryListResponse(
+    response: CategoryListResponse
+  ): CategoryListResponse {
+    return {
+      ...response,
+      items: response.items.map((item) => ({
+        ...item,
+        imageUrl: this.resolvePublicImageUrl(item.imageUrl),
+      })),
+    };
+  }
+
+  private normalizeCategoryResponse(
+    response: CategoryResponse
+  ): CategoryResponse {
+    return {
+      ...response,
+      imageUrl: this.resolvePublicImageUrl(response.imageUrl),
+    };
+  }
+
+  private resolvePublicImageUrl(imageUrl?: string): string | undefined {
+    if (!imageUrl) {
+      return imageUrl;
+    }
+
+    if (
+      imageUrl.startsWith('http://') ||
+      imageUrl.startsWith('https://') ||
+      imageUrl.startsWith('data:') ||
+      imageUrl.startsWith('blob:')
+    ) {
+      return imageUrl;
+    }
+
+    const baseUrl = this.env.categoryPublicBaseUrl;
+    if (!baseUrl) {
+      return imageUrl;
+    }
+
+    const normalizedBase = baseUrl.endsWith('/')
+      ? baseUrl.slice(0, -1)
+      : baseUrl;
+    const normalizedPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+    return `${normalizedBase}${normalizedPath}`;
   }
 }

@@ -29,6 +29,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AppEnvService } from '@pwa/core';
 import { AppButtonComponent } from '@pwa/shared';
 import {
   CategoryResponse,
@@ -63,12 +64,17 @@ export class CategoryFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly appEnv = inject(AppEnvService);
 
   // Estado
   readonly loading = signal(false);
   readonly isEditMode = signal(false);
   readonly categoryId = signal<string | null>(null);
   readonly category = signal<CategoryResponse | null>(null);
+  readonly selectedImageFile = signal<File | null>(null);
+  readonly imagePreviewUrl = signal<string | null>(null);
+
+  private createdObjectUrl: string | null = null;
 
   // Formulario
   readonly form: FormGroup;
@@ -79,6 +85,22 @@ export class CategoryFormComponent implements OnInit {
 
   readonly submitButtonText = computed(() =>
     this.isEditMode() ? 'Actualizar' : 'Crear'
+  );
+
+  readonly maxImageSizeMb = computed(() => this.appEnv.categoryImageMaxSizeMb);
+
+  readonly maxImageSizeBytes = computed(
+    () => this.maxImageSizeMb() * 1024 * 1024
+  );
+
+  readonly currentImageUrl = computed(() => this.category()?.imageUrl || null);
+
+  readonly hasImagePreview = computed(
+    () => !!this.imagePreviewUrl() || !!this.currentImageUrl()
+  );
+
+  readonly displayPreviewUrl = computed(
+    () => this.imagePreviewUrl() || this.currentImageUrl()
   );
 
   constructor() {
@@ -92,9 +114,12 @@ export class CategoryFormComponent implements OnInit {
         ],
       ],
       description: ['', [Validators.maxLength(500)]],
-      imageUrl: [''],
       isActive: [true],
     });
+  }
+
+  ngOnDestroy(): void {
+    this.revokeObjectUrl();
   }
 
   ngOnInit(): void {
@@ -117,7 +142,6 @@ export class CategoryFormComponent implements OnInit {
         this.form.patchValue({
           name: category.name,
           description: category.description || '',
-          imageUrl: category.imageUrl || '',
           isActive: category.isActive,
         });
         this.loading.set(false);
@@ -140,12 +164,53 @@ export class CategoryFormComponent implements OnInit {
     this.loading.set(true);
 
     const formValue = this.form.value;
+    const requestPayload = {
+      ...formValue,
+      image: this.selectedImageFile() || undefined,
+    };
 
     if (this.isEditMode()) {
-      this.updateCategory(formValue);
+      this.updateCategory(requestPayload);
     } else {
-      this.createCategory(formValue);
+      this.createCategory(requestPayload);
     }
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] || null;
+
+    if (!file) {
+      this.selectedImageFile.set(null);
+      this.imagePreviewUrl.set(null);
+      this.revokeObjectUrl();
+      return;
+    }
+
+    if (file.size > this.maxImageSizeBytes()) {
+      this.snackBar.open(
+        `La imagen supera el límite de ${this.maxImageSizeMb()} MB`,
+        'Cerrar',
+        { duration: 3500 }
+      );
+      input.value = '';
+      this.selectedImageFile.set(null);
+      this.imagePreviewUrl.set(null);
+      this.revokeObjectUrl();
+      return;
+    }
+
+    this.selectedImageFile.set(file);
+    this.revokeObjectUrl();
+    this.createdObjectUrl = URL.createObjectURL(file);
+    this.imagePreviewUrl.set(this.createdObjectUrl);
+  }
+
+  clearSelectedImage(fileInput: HTMLInputElement): void {
+    fileInput.value = '';
+    this.selectedImageFile.set(null);
+    this.imagePreviewUrl.set(null);
+    this.revokeObjectUrl();
   }
 
   private createCategory(data: CreateCategoryRequest): void {
@@ -187,6 +252,13 @@ export class CategoryFormComponent implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  private revokeObjectUrl(): void {
+    if (this.createdObjectUrl) {
+      URL.revokeObjectURL(this.createdObjectUrl);
+      this.createdObjectUrl = null;
+    }
   }
 
   cancel(): void {

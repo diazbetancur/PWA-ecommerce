@@ -50,7 +50,7 @@ export interface CategoryListResponse {
 export interface CreateCategoryRequest {
   name: string;
   description?: string;
-  imageUrl?: string;
+  image?: File;
   isActive?: boolean;
   parentId?: string;
 }
@@ -61,7 +61,7 @@ export interface CreateCategoryRequest {
 export interface UpdateCategoryRequest {
   name?: string;
   description?: string;
-  imageUrl?: string;
+  image?: File;
   isActive?: boolean;
   parentId?: string;
 }

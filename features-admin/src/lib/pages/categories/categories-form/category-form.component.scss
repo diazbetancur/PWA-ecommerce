@@ -129,6 +129,46 @@ mat-card {
   }
 
   // Preview de imagen
+  .image-upload-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.875rem;
+    border: 1px dashed var(--tenant-border-color, #cbd5e1);
+    border-radius: 8px;
+    background: var(--tenant-primary-light, #f8fafc);
+
+    .upload-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--tenant-text-color, #1e293b);
+    }
+
+    .upload-hint {
+      margin: 0;
+      font-size: 0.8125rem;
+      color: var(--tenant-text-muted-color, #64748b);
+    }
+
+    .upload-selected-file {
+      margin: 0;
+      font-size: 0.8125rem;
+      color: var(--tenant-text-color, #1e293b);
+      font-weight: 500;
+    }
+
+    .clear-image-btn {
+      align-self: flex-start;
+      border: none;
+      background: transparent;
+      color: var(--tenant-accent-color, #ef4444);
+      cursor: pointer;
+      font-size: 0.8125rem;
+      padding: 0;
+      text-decoration: underline;
+    }
+  }
+
   .image-preview {
     padding: 1rem;
     border: 1px solid var(--tenant-border-color, #e2e8f0);

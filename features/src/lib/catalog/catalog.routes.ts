@@ -23,6 +23,22 @@ export const catalogRoutes: Routes = [
     title: 'Categorías',
   },
   {
+    path: 'categories/:categorySlug/products',
+    loadComponent: () =>
+      import('./pages/category-products/category-products-page.component').then(
+        (m) => m.CategoryProductsPageComponent
+      ),
+    title: 'Productos por categoría',
+  },
+  {
+    path: 'categories/:categorySlug/products/:productSlug',
+    loadComponent: () =>
+      import(
+        './pages/category-product-detail/category-product-detail-page.component'
+      ).then((m) => m.CategoryProductDetailPageComponent),
+    title: 'Detalle de producto',
+  },
+  {
     path: 'product/:id',
     loadComponent: () =>
       import('./pages/product-details/product-details.component').then(

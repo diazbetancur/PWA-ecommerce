@@ -9,6 +9,10 @@ export const environment: AppEnvironment = {
   fcm: {
     vapidPublicKey: 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY',
   },
+  categoryMedia: {
+    maxImageSizeMb: 1,
+    publicBaseUrl: 'https://pub-49f57cb38af14e108e2f36fb4f0dc058.r2.dev',
+  },
   analytics: {
     enabled: false,
     trackingId: undefined,

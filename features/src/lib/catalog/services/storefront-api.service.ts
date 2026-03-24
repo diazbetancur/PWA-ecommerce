@@ -14,7 +14,7 @@
  */
 
 import { Injectable, inject } from '@angular/core';
-import { ApiClientService } from '@pwa/core';
+import { ApiClientService, AppEnvService } from '@pwa/core';
 import { Observable } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import {
@@ -36,6 +36,7 @@ import {
 })
 export class StorefrontApiService {
   private readonly apiClient = inject(ApiClientService);
+  private readonly env = inject(AppEnvService);
 
   // ============================================
   // BANNERS
@@ -83,6 +84,7 @@ export class StorefrontApiService {
     return this.apiClient
       .getWithParams<StoreCategoryDto[]>('/api/store/categories', params)
       .pipe(
+        map((categories) => this.normalizeStoreCategories(categories)),
         catchError((error: unknown) => {
           throw error;
         })
@@ -99,10 +101,59 @@ export class StorefrontApiService {
     return this.apiClient
       .get<StoreCategoryDetailDto>(`/api/store/categories/${slug}`)
       .pipe(
+        map((category) => this.normalizeStoreCategoryDetail(category)),
         catchError((error: unknown) => {
           throw error;
         })
       );
+  }
+
+  private normalizeStoreCategories(
+    categories: StoreCategoryDto[]
+  ): StoreCategoryDto[] {
+    return categories.map((category) => ({
+      ...category,
+      imageUrl: this.resolvePublicImageUrl(category.imageUrl),
+      children: this.normalizeStoreCategories(category.children ?? []),
+    }));
+  }
+
+  private normalizeStoreCategoryDetail(
+    category: StoreCategoryDetailDto
+  ): StoreCategoryDetailDto {
+    return {
+      ...category,
+      imageUrl: this.resolvePublicImageUrl(category.imageUrl),
+      children: this.normalizeStoreCategories(category.children ?? []),
+    };
+  }
+
+  private resolvePublicImageUrl(
+    imageUrl?: string | null
+  ): string | null | undefined {
+    if (!imageUrl) {
+      return imageUrl;
+    }
+
+    if (
+      imageUrl.startsWith('http://') ||
+      imageUrl.startsWith('https://') ||
+      imageUrl.startsWith('data:') ||
+      imageUrl.startsWith('blob:')
+    ) {
+      return imageUrl;
+    }
+
+    const baseUrl = this.env.categoryPublicBaseUrl;
+    if (!baseUrl) {
+      return imageUrl;
+    }
+
+    const normalizedBase = baseUrl.endsWith('/')
+      ? baseUrl.slice(0, -1)
+      : baseUrl;
+    const normalizedPath = imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+    return `${normalizedBase}${normalizedPath}`;
   }
 
   // ============================================

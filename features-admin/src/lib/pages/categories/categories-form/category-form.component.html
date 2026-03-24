@@ -52,24 +52,42 @@
           </mat-hint>
         </mat-form-field>
 
-        <!-- URL de Imagen -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>URL de Imagen</mat-label>
+        <!-- Imagen de categoría -->
+        <div class="image-upload-field full-width">
+          <label class="upload-label" for="category-image-input">
+            Imagen de Categoría (máx {{ maxImageSizeMb() }} MB)
+          </label>
           <input
-            matInput
-            formControlName="imageUrl"
-            placeholder="https://ejemplo.com/imagen.jpg"
-            type="url"
+            #categoryImageInput
+            id="category-image-input"
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
           />
-          <mat-hint>URL completa de la imagen de la categoría</mat-hint>
-        </mat-form-field>
+          <p class="upload-hint">
+            Formatos permitidos: JPG, PNG, WEBP. Si no seleccionas imagen, se
+            mantiene la actual.
+          </p>
+          @if (selectedImageFile()) {
+          <p class="upload-selected-file">
+            Archivo: {{ selectedImageFile()!.name }}
+          </p>
+          <button
+            type="button"
+            class="clear-image-btn"
+            (click)="clearSelectedImage(categoryImageInput)"
+          >
+            Quitar imagen seleccionada
+          </button>
+          }
+        </div>
 
         <!-- Preview de imagen -->
-        @if (form.get('imageUrl')?.value) {
+        @if (hasImagePreview()) {
         <div class="image-preview">
           <p class="preview-label">Vista previa:</p>
           <img
-            [src]="form.get('imageUrl')?.value"
+            [src]="displayPreviewUrl()"
             alt="Preview"
             (error)="$event.target.src = ''"
             class="preview-image"

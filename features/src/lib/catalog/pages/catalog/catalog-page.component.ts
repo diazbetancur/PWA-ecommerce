@@ -1,4 +1,4 @@
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -62,7 +62,6 @@ export class CatalogPageComponent implements OnInit {
   private readonly tenantContext = inject(TenantContextService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly location = inject(Location);
 
   readonly searchControl = new FormControl<string>('');
 
@@ -178,14 +177,7 @@ export class CatalogPageComponent implements OnInit {
   }
 
   goBackToCategories(): void {
-    if (window.history.length > 1) {
-      this.location.back();
-      return;
-    }
-
-    this.router.navigate(['/'], {
-      fragment: 'categorias',
-    });
+    this.router.navigate(['/categories']);
   }
 
   private setupSearch(): void {

@@ -22,6 +22,12 @@ export interface AppEnvironment {
     vapidPublicKey: string;
   };
 
+  /** Configuración para medios de categorías */
+  categoryMedia?: {
+    maxImageSizeMb?: number;
+    publicBaseUrl?: string;
+  };
+
   /** Configuraciones adicionales opcionales */
   analytics?: {
     enabled: boolean;
@@ -114,6 +120,16 @@ export class AppEnvService {
     return this.env.fcm;
   }
 
+  /** Límite de tamaño de imagen de categoría en MB */
+  get categoryImageMaxSizeMb(): number {
+    return this.env.categoryMedia?.maxImageSizeMb ?? 1;
+  }
+
+  /** URL base pública para completar imageUrl de categorías */
+  get categoryPublicBaseUrl(): string {
+    return this.env.categoryMedia?.publicBaseUrl ?? '';
+  }
+
   /**
    * Verifica si una feature está habilitada
    * @param featureName - Nombre de la feature
@@ -187,11 +203,6 @@ export class AppEnvService {
       errors.push('FCM VAPID key needs to be configured');
     }
 
-    // En desarrollo, mostrar warnings
-    if (this.isDevelopment && errors.length > 0) {
-      // Validation errors present
-    }
-
     return {
       isValid: errors.length === 0,
       errors,
@@ -203,14 +214,11 @@ export class AppEnvService {
    */
   logEnvironmentInfo(): void {
     if (this.isConsoleLoggingEnabled) {
-      const info = this.getEnvironmentInfo();
-
-      // Environment info logged (removed for production)
+      this.getEnvironmentInfo();
 
       // Validar configuración
       const validation = this.validateEnvironment();
-      if (!validation.isValid) {
-      }
+      void validation;
     }
   }
 }

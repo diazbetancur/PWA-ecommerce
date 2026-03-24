@@ -1,0 +1,78 @@
+<section class="category-product-detail-page">
+  <button class="back-button" (click)="goBackToCategoryProducts()">
+    <span aria-hidden="true">←</span>
+    Volver a la lista de productos
+  </button>
+
+  @if (loading()) {
+  <div class="state-card">Cargando detalle del producto...</div>
+  } @else if (error()) {
+  <div class="state-card error">{{ error() }}</div>
+  } @else if (product()) {
+  <article class="product-detail-card">
+    <div class="image-column">
+      @if (primaryImage()) {
+      <img
+        [src]="primaryImage()!"
+        [alt]="product()!.name"
+        class="product-image"
+      />
+      } @else {
+      <div class="image-placeholder">Sin imagen disponible</div>
+      }
+    </div>
+
+    <div class="info-column">
+      <h1>{{ product()!.name }}</h1>
+
+      @if (product()!.description) {
+      <p class="description">{{ product()!.description }}</p>
+      }
+
+      <div class="meta-row">
+        <span [class.out-of-stock]="!product()!.inStock">
+          {{ product()!.inStock ? 'Disponible' : 'Sin stock' }}
+        </span>
+        @if (product()!.brand) {
+        <span>Marca: {{ product()!.brand }}</span>
+        } @if (product()!.sku) {
+        <span>SKU: {{ product()!.sku }}</span>
+        }
+      </div>
+
+      <div class="footer-block">
+        <div class="price-block">
+          @if (product()!.compareAtPrice) {
+          <span class="compare-price">{{
+            product()!.compareAtPrice | currency : 'COP' : 'symbol' : '1.0-0'
+          }}</span>
+          }
+          <strong class="current-price">{{
+            product()!.price | currency : 'COP' : 'symbol' : '1.0-0'
+          }}</strong>
+        </div>
+
+        <div class="actions-row">
+          @if (isAuthenticated()) {
+          <button
+            class="favorite-button"
+            [class.active]="isFavorite()"
+            (click)="toggleFavorite()"
+            type="button"
+            [attr.aria-label]="
+              isFavorite() ? 'Quitar de favoritos' : 'Agregar a favoritos'
+            "
+          >
+            {{ isFavorite() ? '♥' : '♡' }}
+          </button>
+          }
+
+          <button class="add-cart-button" (click)="addToCart()" type="button">
+            Add al carro
+          </button>
+        </div>
+      </div>
+    </div>
+  </article>
+  }
+</section>

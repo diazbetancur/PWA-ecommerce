@@ -30,9 +30,7 @@ const colors = {
   red: '\x1b[31m',
 };
 
-void (
-  `${colors.bright}${colors.blue}🔧 Inyectando variables de entorno para Vercel...${colors.reset}\n`
-);
+void `${colors.bright}${colors.blue}🔧 Inyectando variables de entorno para Vercel...${colors.reset}\n`;
 
 // Leer variables de entorno
 const API_BASE_URL =
@@ -44,24 +42,24 @@ const GA_TRACKING_ID = process.env.NG_APP_GA_TRACKING_ID || undefined;
 const ENABLE_ANALYTICS = process.env.NG_APP_ENABLE_ANALYTICS === 'true';
 const LOG_LEVEL = process.env.NG_APP_LOG_LEVEL || 'warn';
 const ENABLE_CONSOLE = process.env.NG_APP_ENABLE_CONSOLE === 'true';
+const CATEGORY_IMAGE_MAX_MB = Number(
+  process.env.NG_APP_CATEGORY_IMAGE_MAX_MB || '1'
+);
+const CATEGORY_PUBLIC_BASE_URL =
+  process.env.NG_APP_CATEGORY_PUBLIC_BASE_URL ||
+  'https://pub-49f57cb38af14e108e2f36fb4f0dc058.r2.dev';
 
 // Detectar si estamos en Vercel
 const IS_VERCEL = process.env.VERCEL === '1';
 const VERCEL_ENV = process.env.VERCEL_ENV || 'unknown'; // production, preview, development
 
-void (
-  `${colors.green}✓${colors.reset} Entorno detectado: ${
-    IS_VERCEL ? 'Vercel' : 'Local'
-  } (${VERCEL_ENV})`
-);
-void (
-  `${colors.green}✓${colors.reset} API Base URL: ${colors.bright}${API_BASE_URL}${colors.reset}`
-);
-void (
-  `${colors.green}✓${colors.reset} Analytics: ${
-    ENABLE_ANALYTICS ? 'Habilitado' : 'Deshabilitado'
-  }`
-);
+void `${colors.green}✓${colors.reset} Entorno detectado: ${
+  IS_VERCEL ? 'Vercel' : 'Local'
+} (${VERCEL_ENV})`;
+void `${colors.green}✓${colors.reset} API Base URL: ${colors.bright}${API_BASE_URL}${colors.reset}`;
+void `${colors.green}✓${colors.reset} Analytics: ${
+  ENABLE_ANALYTICS ? 'Habilitado' : 'Deshabilitado'
+}`;
 
 // Generar contenido del archivo environment.runtime.ts
 const envContent = `import { AppEnvironment } from '@pwa/core';
@@ -85,6 +83,12 @@ export const environment: AppEnvironment = {
   useTenantHeader: true,
   fcm: {
     vapidPublicKey: '${VAPID_PUBLIC_KEY}'
+  },
+  categoryMedia: {
+    maxImageSizeMb: ${
+      Number.isFinite(CATEGORY_IMAGE_MAX_MB) ? CATEGORY_IMAGE_MAX_MB : 1
+    },
+    publicBaseUrl: '${CATEGORY_PUBLIC_BASE_URL}'
   },
   analytics: {
     enabled: ${ENABLE_ANALYTICS},
@@ -123,29 +127,19 @@ if (!fs.existsSync(outputDir)) {
 // Escribir archivo
 try {
   fs.writeFileSync(outputPath, envContent, 'utf8');
-  void (
-    `\n${colors.green}${colors.bright}✓ Archivo generado exitosamente:${colors.reset}`
-  );
+  void `\n${colors.green}${colors.bright}✓ Archivo generado exitosamente:${colors.reset}`;
 } catch (error) {
-  void (
-    `\n${colors.red}${colors.bright}✗ Error al generar archivo:${colors.reset}`
-  );
+  void `\n${colors.red}${colors.bright}✗ Error al generar archivo:${colors.reset}`;
   process.exit(1);
 }
 
 // Mostrar advertencias si se usan valores por defecto
 if (!process.env.NG_APP_API_BASE_URL) {
-  void (
-    `${colors.yellow}⚠️  NG_APP_API_BASE_URL no definida, usando valor por defecto${colors.reset}`
-  );
+  void `${colors.yellow}⚠️  NG_APP_API_BASE_URL no definida, usando valor por defecto${colors.reset}`;
 }
 
 if (VAPID_PUBLIC_KEY === 'REPLACE_WITH_YOUR_VAPID_PUBLIC_KEY') {
-  void (
-    `${colors.yellow}⚠️  NG_APP_VAPID_PUBLIC_KEY no definida, usando placeholder${colors.reset}`
-  );
+  void `${colors.yellow}⚠️  NG_APP_VAPID_PUBLIC_KEY no definida, usando placeholder${colors.reset}`;
 }
 
-void (
-  `\n${colors.green}${colors.bright}✓ Variables de entorno inyectadas correctamente${colors.reset}\n`
-);
+void `\n${colors.green}${colors.bright}✓ Variables de entorno inyectadas correctamente${colors.reset}\n`;

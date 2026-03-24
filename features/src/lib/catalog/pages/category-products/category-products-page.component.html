@@ -1,0 +1,87 @@
+<section class="category-products-page">
+  <header class="page-header">
+    <button class="back-button" (click)="goBackToCategories()">
+      <span aria-hidden="true">←</span>
+      Volver a categorías
+    </button>
+
+    <div class="title-wrap">
+      <p class="eyebrow">Categoría seleccionada</p>
+      <h1>{{ category()?.name || 'Productos de categoría' }}</h1>
+      @if (category()?.description) {
+      <p class="subtitle">{{ category()?.description }}</p>
+      }
+    </div>
+  </header>
+
+  @if (loading()) {
+  <div class="state-card">Cargando productos...</div>
+  } @else if (error()) {
+  <div class="state-card error">{{ error() }}</div>
+  } @else if (products().length === 0) {
+  <div class="state-card">
+    No hay productos disponibles para esta categoría.
+  </div>
+  } @else {
+  <div class="products-grid">
+    @for (product of products(); track trackByProductId($index, product)) {
+    <article class="product-card">
+      <div class="image-wrap">
+        @if (product.mainImageUrl) {
+        <img [src]="product.mainImageUrl" [alt]="product.name" loading="lazy" />
+        } @else {
+        <div class="image-placeholder">Sin imagen</div>
+        }
+      </div>
+
+      <div class="content">
+        <h3>{{ product.name }}</h3>
+        @if (product.shortDescription) {
+        <p class="short-description">{{ product.shortDescription }}</p>
+        }
+        <div class="price-block">
+          @if (product.compareAtPrice) {
+          <span class="compare-price">{{
+            product.compareAtPrice | currency : 'COP' : 'symbol' : '1.0-0'
+          }}</span>
+          }
+          <strong class="current-price">{{
+            product.price | currency : 'COP' : 'symbol' : '1.0-0'
+          }}</strong>
+        </div>
+      </div>
+
+      <div class="actions">
+        <div class="actions-left">
+          <button class="cart-button" (click)="addToCart(product)">
+            Add al carro
+          </button>
+          @if (isAuthenticated()) {
+          <button
+            class="favorite-button"
+            [class.active]="isFavorite(product.id)"
+            (click)="toggleFavorite(product.id)"
+            [attr.aria-label]="
+              isFavorite(product.id)
+                ? 'Quitar de favoritos'
+                : 'Agregar a favoritos'
+            "
+          >
+            {{ isFavorite(product.id) ? '♥' : '♡' }}
+          </button>
+          }
+        </div>
+
+        <button
+          class="view-button"
+          (click)="goToProductDetail(product.slug)"
+          type="button"
+        >
+          Ver
+        </button>
+      </div>
+    </article>
+    }
+  </div>
+  }
+</section>
