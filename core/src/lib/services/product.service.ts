@@ -125,6 +125,12 @@ export class ProductService {
       formData.append('stock', String(product.stock));
     if (product.trackInventory !== undefined)
       formData.append('trackInventory', String(product.trackInventory));
+    if (product.isOnSale !== undefined)
+      formData.append('isOnSale', String(product.isOnSale));
+    if (product.isTaxIncluded !== undefined)
+      formData.append('isTaxIncluded', String(product.isTaxIncluded));
+    if (product.taxPercentage !== undefined)
+      formData.append('taxPercentage', String(product.taxPercentage));
     if (product.isActive !== undefined)
       formData.append('isActive', String(product.isActive));
     if (product.isFeatured !== undefined)

@@ -15,6 +15,14 @@ export const catalogRoutes: Routes = [
     title: 'Catálogo de Productos',
   },
   {
+    path: 'offers',
+    loadComponent: () =>
+      import('./pages/catalog/catalog-page.component').then(
+        (m) => m.CatalogPageComponent
+      ),
+    title: 'Ofertas',
+  },
+  {
     path: 'categories',
     loadComponent: () =>
       import('./pages/categories/categories-page.component').then(

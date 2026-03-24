@@ -178,6 +178,7 @@ export class StorefrontApiService {
       if (filters.maxPrice !== undefined) params['maxPrice'] = filters.maxPrice;
       if (filters.brand) params['brand'] = filters.brand;
       if (filters.featured !== undefined) params['featured'] = filters.featured;
+      if (filters.onSale !== undefined) params['onSale'] = filters.onSale;
       if (filters.inStock !== undefined) params['inStock'] = filters.inStock;
       if (filters.sortBy) params['sortBy'] = filters.sortBy;
       if (filters.sortOrder) params['sortOrder'] = filters.sortOrder;

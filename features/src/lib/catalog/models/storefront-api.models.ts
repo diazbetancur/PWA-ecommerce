@@ -130,6 +130,7 @@ export interface ProductFilters {
   maxPrice?: number;
   brand?: string;
   featured?: boolean;
+  onSale?: boolean;
   inStock?: boolean;
   sortBy?: 'price' | 'name' | 'newest';
   sortOrder?: 'asc' | 'desc';

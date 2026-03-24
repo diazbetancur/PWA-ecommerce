@@ -11,6 +11,7 @@ import {
   Component,
   computed,
   inject,
+  OnDestroy,
   OnInit,
   signal,
 } from '@angular/core';
@@ -64,7 +65,7 @@ import { StoreAdminService } from '../../../services/store-admin.service';
   templateUrl: './product-form.component.html',
   styleUrls: ['./product-form.component.scss'],
 })
-export class ProductFormComponent implements OnInit {
+export class ProductFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly productService = inject(ProductService);
   private readonly router = inject(Router);
@@ -149,6 +150,9 @@ export class ProductFormComponent implements OnInit {
       compareAtPrice: [null, [Validators.min(0)]],
       stock: [0, [Validators.required, Validators.min(0)]],
       trackInventory: [false],
+      isOnSale: [false],
+      isTaxIncluded: [true],
+      taxPercentage: [null],
       isActive: [true],
       isFeatured: [false],
       tags: [''],
@@ -157,6 +161,8 @@ export class ProductFormComponent implements OnInit {
       metaTitle: ['', [Validators.maxLength(200)]],
       metaDescription: ['', [Validators.maxLength(500)]],
     });
+
+    this.setupTaxPercentageValidation();
   }
 
   ngOnDestroy(): void {
@@ -211,6 +217,39 @@ export class ProductFormComponent implements OnInit {
     }
   }
 
+  private setupTaxPercentageValidation(): void {
+    const isTaxIncludedControl = this.form.get('isTaxIncluded');
+    const taxPercentageControl = this.form.get('taxPercentage');
+
+    if (!isTaxIncludedControl || !taxPercentageControl) {
+      return;
+    }
+
+    const applyValidators = (isTaxIncluded: boolean): void => {
+      if (isTaxIncluded) {
+        taxPercentageControl.clearValidators();
+      } else {
+        taxPercentageControl.setValidators([
+          Validators.required,
+          Validators.min(1),
+          Validators.max(100),
+        ]);
+      }
+
+      taxPercentageControl.updateValueAndValidity({ emitEvent: false });
+    };
+
+    applyValidators(Boolean(isTaxIncludedControl.value));
+
+    isTaxIncludedControl.valueChanges.subscribe((isTaxIncluded: boolean) => {
+      applyValidators(Boolean(isTaxIncluded));
+
+      if (isTaxIncluded) {
+        taxPercentageControl.setValue(null, { emitEvent: false });
+      }
+    });
+  }
+
   private loadProduct(id: string): void {
     this.loading.set(true);
 
@@ -251,6 +290,9 @@ export class ProductFormComponent implements OnInit {
           compareAtPrice: product.compareAtPrice || null,
           stock: product.stock,
           trackInventory: product.trackInventory,
+          isOnSale: product.isOnSale ?? false,
+          isTaxIncluded: product.isTaxIncluded ?? true,
+          taxPercentage: product.taxPercentage ?? null,
           isActive: product.isActive,
           isFeatured: product.isFeatured,
           tags: product.tags || '',
@@ -411,6 +453,7 @@ export class ProductFormComponent implements OnInit {
     if (errors['maxlength'])
       return `Máximo ${errors['maxlength'].requiredLength} caracteres`;
     if (errors['min']) return `El valor mínimo es ${errors['min'].min}`;
+    if (errors['max']) return `El valor máximo es ${errors['max'].max}`;
     if (errors['email']) return 'Email inválido';
 
     return 'Campo inválido';

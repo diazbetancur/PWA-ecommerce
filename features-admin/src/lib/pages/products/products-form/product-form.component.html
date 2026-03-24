@@ -112,6 +112,35 @@
             </div>
           </div>
 
+          <div class="checkboxes-group pricing-options">
+            <mat-checkbox formControlName="isOnSale">
+              Producto en oferta
+            </mat-checkbox>
+
+            <mat-checkbox formControlName="isTaxIncluded">
+              Impuesto incluido en el precio
+            </mat-checkbox>
+          </div>
+
+          @if (!form.get('isTaxIncluded')?.value) {
+          <mat-form-field appearance="outline">
+            <mat-label>Porcentaje de impuesto *</mat-label>
+            <input
+              matInput
+              type="number"
+              formControlName="taxPercentage"
+              min="1"
+              max="100"
+            />
+            <span matSuffix>%</span>
+            <mat-hint>Valor entre 1 y 100</mat-hint>
+            @if (form.get('taxPercentage')?.invalid &&
+            form.get('taxPercentage')?.touched) {
+            <mat-error>{{ getErrorMessage('taxPercentage') }}</mat-error>
+            }
+          </mat-form-field>
+          }
+
           <!-- Distribución de Stock por Sucursales -->
           <div class="stock-distribution-section">
             <div class="distribution-header">
@@ -305,7 +334,10 @@
               } @if (displayMainImageUrl()) {
               <div class="main-image-preview">
                 <p class="preview-label">Preview imagen principal</p>
-                <img [src]="displayMainImageUrl()" alt="Main image preview" />
+                <img
+                  [src]="displayMainImageUrl()"
+                  alt="Vista previa principal"
+                />
               </div>
               }
             </div>

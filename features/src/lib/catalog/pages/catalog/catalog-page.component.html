@@ -1,6 +1,6 @@
 <div class="home-page">
   <!-- Banner Section -->
-  @if (banners().length > 0) {
+  @if (!isOffersMode() && banners().length > 0) {
   <section class="banner-section">
     <app-banner-carousel [banners]="banners()" [autoPlayInterval]="5000" />
   </section>
@@ -48,7 +48,7 @@
   </section>
 
   <!-- Categories Section -->
-  @if (shouldShowCategories()) {
+  @if (!isOffersMode() && shouldShowCategories()) {
   <section class="categories-section">
     <div class="container">
       <h2 class="section-title">Categorías</h2>
@@ -102,7 +102,7 @@
   <!-- Products Section -->
   <main class="products-section">
     <div class="container">
-      @if (showBackToCategories()) {
+      @if (!isOffersMode() && showBackToCategories()) {
       <div class="catalog-navigation-top">
         <button class="back-to-categories-btn" (click)="goBackToCategories()">
           <svg

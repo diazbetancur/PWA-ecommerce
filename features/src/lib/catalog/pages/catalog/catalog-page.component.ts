@@ -69,6 +69,7 @@ export class CatalogPageComponent implements OnInit {
   readonly banners = signal<Banner[]>([]);
   readonly categories = signal<StoreCategoryDto[]>([]);
   readonly products = signal<StoreProductDto[]>([]);
+  readonly isOffersMode = signal(false);
   readonly selectedCategory = signal<string | null>(null);
   readonly navigationSource = signal<string | null>(null);
   readonly isLoading = signal(true);
@@ -156,14 +157,33 @@ export class CatalogPageComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.loadBanners();
-    this.loadCategories();
+    const isOffersRoute = this.route.snapshot.routeConfig?.path === 'offers';
+    this.isOffersMode.set(isOffersRoute);
+
+    if (isOffersRoute) {
+      this.currentFilters.set({ onSale: true });
+    } else {
+      this.loadBanners();
+      this.loadCategories();
+    }
+
     this.setupQueryParams();
     this.loadProducts(true);
     this.setupSearch();
   }
 
   private setupQueryParams(): void {
+    if (this.isOffersMode()) {
+      this.navigationSource.set(null);
+      this.selectedCategory.set(null);
+      this.currentFilters.update((f) => ({
+        ...f,
+        onSale: true,
+        category: undefined,
+      }));
+      return;
+    }
+
     this.route.queryParams.subscribe((params) => {
       this.navigationSource.set(params['from'] || null);
       const categoryFromQuery = params['category'] || null;
@@ -294,7 +314,7 @@ export class CatalogPageComponent implements OnInit {
   clearFilters(): void {
     this.searchControl.setValue('', { emitEvent: false });
     this.selectedCategory.set(null);
-    this.currentFilters.set({});
+    this.currentFilters.set(this.isOffersMode() ? { onSale: true } : {});
     this.loadProducts(true);
   }
 

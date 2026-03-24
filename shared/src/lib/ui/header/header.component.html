@@ -24,6 +24,7 @@
       >
       <a routerLink="/catalog" routerLinkActive="active">Productos</a>
       <a routerLink="/categories" routerLinkActive="active">Categorías</a>
+      <a routerLink="/offers" routerLinkActive="active">Ofertas</a>
       @if (showRewardsCatalogMenu()) {
       <a routerLink="/loyalty/rewards" routerLinkActive="active">Premios</a>
       }
@@ -212,6 +213,24 @@
         <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" />
       </svg>
       Categorías
+    </a>
+    <a
+      routerLink="/offers"
+      (click)="closeMobileMenu()"
+      routerLinkActive="active"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path
+          d="M20.59 13.41L11 3.83a2 2 0 00-1.41-.58H4a1 1 0 00-1 1v5.59a2 2 0 00.58 1.41l9.58 9.59a2 2 0 002.83 0l4.6-4.6a2 2 0 000-2.83z"
+        />
+        <circle cx="7.5" cy="7.5" r="1.5" />
+      </svg>
+      Ofertas
     </a>
     @if (showRewardsCatalogMenu()) {
     <a

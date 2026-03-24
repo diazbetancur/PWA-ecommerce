@@ -224,6 +224,9 @@ export interface ProductResponse {
   compareAtPrice: number | null;
   stock: number;
   trackInventory: boolean;
+  isOnSale: boolean;
+  isTaxIncluded: boolean;
+  taxPercentage: number | null;
   isActive: boolean;
   isFeatured: boolean;
   tags: string | null;
@@ -274,6 +277,9 @@ export interface CreateProductDto {
   compareAtPrice?: number;
   stock?: number;
   trackInventory?: boolean;
+  isOnSale?: boolean;
+  isTaxIncluded?: boolean;
+  taxPercentage?: number;
   isActive?: boolean;
   isFeatured?: boolean;
   tags?: string;
@@ -300,6 +306,9 @@ export interface UpdateProductDto {
   compareAtPrice?: number;
   stock?: number;
   trackInventory?: boolean;
+  isOnSale?: boolean;
+  isTaxIncluded?: boolean;
+  taxPercentage?: number;
   isActive?: boolean;
   isFeatured?: boolean;
   tags?: string;
