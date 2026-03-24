@@ -1,0 +1,45 @@
+@if (visible && popup) {
+<div class="site-popup-backdrop" (click)="onBackdropClick($event)">
+  <div
+    class="site-popup-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Popup promocional"
+  >
+    <button
+      type="button"
+      class="close-btn"
+      (click)="onClose()"
+      aria-label="Cerrar popup"
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+
+    @if (popup!.targetUrl) {
+    <a
+      [href]="popup!.targetUrl"
+      target="_self"
+      class="image-link"
+      (click)="onClose()"
+    >
+      <img [src]="popup!.imageUrl" alt="Promoción" class="popup-image" />
+    </a>
+    } @else {
+    <img [src]="popup!.imageUrl" alt="Promoción" class="popup-image" />
+    } @if (popup!.buttonText) { @if (popup!.targetUrl) {
+    <a
+      [href]="popup!.targetUrl"
+      target="_self"
+      class="cta-btn"
+      (click)="onClose()"
+    >
+      {{ popup!.buttonText }}
+    </a>
+    } @else {
+    <button type="button" class="cta-btn" (click)="onClose()">
+      {{ popup!.buttonText }}
+    </button>
+    } }
+  </div>
+</div>
+}

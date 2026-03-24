@@ -11,4 +11,9 @@
   <app-footer />
   <app-whatsapp-button />
   <lib-toast-container />
+  <app-site-popup
+    [visible]="showPopup()"
+    [popup]="activePopup()"
+    (closed)="closePopup()"
+  />
 </div>

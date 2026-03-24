@@ -175,12 +175,20 @@ export class TenantAdminMenuService {
       order: 2,
       parentModule: 'settings',
     },
+    'settings.popups': {
+      module: 'settings',
+      label: 'Popups',
+      icon: 'open_in_new',
+      route: '/tenant-admin/settings/popups',
+      order: 3,
+      parentModule: 'settings',
+    },
     'settings.payments': {
       module: 'settings.payments',
       label: 'Pagos',
       icon: 'payment',
       route: '/tenant-admin/settings/payments',
-      order: 3,
+      order: 4,
       parentModule: 'settings',
     },
     'settings.shipping': {
@@ -188,7 +196,7 @@ export class TenantAdminMenuService {
       label: 'Envíos',
       icon: 'local_shipping',
       route: '/tenant-admin/settings/shipping',
-      order: 4,
+      order: 5,
       parentModule: 'settings',
     },
     'settings.stores': {
@@ -196,7 +204,7 @@ export class TenantAdminMenuService {
       label: 'Sucursales',
       icon: 'store',
       route: '/tenant-admin/settings/stores',
-      order: 5,
+      order: 6,
       parentModule: 'settings',
       requiresFeature: 'enableMultiStore', // Requiere que el tenant tenga multistore habilitado
     },

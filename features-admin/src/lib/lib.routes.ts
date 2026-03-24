@@ -273,6 +273,36 @@ export const featuresAdminRoutes: Route[] = [
           title: 'Marca y Configuración',
         },
       },
+      {
+        path: 'popups',
+        loadComponent: () =>
+          import('./pages/settings/popups-list/popups-list.component').then(
+            (m) => m.PopupsListComponent
+          ),
+        data: {
+          title: 'Popups',
+        },
+      },
+      {
+        path: 'popups/create',
+        loadComponent: () =>
+          import('./pages/settings/popups-form/popups-form.component').then(
+            (m) => m.PopupsFormComponent
+          ),
+        data: {
+          title: 'Nuevo Popup',
+        },
+      },
+      {
+        path: 'popups/:id/edit',
+        loadComponent: () =>
+          import('./pages/settings/popups-form/popups-form.component').then(
+            (m) => m.PopupsFormComponent
+          ),
+        data: {
+          title: 'Editar Popup',
+        },
+      },
       // Sucursales / Tiendas
       {
         path: 'stores',

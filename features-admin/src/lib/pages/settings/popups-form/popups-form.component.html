@@ -1,0 +1,163 @@
+<div class="popup-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <div class="header-content">
+          <div class="title-section">
+            <mat-icon>{{ isEditMode() ? 'edit' : 'add' }}</mat-icon>
+            <h3>{{ pageTitle() }}</h3>
+          </div>
+        </div>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      @if (loading() && isEditMode()) {
+      <div class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Cargando popup...</p>
+      </div>
+      } @else {
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="popup-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Target URL</mat-label>
+          <input
+            matInput
+            formControlName="targetUrl"
+            placeholder="/promos/oferta-especial"
+          />
+          @if (form.get('targetUrl')?.invalid && form.get('targetUrl')?.touched)
+          {
+          <mat-error>{{ getErrorMessage('targetUrl') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Texto del botón</mat-label>
+          <input
+            matInput
+            formControlName="buttonText"
+            placeholder="Ver oferta"
+          />
+          @if (form.get('buttonText')?.invalid &&
+          form.get('buttonText')?.touched) {
+          <mat-error>{{ getErrorMessage('buttonText') }}</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="two-columns">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha inicio</mat-label>
+            <input
+              matInput
+              [matDatepicker]="startPicker"
+              formControlName="startDate"
+            />
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="startPicker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #startPicker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Fecha fin</mat-label>
+            <input
+              matInput
+              [matDatepicker]="endPicker"
+              formControlName="endDate"
+            />
+            <mat-datepicker-toggle
+              matIconSuffix
+              [for]="endPicker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="image-upload-field full-width">
+          <label class="upload-label" for="popup-image-input">
+            Imagen del Popup (requerida)
+          </label>
+          <input
+            #popupImageInput
+            id="popup-image-input"
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+          />
+          <p class="upload-hint">
+            En edición también es requerida según contrato API.
+          </p>
+          @if (selectedImageFile()) {
+          <p class="upload-selected-file">
+            Archivo: {{ selectedImageFile()!.name }}
+          </p>
+          <button
+            type="button"
+            class="clear-image-btn"
+            (click)="clearSelectedImage(popupImageInput)"
+          >
+            Quitar imagen seleccionada
+          </button>
+          }
+        </div>
+
+        @if (hasImagePreview()) {
+        <div class="image-preview">
+          <p class="preview-label">Vista previa:</p>
+          <img
+            [src]="displayPreviewUrl()"
+            alt="Popup preview"
+            class="preview-image"
+          />
+        </div>
+        }
+
+        <div class="checkbox-field">
+          <mat-checkbox formControlName="isActive"> Popup activo </mat-checkbox>
+        </div>
+
+        @if (isEditMode() && popup()) {
+        <div class="info-section">
+          <h3>Información Adicional</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">ID:</span>
+              <code>{{ popup()!.id }}</code>
+            </div>
+            @if (popup()!.createdAt) {
+            <div class="info-item">
+              <span class="info-label">Creado:</span>
+              <span>{{ popup()!.createdAt | date : 'short' }}</span>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <div class="form-actions">
+          <app-button
+            type="button"
+            variant="secondary"
+            (clicked)="cancel()"
+            [disabled]="loading()"
+          >
+            Cancelar
+          </app-button>
+
+          <app-button
+            type="submit"
+            variant="primary"
+            [disabled]="form.invalid || loading()"
+            [loading]="loading()"
+            icon="save"
+          >
+            {{ submitButtonText() }}
+          </app-button>
+        </div>
+      </form>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -6,6 +6,7 @@
 export * from './banner.model';
 export * from './category.model';
 export * from './loyalty.models';
+export * from './popup.model';
 export * from './rbac.model';
 export * from './store.models';
 export * from './tenant-settings.model';

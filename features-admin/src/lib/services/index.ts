@@ -7,6 +7,7 @@ export * from './banner.service';
 export * from './category.service';
 export * from './loyalty-admin.service';
 export * from './permission.service';
+export * from './popup.service';
 export * from './role.service';
 export * from './store-admin.service';
 export * from './tenant-settings.service';

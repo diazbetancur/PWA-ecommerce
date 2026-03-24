@@ -23,6 +23,8 @@ export * from './stores/stores-list/stores-list.component';
 
 // Settings
 export * from './settings/branding-settings/branding-settings.component';
+export * from './settings/popups-form/popups-form.component';
+export * from './settings/popups-list/popups-list.component';
 
 // Loyalty
 export * from './loyalty/index';
