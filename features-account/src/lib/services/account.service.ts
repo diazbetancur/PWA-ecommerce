@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import {
   ApiClientService,
   AuthService as CoreAuthService,
+  PublicCartUiService,
   TenantResolutionService,
   TenantStorageService,
 } from '@pwa/core';
@@ -22,6 +23,7 @@ import {
 export class AccountService {
   private readonly apiClient = inject(ApiClientService);
   private readonly coreAuth = inject(CoreAuthService);
+  private readonly publicCartUi = inject(PublicCartUiService);
   private readonly tenantResolution = inject(TenantResolutionService);
   private readonly tenantStorage = inject(TenantStorageService);
   private readonly router = inject(Router);
@@ -120,10 +122,11 @@ export class AccountService {
   async logout(): Promise<void> {
     try {
       await firstValueFrom(this.apiClient.post<void>('/auth/logout', {})).catch(
-        () => {}
+        () => undefined
       );
     } finally {
       this.coreAuth.clear();
+      this.publicCartUi.clearSessionState();
       this.clearRefreshToken();
       this._state.set({
         user: null,

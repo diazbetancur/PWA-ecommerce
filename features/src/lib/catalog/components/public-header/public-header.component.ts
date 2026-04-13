@@ -15,7 +15,7 @@ import {
   TenantConfigService,
   TenantCurrencyPipe,
 } from '@pwa/core';
-import { TenantAuthModalService } from '@pwa/features-account';
+import { AccountService, TenantAuthModalService } from '@pwa/features-account';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 
 @Component({
@@ -40,6 +40,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs';
 export class PublicHeaderComponent {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly accountService = inject(AccountService);
   private readonly tenantConfig = inject(TenantConfigService);
   private readonly tenantAuthModal = inject(TenantAuthModalService);
   private readonly publicCartUi = inject(PublicCartUiService);
@@ -112,8 +113,7 @@ export class PublicHeaderComponent {
     this.router.navigate(['/account']);
   }
 
-  logout(): void {
-    // TODO: Implementar logout correcto
-    this.router.navigate(['/']);
+  async logout(): Promise<void> {
+    await this.accountService.logout();
   }
 }

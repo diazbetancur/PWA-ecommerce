@@ -227,6 +227,14 @@ export class PublicCartUiService {
       });
   }
 
+  clearSessionState(): void {
+    this.clearAutoHideTimer();
+    this.linesState.set({});
+    this.lastAddedProductIdState.set(null);
+    this.summaryVisibleState.set(false);
+    this.tenantStorage.remove(this.SESSION_KEY);
+  }
+
   hideSummary(): void {
     this.clearAutoHideTimer();
     this.summaryVisibleState.set(false);

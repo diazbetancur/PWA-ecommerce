@@ -23,7 +23,30 @@
 
 .public-layout > * {
   position: relative;
+}
+
+.public-layout > app-header {
+  z-index: 100;
+}
+
+.public-layout > main {
   z-index: 2;
+}
+
+.public-layout > app-footer {
+  z-index: 1;
+}
+
+.public-layout > app-whatsapp-button {
+  z-index: 1000;
+}
+
+.public-layout > lib-toast-container {
+  z-index: 1100;
+}
+
+.public-layout > app-site-popup {
+  z-index: 1200;
 }
 
 .skip-link {

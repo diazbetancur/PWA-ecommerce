@@ -3,7 +3,7 @@
     <h1>🎨 Branding y Configuración de Tienda</h1>
     <p>
       Personaliza la identidad visual de tu tenant y administra datos de
-      contacto, redes, locale y SEO.
+      contacto, redes, moneda y SEO.
     </p>
   </div>
 
@@ -63,15 +63,102 @@
       </div>
 
       <div class="grid two">
-        <label>
-          Logo URL
-          <input type="url" formControlName="logoUrl" />
-        </label>
+        <div class="media-field">
+          <div class="media-field-header">
+            <span>Logo</span>
+            <small
+              >Adjunta una imagen. Max {{ maxBrandingImageSizeMb }} MB.</small
+            >
+          </div>
 
-        <label>
-          Favicon URL
-          <input type="url" formControlName="faviconUrl" />
-        </label>
+          <div class="media-preview" [class.empty]="!displayLogoUrl()">
+            @if (displayLogoUrl(); as logoUrl) {
+            <img
+              [src]="logoUrl"
+              alt="Preview del logo"
+              class="branding-preview logo"
+            />
+            } @else {
+            <span>Sin logo configurado</span>
+            }
+          </div>
+
+          <input
+            #logoInput
+            type="file"
+            accept="image/*,.ico"
+            title="Adjuntar logo"
+            (change)="onLogoSelected($event)"
+          />
+
+          <div class="media-meta">
+            @if (selectedLogoFile(); as file) {
+            <span>{{ file.name }}</span>
+            <button
+              type="button"
+              class="btn btn-link"
+              (click)="clearSelectedLogo(logoInput)"
+            >
+              Quitar seleccion
+            </button>
+            } @else if (existingLogoUrl()) {
+            <span
+              >Si no adjuntas otro archivo, se conserva el logo actual.</span
+            >
+            } @else {
+            <span>Selecciona el archivo de logo de tu tienda.</span>
+            }
+          </div>
+        </div>
+
+        <div class="media-field">
+          <div class="media-field-header">
+            <span>Favicon</span>
+            <small>PNG, SVG o ICO. Max {{ maxBrandingImageSizeMb }} MB.</small>
+          </div>
+
+          <div
+            class="media-preview favicon-preview"
+            [class.empty]="!displayFaviconUrl()"
+          >
+            @if (displayFaviconUrl(); as faviconUrl) {
+            <img
+              [src]="faviconUrl"
+              alt="Preview del favicon"
+              class="branding-preview favicon"
+            />
+            } @else {
+            <span>Sin favicon configurado</span>
+            }
+          </div>
+
+          <input
+            #faviconInput
+            type="file"
+            accept="image/*,.ico"
+            title="Adjuntar favicon"
+            (change)="onFaviconSelected($event)"
+          />
+
+          <div class="media-meta">
+            @if (selectedFaviconFile(); as file) {
+            <span>{{ file.name }}</span>
+            <button
+              type="button"
+              class="btn btn-link"
+              (click)="clearSelectedFavicon(faviconInput)"
+            >
+              Quitar seleccion
+            </button>
+            } @else if (existingFaviconUrl()) {
+            <span
+              >Si no adjuntas otro archivo, se conserva el favicon actual.</span
+            >
+            } @else {
+            <span>Selecciona el archivo favicon de la tienda.</span>
+            }
+          </div>
+        </div>
       </div>
 
       <div class="grid four colors">
@@ -161,22 +248,24 @@
     </section>
     } @if (activeTab() === 'advanced') {
     <section class="section-card" formGroupName="locale">
-      <h2>Locale</h2>
-      <div class="grid four">
+      <h2>Moneda e impuestos</h2>
+      <div class="grid three">
         <label>
-          Locale
-          <input type="text" formControlName="locale" />
+          Moneda
+          <select formControlName="currency" (change)="onCurrencyChange()">
+            @for (option of currencyOptions; track option.code) {
+            <option [value]="option.code">
+              {{ option.code }} - {{ option.label }}
+            </option>
+            }
+          </select>
         </label>
         <label>
-          Currency
-          <input type="text" formControlName="currency" />
+          Simbolo
+          <input type="text" formControlName="currencySymbol" readonly />
         </label>
         <label>
-          Symbol
-          <input type="text" formControlName="currencySymbol" />
-        </label>
-        <label>
-          Tax Rate
+          Impuesto (%)
           <input type="number" step="0.01" formControlName="taxRate" />
         </label>
       </div>

@@ -13,6 +13,19 @@ export interface TenantBrandingSettings {
   backgroundColor: string;
 }
 
+export type TenantBrandingColorSettings = Omit<
+  TenantBrandingSettings,
+  'logoUrl' | 'faviconUrl'
+>;
+
+export interface UpdateTenantBrandingRequest
+  extends Partial<TenantBrandingColorSettings> {
+  logo?: File | null;
+  logoFile?: File | null;
+  favicon?: File | null;
+  faviconFile?: File | null;
+}
+
 export interface TenantContactSettings {
   email: string;
   phone: string;
@@ -48,4 +61,8 @@ export interface TenantSettingsDto {
   seo: TenantSeoSettings;
 }
 
-export type UpdateTenantSettingsRequest = Partial<TenantSettingsDto>;
+export type UpdateTenantSettingsRequest = Partial<
+  Omit<TenantSettingsDto, 'branding'>
+> & {
+  branding?: Partial<TenantBrandingColorSettings>;
+};

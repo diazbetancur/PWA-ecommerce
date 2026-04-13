@@ -77,6 +77,71 @@
   margin-bottom: 12px;
 }
 
+.media-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.media-field-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  span {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  small {
+    color: #6b7280;
+    font-size: 12px;
+  }
+}
+
+.media-preview {
+  min-height: 148px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  overflow: hidden;
+  color: #64748b;
+  text-align: center;
+
+  &.empty {
+    border-style: dashed;
+  }
+}
+
+.favicon-preview {
+  min-height: 96px;
+}
+
+.branding-preview {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+
+  &.favicon {
+    max-height: 56px;
+    max-width: 56px;
+  }
+}
+
+.media-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 24px;
+  font-size: 12px;
+  color: #64748b;
+}
+
 .grid {
   display: grid;
   gap: 12px;
@@ -87,6 +152,10 @@
 
   &.two {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &.three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   &.four {
@@ -103,12 +172,14 @@ label {
 }
 
 input,
+select,
 textarea {
   width: 100%;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   padding: 10px 12px;
   font-size: 14px;
+  background: #fff;
 }
 
 .colors input[type='color'] {
@@ -131,6 +202,14 @@ textarea {
   border-color: var(--tenant-primary-color, #111827);
 }
 
+.btn-link {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--tenant-primary-color, #111827);
+  font-weight: 600;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;
@@ -138,6 +217,7 @@ textarea {
 
 @media (max-width: 900px) {
   .grid.two,
+  .grid.three,
   .grid.four {
     grid-template-columns: 1fr;
   }

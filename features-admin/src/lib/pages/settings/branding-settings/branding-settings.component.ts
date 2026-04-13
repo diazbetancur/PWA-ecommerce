@@ -1,14 +1,31 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { AppEnvService } from '@pwa/core';
 import { ToastService } from '@pwa/shared';
-import { TenantSettingsDto } from '../../../models/tenant-settings.model';
+import {
+  TenantBrandingColorSettings,
+  TenantBrandingSettings,
+  TenantLocaleSettings,
+  TenantSettingsDto,
+  UpdateTenantBrandingRequest,
+  UpdateTenantSettingsRequest,
+} from '../../../models/tenant-settings.model';
 import { TenantSettingsService } from '../../../services/tenant-settings.service';
+import { Observable, of } from 'rxjs';
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'lib-branding-settings',
@@ -17,24 +34,55 @@ import { TenantSettingsService } from '../../../services/tenant-settings.service
   templateUrl: './branding-settings.component.html',
   styleUrl: './branding-settings.component.scss',
 })
-export class BrandingSettingsComponent implements OnInit {
+export class BrandingSettingsComponent implements OnInit, OnDestroy {
+  private readonly defaultLocale = 'es-HN';
+  private readonly defaultCurrency = 'HNL';
   private readonly fb = inject(FormBuilder);
+  private readonly appEnv = inject(AppEnvService);
   private readonly tenantSettingsService = inject(TenantSettingsService);
   private readonly toastService = inject(ToastService);
+  private createdLogoObjectUrl: string | null = null;
+  private createdFaviconObjectUrl: string | null = null;
+
+  readonly currencyOptions = [
+    {
+      code: 'HNL',
+      label: 'Lempira hondureno',
+      symbol: 'L',
+    },
+    {
+      code: 'USD',
+      label: 'Dolar estadounidense',
+      symbol: '$',
+    },
+  ] as const;
 
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);
   readonly activeTab = signal<'branding' | 'contact' | 'social' | 'advanced'>(
     'branding'
   );
+  readonly selectedLogoFile = signal<File | null>(null);
+  readonly selectedFaviconFile = signal<File | null>(null);
+  readonly existingLogoUrl = signal<string | null>(null);
+  readonly existingFaviconUrl = signal<string | null>(null);
+  readonly logoPreviewUrl = signal<string | null>(null);
+  readonly faviconPreviewUrl = signal<string | null>(null);
   readonly savingSection = signal<
     'branding' | 'contact' | 'social' | 'all' | null
   >(null);
+  readonly maxBrandingImageSizeMb = this.appEnv.categoryImageMaxSizeMb;
+  readonly maxBrandingImageSizeBytes =
+    this.maxBrandingImageSizeMb * 1024 * 1024;
+  readonly displayLogoUrl = computed(
+    () => this.logoPreviewUrl() || this.existingLogoUrl()
+  );
+  readonly displayFaviconUrl = computed(
+    () => this.faviconPreviewUrl() || this.existingFaviconUrl()
+  );
 
   readonly settingsForm: FormGroup = this.fb.group({
     branding: this.fb.group({
-      logoUrl: ['', [Validators.required]],
-      faviconUrl: [''],
       primaryColor: ['#3b82f6', [Validators.required]],
       secondaryColor: ['#1e40af', [Validators.required]],
       accentColor: ['#10b981', [Validators.required]],
@@ -53,9 +101,9 @@ export class BrandingSettingsComponent implements OnInit {
       tikTok: [''],
     }),
     locale: this.fb.group({
-      locale: ['es-CO', [Validators.required]],
-      currency: ['COP', [Validators.required]],
-      currencySymbol: ['$', [Validators.required]],
+      locale: [this.defaultLocale, [Validators.required]],
+      currency: [this.defaultCurrency, [Validators.required]],
+      currencySymbol: ['L', [Validators.required]],
       taxRate: [
         19,
         [Validators.required, Validators.min(0), Validators.max(100)],
@@ -69,7 +117,13 @@ export class BrandingSettingsComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.applyCurrencyDefaults(this.defaultCurrency);
     this.loadSettings();
+  }
+
+  ngOnDestroy(): void {
+    this.revokeLogoObjectUrl();
+    this.revokeFaviconObjectUrl();
   }
 
   loadSettings(): void {
@@ -101,19 +155,20 @@ export class BrandingSettingsComponent implements OnInit {
     }
 
     this.savingSection.set('branding');
-    this.tenantSettingsService.updateBranding(group.getRawValue()).subscribe({
-      next: (settings) => {
-        this.applySettings(settings);
-        this.toastService.success('Branding actualizado correctamente');
-        this.savingSection.set(null);
-      },
-      error: (error) => {
-        this.toastService.error(
-          error?.error?.message || 'No se pudo actualizar branding'
-        );
-        this.savingSection.set(null);
-      },
-    });
+    this.tenantSettingsService
+      .updateBranding(this.buildBrandingPayload())
+      .pipe(finalize(() => this.savingSection.set(null)))
+      .subscribe({
+        next: (branding) => {
+          this.applyBrandingSettings(branding);
+          this.toastService.success('Branding actualizado correctamente');
+        },
+        error: (error) => {
+          this.toastService.error(
+            error?.error?.message || 'No se pudo actualizar branding'
+          );
+        },
+      });
   }
 
   saveContact(): void {
@@ -171,18 +226,30 @@ export class BrandingSettingsComponent implements OnInit {
 
     this.savingSection.set('all');
     this.tenantSettingsService
-      .updateSettings(this.settingsForm.getRawValue())
+      .updateSettings(this.buildSettingsPayload())
+      .pipe(
+        switchMap((settings) => this.savePendingBrandingFiles(settings)),
+        finalize(() => this.savingSection.set(null))
+      )
       .subscribe({
-        next: (settings) => {
-          this.applySettings(settings);
+        next: ({ settings, brandingUploadFailed }) => {
+          this.applySettings(settings, {
+            resetBrandingUploads: !brandingUploadFailed,
+          });
+
+          if (brandingUploadFailed) {
+            this.toastService.warning(
+              'La configuracion general se guardo, pero no se pudieron subir las imagenes de branding.'
+            );
+            return;
+          }
+
           this.toastService.success('Configuración actualizada correctamente');
-          this.savingSection.set(null);
         },
         error: (error) => {
           this.toastService.error(
             error?.error?.message || 'No se pudo actualizar la configuración'
           );
-          this.savingSection.set(null);
         },
       });
   }
@@ -195,13 +262,274 @@ export class BrandingSettingsComponent implements OnInit {
     this.activeTab.set(tab);
   }
 
-  private applySettings(settings: TenantSettingsDto): void {
+  onCurrencyChange(): void {
+    const currency = this.settingsForm.get('locale.currency')?.value;
+    this.applyCurrencyDefaults(currency);
+  }
+
+  onLogoSelected(event: Event): void {
+    this.handleBrandingImageSelection(event, 'logo');
+  }
+
+  onFaviconSelected(event: Event): void {
+    this.handleBrandingImageSelection(event, 'favicon');
+  }
+
+  clearSelectedLogo(fileInput: HTMLInputElement): void {
+    fileInput.value = '';
+    this.selectedLogoFile.set(null);
+    this.logoPreviewUrl.set(null);
+    this.revokeLogoObjectUrl();
+  }
+
+  clearSelectedFavicon(fileInput: HTMLInputElement): void {
+    fileInput.value = '';
+    this.selectedFaviconFile.set(null);
+    this.faviconPreviewUrl.set(null);
+    this.revokeFaviconObjectUrl();
+  }
+
+  private applySettings(
+    settings: TenantSettingsDto,
+    options?: { resetBrandingUploads?: boolean }
+  ): void {
+    const normalizedLocale = this.normalizeLocaleSettings(settings.locale);
+
     this.settingsForm.patchValue({
-      branding: settings.branding,
+      branding: this.extractBrandingColorSettings(settings.branding),
       contact: settings.contact,
       social: settings.social,
-      locale: settings.locale,
+      locale: normalizedLocale,
       seo: settings.seo,
     });
+
+    this.applyBrandingSettings(
+      settings.branding,
+      options?.resetBrandingUploads ?? true
+    );
+    this.applyCurrencyDefaults(normalizedLocale.currency);
+  }
+
+  private applyBrandingSettings(
+    branding: TenantBrandingSettings,
+    resetUploads = true
+  ): void {
+    this.settingsForm
+      .get('branding')
+      ?.patchValue(this.extractBrandingColorSettings(branding));
+    this.existingLogoUrl.set(branding.logoUrl || null);
+    this.existingFaviconUrl.set(branding.faviconUrl || null);
+
+    if (resetUploads) {
+      this.resetBrandingUploadState();
+    }
+  }
+
+  private buildSettingsPayload(): UpdateTenantSettingsRequest {
+    const rawValue =
+      this.settingsForm.getRawValue() as UpdateTenantSettingsRequest;
+
+    return {
+      ...rawValue,
+      locale: this.normalizeLocaleSettings(rawValue.locale),
+    };
+  }
+
+  private buildBrandingPayload(): UpdateTenantBrandingRequest {
+    const branding = this.extractBrandingColorSettings(
+      this.settingsForm
+        .get('branding')
+        ?.getRawValue() as TenantBrandingColorSettings
+    );
+
+    return {
+      ...branding,
+      logo: this.selectedLogoFile(),
+      favicon: this.selectedFaviconFile(),
+    };
+  }
+
+  private buildBrandingFilesPayload(): UpdateTenantBrandingRequest {
+    return {
+      logo: this.selectedLogoFile(),
+      favicon: this.selectedFaviconFile(),
+    };
+  }
+
+  private normalizeLocaleSettings(
+    locale?: Partial<TenantLocaleSettings> | null
+  ): TenantLocaleSettings {
+    const currency = this.normalizeCurrency(locale?.currency);
+
+    return {
+      locale: this.defaultLocale,
+      currency,
+      currencySymbol: this.getCurrencySymbol(currency),
+      taxRate: locale?.taxRate ?? 19,
+    };
+  }
+
+  private applyCurrencyDefaults(currency?: string | null): void {
+    const normalizedCurrency = this.normalizeCurrency(currency);
+
+    this.settingsForm.get('locale')?.patchValue(
+      {
+        locale: this.defaultLocale,
+        currency: normalizedCurrency,
+        currencySymbol: this.getCurrencySymbol(normalizedCurrency),
+      },
+      { emitEvent: false }
+    );
+  }
+
+  private normalizeCurrency(currency?: string | null): 'HNL' | 'USD' {
+    return currency === 'USD' ? 'USD' : 'HNL';
+  }
+
+  private getCurrencySymbol(currency: 'HNL' | 'USD'): string {
+    return currency === 'USD' ? '$' : 'L';
+  }
+
+  private handleBrandingImageSelection(
+    event: Event,
+    target: 'logo' | 'favicon'
+  ): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] || null;
+
+    if (!file) {
+      this.clearBrandingSelection(target);
+      return;
+    }
+
+    if (!this.isSupportedImageFile(file)) {
+      this.toastService.warning('Solo se permiten archivos de imagen válidos.');
+      input.value = '';
+      this.clearBrandingSelection(target);
+      return;
+    }
+
+    if (file.size <= 0) {
+      this.toastService.warning('El archivo seleccionado esta vacio.');
+      input.value = '';
+      this.clearBrandingSelection(target);
+      return;
+    }
+
+    if (file.size > this.maxBrandingImageSizeBytes) {
+      this.toastService.warning(
+        `La imagen supera el limite de ${this.maxBrandingImageSizeMb} MB.`
+      );
+      input.value = '';
+      this.clearBrandingSelection(target);
+      return;
+    }
+
+    if (target === 'logo') {
+      this.selectedLogoFile.set(file);
+      this.revokeLogoObjectUrl();
+      this.createdLogoObjectUrl = URL.createObjectURL(file);
+      this.logoPreviewUrl.set(this.createdLogoObjectUrl);
+      return;
+    }
+
+    this.selectedFaviconFile.set(file);
+    this.revokeFaviconObjectUrl();
+    this.createdFaviconObjectUrl = URL.createObjectURL(file);
+    this.faviconPreviewUrl.set(this.createdFaviconObjectUrl);
+  }
+
+  private clearBrandingSelection(target: 'logo' | 'favicon'): void {
+    if (target === 'logo') {
+      this.selectedLogoFile.set(null);
+      this.logoPreviewUrl.set(null);
+      this.revokeLogoObjectUrl();
+      return;
+    }
+
+    this.selectedFaviconFile.set(null);
+    this.faviconPreviewUrl.set(null);
+    this.revokeFaviconObjectUrl();
+  }
+
+  private savePendingBrandingFiles(settings: TenantSettingsDto): Observable<{
+    settings: TenantSettingsDto;
+    brandingUploadFailed: boolean;
+  }> {
+    if (!this.hasPendingBrandingFiles()) {
+      return of({ settings, brandingUploadFailed: false });
+    }
+
+    return this.tenantSettingsService
+      .updateBranding(this.buildBrandingFilesPayload())
+      .pipe(
+        map((branding) => ({
+          settings: this.mergeBrandingIntoSettings(settings, branding),
+          brandingUploadFailed: false,
+        })),
+        catchError(() =>
+          of({
+            settings,
+            brandingUploadFailed: true,
+          })
+        )
+      );
+  }
+
+  private hasPendingBrandingFiles(): boolean {
+    return !!(this.selectedLogoFile() || this.selectedFaviconFile());
+  }
+
+  private mergeBrandingIntoSettings(
+    settings: TenantSettingsDto,
+    branding: TenantBrandingSettings
+  ): TenantSettingsDto {
+    return {
+      ...settings,
+      branding: {
+        ...settings.branding,
+        ...branding,
+      },
+    };
+  }
+
+  private extractBrandingColorSettings(
+    branding:
+      | Partial<TenantBrandingSettings>
+      | Partial<TenantBrandingColorSettings>
+  ): TenantBrandingColorSettings {
+    return {
+      primaryColor: branding.primaryColor || '#3b82f6',
+      secondaryColor: branding.secondaryColor || '#1e40af',
+      accentColor: branding.accentColor || '#10b981',
+      backgroundColor: branding.backgroundColor || '#ffffff',
+    };
+  }
+
+  private resetBrandingUploadState(): void {
+    this.selectedLogoFile.set(null);
+    this.selectedFaviconFile.set(null);
+    this.logoPreviewUrl.set(null);
+    this.faviconPreviewUrl.set(null);
+    this.revokeLogoObjectUrl();
+    this.revokeFaviconObjectUrl();
+  }
+
+  private revokeLogoObjectUrl(): void {
+    if (this.createdLogoObjectUrl) {
+      URL.revokeObjectURL(this.createdLogoObjectUrl);
+      this.createdLogoObjectUrl = null;
+    }
+  }
+
+  private revokeFaviconObjectUrl(): void {
+    if (this.createdFaviconObjectUrl) {
+      URL.revokeObjectURL(this.createdFaviconObjectUrl);
+      this.createdFaviconObjectUrl = null;
+    }
+  }
+
+  private isSupportedImageFile(file: File): boolean {
+    return file.type.startsWith('image/') || /\.ico$/i.test(file.name);
   }
 }
