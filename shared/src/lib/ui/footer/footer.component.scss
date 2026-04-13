@@ -1,5 +1,5 @@
 .footer {
-  background: var(--tenant-accent-color, var(--footer-bg, #1f2937));
+  background: var(--tenant-primary-color, var(--footer-bg, #1f2937));
   color: var(--tenant-footer-text-muted, rgba(255, 255, 255, 0.82));
   margin-top: auto;
 }
@@ -130,7 +130,10 @@
 }
 
 .social-links a:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(
+    --tenant-secondary-color,
+    var(--tenant-accent-color, rgba(255, 255, 255, 0.22))
+  );
   color: var(--tenant-footer-text, #fff);
 }
 

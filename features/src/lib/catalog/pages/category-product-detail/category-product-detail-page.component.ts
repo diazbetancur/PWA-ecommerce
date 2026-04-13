@@ -35,16 +35,23 @@ export class CategoryProductDetailPageComponent implements OnInit {
   readonly loading = signal<boolean>(true);
   readonly error = signal<string | null>(null);
   readonly isFavorite = signal<boolean>(false);
+  readonly selectedImageIndex = signal<number>(0);
 
-  readonly primaryImage = computed(() => {
+  readonly productImages = computed(() => {
     const product = this.product();
     if (!product || product.images.length === 0) {
-      return null;
+      return ['/assets/images/product-placeholder.webp'];
     }
 
-    const preferred = product.images.find((image) => image.isPrimary);
-    return preferred?.url ?? product.images[0]?.url ?? null;
+    return product.images.map((image) => image.url);
   });
+
+  readonly currentImage = computed(
+    () =>
+      this.productImages()[this.selectedImageIndex()] ?? this.productImages()[0]
+  );
+
+  readonly hasImageGallery = computed(() => this.productImages().length > 1);
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
@@ -74,11 +81,18 @@ export class CategoryProductDetailPageComponent implements OnInit {
     this.publicCartUi.addItem({
       productId: product.id,
       name: product.name,
-      imageUrl:
-        this.primaryImage() ?? '/assets/images/product-placeholder.webp',
+      imageUrl: this.currentImage(),
       unitPrice: product.price,
       quantity: 1,
     });
+  }
+
+  selectImage(index: number): void {
+    if (index < 0 || index >= this.productImages().length) {
+      return;
+    }
+
+    this.selectedImageIndex.set(index);
   }
 
   toggleFavorite(): void {
@@ -126,6 +140,10 @@ export class CategoryProductDetailPageComponent implements OnInit {
     this.storefrontApi.getProductBySlug(productSlug).subscribe({
       next: (product) => {
         this.product.set(product);
+        const preferredIndex = product.images.findIndex(
+          (image) => image.isPrimary
+        );
+        this.selectedImageIndex.set(Math.max(preferredIndex, 0));
         this.syncFavoriteStatus(product.id);
         this.loading.set(false);
       },
@@ -133,6 +151,7 @@ export class CategoryProductDetailPageComponent implements OnInit {
         this.error.set('No se pudo cargar el detalle del producto');
         this.product.set(null);
         this.isFavorite.set(false);
+        this.selectedImageIndex.set(0);
         this.loading.set(false);
       },
     });

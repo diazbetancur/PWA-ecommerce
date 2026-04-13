@@ -11,14 +11,36 @@
   } @else if (product()) {
   <article class="product-detail-card">
     <div class="image-column">
-      @if (primaryImage()) {
+      @if (currentImage()) {
       <img
-        [src]="primaryImage()!"
+        [src]="currentImage()"
         [alt]="product()!.name"
+        title="Imagen principal del producto"
         class="product-image"
       />
       } @else {
       <div class="image-placeholder">Sin imagen disponible</div>
+      } @if (hasImageGallery()) {
+      <div class="image-thumbnails">
+        @for (imageUrl of productImages(); track $index) {
+        <button
+          type="button"
+          class="thumbnail-button"
+          [class.active]="$index === selectedImageIndex()"
+          (click)="selectImage($index)"
+          [attr.aria-label]="'Ver imagen ' + ($index + 1)"
+          title="Ver imagen"
+        >
+          <img
+            [src]="imageUrl"
+            [alt]="product()!.name + ' ' + ($index + 1)"
+            title="Miniatura del producto"
+            class="thumbnail-image"
+            loading="lazy"
+          />
+        </button>
+        }
+      </div>
       }
     </div>
 

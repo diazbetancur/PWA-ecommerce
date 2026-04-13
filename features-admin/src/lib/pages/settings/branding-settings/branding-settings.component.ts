@@ -15,6 +15,8 @@ import {
 } from '@angular/forms';
 import { AppEnvService } from '@pwa/core';
 import { ToastService } from '@pwa/shared';
+import { Observable, of } from 'rxjs';
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import {
   TenantBrandingColorSettings,
   TenantBrandingSettings,
@@ -24,8 +26,6 @@ import {
   UpdateTenantSettingsRequest,
 } from '../../../models/tenant-settings.model';
 import { TenantSettingsService } from '../../../services/tenant-settings.service';
-import { Observable, of } from 'rxjs';
-import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'lib-branding-settings',
