@@ -1,10 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '@pwa/core';
-import { extractApiErrorMessage, ToastService } from '@pwa/shared';
+import {
+  ConfirmationDialogService,
+  extractApiErrorMessage,
+  ToastService,
+} from '@pwa/shared';
 import {
   CreateLoyaltyRewardRequest,
   LoyaltyRewardDto,
@@ -25,7 +36,7 @@ import {
   templateUrl: './reward-form.component.html',
   styleUrl: './reward-form.component.scss',
 })
-export class RewardFormComponent implements OnInit {
+export class RewardFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly loyaltyAdminService = inject(LoyaltyAdminService);
   private readonly route = inject(ActivatedRoute);
@@ -33,18 +44,33 @@ export class RewardFormComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly dialog = inject(MatDialog);
   private readonly productService = inject(ProductService);
+  private readonly confirmDialog = inject(ConfirmationDialogService);
 
   isLoading = signal(false);
   isSaving = signal(false);
   submitFeedback = signal<string | null>(null);
   isEditMode = signal(false);
   rewardId = signal<string | null>(null);
+  reward = signal<LoyaltyRewardDto | null>(null);
   selectedProducts = signal<Array<{ productId: string; productName: string }>>(
     []
   );
+  selectedImageFile = signal<File | null>(null);
+  imagePreviewUrl = signal<string | null>(null);
   readonly minAvailableDateTime = signal(
     this.toDateTimeLocal(new Date().toISOString())
   );
+  readonly maxImageSizeMb = computed(() => 1);
+  readonly maxImageSizeBytes = computed(() => 1024 * 1024);
+  readonly currentImageUrl = computed(() => this.reward()?.imageUrl || null);
+  readonly hasImagePreview = computed(
+    () => !!this.imagePreviewUrl() || !!this.currentImageUrl()
+  );
+  readonly displayPreviewUrl = computed(
+    () => this.imagePreviewUrl() || this.currentImageUrl()
+  );
+
+  private createdObjectUrl: string | null = null;
 
   readonly rewardTypeOptions = [
     [RewardType.PRODUCT, REWARD_TYPE_LABELS[RewardType.PRODUCT]],
@@ -86,7 +112,6 @@ export class RewardFormComponent implements OnInit {
     productIds: this.fb.control<string[] | null>(null),
     appliesToAllEligibleProducts: [true],
     singleProductSelectionRule: [null as SingleProductSelectionRule | null],
-    imageUrl: [''],
     couponQuantity: [null as number | null],
     validityDays: [null as number | null],
     availableFrom: [''],
@@ -101,6 +126,10 @@ export class RewardFormComponent implements OnInit {
       this.rewardId.set(id);
       this.loadReward(id);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.revokeObjectUrl();
   }
 
   private loadReward(id: string): void {
@@ -119,6 +148,7 @@ export class RewardFormComponent implements OnInit {
   }
 
   private patchForm(reward: LoyaltyRewardDto): void {
+    this.reward.set(reward);
     this.form.patchValue({
       name: reward.name,
       description: reward.description,
@@ -130,7 +160,6 @@ export class RewardFormComponent implements OnInit {
       singleProductSelectionRule:
         (reward.singleProductSelectionRule as SingleProductSelectionRule) ??
         null,
-      imageUrl: reward.imageUrl ?? '',
       couponQuantity: reward.couponQuantity ?? reward.stock ?? null,
       validityDays: reward.validityDays ?? null,
       availableFrom: this.toDateTimeLocal(reward.availableFrom),
@@ -236,6 +265,34 @@ export class RewardFormComponent implements OnInit {
     this.setSelectedProducts([], []);
   }
 
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] || null;
+
+    if (!file) {
+      this.resetSelectedImageState();
+      return;
+    }
+
+    if (file.size > this.maxImageSizeBytes()) {
+      this.confirmDialog.alert(
+        'Imagen demasiado grande',
+        `La imagen supera el limite de ${this.maxImageSizeMb()} MB`
+      );
+      this.resetSelectedImageState(input);
+      return;
+    }
+
+    this.selectedImageFile.set(file);
+    this.revokeObjectUrl();
+    this.createdObjectUrl = URL.createObjectURL(file);
+    this.imagePreviewUrl.set(this.createdObjectUrl);
+  }
+
+  clearSelectedImage(fileInput: HTMLInputElement): void {
+    this.resetSelectedImageState(fileInput);
+  }
+
   onSubmit(): void {
     this.submitFeedback.set(null);
 
@@ -245,6 +302,11 @@ export class RewardFormComponent implements OnInit {
 
     if (this.form.invalid) {
       this.showInvalidFormFeedback();
+      return;
+    }
+
+    if (!this.isEditMode() && !this.selectedImageFile()) {
+      this.notifyBlockedSubmit('La imagen es requerida para crear el premio');
       return;
     }
 
@@ -311,7 +373,7 @@ export class RewardFormComponent implements OnInit {
       productIds: productIdsPayload,
       appliesToAllEligibleProducts,
       singleProductSelectionRule,
-      imageUrl: this.form.value.imageUrl?.trim() || undefined,
+      image: this.selectedImageFile() || undefined,
       isActive: true,
       couponQuantity,
       stock: couponQuantity,
@@ -456,6 +518,23 @@ export class RewardFormComponent implements OnInit {
   private notifyBlockedSubmit(message: string): void {
     this.submitFeedback.set(message);
     this.toastService.warning(message);
+  }
+
+  private revokeObjectUrl(): void {
+    if (this.createdObjectUrl) {
+      URL.revokeObjectURL(this.createdObjectUrl);
+      this.createdObjectUrl = null;
+    }
+  }
+
+  private resetSelectedImageState(fileInput?: HTMLInputElement): void {
+    if (fileInput) {
+      fileInput.value = '';
+    }
+
+    this.selectedImageFile.set(null);
+    this.imagePreviewUrl.set(null);
+    this.revokeObjectUrl();
   }
 
   private toIso(value: string): string | null {

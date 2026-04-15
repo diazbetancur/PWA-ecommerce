@@ -115,7 +115,7 @@ export class LoyaltyAdminService {
   ): Observable<LoyaltyRewardDto> {
     return this.apiClient.post<LoyaltyRewardDto>(
       `${this.baseUrl}/rewards`,
-      request
+      this.buildRewardFormData(request)
     );
   }
 
@@ -254,8 +254,91 @@ export class LoyaltyAdminService {
   ): Observable<LoyaltyRewardDto> {
     return this.apiClient.put<LoyaltyRewardDto>(
       `${this.baseUrl}/rewards/${id}`,
-      request
+      this.buildRewardFormData(request)
     );
+  }
+
+  private buildRewardFormData(
+    request: CreateLoyaltyRewardRequest | UpdateLoyaltyRewardRequest
+  ): FormData {
+    const formData = new FormData();
+
+    this.appendRequired(formData, 'name', request.name);
+    this.appendRequired(formData, 'description', request.description);
+    this.appendRequired(formData, 'rewardType', request.rewardType);
+    this.appendRequired(formData, 'pointsCost', request.pointsCost);
+    this.appendOptionalValue(formData, 'discountValue', request.discountValue);
+    this.appendStringArray(formData, 'productIds', request.productIds);
+    this.appendOptionalValue(
+      formData,
+      'appliesToAllEligibleProducts',
+      request.appliesToAllEligibleProducts
+    );
+    this.appendOptionalValue(
+      formData,
+      'singleProductSelectionRule',
+      request.singleProductSelectionRule
+    );
+    this.appendRequired(formData, 'isActive', request.isActive);
+    this.appendOptionalValue(
+      formData,
+      'couponQuantity',
+      request.couponQuantity
+    );
+    this.appendOptionalValue(formData, 'stock', request.stock);
+    this.appendOptionalValue(formData, 'validityDays', request.validityDays);
+    this.appendOptionalValue(formData, 'availableFrom', request.availableFrom);
+    this.appendOptionalValue(
+      formData,
+      'availableUntil',
+      request.availableUntil
+    );
+    this.appendOptionalValue(
+      formData,
+      'termsAndConditions',
+      request.termsAndConditions
+    );
+    this.appendOptionalValue(formData, 'displayOrder', request.displayOrder);
+    this.appendOptionalValue(formData, 'image', request.image);
+
+    return formData;
+  }
+
+  private appendRequired(
+    formData: FormData,
+    field: string,
+    value: string | number | boolean
+  ): void {
+    formData.append(field, String(value));
+  }
+
+  private appendOptionalValue(
+    formData: FormData,
+    field: string,
+    value?: string | number | boolean | File | null
+  ): void {
+    if (value === undefined || value === null || value === '') {
+      return;
+    }
+
+    if (value instanceof File) {
+      formData.append(field, value);
+      return;
+    }
+
+    formData.append(field, String(value));
+  }
+
+  private appendStringArray(
+    formData: FormData,
+    field: string,
+    values?: string[] | null
+  ): void {
+    for (const value of values ?? []) {
+      if (value) {
+        formData.append(field, value);
+      }
+    }
   }
 
   /**

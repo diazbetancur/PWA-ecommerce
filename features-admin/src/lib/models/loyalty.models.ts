@@ -205,8 +205,8 @@ export interface CreateLoyaltyRewardRequest {
   appliesToAllEligibleProducts?: boolean;
   /** Regla de selección cuando no aplica a todos */
   singleProductSelectionRule?: SingleProductSelectionRule | string | null;
-  /** URL de la imagen */
-  imageUrl?: string;
+  /** Archivo de imagen (multipart/form-data) */
+  image?: File;
   /** Stock disponible (null = ilimitado) */
   stock?: number | null;
   /** Cantidad de cupones (alias funcional de stock) */
