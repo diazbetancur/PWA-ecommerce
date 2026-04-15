@@ -575,6 +575,43 @@ export interface UpdateLoyaltyConfigRequest {
   /** Monto mínimo de compra para obtener puntos (null = sin mínimo) */
   minPurchaseForPoints?: number | null;
 }
+
+/**
+ * Configuración para usar puntos como dinero
+ * Respuesta del endpoint GET /api/admin/loyalty/points-payment-config
+ */
+export interface LoyaltyPointsPaymentConfigDto {
+  /** Si el uso de puntos como dinero está activo */
+  isEnabled: boolean;
+  /** Valor monetario que representa 1 punto */
+  moneyPerPoint: number;
+  /** Si se permite combinar puntos con cupones */
+  allowCombineWithCoupons: boolean;
+  /** Monto máximo aplicable por transacción (0 = sin límite) */
+  maxMoneyPerTransaction: number;
+  /** Monto mínimo pagable después de aplicar puntos */
+  minimumPayableAmount: number;
+  /** Moneda del tenant calculada por backend */
+  currency: string;
+}
+
+/**
+ * Request para actualizar la configuración de puntos como dinero
+ * Body del endpoint PUT /api/admin/loyalty/points-payment-config
+ */
+export interface UpdateLoyaltyPointsPaymentConfigRequest {
+  /** Si el uso de puntos como dinero está activo */
+  isEnabled?: boolean;
+  /** Valor monetario que representa 1 punto */
+  moneyPerPoint?: number;
+  /** Si se permite combinar puntos con cupones */
+  allowCombineWithCoupons?: boolean;
+  /** Monto máximo aplicable por transacción (0 = sin límite) */
+  maxMoneyPerTransaction?: number;
+  /** Monto mínimo pagable después de aplicar puntos */
+  minimumPayableAmount?: number;
+}
+
 /**
  * Colores para estados de canjes
  */

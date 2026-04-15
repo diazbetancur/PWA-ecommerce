@@ -11,6 +11,7 @@ import {
   Component,
   computed,
   inject,
+  OnDestroy,
   OnInit,
   signal,
 } from '@angular/core';
@@ -30,7 +31,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppEnvService } from '@pwa/core';
-import { AppButtonComponent } from '@pwa/shared';
+import { AppButtonComponent, ConfirmationDialogService } from '@pwa/shared';
 import {
   CategoryResponse,
   CreateCategoryRequest,
@@ -58,13 +59,14 @@ import { CategoryService } from '../../../services/category.service';
   templateUrl: './category-form.component.html',
   styleUrls: ['./category-form.component.scss'],
 })
-export class CategoryFormComponent implements OnInit {
+export class CategoryFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly categoryService = inject(CategoryService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
   private readonly appEnv = inject(AppEnvService);
+  private readonly confirmDialog = inject(ConfirmationDialogService);
 
   // Estado
   readonly loading = signal(false);
@@ -146,7 +148,7 @@ export class CategoryFormComponent implements OnInit {
         });
         this.loading.set(false);
       },
-      error: (error) => {
+      error: () => {
         this.snackBar.open('Error al cargar la categoría', 'Cerrar', {
           duration: 3000,
         });
@@ -181,22 +183,16 @@ export class CategoryFormComponent implements OnInit {
     const file = input.files?.[0] || null;
 
     if (!file) {
-      this.selectedImageFile.set(null);
-      this.imagePreviewUrl.set(null);
-      this.revokeObjectUrl();
+      this.resetSelectedImageState();
       return;
     }
 
     if (file.size > this.maxImageSizeBytes()) {
-      this.snackBar.open(
-        `La imagen supera el límite de ${this.maxImageSizeMb()} MB`,
-        'Cerrar',
-        { duration: 3500 }
+      this.confirmDialog.alert(
+        'Imagen demasiado grande',
+        `La imagen supera el límite de ${this.maxImageSizeMb()} MB`
       );
-      input.value = '';
-      this.selectedImageFile.set(null);
-      this.imagePreviewUrl.set(null);
-      this.revokeObjectUrl();
+      this.resetSelectedImageState(input);
       return;
     }
 
@@ -207,10 +203,7 @@ export class CategoryFormComponent implements OnInit {
   }
 
   clearSelectedImage(fileInput: HTMLInputElement): void {
-    fileInput.value = '';
-    this.selectedImageFile.set(null);
-    this.imagePreviewUrl.set(null);
-    this.revokeObjectUrl();
+    this.resetSelectedImageState(fileInput);
   }
 
   private createCategory(data: CreateCategoryRequest): void {
@@ -259,6 +252,16 @@ export class CategoryFormComponent implements OnInit {
       URL.revokeObjectURL(this.createdObjectUrl);
       this.createdObjectUrl = null;
     }
+  }
+
+  private resetSelectedImageState(fileInput?: HTMLInputElement): void {
+    if (fileInput) {
+      fileInput.value = '';
+    }
+
+    this.selectedImageFile.set(null);
+    this.imagePreviewUrl.set(null);
+    this.revokeObjectUrl();
   }
 
   cancel(): void {

@@ -317,7 +317,8 @@
               />
               <p class="upload-hint">
                 Se enviará como <strong>mainImage</strong>. Si no seleccionas
-                una nueva en edición, se conserva la actual.
+                una nueva en edición, se conserva la actual. La imagen no puede
+                superar 1 MB.
               </p>
 
               @if (selectedMainImageFile()) {
@@ -355,7 +356,8 @@
                 (change)="onAdditionalImagesSelected($event)"
               />
               <p class="upload-hint">
-                Se enviarán como <strong>images</strong> (múltiple).
+                Se enviarán como <strong>images</strong> (múltiple). Cada imagen
+                no puede superar 1 MB.
               </p>
 
               @if (selectedAdditionalImageFiles().length > 0) {

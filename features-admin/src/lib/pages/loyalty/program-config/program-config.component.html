@@ -1,35 +1,57 @@
 <div class="program-config-page">
-  <!-- Header -->
   <div class="page-header">
     <div class="header-content">
       <button class="back-btn" (click)="goBack()"><span>←</span> Volver</button>
       <div>
         <h1>⚙️ Configuración del Programa</h1>
         <p class="subtitle">
-          Gestiona el factor de conversión y reglas del programa de lealtad
+          Gestiona la acumulación de puntos y la configuración de puntos a
+          dinero sin alterar otros flujos del programa
         </p>
       </div>
     </div>
   </div>
 
-  <!-- Loading State -->
-  @if (isLoading()) {
+  <div class="tab-nav" role="tablist" aria-label="Configuración loyalty">
+    <button
+      type="button"
+      class="tab-btn"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'earn'"
+      [class.active]="activeTab() === 'earn'"
+      (click)="selectTab('earn')"
+    >
+      Compras a puntos
+    </button>
+    <button
+      type="button"
+      class="tab-btn"
+      role="tab"
+      [attr.aria-selected]="activeTab() === 'payment'"
+      [class.active]="activeTab() === 'payment'"
+      (click)="selectTab('payment')"
+    >
+      Puntos a dinero
+    </button>
+  </div>
+
+  @if (activeTab() === 'earn') { @if (isLoadingEarnConfig()) {
   <div class="loading-container">
     <div class="spinner"></div>
-    <p>Cargando configuración...</p>
+    <p>Cargando configuración de compras a puntos...</p>
   </div>
-  }
-
-  <!-- Form -->
-  @if (!isLoading() && configForm) {
-  <form [formGroup]="configForm" (ngSubmit)="onSubmit()" class="config-form">
-    <!-- Estado del Programa -->
+  } @else if (earnConfigForm) {
+  <form
+    [formGroup]="earnConfigForm"
+    (ngSubmit)="onEarnConfigSubmit()"
+    class="config-form"
+  >
     <div class="form-section">
       <h2>📊 Estado del Programa</h2>
       <div class="form-group">
         <label
           class="toggle-label"
-          [attr.data-enabled]="configForm.get('isEnabled')?.value"
+          [attr.data-enabled]="earnConfigForm.get('isEnabled')?.value"
         >
           <span class="switch-state-label">Estado del programa</span>
           <input
@@ -40,13 +62,13 @@
           <span class="toggle-slider"></span>
           <span
             class="toggle-text"
-            [attr.data-enabled]="configForm.get('isEnabled')?.value"
+            [attr.data-enabled]="earnConfigForm.get('isEnabled')?.value"
           >
-            {{ configForm.get('isEnabled')?.value ? 'Activo' : 'Inactivo' }}
+            {{ earnConfigForm.get('isEnabled')?.value ? 'Activo' : 'Inactivo' }}
           </span>
         </label>
         <p class="help-text">
-          @if (configForm.get('isEnabled')?.value) { El programa está
+          @if (earnConfigForm.get('isEnabled')?.value) { El programa está
           disponible: los usuarios pueden ganar y canjear puntos. } @else { El
           programa está pausado: los usuarios no podrán ganar ni canjear puntos.
           }
@@ -54,9 +76,8 @@
       </div>
     </div>
 
-    <!-- Factor de Conversión -->
     <div class="form-section">
-      <h2>💰 Factor de Conversión</h2>
+      <h2>🛒 Compras a puntos</h2>
       <div class="conversion-info">
         <p class="info-text">
           Configura el monto que debe consumir un cliente para obtener 1 punto.
@@ -95,7 +116,6 @@
       </div>
     </div>
 
-    <!-- Monto Mínimo de Compra -->
     <div class="form-section">
       <h2>🛒 Monto Mínimo de Compra</h2>
       <div class="form-group">
@@ -115,7 +135,6 @@
       </div>
     </div>
 
-    <!-- Expiración de Puntos -->
     <div class="form-section">
       <h2>⏰ Expiración de Puntos</h2>
       <div class="form-group">
@@ -135,7 +154,6 @@
       </div>
     </div>
 
-    <!-- Actions -->
     <div class="form-actions">
       <button type="button" class="btn btn-secondary" (click)="goBack()">
         Cancelar
@@ -143,13 +161,209 @@
       <button
         type="submit"
         class="btn btn-primary"
-        [disabled]="configForm.invalid || isSaving()"
+        [disabled]="earnConfigForm.invalid || isSavingEarnConfig()"
       >
-        @if (isSaving()) {
+        @if (isSavingEarnConfig()) {
         <span class="spinner-sm"></span>
-        } Guardar Configuración
+        } Guardar Compras a Puntos
       </button>
     </div>
   </form>
-  }
+  } } @if (activeTab() === 'payment') { @if (isLoadingPointsPaymentConfig()) {
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <p>Cargando configuración de puntos a dinero...</p>
+  </div>
+  } @else if (pointsPaymentForm) {
+  <form
+    [formGroup]="pointsPaymentForm"
+    (ngSubmit)="onPointsPaymentSubmit()"
+    class="config-form"
+  >
+    <div class="form-section">
+      <h2>💳 Estado de Puntos a Dinero</h2>
+      <div class="form-group">
+        <label
+          class="toggle-label"
+          [attr.data-enabled]="pointsPaymentForm.get('isEnabled')?.value"
+        >
+          <span class="switch-state-label">Permitir uso de puntos</span>
+          <input
+            type="checkbox"
+            formControlName="isEnabled"
+            class="toggle-checkbox"
+          />
+          <span class="toggle-slider"></span>
+          <span
+            class="toggle-text"
+            [attr.data-enabled]="pointsPaymentForm.get('isEnabled')?.value"
+          >
+            {{
+              pointsPaymentForm.get('isEnabled')?.value ? 'Activo' : 'Inactivo'
+            }}
+          </span>
+        </label>
+        <p class="help-text">
+          Activa o pausa la configuración para usar puntos como dinero a nivel
+          de tenant.
+        </p>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>💰 Valor Monetario por Punto</h2>
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="moneyPerPoint">
+            Valor de 1 punto en {{ pointsPaymentCurrency() }}
+          </label>
+          <input
+            type="number"
+            id="moneyPerPoint"
+            class="form-control"
+            formControlName="moneyPerPoint"
+            min="0.000001"
+            step="0.01"
+          />
+          <p class="help-text">
+            Debe ser mayor que 0. Este valor lo interpreta el backend como
+            dinero por punto.
+          </p>
+        </div>
+      </div>
+
+      <div class="conversion-summary">
+        <div class="summary-text">
+          <strong>1 punto</strong> equivale a
+          <strong>
+            {{
+              pointsPaymentForm.get('moneyPerPoint')?.value
+                | currency : pointsPaymentCurrency()
+            }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h2>🧾 Reglas Operativas</h2>
+
+      <div class="form-group">
+        <label
+          class="toggle-label"
+          [attr.data-enabled]="
+            pointsPaymentForm.get('allowCombineWithCoupons')?.value
+          "
+        >
+          <span class="switch-state-label">Combinar con cupones</span>
+          <input
+            type="checkbox"
+            formControlName="allowCombineWithCoupons"
+            class="toggle-checkbox"
+          />
+          <span class="toggle-slider"></span>
+          <span
+            class="toggle-text"
+            [attr.data-enabled]="
+              pointsPaymentForm.get('allowCombineWithCoupons')?.value
+            "
+          >
+            {{
+              pointsPaymentForm.get('allowCombineWithCoupons')?.value
+                ? 'Permitido'
+                : 'No permitido'
+            }}
+          </span>
+        </label>
+      </div>
+
+      <div class="form-row form-row-split">
+        <div class="form-group flex-1">
+          <label for="maxMoneyPerTransaction">Máximo por transacción</label>
+          <input
+            type="number"
+            id="maxMoneyPerTransaction"
+            class="form-control"
+            formControlName="maxMoneyPerTransaction"
+            min="0"
+            step="0.01"
+          />
+          <p class="help-text">
+            Usa 0 para indicar que no existe límite por transacción.
+          </p>
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="minimumPayableAmount">Monto mínimo pagable</label>
+          <input
+            type="number"
+            id="minimumPayableAmount"
+            class="form-control"
+            formControlName="minimumPayableAmount"
+            min="0"
+            step="0.01"
+          />
+          <p class="help-text">
+            Monto mínimo que debe seguir siendo pagable después de aplicar
+            puntos.
+          </p>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <span class="summary-label">Moneda</span>
+          <strong>{{ pointsPaymentCurrency() }}</strong>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Máximo por transacción</span>
+          <strong>
+            @if ((pointsPaymentForm.get('maxMoneyPerTransaction')?.value || 0) >
+            0) {
+            {{
+              pointsPaymentForm.get('maxMoneyPerTransaction')?.value
+                | currency : pointsPaymentCurrency()
+            }}
+            } @else { Sin límite }
+          </strong>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">Monto mínimo pagable</span>
+          <strong>
+            {{
+              pointsPaymentForm.get('minimumPayableAmount')?.value
+                | currency : pointsPaymentCurrency()
+            }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="goBack()">
+        Cancelar
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="pointsPaymentForm.invalid || isSavingPointsPaymentConfig()"
+      >
+        @if (isSavingPointsPaymentConfig()) {
+        <span class="spinner-sm"></span>
+        } Guardar Puntos a Dinero
+      </button>
+    </div>
+  </form>
+  } @else {
+  <div class="state-box error">
+    <p>{{ pointsPaymentLoadError() }}</p>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      (click)="retryPointsPaymentLoad()"
+    >
+      Reintentar
+    </button>
+  </div>
+  } }
 </div>

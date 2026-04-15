@@ -75,6 +75,12 @@
   }
 }
 
+.dialog-actions--single {
+  .confirm-button {
+    min-width: 160px;
+  }
+}
+
 .cancel-button {
   color: rgba(0, 0, 0, 0.6);
 
@@ -85,6 +91,15 @@
 
 .confirm-button {
   color: white;
+
+  &--primary {
+    background-color: var(--tenant-primary-color, #2563eb);
+
+    &:hover:not(:disabled) {
+      background-color: var(--tenant-primary-hover, #1d4ed8);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+  }
 
   &--danger {
     background-color: #ef4444;

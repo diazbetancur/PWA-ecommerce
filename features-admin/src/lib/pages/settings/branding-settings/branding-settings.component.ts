@@ -14,7 +14,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { AppEnvService } from '@pwa/core';
-import { ToastService } from '@pwa/shared';
+import { ConfirmationDialogService, ToastService } from '@pwa/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import {
@@ -40,6 +40,7 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly appEnv = inject(AppEnvService);
   private readonly tenantSettingsService = inject(TenantSettingsService);
+  private readonly confirmDialog = inject(ConfirmationDialogService);
   private readonly toastService = inject(ToastService);
   private createdLogoObjectUrl: string | null = null;
   private createdFaviconObjectUrl: string | null = null;
@@ -417,7 +418,8 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
     }
 
     if (file.size > this.maxBrandingImageSizeBytes) {
-      this.toastService.warning(
+      this.confirmDialog.alert(
+        'Imagen demasiado grande',
         `La imagen supera el limite de ${this.maxBrandingImageSizeMb} MB.`
       );
       input.value = '';

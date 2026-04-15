@@ -115,6 +115,15 @@ export interface TenantSeo {
   keywords?: string;
 }
 
+export interface TenantLoyaltyPointsPaymentConfig {
+  isEnabled: boolean;
+  moneyPerPoint: number;
+  allowCombineWithCoupons: boolean;
+  maxMoneyPerTransaction: number;
+  minimumPayableAmount: number;
+  currency: string;
+}
+
 export interface TenantMessages {
   welcome?: string;
   cartEmpty?: string;
@@ -146,6 +155,7 @@ export interface TenantConfig {
   social?: TenantSocial;
   seo?: TenantSeo;
   messages?: TenantMessages;
+  loyaltyPointsPayment?: TenantLoyaltyPointsPaymentConfig;
 }
 
 export interface Product {

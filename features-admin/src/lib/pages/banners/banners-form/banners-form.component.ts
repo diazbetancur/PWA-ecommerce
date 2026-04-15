@@ -24,7 +24,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppButtonComponent } from '@pwa/shared';
+import { AppEnvService } from '@pwa/core';
+import { AppButtonComponent, ConfirmationDialogService } from '@pwa/shared';
 import {
   BannerResponse,
   CreateBannerRequest,
@@ -59,6 +60,8 @@ export class BannersFormComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly appEnv = inject(AppEnvService);
+  private readonly confirmDialog = inject(ConfirmationDialogService);
 
   readonly loading = signal(false);
   readonly isEditMode = signal(false);
@@ -80,6 +83,12 @@ export class BannersFormComponent implements OnInit, OnDestroy {
   );
 
   readonly currentImageUrl = computed(() => this.banner()?.imageUrl || null);
+
+  readonly maxImageSizeMb = computed(() => this.appEnv.categoryImageMaxSizeMb);
+
+  readonly maxImageSizeBytes = computed(
+    () => this.maxImageSizeMb() * 1024 * 1024
+  );
 
   readonly hasImagePreview = computed(
     () => !!this.imagePreviewUrl() || !!this.currentImageUrl()
@@ -121,9 +130,16 @@ export class BannersFormComponent implements OnInit, OnDestroy {
     const file = input.files?.[0] || null;
 
     if (!file) {
-      this.selectedImageFile.set(null);
-      this.imagePreviewUrl.set(null);
-      this.revokeObjectUrl();
+      this.resetSelectedImageState();
+      return;
+    }
+
+    if (file.size > this.maxImageSizeBytes()) {
+      this.confirmDialog.alert(
+        'Imagen demasiado grande',
+        `La imagen supera el límite de ${this.maxImageSizeMb()} MB`
+      );
+      this.resetSelectedImageState(input);
       return;
     }
 
@@ -134,10 +150,7 @@ export class BannersFormComponent implements OnInit, OnDestroy {
   }
 
   clearSelectedImage(fileInput: HTMLInputElement): void {
-    fileInput.value = '';
-    this.selectedImageFile.set(null);
-    this.imagePreviewUrl.set(null);
-    this.revokeObjectUrl();
+    this.resetSelectedImageState(fileInput);
   }
 
   onSubmit(): void {
@@ -321,5 +334,15 @@ export class BannersFormComponent implements OnInit, OnDestroy {
       URL.revokeObjectURL(this.createdObjectUrl);
       this.createdObjectUrl = null;
     }
+  }
+
+  private resetSelectedImageState(fileInput?: HTMLInputElement): void {
+    if (fileInput) {
+      fileInput.value = '';
+    }
+
+    this.selectedImageFile.set(null);
+    this.imagePreviewUrl.set(null);
+    this.revokeObjectUrl();
   }
 }

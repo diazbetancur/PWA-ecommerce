@@ -1,6 +1,7 @@
 import {
   BrandingConfig,
   TenantContact,
+  TenantLoyaltyPointsPaymentConfig,
   TenantSeo,
   TenantSocial,
   ThemeConfig,
@@ -26,6 +27,7 @@ export interface PublicTenantConfigResponse {
   social?: TenantSocial;
   seo?: TenantSeo;
   messages?: Record<string, string>;
+  loyaltyPointsPayment?: TenantLoyaltyPointsPaymentConfig;
 }
 
 export type TenantResolutionStatus =

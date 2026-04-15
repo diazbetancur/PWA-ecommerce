@@ -9,6 +9,7 @@ import {
   GetLoyaltyRedemptionsQuery,
   GetLoyaltyRewardsQuery,
   LoyaltyDashboardSummaryDto,
+  LoyaltyPointsPaymentConfigDto,
   LoyaltyProgramConfigDto,
   LoyaltyRewardDto,
   PagedLoyaltyRedemptionsResponse,
@@ -16,6 +17,7 @@ import {
   PointsAdjustmentFilters,
   PointsAdjustmentResponse,
   UpdateLoyaltyConfigRequest,
+  UpdateLoyaltyPointsPaymentConfigRequest,
   UpdateLoyaltyRewardRequest,
   UpdateRedemptionStatusRequest,
 } from '../models/loyalty.models';
@@ -549,6 +551,21 @@ omer(redemptionId);
   ): Observable<LoyaltyProgramConfigDto> {
     return this.apiClient.put<LoyaltyProgramConfigDto>(
       `${this.baseUrl}/config`,
+      request
+    );
+  }
+
+  getPointsPaymentConfig(): Observable<LoyaltyPointsPaymentConfigDto> {
+    return this.apiClient.get<LoyaltyPointsPaymentConfigDto>(
+      `${this.baseUrl}/points-payment-config`
+    );
+  }
+
+  updatePointsPaymentConfig(
+    request: UpdateLoyaltyPointsPaymentConfigRequest
+  ): Observable<LoyaltyPointsPaymentConfigDto> {
+    return this.apiClient.put<LoyaltyPointsPaymentConfigDto>(
+      `${this.baseUrl}/points-payment-config`,
       request
     );
   }

@@ -32,13 +32,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  AppEnvService,
   CreateProductDto,
   InitialStoreStockDto,
   ProductResponse,
   ProductService,
   UpdateProductDto,
 } from '@pwa/core';
-import { AppButtonComponent } from '@pwa/shared';
+import { AppButtonComponent, ConfirmationDialogService } from '@pwa/shared';
 import { CategorySelectorDialogComponent } from '../../../components/category-selector-dialog/category-selector-dialog.component';
 import { CategoryListItem } from '../../../models/category.model';
 import { StoreDto } from '../../../models/store.models';
@@ -73,6 +74,8 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly storeAdminService = inject(StoreAdminService);
+  private readonly appEnv = inject(AppEnvService);
+  private readonly confirmDialog = inject(ConfirmationDialogService);
 
   // Estado
   readonly loading = signal(false);
@@ -129,6 +132,12 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   readonly displayMainImageUrl = computed(
     () => this.mainImagePreviewUrl() || this.existingMainImageUrl()
+  );
+
+  readonly maxImageSizeMb = computed(() => this.appEnv.categoryImageMaxSizeMb);
+
+  readonly maxImageSizeBytes = computed(
+    () => this.maxImageSizeMb() * 1024 * 1024
   );
 
   private createdMainImageObjectUrl: string | null = null;
@@ -259,7 +268,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
         // Cargar categorías si existen
         if (product.categories && product.categories.length > 0) {
-          const categories = product.categories.map((cat: any) => ({
+          const categories = product.categories.map((cat) => ({
             id: cat.id,
             name: cat.name,
             slug: cat.slug,
@@ -273,7 +282,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
         // Cargar distribución de stock por tiendas si existe
         if (product.storeStock && product.storeStock.length > 0) {
-          const distribution = product.storeStock.map((item: any) => ({
+          const distribution = product.storeStock.map((item) => ({
             storeId: item.storeId,
             stock: item.stock,
           }));
@@ -297,13 +306,13 @@ export class ProductFormComponent implements OnInit, OnDestroy {
           isFeatured: product.isFeatured,
           tags: product.tags || '',
           brand: product.brand || '',
-          categoryIds: product.categories?.map((cat: any) => cat.id) || [],
+          categoryIds: product.categories?.map((cat) => cat.id) || [],
           metaTitle: product.metaTitle || '',
           metaDescription: product.metaDescription || '',
         });
         this.loading.set(false);
       },
-      error: (error) => {
+      error: () => {
         this.snackBar.open('Error al cargar el producto', 'Cerrar', {
           duration: 3000,
         });
@@ -356,7 +365,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   private createProduct(data: CreateProductDto): void {
     this.productService.create(data).subscribe({
-      next: (product) => {
+      next: () => {
         this.snackBar.open('Producto creado exitosamente', 'Cerrar', {
           duration: 2000,
         });
@@ -375,7 +384,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
     if (!id) return;
 
     this.productService.update(id, data).subscribe({
-      next: (product) => {
+      next: () => {
         this.snackBar.open('Producto actualizado exitosamente', 'Cerrar', {
           duration: 2000,
         });
@@ -405,6 +414,15 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (file.size > this.maxImageSizeBytes()) {
+      this.confirmDialog.alert(
+        'Imagen demasiado grande',
+        `La imagen principal supera el límite de ${this.maxImageSizeMb()} MB`
+      );
+      this.clearMainImage(input);
+      return;
+    }
+
     this.selectedMainImageFile.set(file);
     this.revokeMainImageObjectUrl();
     this.createdMainImageObjectUrl = URL.createObjectURL(file);
@@ -414,7 +432,30 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   onAdditionalImagesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const files = Array.from(input.files || []);
-    this.selectedAdditionalImageFiles.set(files);
+
+    if (!files.length) {
+      this.selectedAdditionalImageFiles.set([]);
+      return;
+    }
+
+    const validFiles = files.filter(
+      (file) => file.size <= this.maxImageSizeBytes()
+    );
+    const rejectedFilesCount = files.length - validFiles.length;
+
+    if (rejectedFilesCount > 0) {
+      const message =
+        rejectedFilesCount === 1
+          ? `Se omitió 1 imagen porque supera el límite de ${this.maxImageSizeMb()} MB`
+          : `Se omitieron ${rejectedFilesCount} imágenes porque superan el límite de ${this.maxImageSizeMb()} MB`;
+      this.confirmDialog.alert('Imágenes demasiado grandes', message);
+    }
+
+    if (!validFiles.length) {
+      input.value = '';
+    }
+
+    this.selectedAdditionalImageFiles.set(validFiles);
   }
 
   onVideosSelected(event: Event): void {

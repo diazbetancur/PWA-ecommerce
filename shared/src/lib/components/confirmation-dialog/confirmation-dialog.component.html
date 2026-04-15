@@ -9,7 +9,11 @@
     <p class="dialog-message">{{ data.message }}</p>
   </mat-dialog-content>
 
-  <mat-dialog-actions class="dialog-actions">
+  <mat-dialog-actions
+    class="dialog-actions"
+    [class.dialog-actions--single]="config.hideCancelButton"
+  >
+    @if (!config.hideCancelButton) {
     <button
       mat-button
       class="cancel-button"
@@ -18,12 +22,23 @@
     >
       {{ config.cancelText }}
     </button>
+    } @if (config.hideCancelButton) {
     <button
       mat-flat-button
-      [class]="'confirm-button confirm-button--' + config.type"
+      [class]="'confirm-button confirm-button--' + config.confirmButtonColor"
+      (click)="onConfirm()"
+      cdkFocusInitial
+    >
+      {{ config.confirmText }}
+    </button>
+    } @else {
+    <button
+      mat-flat-button
+      [class]="'confirm-button confirm-button--' + config.confirmButtonColor"
       (click)="onConfirm()"
     >
       {{ config.confirmText }}
     </button>
+    }
   </mat-dialog-actions>
 </div>

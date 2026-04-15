@@ -278,7 +278,7 @@ export class TenantBootstrapService {
         id: response.tenant.id,
         slug: response.tenant.slug,
         displayName: response.tenant.displayName,
-        status: response.tenant.status as any,
+        status: response.tenant.status as TenantConfig['tenant']['status'],
         plan: response.tenant.plan,
         branding: response.tenant.branding,
       },
@@ -299,6 +299,7 @@ export class TenantBootstrapService {
       contact: response.contact,
       social: response.social,
       seo: response.seo,
+      loyaltyPointsPayment: response.loyaltyPointsPayment,
     };
   }
 

@@ -53,12 +53,22 @@ export interface TenantSeoSettings {
   keywords: string;
 }
 
+export interface TenantLoyaltyPointsPaymentSettings {
+  isEnabled: boolean;
+  moneyPerPoint: number;
+  allowCombineWithCoupons: boolean;
+  maxMoneyPerTransaction: number;
+  minimumPayableAmount: number;
+  currency: string;
+}
+
 export interface TenantSettingsDto {
   branding: TenantBrandingSettings;
   contact: TenantContactSettings;
   social: TenantSocialSettings;
   locale: TenantLocaleSettings;
   seo: TenantSeoSettings;
+  loyaltyPointsPayment?: TenantLoyaltyPointsPaymentSettings;
 }
 
 export type UpdateTenantSettingsRequest = Partial<

@@ -60,4 +60,22 @@ export class ConfirmationDialogService {
       type: 'warning',
     });
   }
+
+  /**
+   * Shortcut para mostrar un mensaje informativo con un solo botón primario.
+   */
+  alert(
+    title: string,
+    message: string,
+    type: 'danger' | 'warning' | 'info' = 'warning'
+  ): Observable<boolean> {
+    return this.confirm({
+      title,
+      message,
+      confirmText: 'Confirmar',
+      type,
+      hideCancelButton: true,
+      confirmButtonColor: 'primary',
+    });
+  }
 }

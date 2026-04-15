@@ -1,11 +1,11 @@
-import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import {
-  MatDialogModule,
   MAT_DIALOG_DATA,
+  MatDialogModule,
   MatDialogRef,
 } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
 export interface ConfirmationDialogData {
@@ -15,6 +15,8 @@ export interface ConfirmationDialogData {
   cancelText?: string;
   type?: 'danger' | 'warning' | 'info';
   icon?: string;
+  hideCancelButton?: boolean;
+  confirmButtonColor?: 'primary' | 'danger' | 'warning' | 'info';
 }
 
 @Component({
@@ -35,6 +37,9 @@ export class ConfirmationDialogComponent {
     cancelText: this.data.cancelText || 'Cancelar',
     type: this.data.type || 'warning',
     icon: this.data.icon || this.getDefaultIcon(),
+    hideCancelButton: this.data.hideCancelButton ?? false,
+    confirmButtonColor:
+      this.data.confirmButtonColor || this.data.type || 'warning',
   };
 
   private getDefaultIcon(): string {

@@ -42,9 +42,61 @@ h1 {
   font-size: 0.95rem;
 }
 
+.tab-nav {
+  display: inline-flex;
+  gap: 0.5rem;
+  padding: 0.4rem;
+  margin-bottom: 1.5rem;
+  background: var(--tenant-surface-color, #fff);
+  border: 1px solid var(--tenant-border-color, #e5e7eb);
+  border-radius: 12px;
+}
+
+.tab-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  color: var(--tenant-text-muted-color, #6b7280);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+
+  &:hover {
+    background: var(--tenant-primary-light, #f3f4f6);
+    color: var(--tenant-text-color, #111827);
+  }
+
+  &.active {
+    background: var(--tenant-primary-color, #2563eb);
+    color: var(--tenant-on-primary, #fff);
+  }
+}
+
 .loading-container {
   text-align: center;
   padding: 3rem;
+}
+
+.state-box {
+  background: var(--tenant-surface-color, #fff);
+  border: 1px solid var(--tenant-border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.state-box.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-color: rgba(220, 38, 38, 0.18);
+  background: rgba(254, 242, 242, 0.9);
+
+  p {
+    margin: 0;
+    color: #991b1b;
+  }
 }
 
 .spinner {
@@ -107,6 +159,10 @@ h1 {
   margin-bottom: 1rem;
 }
 
+.form-row-split {
+  flex-wrap: wrap;
+}
+
 .flex-1 {
   flex: 1;
 }
@@ -138,6 +194,33 @@ h1 {
   strong {
     color: var(--tenant-primary-color, #2563eb);
   }
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.summary-card {
+  padding: 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--tenant-border-color, #e5e7eb);
+  background: var(--tenant-surface-color, #fff);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  strong {
+    color: var(--tenant-text-color, #111827);
+  }
+}
+
+.summary-label {
+  font-size: 0.82rem;
+  color: var(--tenant-text-muted-color, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
 .form-control {
@@ -295,4 +378,35 @@ h1 {
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+@media (max-width: 768px) {
+  .program-config-page {
+    padding: 1rem;
+  }
+
+  .header-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .tab-nav {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .state-box.error {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .btn {
+    justify-content: center;
+    width: 100%;
+  }
 }
