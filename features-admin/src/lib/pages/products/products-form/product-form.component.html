@@ -27,46 +27,103 @@
         <div class="form-section">
           <h2>Información Básica</h2>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Nombre del Producto *</mat-label>
-            <input matInput formControlName="name" />
+          <div class="field-group">
+            <label class="form-field">
+              Nombre del Producto *
+              <input
+                type="text"
+                formControlName="name"
+                title="Nombre del producto"
+                [class.invalid]="
+                  form.get('name')?.invalid && form.get('name')?.touched
+                "
+              />
+            </label>
             @if (form.get('name')?.invalid && form.get('name')?.touched) {
-            <mat-error>{{ getErrorMessage('name') }}</mat-error>
+            <div class="field-error">{{ getErrorMessage('name') }}</div>
             }
-          </mat-form-field>
+          </div>
 
-          <mat-form-field appearance="outline">
-            <mat-label>SKU</mat-label>
-            <input matInput formControlName="sku" />
-          </mat-form-field>
+          <div class="field-group">
+            <label class="form-field">
+              SKU
+              <input
+                type="text"
+                formControlName="sku"
+                title="SKU del producto"
+                [class.invalid]="
+                  form.get('sku')?.invalid && form.get('sku')?.touched
+                "
+              />
+            </label>
+            @if (form.get('sku')?.invalid && form.get('sku')?.touched) {
+            <div class="field-error">{{ getErrorMessage('sku') }}</div>
+            }
+          </div>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Marca</mat-label>
-            <input matInput formControlName="brand" />
-          </mat-form-field>
+          <div class="field-group">
+            <label class="form-field">
+              Marca
+              <input
+                type="text"
+                formControlName="brand"
+                title="Marca del producto"
+                [class.invalid]="
+                  form.get('brand')?.invalid && form.get('brand')?.touched
+                "
+              />
+            </label>
+            @if (form.get('brand')?.invalid && form.get('brand')?.touched) {
+            <div class="field-error">{{ getErrorMessage('brand') }}</div>
+            }
+          </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Descripción Corta</mat-label>
-            <textarea
-              matInput
-              formControlName="shortDescription"
-              rows="2"
-              maxlength="250"
-            ></textarea>
-            <mat-hint align="end"
-              >{{ form.get('shortDescription')?.value?.length || 0 }} /
-              250</mat-hint
-            >
-          </mat-form-field>
+          <div class="field-group full-width">
+            <label class="form-field">
+              Descripción Corta
+              <textarea
+                formControlName="shortDescription"
+                title="Descripción corta"
+                rows="2"
+                maxlength="250"
+                [class.invalid]="
+                  form.get('shortDescription')?.invalid &&
+                  form.get('shortDescription')?.touched
+                "
+              ></textarea>
+            </label>
+            <div class="field-footer">
+              @if (form.get('shortDescription')?.invalid &&
+              form.get('shortDescription')?.touched) {
+              <span class="field-error">{{
+                getErrorMessage('shortDescription')
+              }}</span>
+              }
+              <span class="field-hint"
+                >{{ form.get('shortDescription')?.value?.length || 0 }} /
+                250</span
+              >
+            </div>
+          </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Descripción Completa</mat-label>
-            <textarea
-              matInput
-              formControlName="description"
-              rows="4"
-            ></textarea>
-          </mat-form-field>
+          <div class="field-group full-width">
+            <label class="form-field">
+              Descripción Completa
+              <textarea
+                formControlName="description"
+                title="Descripción completa"
+                rows="4"
+                [class.invalid]="
+                  form.get('description')?.invalid &&
+                  form.get('description')?.touched
+                "
+              ></textarea>
+            </label>
+            @if (form.get('description')?.invalid &&
+            form.get('description')?.touched) {
+            <div class="field-error">{{ getErrorMessage('description') }}</div>
+            }
+          </div>
         </div>
 
         <!-- Precios e Inventario -->
@@ -74,36 +131,80 @@
           <h2>Precios e Inventario</h2>
 
           <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Precio *</mat-label>
-              <input matInput type="number" formControlName="price" min="0" />
-              <span matPrefix>$&nbsp;</span>
+            <div class="field-group">
+              <label class="form-field">
+                Precio *
+                <div
+                  class="input-shell"
+                  [class.invalid]="
+                    form.get('price')?.invalid && form.get('price')?.touched
+                  "
+                >
+                  <span class="input-affix">$</span>
+                  <input
+                    type="number"
+                    formControlName="price"
+                    min="0"
+                    title="Precio del producto"
+                  />
+                </div>
+              </label>
               @if (form.get('price')?.invalid && form.get('price')?.touched) {
-              <mat-error>{{ getErrorMessage('price') }}</mat-error>
+              <div class="field-error">{{ getErrorMessage('price') }}</div>
               }
-            </mat-form-field>
+            </div>
 
-            <mat-form-field appearance="outline">
-              <mat-label>Precio de Comparación</mat-label>
-              <input
-                matInput
-                type="number"
-                formControlName="compareAtPrice"
-                min="0"
-              />
-              <span matPrefix>$&nbsp;</span>
-              <mat-hint>Precio antes del descuento (opcional)</mat-hint>
-            </mat-form-field>
+            <div class="field-group">
+              <label class="form-field">
+                Precio de Comparación
+                <div
+                  class="input-shell"
+                  [class.invalid]="
+                    form.get('compareAtPrice')?.invalid &&
+                    form.get('compareAtPrice')?.touched
+                  "
+                >
+                  <span class="input-affix">$</span>
+                  <input
+                    type="number"
+                    formControlName="compareAtPrice"
+                    min="0"
+                    title="Precio de comparación"
+                  />
+                </div>
+              </label>
+              <div class="field-footer">
+                @if (form.get('compareAtPrice')?.invalid &&
+                form.get('compareAtPrice')?.touched) {
+                <span class="field-error">{{
+                  getErrorMessage('compareAtPrice')
+                }}</span>
+                }
+                <span class="field-hint"
+                  >Precio antes del descuento (opcional)</span
+                >
+              </div>
+            </div>
           </div>
 
           <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Stock *</mat-label>
-              <input matInput type="number" formControlName="stock" min="0" />
+            <div class="field-group">
+              <label class="form-field">
+                Stock *
+                <input
+                  type="number"
+                  formControlName="stock"
+                  min="0"
+                  title="Stock del producto"
+                  [class.invalid]="
+                    form.get('stock')?.invalid && form.get('stock')?.touched
+                  "
+                />
+              </label>
               @if (form.get('stock')?.invalid && form.get('stock')?.touched) {
-              <mat-error>{{ getErrorMessage('stock') }}</mat-error>
+              <div class="field-error">{{ getErrorMessage('stock') }}</div>
               }
-            </mat-form-field>
+            </div>
 
             <div class="checkbox-wrapper">
               <mat-checkbox formControlName="trackInventory">
@@ -123,22 +224,36 @@
           </div>
 
           @if (!form.get('isTaxIncluded')?.value) {
-          <mat-form-field appearance="outline">
-            <mat-label>Porcentaje de impuesto *</mat-label>
-            <input
-              matInput
-              type="number"
-              formControlName="taxPercentage"
-              min="1"
-              max="100"
-            />
-            <span matSuffix>%</span>
-            <mat-hint>Valor entre 1 y 100</mat-hint>
-            @if (form.get('taxPercentage')?.invalid &&
-            form.get('taxPercentage')?.touched) {
-            <mat-error>{{ getErrorMessage('taxPercentage') }}</mat-error>
-            }
-          </mat-form-field>
+          <div class="field-group">
+            <label class="form-field">
+              Porcentaje de impuesto *
+              <div
+                class="input-shell"
+                [class.invalid]="
+                  form.get('taxPercentage')?.invalid &&
+                  form.get('taxPercentage')?.touched
+                "
+              >
+                <input
+                  type="number"
+                  formControlName="taxPercentage"
+                  min="1"
+                  max="100"
+                  title="Porcentaje de impuesto"
+                />
+                <span class="input-affix">%</span>
+              </div>
+            </label>
+            <div class="field-footer">
+              @if (form.get('taxPercentage')?.invalid &&
+              form.get('taxPercentage')?.touched) {
+              <span class="field-error">{{
+                getErrorMessage('taxPercentage')
+              }}</span>
+              }
+              <span class="field-hint">Valor entre 1 y 100</span>
+            </div>
+          </div>
           }
 
           <!-- Distribución de Stock por Sucursales -->
@@ -187,6 +302,7 @@
                 <div class="form-row-inline">
                   <select
                     class="store-select"
+                    title="Sucursal para asignar stock"
                     [value]="selectedStoreId() || ''"
                     (change)="onStoreSelected($any($event.target).value)"
                   >
@@ -200,6 +316,7 @@
                   <input
                     type="number"
                     class="stock-input"
+                    title="Cantidad de stock a asignar"
                     placeholder="Cantidad"
                     min="0"
                     [value]="stockAmount()"
@@ -254,6 +371,7 @@
                         <input
                           type="number"
                           class="stock-input-inline"
+                          title="Stock asignado a la sucursal"
                           min="0"
                           [value]="item.stock"
                           (input)="
@@ -305,34 +423,39 @@
 
           <div class="media-upload-grid">
             <div class="image-upload-field full-width">
-              <label class="upload-label" for="product-main-image-input">
-                Imagen Principal
-              </label>
+              <div class="media-field-header">
+                <span>Imagen Principal</span>
+                <small
+                  >Adjunta la imagen principal del producto. Max 1 MB.</small
+                >
+              </div>
               <input
                 #productMainImageInput
                 id="product-main-image-input"
                 type="file"
                 accept="image/*"
+                title="Adjuntar imagen principal"
                 (change)="onMainImageSelected($event)"
               />
-              <p class="upload-hint">
-                Se enviará como <strong>mainImage</strong>. Si no seleccionas
-                una nueva en edición, se conserva la actual. La imagen no puede
-                superar 1 MB.
-              </p>
 
-              @if (selectedMainImageFile()) {
-              <p class="upload-selected-file">
-                Archivo: {{ selectedMainImageFile()!.name }}
-              </p>
-              <button
-                type="button"
-                class="clear-media-btn"
-                (click)="clearMainImage(productMainImageInput)"
-              >
-                Quitar imagen principal seleccionada
-              </button>
-              } @if (displayMainImageUrl()) {
+              <div class="media-meta">
+                @if (selectedMainImageFile(); as file) {
+                <span>{{ file.name }}</span>
+                <button
+                  type="button"
+                  class="clear-media-btn"
+                  (click)="clearMainImage(productMainImageInput)"
+                >
+                  Quitar seleccion
+                </button>
+                } @else if (existingMainImageUrl()) {
+                <span>Si no adjuntas otra imagen, se conserva la actual.</span>
+                } @else {
+                <span>Se enviará como <strong>mainImage</strong>.</span>
+                }
+              </div>
+
+              @if (displayMainImageUrl()) {
               <div class="main-image-preview">
                 <p class="preview-label">Preview imagen principal</p>
                 <img
@@ -344,73 +467,81 @@
             </div>
 
             <div class="image-upload-field full-width">
-              <label class="upload-label" for="product-images-input">
-                Imágenes Adicionales
-              </label>
+              <div class="media-field-header">
+                <span>Imágenes Adicionales</span>
+                <small>Adjunta varias imágenes. Max 1 MB por imagen.</small>
+              </div>
               <input
                 #productImagesInput
                 id="product-images-input"
                 type="file"
                 accept="image/*"
                 multiple
+                title="Adjuntar imágenes adicionales"
                 (change)="onAdditionalImagesSelected($event)"
               />
-              <p class="upload-hint">
-                Se enviarán como <strong>images</strong> (múltiple). Cada imagen
-                no puede superar 1 MB.
-              </p>
 
-              @if (selectedAdditionalImageFiles().length > 0) {
-              <p class="upload-selected-file">
-                {{ selectedAdditionalImageFiles().length }} imagen(es)
-                seleccionada(s)
-              </p>
-              <button
-                type="button"
-                class="clear-media-btn"
-                (click)="clearAdditionalImages(productImagesInput)"
-              >
-                Quitar imágenes adicionales
-              </button>
-              } @if (isEditMode() && existingImageUrls().length > 0) {
-              <p class="existing-media-label">
-                Imágenes actuales: {{ existingImageUrls().length }}
-              </p>
-              }
+              <div class="media-meta">
+                @if (selectedAdditionalImageFiles().length > 0) {
+                <span>
+                  {{ selectedAdditionalImageFiles().length }} imagen(es)
+                  seleccionada(s)
+                </span>
+                <button
+                  type="button"
+                  class="clear-media-btn"
+                  (click)="clearAdditionalImages(productImagesInput)"
+                >
+                  Quitar seleccion
+                </button>
+                } @else if (isEditMode() && existingImageUrls().length > 0) {
+                <span>Imágenes actuales: {{ existingImageUrls().length }}</span>
+                } @else {
+                <span
+                  >Se enviarán como <strong>images</strong> (múltiple).</span
+                >
+                }
+              </div>
             </div>
 
             <div class="image-upload-field full-width">
-              <label class="upload-label" for="product-videos-input">
-                Videos
-              </label>
+              <div class="media-field-header">
+                <span>Videos</span>
+                <small
+                  >Adjunta uno o varios videos para complementar el
+                  producto.</small
+                >
+              </div>
               <input
                 #productVideosInput
                 id="product-videos-input"
                 type="file"
                 accept="video/*"
                 multiple
+                title="Adjuntar videos"
                 (change)="onVideosSelected($event)"
               />
-              <p class="upload-hint">
-                Se enviarán como <strong>videos</strong> (múltiple).
-              </p>
 
-              @if (selectedVideoFiles().length > 0) {
-              <p class="upload-selected-file">
-                {{ selectedVideoFiles().length }} video(s) seleccionado(s)
-              </p>
-              <button
-                type="button"
-                class="clear-media-btn"
-                (click)="clearVideos(productVideosInput)"
-              >
-                Quitar videos
-              </button>
-              } @if (isEditMode() && existingVideoUrls().length > 0) {
-              <p class="existing-media-label">
-                Videos actuales: {{ existingVideoUrls().length }}
-              </p>
-              }
+              <div class="media-meta">
+                @if (selectedVideoFiles().length > 0) {
+                <span>
+                  {{ selectedVideoFiles().length }} video(s) seleccionado(s)
+                </span>
+                <button
+                  type="button"
+                  class="clear-media-btn"
+                  (click)="clearVideos(productVideosInput)"
+                >
+                  Quitar seleccion
+                </button>
+                } @else if (isEditMode() && existingVideoUrls().length > 0) {
+                <span>Videos actuales: {{ existingVideoUrls().length }}</span>
+                } @else {
+                <span
+                  >Se enviarán como <strong>videos</strong> (múltiple).</span
+                >
+                }
+              </div>
             </div>
           </div>
 
@@ -462,42 +593,80 @@
             }
           </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Etiquetas</mat-label>
-            <input
-              matInput
-              formControlName="tags"
-              placeholder="etiqueta1, etiqueta2, etiqueta3"
-            />
-            <mat-hint>Separadas por comas</mat-hint>
-          </mat-form-field>
+          <div class="field-group full-width">
+            <label class="form-field">
+              Etiquetas
+              <input
+                type="text"
+                formControlName="tags"
+                title="Etiquetas del producto"
+                placeholder="etiqueta1, etiqueta2, etiqueta3"
+              />
+            </label>
+            <div class="field-footer">
+              <span class="field-hint">Separadas por comas</span>
+            </div>
+          </div>
         </div>
 
         <!-- SEO -->
         <div class="form-section">
           <h2>SEO</h2>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Meta Título</mat-label>
-            <input matInput formControlName="metaTitle" maxlength="200" />
-            <mat-hint align="end"
-              >{{ form.get('metaTitle')?.value?.length || 0 }} / 200</mat-hint
-            >
-          </mat-form-field>
+          <div class="field-group full-width">
+            <label class="form-field">
+              Meta Título
+              <input
+                type="text"
+                formControlName="metaTitle"
+                title="Meta título"
+                maxlength="200"
+                [class.invalid]="
+                  form.get('metaTitle')?.invalid &&
+                  form.get('metaTitle')?.touched
+                "
+              />
+            </label>
+            <div class="field-footer">
+              @if (form.get('metaTitle')?.invalid &&
+              form.get('metaTitle')?.touched) {
+              <span class="field-error">{{
+                getErrorMessage('metaTitle')
+              }}</span>
+              }
+              <span class="field-hint"
+                >{{ form.get('metaTitle')?.value?.length || 0 }} / 200</span
+              >
+            </div>
+          </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Meta Descripción</mat-label>
-            <textarea
-              matInput
-              formControlName="metaDescription"
-              rows="2"
-              maxlength="500"
-            ></textarea>
-            <mat-hint align="end"
-              >{{ form.get('metaDescription')?.value?.length || 0 }} /
-              500</mat-hint
-            >
-          </mat-form-field>
+          <div class="field-group full-width">
+            <label class="form-field">
+              Meta Descripción
+              <textarea
+                formControlName="metaDescription"
+                title="Meta descripción"
+                rows="2"
+                maxlength="500"
+                [class.invalid]="
+                  form.get('metaDescription')?.invalid &&
+                  form.get('metaDescription')?.touched
+                "
+              ></textarea>
+            </label>
+            <div class="field-footer">
+              @if (form.get('metaDescription')?.invalid &&
+              form.get('metaDescription')?.touched) {
+              <span class="field-error">{{
+                getErrorMessage('metaDescription')
+              }}</span>
+              }
+              <span class="field-hint"
+                >{{ form.get('metaDescription')?.value?.length || 0 }} /
+                500</span
+              >
+            </div>
+          </div>
         </div>
 
         <!-- Opciones -->

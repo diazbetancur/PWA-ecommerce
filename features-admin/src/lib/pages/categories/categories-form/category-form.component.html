@@ -20,66 +20,90 @@
       } @else {
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="category-form">
         <!-- Nombre -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Nombre</mat-label>
-          <input
-            matInput
-            formControlName="name"
-            placeholder="Ej: Electrónica"
-            required
-          />
+        <div class="field-group full-width">
+          <label class="form-field">
+            Nombre
+            <input
+              type="text"
+              formControlName="name"
+              title="Nombre de la categoría"
+              placeholder="Ej: Electrónica"
+              required
+              [class.invalid]="
+                form.get('name')?.invalid && form.get('name')?.touched
+              "
+            />
+          </label>
           @if (form.get('name')?.invalid && form.get('name')?.touched) {
-          <mat-error>{{ getErrorMessage('name') }}</mat-error>
+          <div class="field-error">{{ getErrorMessage('name') }}</div>
           }
-        </mat-form-field>
+        </div>
 
         <!-- Descripción -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Descripción</mat-label>
-          <textarea
-            matInput
-            formControlName="description"
-            placeholder="Descripción de la categoría"
-            rows="4"
-            maxlength="500"
-          ></textarea>
-          @if (form.get('description')?.invalid &&
-          form.get('description')?.touched) {
-          <mat-error>{{ getErrorMessage('description') }}</mat-error>
-          }
-          <mat-hint align="end">
-            {{ form.get('description')?.value?.length || 0 }} / 500
-          </mat-hint>
-        </mat-form-field>
+        <div class="field-group full-width">
+          <label class="form-field">
+            Descripción
+            <textarea
+              formControlName="description"
+              title="Descripción de la categoría"
+              placeholder="Descripción de la categoría"
+              rows="4"
+              maxlength="500"
+              [class.invalid]="
+                form.get('description')?.invalid &&
+                form.get('description')?.touched
+              "
+            ></textarea>
+          </label>
+          <div class="field-footer">
+            @if (form.get('description')?.invalid &&
+            form.get('description')?.touched) {
+            <span class="field-error">{{
+              getErrorMessage('description')
+            }}</span>
+            }
+            <span class="field-hint">
+              {{ form.get('description')?.value?.length || 0 }} / 500
+            </span>
+          </div>
+        </div>
 
         <!-- Imagen de categoría -->
         <div class="image-upload-field full-width">
-          <label class="upload-label" for="category-image-input">
-            Imagen de Categoría (máx {{ maxImageSizeMb() }} MB)
-          </label>
+          <div class="media-field-header">
+            <span>Imagen de Categoría</span>
+            <small
+              >Formatos permitidos: JPG, PNG, WEBP. Max
+              {{ maxImageSizeMb() }} MB.</small
+            >
+          </div>
           <input
             #categoryImageInput
             id="category-image-input"
             type="file"
             accept="image/*"
+            title="Adjuntar imagen de categoría"
             (change)="onImageSelected($event)"
           />
-          <p class="upload-hint">
-            Formatos permitidos: JPG, PNG, WEBP. Si no seleccionas imagen, se
-            mantiene la actual.
-          </p>
-          @if (selectedImageFile()) {
-          <p class="upload-selected-file">
-            Archivo: {{ selectedImageFile()!.name }}
-          </p>
-          <button
-            type="button"
-            class="clear-image-btn"
-            (click)="clearSelectedImage(categoryImageInput)"
-          >
-            Quitar imagen seleccionada
-          </button>
-          }
+
+          <div class="media-meta">
+            @if (selectedImageFile(); as file) {
+            <span>{{ file.name }}</span>
+            <button
+              type="button"
+              class="clear-image-btn"
+              (click)="clearSelectedImage(categoryImageInput)"
+            >
+              Quitar seleccion
+            </button>
+            } @else if (currentImageUrl()) {
+            <span
+              >Si no adjuntas otro archivo, se conserva la imagen actual.</span
+            >
+            } @else {
+            <span>Selecciona la imagen que representará la categoría.</span>
+            }
+          </div>
         </div>
 
         <!-- Preview de imagen -->

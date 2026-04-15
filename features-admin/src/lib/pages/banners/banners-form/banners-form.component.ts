@@ -33,6 +33,8 @@ import {
 } from '../../../models/banner.model';
 import { BannerService } from '../../../services/banner.service';
 
+type BannerDateValue = Date | string | null;
+
 @Component({
   selector: 'lib-banners-form',
   standalone: true,
@@ -222,8 +224,8 @@ export class BannersFormComponent implements OnInit, OnDestroy {
           subtitle: banner.subtitle || '',
           targetUrl: banner.targetUrl || '',
           buttonText: banner.buttonText || '',
-          startDate: this.toDateObject(banner.startDate),
-          endDate: this.toDateObject(banner.endDate),
+          startDate: this.toDateInputValue(banner.startDate),
+          endDate: this.toDateInputValue(banner.endDate),
           displayOrder: banner.displayOrder,
           isActive: banner.isActive,
         });
@@ -303,8 +305,8 @@ export class BannersFormComponent implements OnInit, OnDestroy {
   }
 
   private validateDateRange(): boolean {
-    const start = this.form.get('startDate')?.value as Date | string | null;
-    const end = this.form.get('endDate')?.value as Date | string | null;
+    const start = this.form.get('startDate')?.value as BannerDateValue;
+    const end = this.form.get('endDate')?.value as BannerDateValue;
 
     if (!start || !end) {
       return true;
@@ -313,20 +315,30 @@ export class BannersFormComponent implements OnInit, OnDestroy {
     return new Date(start).getTime() <= new Date(end).getTime();
   }
 
-  private toIsoDate(value?: Date | string | null): string | undefined {
+  private toIsoDate(value?: BannerDateValue): string | undefined {
     if (!value) {
       return undefined;
+    }
+
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return new Date(`${value}T00:00:00`).toISOString();
     }
 
     return new Date(value).toISOString();
   }
 
-  private toDateObject(value?: string | null): Date | null {
+  private toDateInputValue(value?: string | null): string | null {
     if (!value) {
       return null;
     }
 
-    return new Date(value);
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    return date.toISOString().slice(0, 10);
   }
 
   private revokeObjectUrl(): void {
