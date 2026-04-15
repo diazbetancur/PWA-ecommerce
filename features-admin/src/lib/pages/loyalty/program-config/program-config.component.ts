@@ -7,7 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ToastService } from '@pwa/shared';
+import { extractApiErrorMessage, ToastService } from '@pwa/shared';
 import {
   LoyaltyPointsPaymentConfigDto,
   LoyaltyProgramConfigDto,
@@ -222,10 +222,8 @@ export class ProgramConfigComponent implements OnInit {
         );
         this.isSavingEarnConfig.set(false);
       },
-      error: () => {
-        this.toastService.error(
-          'No se pudo guardar la configuración de compras a puntos'
-        );
+      error: (err) => {
+        this.toastService.error(extractApiErrorMessage(err));
         this.isSavingEarnConfig.set(false);
       },
     });
@@ -271,10 +269,7 @@ export class ProgramConfigComponent implements OnInit {
         this.isSavingPointsPaymentConfig.set(false);
       },
       error: (err) => {
-        this.toastService.error(
-          err?.error?.message ||
-            'No se pudo guardar la configuración de puntos a dinero'
-        );
+        this.toastService.error(extractApiErrorMessage(err));
         this.isSavingPointsPaymentConfig.set(false);
       },
     });

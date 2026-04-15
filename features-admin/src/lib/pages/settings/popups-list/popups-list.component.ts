@@ -25,6 +25,7 @@ import {
   AppButtonComponent,
   buildAppSnackBarConfig,
   ConfirmationDialogService,
+  extractApiErrorMessage,
 } from '@pwa/shared';
 import { PopupListItem, PopupListParams } from '../../../models/popup.model';
 import { PopupService } from '../../../services/popup.service';
@@ -149,11 +150,9 @@ export class PopupsListComponent implements OnInit {
             this.loadPopups();
           },
           error: (error) => {
-            this.snackBar.open(
-              error?.error?.message || 'Error al eliminar popup',
-              'Cerrar',
-              { duration: 3000 }
-            );
+            this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
+              duration: 3000,
+            });
             this.loading.set(false);
           },
         });

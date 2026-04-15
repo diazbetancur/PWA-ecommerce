@@ -16,11 +16,7 @@ import {
 } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {
   MatSnackBar,
@@ -28,11 +24,11 @@ import {
   MatSnackBarModule,
 } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppEnvService } from '@pwa/core';
 import {
   AppButtonComponent,
   buildAppSnackBarConfig,
   ConfirmationDialogService,
+  extractApiErrorMessage,
 } from '@pwa/shared';
 import {
   CreatePopupRequest,
@@ -50,12 +46,8 @@ type PopupDateValue = Date | string | null;
     CommonModule,
     ReactiveFormsModule,
     MatCardModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatIconModule,
     MatCheckboxModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
     AppButtonComponent,
@@ -78,7 +70,6 @@ export class PopupsFormComponent implements OnInit, OnDestroy {
         buildAppSnackBarConfig(message, config)
       ),
   };
-  private readonly appEnv = inject(AppEnvService);
   private readonly confirmDialog = inject(ConfirmationDialogService);
 
   readonly loading = signal(false);
@@ -102,11 +93,9 @@ export class PopupsFormComponent implements OnInit, OnDestroy {
 
   readonly currentImageUrl = computed(() => this.popup()?.imageUrl || null);
 
-  readonly maxImageSizeMb = computed(() => this.appEnv.categoryImageMaxSizeMb);
+  readonly maxImageSizeMb = computed(() => 1);
 
-  readonly maxImageSizeBytes = computed(
-    () => this.maxImageSizeMb() * 1024 * 1024
-  );
+  readonly maxImageSizeBytes = computed(() => 1024 * 1024);
 
   readonly hasImagePreview = computed(
     () => !!this.imagePreviewUrl() || !!this.currentImageUrl()
@@ -232,8 +221,8 @@ export class PopupsFormComponent implements OnInit, OnDestroy {
         this.form.patchValue({
           targetUrl: popup.targetUrl || '',
           buttonText: popup.buttonText || '',
-          startDate: this.toDateObject(popup.startDate),
-          endDate: this.toDateObject(popup.endDate),
+          startDate: this.toDateInputValue(popup.startDate),
+          endDate: this.toDateInputValue(popup.endDate),
           isActive: popup.isActive,
         });
         this.loading.set(false);
@@ -256,13 +245,9 @@ export class PopupsFormComponent implements OnInit, OnDestroy {
         this.router.navigate(['/tenant-admin/settings/popups']);
       },
       error: (error) => {
-        this.snackBar.open(
-          error?.error?.message || 'Error al crear popup',
-          'Cerrar',
-          {
-            duration: 3000,
-          }
-        );
+        this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
+          duration: 3000,
+        });
         this.loading.set(false);
       },
     });
@@ -282,13 +267,9 @@ export class PopupsFormComponent implements OnInit, OnDestroy {
         this.router.navigate(['/tenant-admin/settings/popups']);
       },
       error: (error) => {
-        this.snackBar.open(
-          error?.error?.message || 'Error al actualizar popup',
-          'Cerrar',
-          {
-            duration: 3000,
-          }
-        );
+        this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
+          duration: 3000,
+        });
         this.loading.set(false);
       },
     });
@@ -323,15 +304,25 @@ export class PopupsFormComponent implements OnInit, OnDestroy {
       return undefined;
     }
 
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return new Date(`${value}T00:00:00`).toISOString();
+    }
+
     return new Date(value).toISOString();
   }
 
-  private toDateObject(value?: string | null): Date | null {
+  private toDateInputValue(value?: string | null): string | null {
     if (!value) {
       return null;
     }
 
-    return new Date(value);
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return null;
+    }
+
+    return date.toISOString().slice(0, 10);
   }
 
   private revokeObjectUrl(): void {

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ToastService } from '@pwa/shared';
+import { extractApiErrorMessage, ToastService } from '@pwa/shared';
 import {
   LoyaltyRedemptionDto,
   PagedLoyaltyRedemptionsResponse,
@@ -505,7 +505,7 @@ export class RedemptionsListComponent implements OnInit {
           this.loadRedemptions();
         },
         error: (err) => {
-          this.toastService.error('No se pudo aprobar el canje');
+          this.toastService.error(extractApiErrorMessage(err));
         },
       });
   }
@@ -529,7 +529,7 @@ export class RedemptionsListComponent implements OnInit {
             this.loadRedemptions();
           },
           error: (err) => {
-            this.toastService.error('No se pudo actualizar el estado');
+            this.toastService.error(extractApiErrorMessage(err));
           },
         });
     }
@@ -555,7 +555,7 @@ export class RedemptionsListComponent implements OnInit {
           this.loadRedemptions();
         },
         error: (err) => {
-          this.toastService.error('No se pudo cancelar el canje');
+          this.toastService.error(extractApiErrorMessage(err));
         },
       });
   }

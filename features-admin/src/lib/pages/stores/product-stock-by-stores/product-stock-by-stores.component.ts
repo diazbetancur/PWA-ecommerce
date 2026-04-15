@@ -11,7 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToastService } from '@pwa/shared';
+import { extractApiErrorMessage, ToastService } from '@pwa/shared';
 import {
   ProductStoreStockDto,
   UpdateProductStoreStockRequest,
@@ -183,8 +183,7 @@ export class ProductStockByStoresComponent implements OnInit {
           this.loadStock(productId); // Recargar datos
         },
         error: (err) => {
-          const message = err.error?.detail || 'Error al actualizar el stock';
-          this.toastService.error(message);
+          this.toastService.error(extractApiErrorMessage(err));
           this.savingStock.set(false);
         },
       });

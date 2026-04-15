@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '@pwa/core';
-import { ToastService } from '@pwa/shared';
+import { extractApiErrorMessage, ToastService } from '@pwa/shared';
 import {
   CreateLoyaltyRewardRequest,
   LoyaltyRewardDto,
@@ -343,11 +343,7 @@ export class RewardFormComponent implements OnInit {
         this.goBack();
       },
       error: (err) => {
-        const message =
-          err?.error?.message ||
-          err?.error?.detail ||
-          err?.error?.title ||
-          'No se pudo guardar el premio';
+        const message = extractApiErrorMessage(err);
         this.submitFeedback.set(message);
         this.toastService.error(message);
         console.error('[RewardForm] Error saving reward', err);

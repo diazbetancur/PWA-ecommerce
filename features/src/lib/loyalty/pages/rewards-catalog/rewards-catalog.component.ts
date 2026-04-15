@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { AuthService } from '@pwa/core';
 import { TenantAuthModalService } from '@pwa/features-account';
-import { ToastService } from '@pwa/shared';
+import { extractApiErrorMessage, ToastService } from '@pwa/shared';
 import {
   LoyaltyRewardDto,
   PagedLoyaltyRewardsResponse,
@@ -179,10 +179,8 @@ export class RewardsCatalogComponent implements OnInit {
         }
         this.loadRewards();
       },
-      error: () => {
-        this.toastService.error(
-          'No fue posible redimir el premio. Verifica tus puntos e intenta nuevamente.'
-        );
+      error: (error) => {
+        this.toastService.error(extractApiErrorMessage(error));
         this.redeemingRewardId.set(null);
       },
     });

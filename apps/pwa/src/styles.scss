@@ -371,7 +371,7 @@ select:focus {
 /* Material Paginator - Modern & Clean */
 .mat-mdc-paginator {
   background-color: transparent !important;
-  color: var(--tenant-text-color) !important;
+  color: #000000 !important;
   border-radius: 8px;
   padding: 0.5rem 0;
 
@@ -385,7 +385,7 @@ select:focus {
     align-items: center;
 
     .mat-mdc-paginator-page-size-label {
-      color: var(--tenant-secondary-color);
+      color: #000000 !important;
       margin: 0 0.5rem 0 0;
       font-size: 0.875rem;
 
@@ -402,17 +402,40 @@ select:focus {
 
     .mat-mdc-form-field {
       margin: 0 0.5rem;
+
+      .mat-mdc-text-field-wrapper {
+        background-color: #ffffff !important;
+        border-radius: 8px;
+      }
+
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: #d1d5db !important;
+      }
+
+      .mat-mdc-form-field-infix {
+        min-height: 34px;
+        padding-top: 0.25rem;
+        padding-bottom: 0.25rem;
+      }
+
+      .mat-mdc-select-min-line,
+      .mat-mdc-select-value,
+      .mat-mdc-select-arrow {
+        color: #000000 !important;
+      }
     }
   }
 
   .mat-mdc-paginator-range-label {
-    color: var(--tenant-secondary-color);
+    color: #000000 !important;
     margin: 0 2rem;
     font-size: 0.875rem;
   }
 
   .mat-mdc-icon-button {
-    color: var(--tenant-primary-color);
+    color: #000000 !important;
     transition: all 0.2s ease;
 
     &:hover:not([disabled]) {
@@ -431,6 +454,29 @@ select:focus {
   }
 }
 
+/* Paginator dropdown panel: white, compact and easier to read */
+div.mat-mdc-select-panel {
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db;
+  border-radius: 8px !important;
+  padding: 4px !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+}
+
+div.mat-mdc-select-panel .mat-mdc-option {
+  min-height: 32px !important;
+  padding: 0 10px !important;
+}
+
+div.mat-mdc-select-panel .mat-mdc-option .mdc-list-item__primary-text {
+  color: #000000 !important;
+  font-size: 0.875rem;
+}
+
+div.mat-mdc-select-panel .mat-mdc-option.mdc-list-item--selected {
+  background-color: #f3f4f6 !important;
+}
+
 /* Material Table - Clean & Modern */
 .mat-mdc-table {
   background-color: transparent;
@@ -441,7 +487,7 @@ select:focus {
   }
 
   .mat-mdc-header-cell {
-    color: var(--tenant-secondary-color);
+    color: #000000 !important;
     font-weight: 600;
     font-size: 0.875rem;
     border-bottom-color: #e2e8f0;

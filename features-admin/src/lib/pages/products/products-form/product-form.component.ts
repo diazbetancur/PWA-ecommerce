@@ -47,6 +47,7 @@ import {
   AppButtonComponent,
   buildAppSnackBarConfig,
   ConfirmationDialogService,
+  extractApiErrorMessage,
 } from '@pwa/shared';
 import { CategorySelectorDialogComponent } from '../../../components/category-selector-dialog/category-selector-dialog.component';
 import { CategoryListItem } from '../../../models/category.model';
@@ -388,7 +389,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         this.router.navigate(['/tenant-admin/catalog/products']);
       },
       error: (error) => {
-        const message = error?.error?.title || 'Error al crear el producto';
+        const message = extractApiErrorMessage(error);
         this.snackBar.open(message, 'Cerrar', { duration: 3000 });
         this.loading.set(false);
       },
@@ -407,8 +408,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
         this.router.navigate(['/tenant-admin/catalog/products']);
       },
       error: (error) => {
-        const message =
-          error?.error?.title || 'Error al actualizar el producto';
+        const message = extractApiErrorMessage(error);
         this.snackBar.open(message, 'Cerrar', { duration: 3000 });
         this.loading.set(false);
       },

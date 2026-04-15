@@ -14,7 +14,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { AppEnvService } from '@pwa/core';
-import { ConfirmationDialogService, ToastService } from '@pwa/shared';
+import {
+  ConfirmationDialogService,
+  extractApiErrorMessage,
+  ToastService,
+} from '@pwa/shared';
 import { Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import {
@@ -137,11 +141,9 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
         this.isLoading.set(false);
       },
       error: (error) => {
-        this.errorMessage.set(
-          error?.error?.message ||
-            'No se pudo cargar la configuración del tenant.'
-        );
-        this.toastService.error('No se pudo cargar la configuración');
+        const message = extractApiErrorMessage(error);
+        this.errorMessage.set(message);
+        this.toastService.error(message);
         this.isLoading.set(false);
       },
     });
@@ -165,9 +167,7 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
           this.toastService.success('Branding actualizado correctamente');
         },
         error: (error) => {
-          this.toastService.error(
-            error?.error?.message || 'No se pudo actualizar branding'
-          );
+          this.toastService.error(extractApiErrorMessage(error));
         },
       });
   }
@@ -188,9 +188,7 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
         this.savingSection.set(null);
       },
       error: (error) => {
-        this.toastService.error(
-          error?.error?.message || 'No se pudo actualizar contacto'
-        );
+        this.toastService.error(extractApiErrorMessage(error));
         this.savingSection.set(null);
       },
     });
@@ -210,9 +208,7 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
         this.savingSection.set(null);
       },
       error: (error) => {
-        this.toastService.error(
-          error?.error?.message || 'No se pudo actualizar redes sociales'
-        );
+        this.toastService.error(extractApiErrorMessage(error));
         this.savingSection.set(null);
       },
     });
@@ -248,9 +244,7 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
           this.toastService.success('Configuración actualizada correctamente');
         },
         error: (error) => {
-          this.toastService.error(
-            error?.error?.message || 'No se pudo actualizar la configuración'
-          );
+          this.toastService.error(extractApiErrorMessage(error));
         },
       });
   }

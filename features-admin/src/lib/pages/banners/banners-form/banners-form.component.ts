@@ -33,6 +33,7 @@ import {
   AppButtonComponent,
   buildAppSnackBarConfig,
   ConfirmationDialogService,
+  extractApiErrorMessage,
 } from '@pwa/shared';
 import {
   BannerResponse,
@@ -265,13 +266,9 @@ export class BannersFormComponent implements OnInit, OnDestroy {
         this.router.navigate(['/tenant-admin/catalog/banners']);
       },
       error: (error) => {
-        this.snackBar.open(
-          error?.error?.message || 'Error al crear banner',
-          'Cerrar',
-          {
-            duration: 3000,
-          }
-        );
+        this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
+          duration: 3000,
+        });
         this.loading.set(false);
       },
     });
@@ -291,13 +288,9 @@ export class BannersFormComponent implements OnInit, OnDestroy {
         this.router.navigate(['/tenant-admin/catalog/banners']);
       },
       error: (error) => {
-        this.snackBar.open(
-          error?.error?.message || 'Error al actualizar banner',
-          'Cerrar',
-          {
-            duration: 3000,
-          }
-        );
+        this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
+          duration: 3000,
+        });
         this.loading.set(false);
       },
     });

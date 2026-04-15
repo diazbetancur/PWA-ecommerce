@@ -31,6 +31,7 @@ import {
   AppButtonComponent,
   buildAppSnackBarConfig,
   ConfirmationDialogService,
+  extractApiErrorMessage,
   SearchInputComponent,
 } from '@pwa/shared';
 import { CategoryProductsModalComponent } from '../../../components/category-products-modal/category-products-modal.component';
@@ -201,11 +202,9 @@ export class CategoriesListComponent implements OnInit {
         this.loadCategories();
       },
       error: (error) => {
-        this.snackBar.open(
-          error.error?.message || 'Error al eliminar categoría',
-          'Cerrar',
-          { duration: 3000 }
-        );
+        this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
+          duration: 3000,
+        });
         this.loading.set(false);
       },
     });

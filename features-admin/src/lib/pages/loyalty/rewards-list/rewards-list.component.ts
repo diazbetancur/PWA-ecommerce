@@ -2,7 +2,11 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ConfirmationDialogService, ToastService } from '@pwa/shared';
+import {
+  ConfirmationDialogService,
+  extractApiErrorMessage,
+  ToastService,
+} from '@pwa/shared';
 import {
   GetLoyaltyRewardsQuery,
   LoyaltyRewardDto,
@@ -209,8 +213,8 @@ export class RewardsListComponent implements OnInit {
             );
             this.loadRewards();
           },
-          error: () => {
-            this.toastService.error('No se pudo eliminar el premio');
+          error: (err) => {
+            this.toastService.error(extractApiErrorMessage(err));
           },
         });
       });

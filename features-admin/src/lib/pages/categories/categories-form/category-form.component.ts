@@ -39,6 +39,7 @@ import {
   AppButtonComponent,
   buildAppSnackBarConfig,
   ConfirmationDialogService,
+  extractApiErrorMessage,
 } from '@pwa/shared';
 import {
   CategoryResponse,
@@ -231,11 +232,9 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
         this.router.navigate(['/tenant-admin/catalog/categories']);
       },
       error: (error) => {
-        this.snackBar.open(
-          error.error?.message || 'Error al crear la categoría',
-          'Cerrar',
-          { duration: 3000 }
-        );
+        this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
+          duration: 3000,
+        });
         this.loading.set(false);
       },
     });
@@ -253,11 +252,9 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
         this.router.navigate(['/tenant-admin/catalog/categories']);
       },
       error: (error) => {
-        this.snackBar.open(
-          error.error?.message || 'Error al actualizar la categoría',
-          'Cerrar',
-          { duration: 3000 }
-        );
+        this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
+          duration: 3000,
+        });
         this.loading.set(false);
       },
     });

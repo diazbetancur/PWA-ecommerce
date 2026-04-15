@@ -19,88 +19,102 @@
       </div>
       } @else {
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="popup-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Target URL</mat-label>
-          <input
-            matInput
-            formControlName="targetUrl"
-            placeholder="/promos/oferta-especial"
-          />
+        <div class="field-group full-width">
+          <label class="form-field">
+            Target URL
+            <input
+              type="text"
+              formControlName="targetUrl"
+              title="URL de destino del popup"
+              placeholder="/promos/oferta-especial"
+              [class.invalid]="
+                form.get('targetUrl')?.invalid && form.get('targetUrl')?.touched
+              "
+            />
+          </label>
           @if (form.get('targetUrl')?.invalid && form.get('targetUrl')?.touched)
           {
-          <mat-error>{{ getErrorMessage('targetUrl') }}</mat-error>
+          <div class="field-error">{{ getErrorMessage('targetUrl') }}</div>
           }
-        </mat-form-field>
+        </div>
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Texto del botón</mat-label>
-          <input
-            matInput
-            formControlName="buttonText"
-            placeholder="Ver oferta"
-          />
+        <div class="field-group full-width">
+          <label class="form-field">
+            Texto del botón
+            <input
+              type="text"
+              formControlName="buttonText"
+              title="Texto del boton del popup"
+              placeholder="Ver oferta"
+              [class.invalid]="
+                form.get('buttonText')?.invalid &&
+                form.get('buttonText')?.touched
+              "
+            />
+          </label>
           @if (form.get('buttonText')?.invalid &&
           form.get('buttonText')?.touched) {
-          <mat-error>{{ getErrorMessage('buttonText') }}</mat-error>
+          <div class="field-error">{{ getErrorMessage('buttonText') }}</div>
           }
-        </mat-form-field>
+        </div>
 
         <div class="two-columns">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fecha inicio</mat-label>
-            <input
-              matInput
-              [matDatepicker]="startPicker"
-              formControlName="startDate"
-            />
-            <mat-datepicker-toggle
-              matIconSuffix
-              [for]="startPicker"
-            ></mat-datepicker-toggle>
-            <mat-datepicker #startPicker></mat-datepicker>
-          </mat-form-field>
+          <div class="field-group full-width">
+            <label class="form-field">
+              Fecha inicio
+              <input
+                type="date"
+                formControlName="startDate"
+                title="Fecha de inicio del popup"
+              />
+            </label>
+          </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Fecha fin</mat-label>
-            <input
-              matInput
-              [matDatepicker]="endPicker"
-              formControlName="endDate"
-            />
-            <mat-datepicker-toggle
-              matIconSuffix
-              [for]="endPicker"
-            ></mat-datepicker-toggle>
-            <mat-datepicker #endPicker></mat-datepicker>
-          </mat-form-field>
+          <div class="field-group full-width">
+            <label class="form-field">
+              Fecha fin
+              <input
+                type="date"
+                formControlName="endDate"
+                title="Fecha de fin del popup"
+              />
+            </label>
+          </div>
         </div>
 
         <div class="image-upload-field full-width">
-          <label class="upload-label" for="popup-image-input">
-            Imagen del Popup (requerida)
-          </label>
+          <div class="media-field-header">
+            <span>Imagen del Popup</span>
+            <small
+              >Tamano sugerido: 1200 x 1200 px (relacion 1:1). Max
+              {{ maxImageSizeMb() }} MB.</small
+            >
+          </div>
           <input
             #popupImageInput
             id="popup-image-input"
             type="file"
             accept="image/*"
+            title="Adjuntar imagen de popup"
             (change)="onImageSelected($event)"
           />
-          <p class="upload-hint">
-            En edición también es requerida según contrato API.
-          </p>
-          @if (selectedImageFile()) {
-          <p class="upload-selected-file">
-            Archivo: {{ selectedImageFile()!.name }}
-          </p>
-          <button
-            type="button"
-            class="clear-image-btn"
-            (click)="clearSelectedImage(popupImageInput)"
-          >
-            Quitar imagen seleccionada
-          </button>
-          }
+
+          <div class="media-meta">
+            @if (selectedImageFile(); as file) {
+            <span>{{ file.name }}</span>
+            <button
+              type="button"
+              class="clear-image-btn"
+              (click)="clearSelectedImage(popupImageInput)"
+            >
+              Quitar seleccion
+            </button>
+            } @else if (currentImageUrl()) {
+            <span>Hay una imagen actual, adjunta una nueva para guardar.</span>
+            } @else {
+            <span>Selecciona la imagen que se mostrara en el popup.</span>
+            }
+          </div>
         </div>
 
         @if (hasImagePreview()) {

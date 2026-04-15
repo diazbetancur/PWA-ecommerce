@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ToastService } from '@pwa/shared';
+import { extractApiErrorMessage, ToastService } from '@pwa/shared';
 import {
   AdjustPointsRequest,
   AdjustPointsResponse,
@@ -506,9 +506,7 @@ export class PointsAdjustmentComponent {
           this.router.navigate(['/tenant-admin/loyalty/points-adjustments']);
         },
         error: (err) => {
-          this.toastService.error(
-            'No se pudo realizar el ajuste. Verifica los datos e intenta nuevamente.'
-          );
+          this.toastService.error(extractApiErrorMessage(err));
           this.isSubmitting.set(false);
         },
       });

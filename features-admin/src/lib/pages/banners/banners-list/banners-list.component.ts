@@ -28,6 +28,7 @@ import {
   AppButtonComponent,
   buildAppSnackBarConfig,
   ConfirmationDialogService,
+  extractApiErrorMessage,
 } from '@pwa/shared';
 import { BannerListItem, BannerListParams } from '../../../models/banner.model';
 import { BannerService } from '../../../services/banner.service';
@@ -154,11 +155,9 @@ export class BannersListComponent implements OnInit {
             this.loadBanners();
           },
           error: (error) => {
-            this.snackBar.open(
-              error?.error?.message || 'Error al eliminar banner',
-              'Cerrar',
-              { duration: 3000 }
-            );
+            this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
+              duration: 3000,
+            });
             this.loading.set(false);
           },
         });

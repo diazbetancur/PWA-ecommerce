@@ -10,7 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { ToastService } from '@pwa/shared';
+import { extractApiErrorMessage, ToastService } from '@pwa/shared';
 import { StoreDto } from '../../../models/store.models';
 import { StoreAdminService } from '../../../services/store-admin.service';
 
@@ -133,9 +133,7 @@ export class StoresListComponent implements OnInit {
           this.loadStores();
         },
         error: (err) => {
-          this.toastService.error(
-            err.error?.detail || 'Error al establecer tienda predeterminada'
-          );
+          this.toastService.error(extractApiErrorMessage(err));
         },
       });
   }
@@ -168,10 +166,7 @@ export class StoresListComponent implements OnInit {
           this.loadStores();
         },
         error: (err) => {
-          const message =
-            err.error?.detail ||
-            'Error al eliminar la tienda. Puede tener stock u órdenes asociadas.';
-          this.toastService.error(message);
+          this.toastService.error(extractApiErrorMessage(err));
         },
       });
   }

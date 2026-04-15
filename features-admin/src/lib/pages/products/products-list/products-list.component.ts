@@ -36,6 +36,7 @@ import {
   AppButtonComponent,
   buildAppSnackBarConfig,
   ConfirmationDialogService,
+  extractApiErrorMessage,
 } from '@pwa/shared';
 
 @Component({
@@ -183,7 +184,7 @@ export class ProductsListComponent implements OnInit {
         this.loadProducts();
       },
       error: (error) => {
-        this.snackBar.open('Error al actualizar producto', 'Cerrar', {
+        this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
           duration: 3000,
         });
       },
@@ -215,7 +216,7 @@ export class ProductsListComponent implements OnInit {
         this.loadProducts();
       },
       error: (error) => {
-        this.snackBar.open('Error al eliminar producto', 'Cerrar', {
+        this.snackBar.open(extractApiErrorMessage(error), 'Cerrar', {
           duration: 3000,
         });
       },
