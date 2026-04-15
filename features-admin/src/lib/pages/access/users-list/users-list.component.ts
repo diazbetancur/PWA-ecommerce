@@ -17,6 +17,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  AppButtonComponent,
   ConfirmationDialogComponent,
   ConfirmationDialogData,
 } from '@pwa/shared';
@@ -38,6 +39,7 @@ import { TenantUserService } from '../../../services/tenant-user.service';
     MatProgressSpinnerModule,
     MatChipsModule,
     MatBadgeModule,
+    AppButtonComponent,
   ],
   templateUrl: './users-list.component.html',
   styleUrl: './users-list.component.scss',

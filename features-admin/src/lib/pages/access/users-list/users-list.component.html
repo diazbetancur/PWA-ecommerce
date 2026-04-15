@@ -11,15 +11,14 @@
       </p>
     </div>
     <div class="toolbar-actions">
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="openCreateDialog()"
-        [disabled]="isLoading()"
+      <app-button
+        variant="primary"
+        icon="person_add"
+        (clicked)="openCreateDialog()"
+        class="create-button"
       >
-        <mat-icon>person_add</mat-icon>
         {{ createLabel() }}
-      </button>
+      </app-button>
     </div>
   </div>
 
@@ -111,7 +110,9 @@
       <ng-container matColumnDef="lastLogin">
         <th mat-header-cell *matHeaderCellDef>Último acceso</th>
         <td mat-cell *matCellDef="let user">
-          <span class="last-login">{{ formatLastLogin(user.lastLoginAt) }}</span>
+          <span class="last-login">{{
+            formatLastLogin(user.lastLoginAt)
+          }}</span>
         </td>
       </ng-container>
 
