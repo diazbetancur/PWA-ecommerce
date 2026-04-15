@@ -3,6 +3,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TenantAdminMenuService, TenantContextService } from '@pwa/core';
 import { TenantAdminMenuComponent } from '../../components/tenant-admin-menu/tenant-admin-menu.component';
+import { ToastContainerComponent } from '../../ui/toast-container/toast-container.component';
 
 /**
  * 🏗️ Layout Principal para Panel Administrativo del Tenant
@@ -18,7 +19,12 @@ import { TenantAdminMenuComponent } from '../../components/tenant-admin-menu/ten
 @Component({
   selector: 'app-tenant-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, TenantAdminMenuComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    TenantAdminMenuComponent,
+    ToastContainerComponent,
+  ],
   templateUrl: './tenant-admin-layout.component.html',
   styleUrl: './tenant-admin-layout.component.scss',
 })

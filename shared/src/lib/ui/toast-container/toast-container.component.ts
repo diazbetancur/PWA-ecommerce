@@ -55,7 +55,7 @@ import { ToastService } from '../../services/toast.service';
         align-items: center;
         gap: 12px;
         padding: 16px;
-        background: white;
+        background: #ffffff;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         cursor: pointer;
@@ -95,13 +95,13 @@ import { ToastService } from '../../services/toast.service';
         flex: 1;
         font-size: 0.95rem;
         line-height: 1.4;
-        color: #333;
+        color: #1f2937;
       }
 
       .toast-close {
         background: none;
         border: none;
-        color: #999;
+        color: #6b7280;
         font-size: 1.2rem;
         cursor: pointer;
         padding: 4px;
@@ -116,20 +116,32 @@ import { ToastService } from '../../services/toast.service';
 
       /* Toast Types */
       .toast-success {
-        border-left-color: #28a745;
+        background: #15803d;
+        border-left-color: #15803d;
       }
 
       .toast-success .toast-icon {
-        background: #28a745;
+        background: rgba(255, 255, 255, 0.22);
+        color: white;
+      }
+
+      .toast-success .toast-message,
+      .toast-success .toast-close {
         color: white;
       }
 
       .toast-error {
-        border-left-color: #dc3545;
+        background: #b91c1c;
+        border-left-color: #b91c1c;
       }
 
       .toast-error .toast-icon {
-        background: #dc3545;
+        background: rgba(255, 255, 255, 0.22);
+        color: white;
+      }
+
+      .toast-error .toast-message,
+      .toast-error .toast-close {
         color: white;
       }
 

@@ -29,7 +29,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarModule,
+} from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   AppEnvService,
@@ -39,7 +43,11 @@ import {
   ProductService,
   UpdateProductDto,
 } from '@pwa/core';
-import { AppButtonComponent, ConfirmationDialogService } from '@pwa/shared';
+import {
+  AppButtonComponent,
+  buildAppSnackBarConfig,
+  ConfirmationDialogService,
+} from '@pwa/shared';
 import { CategorySelectorDialogComponent } from '../../../components/category-selector-dialog/category-selector-dialog.component';
 import { CategoryListItem } from '../../../models/category.model';
 import { StoreDto } from '../../../models/store.models';
@@ -71,7 +79,15 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private readonly productService = inject(ProductService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly matSnackBar = inject(MatSnackBar);
+  private readonly snackBar = {
+    open: (message: string, action?: string, config?: MatSnackBarConfig) =>
+      this.matSnackBar.open(
+        message,
+        action,
+        buildAppSnackBarConfig(message, config)
+      ),
+  };
   private readonly dialog = inject(MatDialog);
   private readonly storeAdminService = inject(StoreAdminService);
   private readonly appEnv = inject(AppEnvService);

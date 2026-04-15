@@ -28,10 +28,18 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarModule,
+} from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppEnvService } from '@pwa/core';
-import { AppButtonComponent, ConfirmationDialogService } from '@pwa/shared';
+import {
+  AppButtonComponent,
+  buildAppSnackBarConfig,
+  ConfirmationDialogService,
+} from '@pwa/shared';
 import {
   CategoryResponse,
   CreateCategoryRequest,
@@ -64,7 +72,15 @@ export class CategoryFormComponent implements OnInit, OnDestroy {
   private readonly categoryService = inject(CategoryService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly matSnackBar = inject(MatSnackBar);
+  private readonly snackBar = {
+    open: (message: string, action?: string, config?: MatSnackBarConfig) =>
+      this.matSnackBar.open(
+        message,
+        action,
+        buildAppSnackBarConfig(message, config)
+      ),
+  };
   private readonly appEnv = inject(AppEnvService);
   private readonly confirmDialog = inject(ConfirmationDialogService);
 

@@ -22,16 +22,26 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarModule,
+} from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppEnvService } from '@pwa/core';
-import { AppButtonComponent, ConfirmationDialogService } from '@pwa/shared';
+import {
+  AppButtonComponent,
+  buildAppSnackBarConfig,
+  ConfirmationDialogService,
+} from '@pwa/shared';
 import {
   CreatePopupRequest,
   PopupResponse,
   UpdatePopupRequest,
 } from '../../../models/popup.model';
 import { PopupService } from '../../../services/popup.service';
+
+type PopupDateValue = Date | string | null;
 
 @Component({
   selector: 'lib-popups-form',
@@ -59,7 +69,15 @@ export class PopupsFormComponent implements OnInit, OnDestroy {
   private readonly popupService = inject(PopupService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly matSnackBar = inject(MatSnackBar);
+  private readonly snackBar = {
+    open: (message: string, action?: string, config?: MatSnackBarConfig) =>
+      this.matSnackBar.open(
+        message,
+        action,
+        buildAppSnackBarConfig(message, config)
+      ),
+  };
   private readonly appEnv = inject(AppEnvService);
   private readonly confirmDialog = inject(ConfirmationDialogService);
 
@@ -290,8 +308,8 @@ export class PopupsFormComponent implements OnInit, OnDestroy {
   }
 
   private validateDateRange(): boolean {
-    const start = this.form.get('startDate')?.value as Date | string | null;
-    const end = this.form.get('endDate')?.value as Date | string | null;
+    const start = this.form.get('startDate')?.value as PopupDateValue;
+    const end = this.form.get('endDate')?.value as PopupDateValue;
 
     if (!start || !end) {
       return true;
@@ -300,7 +318,7 @@ export class PopupsFormComponent implements OnInit, OnDestroy {
     return new Date(start).getTime() <= new Date(end).getTime();
   }
 
-  private toIsoDate(value?: Date | string | null): string | undefined {
+  private toIsoDate(value?: PopupDateValue): string | undefined {
     if (!value) {
       return undefined;
     }

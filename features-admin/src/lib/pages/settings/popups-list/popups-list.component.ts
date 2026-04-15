@@ -12,12 +12,20 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarModule,
+} from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { TenantAdminMenuService } from '@pwa/core';
-import { AppButtonComponent, ConfirmationDialogService } from '@pwa/shared';
+import {
+  AppButtonComponent,
+  buildAppSnackBarConfig,
+  ConfirmationDialogService,
+} from '@pwa/shared';
 import { PopupListItem, PopupListParams } from '../../../models/popup.model';
 import { PopupService } from '../../../services/popup.service';
 
@@ -44,7 +52,15 @@ export class PopupsListComponent implements OnInit {
   private readonly popupService = inject(PopupService);
   private readonly menuService = inject(TenantAdminMenuService);
   private readonly router = inject(Router);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly matSnackBar = inject(MatSnackBar);
+  private readonly snackBar = {
+    open: (message: string, action?: string, config?: MatSnackBarConfig) =>
+      this.matSnackBar.open(
+        message,
+        action,
+        buildAppSnackBarConfig(message, config)
+      ),
+  };
   private readonly confirmDialog = inject(ConfirmationDialogService);
 
   readonly popups = signal<PopupListItem[]>([]);

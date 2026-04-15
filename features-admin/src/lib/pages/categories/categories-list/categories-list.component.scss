@@ -141,6 +141,44 @@
   color: rgba(0, 0, 0, 0.87);
 }
 
+.categories-table .mat-column-image {
+  width: 84px;
+}
+
+.image-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.category-thumbnail {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+}
+
+.category-thumbnail-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+
+  mat-icon {
+    color: #94a3b8;
+    font-size: 1.15rem;
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+}
+
 /* Slug y badges */
 .slug {
   font-family: 'Courier New', monospace;

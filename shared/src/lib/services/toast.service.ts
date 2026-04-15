@@ -26,6 +26,7 @@ export interface Toast {
   providedIn: 'root',
 })
 export class ToastService {
+  private readonly extraDurationMs = 2000;
   private readonly toasts = signal<Toast[]>([]);
   private idCounter = 0;
 
@@ -94,7 +95,7 @@ export class ToastService {
     if (toast.duration && toast.duration > 0) {
       setTimeout(() => {
         this.remove(id);
-      }, toast.duration);
+      }, toast.duration + this.extraDurationMs);
     }
   }
 

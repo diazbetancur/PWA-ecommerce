@@ -1,7 +1,12 @@
 import { Component, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarModule,
+} from '@angular/material/snack-bar';
 import { PushService, TenantConfigService } from '@pwa/core';
+import { buildAppSnackBarConfig } from '@pwa/shared';
 
 @Component({
   selector: 'lib-features-admin',
@@ -12,7 +17,15 @@ import { PushService, TenantConfigService } from '@pwa/core';
 export class FeaturesAdmin {
   private readonly push = inject(PushService);
   private readonly tenant = inject(TenantConfigService);
-  private readonly snack = inject(MatSnackBar);
+  private readonly matSnack = inject(MatSnackBar);
+  private readonly snack = {
+    open: (message: string, action?: string, config?: MatSnackBarConfig) =>
+      this.matSnack.open(
+        message,
+        action,
+        buildAppSnackBarConfig(message, config)
+      ),
+  };
 
   readonly pushEnabled = computed(
     () => !!this.tenant.config?.features?.['push']

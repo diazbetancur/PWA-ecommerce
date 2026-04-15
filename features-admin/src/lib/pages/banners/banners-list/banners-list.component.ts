@@ -15,12 +15,20 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarModule,
+} from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { TenantAdminMenuService } from '@pwa/core';
-import { AppButtonComponent, ConfirmationDialogService } from '@pwa/shared';
+import {
+  AppButtonComponent,
+  buildAppSnackBarConfig,
+  ConfirmationDialogService,
+} from '@pwa/shared';
 import { BannerListItem, BannerListParams } from '../../../models/banner.model';
 import { BannerService } from '../../../services/banner.service';
 
@@ -50,7 +58,15 @@ export class BannersListComponent implements OnInit {
   private readonly bannerService = inject(BannerService);
   private readonly menuService = inject(TenantAdminMenuService);
   private readonly router = inject(Router);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly matSnackBar = inject(MatSnackBar);
+  private readonly snackBar = {
+    open: (message: string, action?: string, config?: MatSnackBarConfig) =>
+      this.matSnackBar.open(
+        message,
+        action,
+        buildAppSnackBarConfig(message, config)
+      ),
+  };
   private readonly confirmDialog = inject(ConfirmationDialogService);
 
   readonly banners = signal<BannerListItem[]>([]);

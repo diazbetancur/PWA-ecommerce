@@ -32,3 +32,4 @@ export * from './lib/ui/toast-container/toast-container.component';
 
 // Utilities
 export * from './lib/utils/product-mappers';
+export * from './lib/utils/snackbar-config';

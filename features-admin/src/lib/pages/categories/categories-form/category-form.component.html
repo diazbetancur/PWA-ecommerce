@@ -142,10 +142,6 @@
               <span class="info-label">Productos:</span>
               <span>{{ category()!.productCount }}</span>
             </div>
-            <div class="info-item">
-              <span class="info-label">Creada:</span>
-              <span>{{ category()!.createdAt | date : 'short' }}</span>
-            </div>
             @if (category()!.updatedAt) {
             <div class="info-item">
               <span class="info-label">Actualizada:</span>

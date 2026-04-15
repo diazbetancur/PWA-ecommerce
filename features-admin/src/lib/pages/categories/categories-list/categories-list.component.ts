@@ -18,13 +18,18 @@ import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import {
+  MatSnackBar,
+  MatSnackBarConfig,
+  MatSnackBarModule,
+} from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { TenantAdminMenuService } from '@pwa/core';
 import {
   AppButtonComponent,
+  buildAppSnackBarConfig,
   ConfirmationDialogService,
   SearchInputComponent,
 } from '@pwa/shared';
@@ -66,7 +71,15 @@ export class CategoriesListComponent implements OnInit {
   private readonly categoryService = inject(CategoryService);
   private readonly menuService = inject(TenantAdminMenuService);
   private readonly router = inject(Router);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly matSnackBar = inject(MatSnackBar);
+  private readonly snackBar = {
+    open: (message: string, action?: string, config?: MatSnackBarConfig) =>
+      this.matSnackBar.open(
+        message,
+        action,
+        buildAppSnackBarConfig(message, config)
+      ),
+  };
   private readonly confirmDialog = inject(ConfirmationDialogService);
   private readonly dialog = inject(MatDialog);
 
@@ -82,6 +95,7 @@ export class CategoriesListComponent implements OnInit {
 
   readonly displayedColumns = computed(() => {
     const baseColumns = [
+      'image',
       'name',
       // 'slug',
       // 'description',

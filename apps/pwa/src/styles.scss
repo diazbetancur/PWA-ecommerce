@@ -248,6 +248,34 @@ select:focus {
   transform: translateY(0);
 }
 
+/* ===== GLOBAL SNACKBAR STYLES ===== */
+.mat-mdc-snack-bar-container.app-snackbar {
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-mdc-snack-bar-button-color: #ffffff;
+}
+
+.mat-mdc-snack-bar-container.app-snackbar .mdc-snackbar__surface {
+  border-radius: 12px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.24);
+}
+
+.mat-mdc-snack-bar-container.app-snackbar-success .mdc-snackbar__surface {
+  background-color: #15803d;
+}
+
+.mat-mdc-snack-bar-container.app-snackbar-error .mdc-snackbar__surface {
+  background-color: #b91c1c;
+}
+
+.mat-mdc-snack-bar-container.app-snackbar-warning .mdc-snackbar__surface {
+  background-color: #b45309;
+}
+
+.mat-mdc-snack-bar-container.app-snackbar .mdc-snackbar__label,
+.mat-mdc-snack-bar-container.app-snackbar .mat-mdc-button {
+  color: #ffffff !important;
+}
+
 /* ===== UTILITY CLASSES ===== */
 .text-primary {
   color: var(--tenant-primary-color) !important;
