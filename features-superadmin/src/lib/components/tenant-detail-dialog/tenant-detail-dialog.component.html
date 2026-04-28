@@ -29,7 +29,7 @@
               <span class="label">Slug</span>
               <span class="value mono">{{ tenant()!.slug }}</span>
             </div>
-            <div class="info-item">
+            <div class="info-item info-item-hidden">
               <span class="label">ID</span>
               <span class="value mono small">{{ tenant()!.id }}</span>
             </div>
@@ -56,10 +56,9 @@
         </div>
 
         <div class="info-section">
-          <h3>Fechas</h3>
           <div class="info-grid">
             <div class="info-item">
-              <span class="label">Creado</span>
+              <span class="label">Fecha Creado</span>
               <span class="value">{{ formatDate(tenant()!.createdAt) }}</span>
             </div>
             <div class="info-item">
@@ -157,5 +156,7 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onClose()">Cerrar</button>
+  <button type="button" class="btn btn-secondary" (click)="onClose()">
+    Cerrar
+  </button>
 </mat-dialog-actions>

@@ -65,24 +65,27 @@
 
   <!-- Actions -->
   <mat-dialog-actions class="dialog-actions">
-    <button mat-button (click)="cancel()" [disabled]="isSaving()">
+    <button
+      type="button"
+      class="btn btn-outline"
+      (click)="cancel()"
+      [disabled]="isSaving()"
+    >
       Cancelar
     </button>
     <button
-      mat-raised-button
-      color="primary"
+      type="button"
+      class="btn btn-primary save-button"
       (click)="save()"
       [disabled]="!hasChanges() || !isValid() || isSaving()"
-      class="save-button"
     >
       @if (isSaving()) {
-      <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
-      } @if (!isSaving()) {
-      <ng-container matButtonIcon>
+      <span class="spinner-small" aria-hidden="true"></span>
+      Guardando... } @if (!isSaving()) {
+      <ng-container>
         <mat-icon>save</mat-icon>
       </ng-container>
-      }
-      <span>{{ isSaving() ? 'Guardando...' : 'Guardar Cambios' }}</span>
+      Guardar cambios }
     </button>
   </mat-dialog-actions>
 </div>

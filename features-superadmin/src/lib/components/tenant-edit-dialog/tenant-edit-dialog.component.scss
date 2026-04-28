@@ -8,7 +8,7 @@ h2[mat-dialog-title] {
   gap: 8px;
   margin: 0;
   padding: 20px 24px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #1976d2;
 
   mat-icon {
     color: #1976d2;
@@ -80,16 +80,75 @@ form {
 }
 
 mat-dialog-actions {
+  gap: 1rem;
   padding: 16px 24px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #e5e7eb;
 
   button {
     display: flex;
     align-items: center;
     gap: 8px;
+  }
+}
 
-    mat-spinner {
-      margin-right: 8px;
-    }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 160px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+
+  .mat-icon {
+    margin: 0;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: #ffffff;
+  color: #2563eb;
+  border-color: #bfdbfe;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #60a5fa;
+}
+
+.spinner-small {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

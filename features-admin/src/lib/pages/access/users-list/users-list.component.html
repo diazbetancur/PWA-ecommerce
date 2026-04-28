@@ -36,10 +36,9 @@
     <mat-icon class="error-icon">error_outline</mat-icon>
     <h3>{{ errorTitle() }}</h3>
     <p>{{ errorMessage() }}</p>
-    <button mat-raised-button color="primary" (click)="loadUsers()">
-      <mat-icon>refresh</mat-icon>
+    <app-button variant="primary" icon="refresh" (clicked)="loadUsers()">
       Reintentar
-    </button>
+    </app-button>
   </div>
   }
 
@@ -49,10 +48,14 @@
     <mat-icon class="empty-icon">person_add</mat-icon>
     <h3>{{ emptyTitle() }}</h3>
     <p>{{ emptyDescription() }}</p>
-    <button mat-raised-button color="primary" (click)="openCreateDialog()">
-      <mat-icon>add</mat-icon>
+    <app-button
+      variant="primary"
+      icon="person_add"
+      (clicked)="openCreateDialog()"
+      class="create-button"
+    >
       {{ createLabel() }}
-    </button>
+    </app-button>
   </div>
   }
 

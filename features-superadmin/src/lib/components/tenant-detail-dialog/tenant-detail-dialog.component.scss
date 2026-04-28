@@ -21,6 +21,12 @@ mat-dialog-content {
   max-height: 70vh;
 }
 
+mat-dialog-actions {
+  gap: 1rem;
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -104,6 +110,10 @@ mat-dialog-content {
       word-break: break-all;
     }
   }
+}
+
+.info-item-hidden {
+  display: none;
 }
 
 .status-badge {
@@ -205,6 +215,28 @@ mat-dialog-content {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
 }
 
 .step-item {

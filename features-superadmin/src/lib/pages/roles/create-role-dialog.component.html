@@ -82,20 +82,24 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()" [disabled]="isSaving()">
+  <button
+    type="button"
+    class="btn btn-outline"
+    (click)="onCancel()"
+    [disabled]="isSaving()"
+  >
     Cancelar
   </button>
   <button
-    mat-raised-button
-    color="primary"
+    type="button"
+    class="btn btn-primary"
     (click)="onSubmit()"
     [disabled]="isLoading() || isSaving() || form.invalid"
   >
     @if (isSaving()) {
-    <mat-spinner diameter="20"></mat-spinner>
-    } @else {
-    <mat-icon matButtonIcon>save</mat-icon>
-    }
-    <span>{{ isSaving() ? 'Creando...' : 'Crear Rol' }}</span>
+    <span class="spinner-small" aria-hidden="true"></span>
+    Creando... } @else {
+    <mat-icon>save</mat-icon>
+    Crear rol }
   </button>
 </mat-dialog-actions>

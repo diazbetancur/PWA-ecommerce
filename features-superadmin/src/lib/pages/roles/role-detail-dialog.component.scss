@@ -87,7 +87,7 @@ mat-dialog-content {
 
 mat-tab-group {
   height: 100%;
-  
+
   ::ng-deep {
     .mat-mdc-tab-body-wrapper {
       flex: 1;
@@ -355,8 +355,31 @@ mat-tab-group {
 
 /* ===== ACTIONS ===== */
 mat-dialog-actions {
+  gap: 1rem;
   padding: 1rem 2rem;
   border-top: 1px solid #e2e8f0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn-secondary:hover {
+  background: #e5e7eb;
 }
 
 /* ===== RESPONSIVE ===== */

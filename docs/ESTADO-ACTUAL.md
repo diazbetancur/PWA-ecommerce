@@ -30,7 +30,7 @@ TenantBootstrapService (APP_INITIALIZER)
 TenantContextService
   ↓ Signals: tenantSlug(), tenantKey()
   ↓
-TenantHeaderInterceptor
+authTenantInterceptor
   ↓ Headers: X-Tenant-Slug, X-Tenant-Key
 ```
 

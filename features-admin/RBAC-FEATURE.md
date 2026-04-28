@@ -46,7 +46,7 @@ features-admin/src/lib/
 
 - **Usa `ApiClientService`** del core (NO reinventa el wrapper HTTP)
 - Headers automáticos: `X-Tenant-Slug`, `Authorization Bearer token`
-- Interceptores ya configurados: `TenantHeaderInterceptor`
+- Interceptor HTTP activo: `authTenantInterceptor`
 
 ### ✅ Componentes Compartidos Reutilizados
 
@@ -136,13 +136,13 @@ Si no puedes cambiar el backend inmediatamente, puedes hacer un override en el c
 
 ```typescript
 // Ejemplo: donde se procesa el menú dinámico
-menuItems = menuItems.map(item => {
+menuItems = menuItems.map((item) => {
   if (item.code === 'permissions') {
     return {
       ...item,
       name: 'Accesibilidad',
       path: '/admin/access',
-      icon: 'shield'
+      icon: 'shield',
     };
   }
   return item;

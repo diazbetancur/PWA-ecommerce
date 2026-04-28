@@ -97,7 +97,7 @@ export class RoleDetailDialogComponent implements OnInit {
 
     for (const permission of this.role.permissions) {
       const [resource] = permission.split(':');
-      
+
       if (!grouped.has(resource)) {
         grouped.set(resource, []);
       }
@@ -150,7 +150,8 @@ export class RoleDetailDialogComponent implements OnInit {
       );
 
       this.users.set(usersWithRole);
-    } catch (err: unknown) {
+    } catch {
+      this.users.set([]);
     } finally {
       this.isLoadingUsers.set(false);
     }
