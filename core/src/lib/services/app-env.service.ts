@@ -1,50 +1,12 @@
 import { Injectable, inject } from '@angular/core';
-import { APP_ENV } from '../config/app-env.token';
+import {
+  APP_ENV,
+  AppEnv,
+  AppEnvironmentName,
+  AppLogLevel,
+} from '../config/app-env.token';
 
-/**
- * Interfaz que define la estructura de configuración del entorno
- */
-export interface AppEnvironment {
-  /** Indica si está en modo producción */
-  production: boolean;
-
-  /** Indica si debe usar API mock o real */
-  mockApi: boolean;
-
-  /** URL base del backend API */
-  apiBaseUrl: string;
-
-  /** Habilitar headers de tenant en requests */
-  useTenantHeader: boolean;
-
-  /** Configuración de Firebase Cloud Messaging */
-  fcm: {
-    vapidPublicKey: string;
-  };
-
-  /** Configuración para medios de categorías */
-  categoryMedia?: {
-    maxImageSizeMb?: number;
-    publicBaseUrl?: string;
-  };
-
-  /** Configuraciones adicionales opcionales */
-  analytics?: {
-    enabled: boolean;
-    trackingId?: string;
-  };
-
-  /** Configuraciones de logging */
-  logging?: {
-    level: 'debug' | 'info' | 'warn' | 'error';
-    enableConsole: boolean;
-  };
-
-  /** Configuraciones de features flags */
-  features?: {
-    [key: string]: boolean;
-  };
-}
+export type AppEnvironment = AppEnv;
 
 /**
  * Servicio centralizado para acceder a la configuración del entorno
@@ -57,11 +19,18 @@ export class AppEnvService {
   private readonly env: AppEnvironment = (inject(APP_ENV, {
     optional: true,
   }) || {
+    environmentName: 'local',
     production: false,
-    mockApi: true,
-    apiBaseUrl: 'http://localhost:5200',
+    apiBaseUrl: 'http://localhost:5093',
+    publicAssetBaseUrl: '',
+    enableServiceWorker: false,
+    enableSSR: false,
+    logLevel: 'debug',
+    featureFlags: {},
+    enableConsoleLogging: true,
+    publicVapidKey: '',
+    categoryImageMaxSizeMb: 1,
     useTenantHeader: true,
-    fcm: { vapidPublicKey: '' },
   }) as AppEnvironment;
 
   /**
@@ -71,32 +40,22 @@ export class AppEnvService {
     return this.env;
   }
 
+  get environmentName(): AppEnvironmentName {
+    return this.env.environmentName;
+  }
+
   /**
    * Indica si la aplicación está en modo producción
    */
   get isProduction(): boolean {
-    return this.env.production;
+    return this.env.production || this.env.environmentName === 'pdn';
   }
 
   /**
    * Indica si la aplicación está en modo desarrollo
    */
   get isDevelopment(): boolean {
-    return !this.env.production;
-  }
-
-  /**
-   * Indica si debe usar API mock (true) o real (false)
-   */
-  get useMockApi(): boolean {
-    return this.env.mockApi;
-  }
-
-  /**
-   * Indica si debe usar API real (false) o mock (true)
-   */
-  get useRealApi(): boolean {
-    return !this.env.mockApi;
+    return !this.isProduction;
   }
 
   /**
@@ -110,24 +69,26 @@ export class AppEnvService {
    * Indica si debe incluir headers de tenant
    */
   get useTenantHeader(): boolean {
-    return this.env.useTenantHeader;
+    return this.env.useTenantHeader ?? true;
   }
 
   /**
    * Obtiene la configuración de FCM
    */
   get fcmConfig(): { vapidPublicKey: string } {
-    return this.env.fcm;
+    return {
+      vapidPublicKey: this.env.publicVapidKey ?? '',
+    };
   }
 
   /** Límite de tamaño de imagen de categoría en MB */
   get categoryImageMaxSizeMb(): number {
-    return this.env.categoryMedia?.maxImageSizeMb ?? 1;
+    return this.env.categoryImageMaxSizeMb ?? 1;
   }
 
   /** URL base pública para completar imageUrl de categorías */
   get categoryPublicBaseUrl(): string {
-    return this.env.categoryMedia?.publicBaseUrl ?? '';
+    return this.env.publicAssetBaseUrl ?? '';
   }
 
   /**
@@ -136,46 +97,50 @@ export class AppEnvService {
    * @returns boolean
    */
   isFeatureEnabled(featureName: string): boolean {
-    return this.env.features?.[featureName] ?? false;
+    return this.env.featureFlags?.[featureName] ?? false;
   }
 
   /**
    * Obtiene el nivel de logging configurado
    */
-  get loggingLevel(): 'debug' | 'info' | 'warn' | 'error' {
-    return this.env.logging?.level ?? 'info';
+  get loggingLevel(): AppLogLevel {
+    return this.env.logLevel;
   }
 
   /**
    * Indica si el logging en consola está habilitado
    */
   get isConsoleLoggingEnabled(): boolean {
-    return this.env.logging?.enableConsole ?? this.isDevelopment;
+    return this.env.enableConsoleLogging ?? this.isDevelopment;
+  }
+
+  get isServiceWorkerEnabled(): boolean {
+    return this.env.enableServiceWorker;
+  }
+
+  get isSsrEnabled(): boolean {
+    return this.env.enableSSR;
   }
 
   /**
    * Obtiene información del entorno para debugging
    */
   getEnvironmentInfo(): {
+    environmentName: AppEnvironmentName;
     mode: string;
-    api: string;
     baseUrl: string;
-    version: string;
+    serviceWorker: boolean;
+    ssr: boolean;
+    logLevel: AppLogLevel;
   } {
     return {
+      environmentName: this.environmentName,
       mode: this.isProduction ? 'production' : 'development',
-      api: this.useMockApi ? 'mock' : 'real',
       baseUrl: this.apiBaseUrl,
-      version: this.getAppVersion(),
+      serviceWorker: this.isServiceWorkerEnabled,
+      ssr: this.isSsrEnabled,
+      logLevel: this.loggingLevel,
     };
-  }
-
-  /**
-   * Obtiene la versión de la aplicación (desde package.json si está disponible)
-   */
-  private getAppVersion(): string {
-    // En un escenario real, podrías inyectar la versión desde build time
-    return '1.0.0';
   }
 
   /**
@@ -185,27 +150,45 @@ export class AppEnvService {
   validateEnvironment(): {
     isValid: boolean;
     errors: string[];
+    warnings: string[];
   } {
     const errors: string[] = [];
+    const warnings: string[] = [];
 
-    // Validar URL del API
+    const allowedEnvironmentNames: AppEnvironmentName[] = [
+      'local',
+      'dev',
+      'qa',
+      'pdn',
+    ];
+
+    if (!this.environmentName) {
+      errors.push('environmentName is required');
+    } else if (!allowedEnvironmentNames.includes(this.environmentName)) {
+      errors.push(
+        `environmentName must be one of: ${allowedEnvironmentNames.join(', ')}`
+      );
+    }
+
     if (!this.apiBaseUrl) {
       errors.push('apiBaseUrl is required');
     } else if (!this.apiBaseUrl.startsWith('http')) {
       errors.push('apiBaseUrl must start with http or https');
     }
 
-    // Validar configuración FCM
     if (
       !this.fcmConfig.vapidPublicKey ||
       this.fcmConfig.vapidPublicKey.includes('REPLACE_WITH')
     ) {
-      errors.push('FCM VAPID key needs to be configured');
+      warnings.push(
+        'publicVapidKey is not configured; push notifications remain disabled'
+      );
     }
 
     return {
       isValid: errors.length === 0,
       errors,
+      warnings,
     };
   }
 
@@ -214,11 +197,7 @@ export class AppEnvService {
    */
   logEnvironmentInfo(): void {
     if (this.isConsoleLoggingEnabled) {
-      this.getEnvironmentInfo();
-
-      // Validar configuración
-      const validation = this.validateEnvironment();
-      void validation;
+      console.info('[APP_ENV]', this.getEnvironmentInfo());
     }
   }
 }

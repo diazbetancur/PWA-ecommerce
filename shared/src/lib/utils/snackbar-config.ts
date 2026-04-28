@@ -1,8 +1,8 @@
 import { MatSnackBarConfig } from '@angular/material/snack-bar';
+import { DEFAULT_APP_ERROR_USER_MESSAGE, mapErrorToAppError } from '@pwa/core';
 
 const EXTRA_DURATION_MS = 2000;
-export const GENERIC_API_ERROR_MESSAGE =
-  'Ocurrio un error, por favor contacte a su administrador.';
+export const GENERIC_API_ERROR_MESSAGE = DEFAULT_APP_ERROR_USER_MESSAGE;
 
 const SUCCESS_PATTERNS = [
   /exitos/i,
@@ -32,95 +32,11 @@ const ERROR_PATTERNS = [
 
 type SnackTone = 'success' | 'error' | 'warning';
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function toNonEmptyString(value: unknown): string | null {
-  if (typeof value !== 'string') {
-    return null;
-  }
-
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
-function extractValidationMessage(errors: unknown): string | null {
-  if (!isRecord(errors)) {
-    return null;
-  }
-
-  for (const field of Object.keys(errors)) {
-    const value = errors[field];
-
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        const message = toNonEmptyString(item);
-        if (message) {
-          return message;
-        }
-      }
-      continue;
-    }
-
-    const message = toNonEmptyString(value);
-    if (message) {
-      return message;
-    }
-  }
-
-  return null;
-}
-
-function getErrorPayload(error: unknown): Record<string, unknown> | null {
-  if (!isRecord(error)) {
-    return null;
-  }
-
-  const nestedError = error['error'];
-  if (isRecord(nestedError)) {
-    return nestedError;
-  }
-
-  return error;
-}
-
 export function extractApiErrorMessage(
   error: unknown,
   fallbackMessage = GENERIC_API_ERROR_MESSAGE
 ): string {
-  const payload = getErrorPayload(error);
-
-  if (!payload) {
-    return fallbackMessage;
-  }
-
-  const detail = toNonEmptyString(payload['detail']);
-  if (detail) {
-    return detail;
-  }
-
-  const validationMessage = extractValidationMessage(payload['errors']);
-  if (validationMessage) {
-    return validationMessage;
-  }
-
-  const title = toNonEmptyString(payload['title']);
-  if (title) {
-    return title;
-  }
-
-  const message = toNonEmptyString(payload['message']);
-  if (message) {
-    return message;
-  }
-
-  const description = toNonEmptyString(payload['error_description']);
-  if (description) {
-    return description;
-  }
-
-  return fallbackMessage;
+  return mapErrorToAppError(error).userMessage || fallbackMessage;
 }
 
 function normalizePanelClass(

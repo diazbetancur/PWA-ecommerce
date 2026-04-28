@@ -20,10 +20,10 @@ export class PushService {
   async getToken(): Promise<string | null> {
     // Prefer browser Push API via SwPush for token (VAPID). If not enabled or unsupported, return null.
     if (!this.swPush.isEnabled) return null;
-    if (!this.env?.fcm?.vapidPublicKey) return null;
+    if (!this.env.publicVapidKey) return null;
     try {
       const sub = await this.swPush.requestSubscription({
-        serverPublicKey: this.env.fcm.vapidPublicKey,
+        serverPublicKey: this.env.publicVapidKey,
       });
       // Persist token (mock): send to backend or store locally per-tenant.
       const token = btoa(JSON.stringify(sub));

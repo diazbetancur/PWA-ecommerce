@@ -96,6 +96,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
 
   // Estado
   readonly loading = signal(false);
+  readonly submitting = signal(false);
   readonly isEditMode = signal(false);
   readonly productId = signal<string | null>(null);
   readonly product = signal<ProductResponse | null>(null);
@@ -354,7 +355,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.loading.set(true);
+    this.submitting.set(true);
 
     const formValue = {
       ...this.form.value,
@@ -391,7 +392,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       error: (error) => {
         const message = extractApiErrorMessage(error);
         this.snackBar.open(message, 'Cerrar', { duration: 3000 });
-        this.loading.set(false);
+        this.submitting.set(false);
       },
     });
   }
@@ -410,7 +411,7 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       error: (error) => {
         const message = extractApiErrorMessage(error);
         this.snackBar.open(message, 'Cerrar', { duration: 3000 });
-        this.loading.set(false);
+        this.submitting.set(false);
       },
     });
   }

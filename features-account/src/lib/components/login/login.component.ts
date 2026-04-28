@@ -11,6 +11,7 @@ import {
   UserModeService,
 } from '@pwa/core';
 import { AccountService } from '../../services';
+import { shouldShowControlError } from '../../utils/password-form.utils';
 
 @Component({
   selector: 'lib-login',
@@ -31,6 +32,7 @@ export class LoginComponent {
 
   readonly showPassword = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly submitted = signal(false);
 
   // Usar tenant por defecto si no hay tenant disponible
   readonly tenantConfigData = computed(() =>
@@ -45,8 +47,8 @@ export class LoginComponent {
   readonly hasTenant = computed(() => !!this.tenantConfig.tenantSlug);
 
   readonly loginForm = this.fb.nonNullable.group({
-    email: ['admin@yourdomain.com', [Validators.required, Validators.email]],
-    password: ['Admin123!', [Validators.required, Validators.minLength(6)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
     rememberMe: [false],
   });
 
@@ -60,6 +62,8 @@ export class LoginComponent {
   }
 
   async onSubmit(): Promise<void> {
+    this.submitted.set(true);
+
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -153,17 +157,22 @@ export class LoginComponent {
 
   getFieldError(field: 'email' | 'password'): string | null {
     const control = this.loginForm.get(field);
-    if (!control?.touched) return null;
+    if (!shouldShowControlError(control, this.submitted())) {
+      return null;
+    }
+
+    if (!control) {
+      return null;
+    }
 
     if (control.hasError('required')) {
-      return `${field === 'email' ? 'Email' : 'Contraseña'} es requerido`;
+      return `${field === 'email' ? 'Email' : 'Contraseña'} es requerido.`;
     }
+
     if (control.hasError('email')) {
-      return 'Email inválido';
+      return 'Ingresa un correo válido.';
     }
-    if (control.hasError('minlength')) {
-      return 'La contraseña debe tener al menos 6 caracteres';
-    }
+
     return null;
   }
 }

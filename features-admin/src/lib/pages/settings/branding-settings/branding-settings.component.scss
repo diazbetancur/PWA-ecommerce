@@ -77,6 +77,14 @@
   margin-bottom: 12px;
 }
 
+.section-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
 .media-field {
   display: flex;
   flex-direction: column;
@@ -210,15 +218,18 @@ textarea {
   font-weight: 600;
 }
 
-.actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
 @media (max-width: 900px) {
   .grid.two,
   .grid.three,
   .grid.four {
     grid-template-columns: 1fr;
+  }
+
+  .section-actions {
+    justify-content: stretch;
+
+    .btn {
+      width: 100%;
+    }
   }
 }

@@ -3,12 +3,15 @@ import { Router } from '@angular/router';
 import {
   ApiClientService,
   AuthService as CoreAuthService,
+  mapErrorToAppError,
   PublicCartUiService,
   TenantResolutionService,
   TenantStorageService,
 } from '@pwa/core';
 import { firstValueFrom } from 'rxjs';
 import {
+  ActivateAccountRequest,
+  AuthActionResponse,
   AuthState,
   ChangePasswordRequest,
   ForgotPasswordRequest,
@@ -62,14 +65,10 @@ export class AccountService {
         isLoading: false,
       }));
     } catch (error: unknown) {
-      const message =
-        error instanceof Error ? error.message : 'Error al iniciar sesión';
-      this._state.update((s) => ({
-        ...s,
-        isLoading: false,
-        error: message,
-      }));
-      throw error;
+      this.failWithMappedError(
+        error,
+        'No pudimos iniciar sesión. Intenta nuevamente más tarde.'
+      );
     }
   }
 
@@ -143,53 +142,75 @@ export class AccountService {
 
     try {
       await firstValueFrom(
-        this.apiClient.post<{ message: string }>('/auth/forgot-password', {
+        this.apiClient.post<AuthActionResponse>('/api/auth/forgot-password', {
           email: request.email,
         })
       );
 
       this._state.update((s) => ({ ...s, isLoading: false }));
     } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Error al solicitar recuperación';
-      this._state.update((s) => ({
-        ...s,
-        isLoading: false,
-        error: message,
-      }));
-      throw error;
+      this.failWithMappedError(
+        error,
+        'No pudimos iniciar la recuperación de contraseña. Intenta nuevamente más tarde.'
+      );
     }
   }
 
-  async resetPassword(request: ResetPasswordRequest): Promise<void> {
+  async activateAccount(
+    request: ActivateAccountRequest
+  ): Promise<AuthActionResponse> {
     this._state.update((s) => ({ ...s, isLoading: true, error: null }));
 
     try {
       if (request.password !== request.confirmPassword) {
-        throw new Error('Las contraseñas no coinciden');
+        this.failWithMessage('Las contraseñas no coinciden.');
       }
 
-      await firstValueFrom(
-        this.apiClient.post<{ message: string }>('/auth/reset-password', {
+      const response = await firstValueFrom(
+        this.apiClient.post<AuthActionResponse>('/api/auth/activate-account', {
           token: request.token,
           password: request.password,
+          confirmPassword: request.confirmPassword,
         })
       );
 
       this._state.update((s) => ({ ...s, isLoading: false }));
+
+      return response;
     } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Error al restablecer contraseña';
-      this._state.update((s) => ({
-        ...s,
-        isLoading: false,
-        error: message,
-      }));
-      throw error;
+      this.failWithMappedError(
+        error,
+        'No pudimos completar la activación. Intenta nuevamente más tarde.'
+      );
+    }
+  }
+
+  async resetPassword(
+    request: ResetPasswordRequest
+  ): Promise<AuthActionResponse> {
+    this._state.update((s) => ({ ...s, isLoading: true, error: null }));
+
+    try {
+      if (request.password !== request.confirmPassword) {
+        this.failWithMessage('Las contraseñas no coinciden.');
+      }
+
+      const response = await firstValueFrom(
+        this.apiClient.post<AuthActionResponse>('/api/auth/reset-password', {
+          token: request.token,
+          password: request.password,
+          confirmPassword: request.confirmPassword,
+        })
+      );
+
+      this._state.update((s) => ({ ...s, isLoading: false }));
+
+      return response;
+    } catch (error: unknown) {
+      this.failWithMappedError(
+        error,
+        'No pudimos restablecer la contraseña. Intenta nuevamente más tarde.'
+      );
     }
   }
 
@@ -320,5 +341,20 @@ export class AccountService {
 
   private getStorageScope(): 'tenant' | 'global' {
     return this.tenantResolution.isAdminContext() ? 'global' : 'tenant';
+  }
+
+  private failWithMappedError(error: unknown, fallbackMessage: string): never {
+    const appError = mapErrorToAppError(error);
+    this.failWithMessage(appError.userMessage || fallbackMessage);
+  }
+
+  private failWithMessage(message: string): never {
+    this._state.update((s) => ({
+      ...s,
+      isLoading: false,
+      error: message,
+    }));
+
+    throw new Error(message);
   }
 }

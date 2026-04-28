@@ -124,6 +124,11 @@ mat-dialog-content {
     color: #f57c00;
   }
 
+  &.status-pendingactivation {
+    background: #fff3e0;
+    color: #f57c00;
+  }
+
   &.status-seeding {
     background: #e3f2fd;
     color: #1976d2;

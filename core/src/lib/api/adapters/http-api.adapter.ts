@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { ApiClientService } from '../../services/api-client.service';
 import { CartItem, Order, Product } from '../../models/types';
+import { ApiClientService } from '../../services/api-client.service';
 import {
   AdminApi,
   AuthApi,
@@ -18,7 +18,7 @@ import {
  * Adapter HTTP que implementa todas las APIs usando ApiClientService
  * - Usa paths relativos automáticamente
  * - Se beneficia del sistema de entornos y logging
- * - Integrado con TenantHeaderInterceptor
+ * - Integrado con el interceptor HTTP activo de auth, tenant y correlationId
  */
 @Injectable({ providedIn: 'root' })
 export class HttpApiAdapter {

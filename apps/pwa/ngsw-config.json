@@ -26,26 +26,5 @@
         ]
       }
     }
-  ],
-  "dataGroups": [
-    {
-      "name": "config-api",
-      "urls": ["/public/config"],
-      "cacheConfig": {
-        "maxSize": 10,
-        "maxAge": "1h",
-        "strategy": "freshness",
-        "timeout": "5s"
-      }
-    },
-    {
-      "name": "catalog-api",
-      "urls": ["/catalog/**"],
-      "cacheConfig": {
-        "maxSize": 50,
-        "maxAge": "1h",
-        "strategy": "performance"
-      }
-    }
   ]
 }

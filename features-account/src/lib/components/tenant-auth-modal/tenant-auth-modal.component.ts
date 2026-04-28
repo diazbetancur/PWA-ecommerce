@@ -65,7 +65,7 @@ export class TenantAuthModalComponent {
 
   readonly loginForm = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
+    password: ['', [Validators.required]],
     rememberMe: [false],
   });
 
@@ -192,7 +192,7 @@ export class TenantAuthModalComponent {
       const { email } = this.forgotForm.getRawValue();
       await this.accountService.forgotPassword({ email });
       this.successMessage.set(
-        'Se envió un enlace de recuperación a tu correo electrónico.'
+        'Si la cuenta existe, enviaremos instrucciones al correo asociado.'
       );
       this.forgotForm.reset();
     } catch (error) {
@@ -219,9 +219,6 @@ export class TenantAuthModalComponent {
     }
     if (control.hasError('email')) {
       return 'Email inválido';
-    }
-    if (control.hasError('minlength')) {
-      return 'La contraseña debe tener al menos 6 caracteres';
     }
     return null;
   }

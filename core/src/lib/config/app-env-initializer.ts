@@ -8,19 +8,24 @@ import { AppEnvService } from '../services/app-env.service';
 export function initializeAppEnvironmentFactory(envService: AppEnvService) {
   return (): Promise<void> => {
     return new Promise((resolve) => {
-      // Log de información del entorno
       envService.logEnvironmentInfo();
 
-      // Validar configuración (errors se loggean automáticamente)
-      envService.validateEnvironment();
+      const validation = envService.validateEnvironment();
 
-      // En desarrollo, mostrar información adicional
-      if (envService.isDevelopment) {
-        console.group('🔧 Development Mode Configuration');
-        console.groupEnd();
+      if (validation.errors.length > 0) {
+        console.error(
+          '[APP_ENV] Invalid public configuration',
+          validation.errors
+        );
       }
 
-      // Resolver inmediatamente (configuración síncrona)
+      if (
+        validation.warnings.length > 0 &&
+        envService.isConsoleLoggingEnabled
+      ) {
+        console.warn('[APP_ENV] Configuration warnings', validation.warnings);
+      }
+
       resolve();
     });
   };

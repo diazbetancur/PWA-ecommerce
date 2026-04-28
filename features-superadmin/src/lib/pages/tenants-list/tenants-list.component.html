@@ -48,11 +48,15 @@
         <span class="filter-label">Estado</span>
         <select
           class="filter-select"
+          title="Filtrar por estado"
           [(ngModel)]="statusFilter"
           (ngModelChange)="onFilterChange()"
         >
           <option [value]="null">Todos</option>
           <option [value]="TenantStatus.Ready">Ready</option>
+          <option [value]="TenantStatus.PendingActivation">
+            Pendiente de activación
+          </option>
           <option [value]="TenantStatus.Pending">Pending</option>
           <option [value]="TenantStatus.Seeding">Seeding</option>
           <option [value]="TenantStatus.Suspended">Suspended</option>
@@ -64,6 +68,7 @@
         <span class="filter-label">Plan</span>
         <select
           class="filter-select"
+          title="Filtrar por plan"
           [(ngModel)]="planFilter"
           (ngModelChange)="onFilterChange()"
         >
@@ -145,12 +150,9 @@
             </span>
           </td>
           <td>
-            <span
-              class="status-badge"
-              [class]="'status-' + tenant.status.toLowerCase()"
-            >
+            <span class="status-badge" [class]="getStatusClass(tenant.status)">
               <span class="status-dot"></span>
-              {{ tenant.status }}
+              {{ getStatusLabel(tenant.status) }}
             </span>
           </td>
           <td class="date-cell">{{ formatDate(tenant.createdAt) }}</td>

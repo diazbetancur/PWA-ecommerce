@@ -1,8 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
-import { APP_ENV, AppEnv } from '../config/app-env.token';
 import { BrandingConfig, TenantConfig, ThemeConfig } from '../models/types';
 import { ApiClientService } from './api-client.service';
 import { ManifestService } from './manifest.service';
@@ -12,17 +10,23 @@ import { ThemeService } from './theme.service';
 
 @Injectable({ providedIn: 'root' })
 export class TenantConfigService {
-  private readonly http = inject(HttpClient);
   private readonly apiClient = inject(ApiClientService);
   private readonly i18n = inject(TranslocoService);
   private readonly theme = inject(ThemeService);
   private readonly manifest = inject(ManifestService);
   private readonly seo = inject(SeoService);
   private readonly tenantResolution = inject(TenantResolutionService);
-  private readonly env: AppEnv = inject(APP_ENV);
 
-  private _config?: TenantConfig;
+  private readonly configState = signal<TenantConfig | undefined>(undefined);
   private _overrideSlug?: string | null;
+
+  private get _config(): TenantConfig | undefined {
+    return this.configState();
+  }
+
+  private set _config(value: TenantConfig | undefined) {
+    this.configState.set(value);
+  }
 
   get config(): TenantConfig | undefined {
     return this._config;
@@ -68,16 +72,10 @@ export class TenantConfigService {
     }
 
     try {
-      if (this.env.mockApi) {
-        const url = `/config/tenants/${tenantKey}.json`;
-        const loaded = await firstValueFrom(this.http.get<TenantConfig>(url));
-        this._config = this.withNormalizedTheme(loaded);
-      } else {
-        const loaded = (await firstValueFrom(
-          this.apiClient.getTenantConfig(tenantKey)
-        )) as TenantConfig;
-        this._config = this.withNormalizedTheme(loaded);
-      }
+      const loaded = (await firstValueFrom(
+        this.apiClient.getTenantConfig(tenantKey)
+      )) as TenantConfig;
+      this._config = this.withNormalizedTheme(loaded);
       this.applyDynamic(reapply);
     } catch (e: any) {
       // Si es 404, no lanzar error - dejar config undefined para que el guard redirija
@@ -92,6 +90,32 @@ export class TenantConfigService {
   async switchTenant(slug: string): Promise<void> {
     this._overrideSlug = slug;
     await this.load(true);
+  }
+
+  updateRuntimeBranding(branding: Partial<BrandingConfig>): void {
+    if (!this._config) {
+      return;
+    }
+
+    const currentBranding = this._config.tenant.branding;
+    const mergedBranding: BrandingConfig = {
+      ...currentBranding,
+      ...branding,
+      primaryColor:
+        branding.primaryColor ||
+        currentBranding?.primaryColor ||
+        this._config.theme.primary,
+    };
+
+    this._config = this.withNormalizedTheme({
+      ...this._config,
+      tenant: {
+        ...this._config.tenant,
+        branding: mergedBranding,
+      },
+    });
+
+    this.applyDynamic(true);
   }
 
   private applyDynamic(_triggeredBySwitch: boolean): void {

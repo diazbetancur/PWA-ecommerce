@@ -28,6 +28,11 @@ h1 {
   margin: 0 0 1.5rem;
   color: #718096;
   text-align: center;
+  font-size: 0.875rem;
+}
+
+.required {
+  color: #e53e3e;
 }
 
 .alert {
@@ -99,12 +104,21 @@ input.error {
 
 .toggle-password {
   position: absolute;
-  right: 0.75rem;
+  right: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.25rem;
-  padding: 0.25rem;
+  padding: 0;
+  color: #667eea;
+}
+
+.toggle-password .material-icons {
+  font-size: 1.125rem;
 }
 
 .checkbox-group {
@@ -137,7 +151,7 @@ input.error {
 
 .btn-primary {
   padding: 0.75rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2340a3 0%, #4b1f87 100%);
   color: white;
   border: none;
   border-radius: 0.5rem;
@@ -153,7 +167,7 @@ input.error {
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 10px 20px rgba(35, 64, 163, 0.28);
 }
 
 .btn-primary:disabled {

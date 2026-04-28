@@ -50,6 +50,13 @@ export class TenantContextService {
   readonly tenantDisplayName = computed(
     () => this.currentTenant()?.displayName ?? null
   );
+  readonly tenantLogoUrl = computed(() => {
+    const config = this.currentConfig();
+    const tenantLogo =
+      config?.tenant.branding?.logoUrl || config?.theme?.logoUrl || null;
+
+    return this.resolveAssetUrl(tenantLogo, config?.cdnBaseUrl);
+  });
 
   readonly currency = computed(() => this.resolvedConfig()?.currency ?? 'USD');
   readonly locale = computed(() => this.resolvedConfig()?.locale ?? 'en-US');
@@ -111,6 +118,10 @@ export class TenantContextService {
     return this.currentTenant();
   }
 
+  getResolvedTenantLogoUrl(): string | null {
+    return this.tenantLogoUrl();
+  }
+
   getTenantConfig(): TenantConfig | null {
     return this.getCurrentTenantConfig();
   }
@@ -135,7 +146,7 @@ export class TenantContextService {
   }
 
   isGeneralAdminMode(): boolean {
-    const slug = this.getTenantSlug();
+    const slug = this.getTenantSlug() ?? this.tenantResolution.getTenantSlug();
     return slug === null || slug === 'general-admin';
   }
 
@@ -149,23 +160,52 @@ export class TenantContextService {
   }
 
   shouldIncludeTenantHeaders(url: string): boolean {
-    if (this.isGeneralAdminMode()) {
-      return url.includes('/api/admin/');
-    }
+    const requestPath = this.extractRequestPath(url);
 
-    if (url.includes('/api/public/') || url.includes('/api/health')) {
+    if (!requestPath || !this.shouldHandleHttpRequest(url)) {
       return false;
     }
 
-    if (url.startsWith('/api/') || url.includes('/api/')) {
+    if (this.isTenantAwarePublicRequest(requestPath)) {
       return true;
     }
 
-    if (url.startsWith('http://') || url.startsWith('https://')) {
+    if (this.isTenantScopedAdminRequest(requestPath)) {
+      return true;
+    }
+
+    if (this.isGeneralAdminMode()) {
+      return requestPath.startsWith('/api/admin/');
+    }
+
+    if (
+      requestPath.startsWith('/api/public/') ||
+      requestPath.startsWith('/api/health') ||
+      requestPath === '/health' ||
+      requestPath.startsWith('/admin/auth/')
+    ) {
       return false;
     }
 
-    return false;
+    return requestPath.startsWith('/api/') || requestPath.startsWith('/auth/');
+  }
+
+  shouldHandleHttpRequest(url: string): boolean {
+    const requestPath = this.extractRequestPath(url);
+
+    if (!requestPath) {
+      return false;
+    }
+
+    return (
+      requestPath.startsWith('/api/') ||
+      requestPath.startsWith('/auth/') ||
+      requestPath.startsWith('/admin/') ||
+      requestPath.startsWith('/superadmin/') ||
+      requestPath.startsWith('/admin/auth/') ||
+      requestPath === '/health' ||
+      requestPath.startsWith('/health/')
+    );
   }
 
   async waitForTenant(timeoutMs = 5000): Promise<void> {
@@ -191,5 +231,69 @@ export class TenantContextService {
 
   private getStorageScope(): 'tenant' | 'global' {
     return this.tenantResolution.isAdminContext() ? 'global' : 'tenant';
+  }
+
+  private extractRequestPath(url: string): string | null {
+    if (!url) {
+      return null;
+    }
+
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      try {
+        return new URL(url).pathname;
+      } catch {
+        return null;
+      }
+    }
+
+    const queryIndex = url.indexOf('?');
+    return queryIndex >= 0 ? url.slice(0, queryIndex) : url;
+  }
+
+  private isTenantAwarePublicRequest(requestPath: string): boolean {
+    return requestPath.startsWith('/api/public/tenant/');
+  }
+
+  private resolveAssetUrl(
+    assetUrl?: string | null,
+    cdnBaseUrl?: string | null
+  ): string | null {
+    if (!assetUrl) {
+      return null;
+    }
+
+    if (
+      assetUrl.startsWith('http://') ||
+      assetUrl.startsWith('https://') ||
+      assetUrl.startsWith('data:') ||
+      assetUrl.startsWith('blob:')
+    ) {
+      return assetUrl;
+    }
+
+    if (assetUrl.startsWith('/')) {
+      return assetUrl;
+    }
+
+    if (cdnBaseUrl) {
+      const normalizedBase = cdnBaseUrl.endsWith('/')
+        ? cdnBaseUrl
+        : `${cdnBaseUrl}/`;
+      return `${normalizedBase}${assetUrl}`;
+    }
+
+    return `/${assetUrl}`;
+  }
+
+  private isTenantScopedAdminRequest(requestPath: string): boolean {
+    if (this.tenantResolution.isAdminContext()) {
+      return false;
+    }
+
+    return (
+      requestPath.startsWith('/admin/settings') ||
+      requestPath.startsWith('/admin/users') ||
+      requestPath.startsWith('/admin/roles')
+    );
   }
 }

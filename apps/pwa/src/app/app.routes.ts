@@ -1,8 +1,29 @@
 import { Route } from '@angular/router';
-import { AuthGuard, EmployeeGuard, tenantGuard } from '@pwa/core';
+import {
+  AuthGuard,
+  EmployeeGuard,
+  TENANT_ERROR_ROUTES,
+  tenantGuard,
+} from '@pwa/core';
 import { PublicLayoutComponent, TenantAdminLayoutComponent } from '@pwa/shared';
 
 export const appRoutes: Route[] = [
+  ...TENANT_ERROR_ROUTES,
+  {
+    path: 'activate-account',
+    redirectTo: 'account/activate-account',
+    pathMatch: 'full',
+  },
+  {
+    path: 'forgot-password',
+    redirectTo: 'account/forgot-password',
+    pathMatch: 'full',
+  },
+  {
+    path: 'reset-password',
+    redirectTo: 'account/reset-password',
+    pathMatch: 'full',
+  },
   // Rutas que REQUIEREN tenant activo (tienda pública)
   {
     path: '',

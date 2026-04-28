@@ -2,10 +2,19 @@ import { Component, DOCUMENT, effect, inject, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
 import { DynamicPwaAssetsService, TenantContextService } from '@pwa/core';
-import { IosInstallBannerComponent } from '@pwa/shared';
+import {
+  AppGlobalLoaderComponent,
+  IosInstallBannerComponent,
+  ToastContainerComponent,
+} from '@pwa/shared';
 
 @Component({
-  imports: [RouterModule, IosInstallBannerComponent],
+  imports: [
+    RouterModule,
+    AppGlobalLoaderComponent,
+    IosInstallBannerComponent,
+    ToastContainerComponent,
+  ],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',

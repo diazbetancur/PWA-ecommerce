@@ -1,10 +1,11 @@
+import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @Component({
   selector: 'lib-loader',
   standalone: true,
-  imports: [MatProgressBarModule],
+  imports: [CommonModule, MatProgressBarModule],
   templateUrl: './loader.component.html',
   styleUrl: './loader.component.scss',
 })

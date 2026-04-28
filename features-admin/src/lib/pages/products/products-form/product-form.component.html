@@ -691,7 +691,7 @@
             variant="ghost"
             icon="close"
             (clicked)="cancel()"
-            [disabled]="loading()"
+            [disabled]="submitting()"
           >
             Cancelar
           </app-button>
@@ -700,8 +700,8 @@
             type="submit"
             variant="primary"
             icon="save"
-            [disabled]="loading() || form.invalid"
-            [loading]="loading()"
+            [disabled]="submitting() || form.invalid"
+            [loading]="submitting()"
           >
             {{ submitButtonText() }}
           </app-button>

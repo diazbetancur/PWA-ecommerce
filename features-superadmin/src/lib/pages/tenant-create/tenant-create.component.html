@@ -129,19 +129,19 @@
                 }}
               </span>
               <h3 class="plan-name">{{ plan.name }}</h3>
-              <ul class="plan-features">
+              <div class="plan-features">
                 @for (limit of plan.limits.slice(0, 6); track limit.limitCode) {
-                <li>
+                <div class="plan-feature-item">
                   <span class="material-icons">check</span>
                   {{ limit.description }}
-                </li>
+                </div>
                 } @if (plan.limits.length > 6) {
-                <li class="more-features">
+                <div class="plan-feature-item more-features">
                   <span class="material-icons">add</span>
                   Y {{ plan.limits.length - 6 }} características más
-                </li>
+                </div>
                 }
-              </ul>
+              </div>
             </div>
           </label>
           }
@@ -205,13 +205,10 @@
         <h2>¡Comercio Creado Exitosamente!</h2>
       </div>
       <div class="modal-body">
-        <!-- Mensaje del backend -->
-        @if (createdTenant()?.message) {
         <div class="success-message">
           <span class="material-icons">info</span>
-          <p>{{ createdTenant()?.message }}</p>
+          <p>{{ getCreationSummaryMessage() }}</p>
         </div>
-        }
 
         <!-- Datos del Comercio -->
         <div class="info-section">
@@ -226,17 +223,17 @@
             </div>
             <div class="info-item">
               <label>Estado</label>
-              <span class="badge-status">{{ createdTenant()?.status }}</span>
+              <span class="badge-status">{{
+                getFriendlyStatus(createdTenant()?.status)
+              }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Credenciales del Administrador -->
-        @if (createdTenant()?.temporaryPassword) {
-        <div class="credentials-section">
+        <div class="credentials-section activation-section">
           <h4>
-            <span class="material-icons">vpn_key</span>
-            Credenciales del Administrador
+            <span class="material-icons">mail</span>
+            Activación del Administrador
           </h4>
 
           <div class="credential-item">
@@ -253,35 +250,17 @@
             </div>
           </div>
 
-          <div class="credential-item">
-            <label>Contraseña Temporal</label>
-            <div class="credential-value">
-              <code class="password">{{
-                createdTenant()?.temporaryPassword
-              }}</code>
-              <button
-                class="btn-copy"
-                (click)="copyToClipboard(createdTenant()?.temporaryPassword!)"
-                title="Copiar"
-              >
-                <span class="material-icons">content_copy</span>
-              </button>
-            </div>
-          </div>
-
           <div class="credentials-warning">
-            <span class="material-icons">warning</span>
+            <span class="material-icons">mark_email_read</span>
             <div>
-              <strong>¡Importante!</strong>
+              <strong>Activación segura</strong>
               <p>
-                Guarda estas credenciales en un lugar seguro. La contraseña
-                temporal solo se muestra una vez y debe ser cambiada en el
-                primer inicio de sesión.
+                El administrador principal debe activar su cuenta desde el
+                enlace enviado al correo y definir su propia contraseña.
               </p>
             </div>
           </div>
         </div>
-        }
 
         <!-- Acceso Directo -->
         <div class="access-section">
@@ -308,10 +287,14 @@
             Próximos pasos
           </h4>
           <ol>
-            <li>Guarda las credenciales del administrador</li>
-            <li>Accede usando la URL del comercio</li>
-            <li>Inicia sesión con el email y contraseña proporcionados</li>
-            <li>Cambia la contraseña temporal por una segura</li>
+            <li>Verifica que el correo del administrador sea correcto</li>
+            <li>Confirma la activación de la cuenta desde el correo enviado</li>
+            <li>
+              Accede usando la URL del comercio una vez activada la cuenta
+            </li>
+            <li>
+              Si el correo no llegó, reintenta el reenvío cuando esté disponible
+            </li>
           </ol>
         </div>
       </div>

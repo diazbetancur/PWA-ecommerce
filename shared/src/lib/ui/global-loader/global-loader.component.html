@@ -1,0 +1,24 @@
+@if (isVisible()) {
+<output class="global-loader-overlay" aria-live="polite" aria-busy="true">
+  <div class="global-loader-card">
+    @if (showLogo()) {
+    <img
+      class="global-loader-logo"
+      [src]="tenantLogoUrl()"
+      [alt]="logoAltText()"
+      title="{{ logoAltText() }}"
+      (error)="handleLogoError()"
+    />
+    } @else {
+    <div class="global-loader-dots" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    }
+
+    <p class="global-loader-text">Cargando...</p>
+    <span class="sr-only">Cargando contenido del comercio</span>
+  </div>
+</output>
+}

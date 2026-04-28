@@ -27,15 +27,11 @@ export * from './lib/auth';
 
 // HTTP & Interceptors
 export * from './lib/http';
-export * from './lib/interceptors/tenant-header.interceptor';
 
 // Pipes
 export * from './lib/pipes';
 
 // Providers
-export * from './lib/providers/tenant-app-initializer.provider';
-export * from './lib/providers/tenant-bootstrap.provider';
-export * from './lib/providers/tenant-interceptor.provider';
 
 // Components
 export * from './lib/components/mode-selector/mode-selector-dialog.component';
@@ -46,7 +42,9 @@ export * from './lib/components/tenant-not-found/tenant-not-found.component';
 export * from './lib/routes';
 
 // Errors
+export * from './lib/errors/app-error';
 export * from './lib/errors/global-error-handler';
+export * from './lib/errors/http-error.mapper';
 
 // APIs
 export * from './lib/api/adapters/http-api.adapter';

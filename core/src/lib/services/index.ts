@@ -5,6 +5,8 @@
 
 export * from './api-client.service';
 export * from './app-env.service';
+export * from './global-loader.service';
+export * from './loader.service';
 export * from './manifest.service';
 export * from './product.service';
 export * from './public-cart-ui.service';

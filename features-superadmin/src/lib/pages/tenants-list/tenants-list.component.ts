@@ -171,36 +171,43 @@ export class TenantsListComponent {
   }
 
   deleteTenant(tenant: TenantListItem): void {
-    this.confirmDialog.confirmDelete(
-      tenant.name,
-      'Esta acción no se puede deshacer. Se eliminará el comercio y todos sus datos.'
-    ).subscribe(async (confirmed) => {
-      if (!confirmed) return;
+    this.confirmDialog
+      .confirmDelete(
+        tenant.name,
+        'Esta acción no se puede deshacer. Se eliminará el comercio y todos sus datos.'
+      )
+      .subscribe(async (confirmed) => {
+        if (!confirmed) return;
 
-      try {
-        await this.tenantService.deleteTenant(tenant.id);
-        
-        this.confirmDialog.confirm({
-          title: 'Eliminación exitosa',
-          message: `El comercio "${tenant.name}" ha sido eliminado correctamente.`,
-          confirmText: 'Aceptar',
-          type: 'info',
-          icon: 'check_circle',
-        }).subscribe();
-        
-        await this.loadTenants();
-      } catch (err) {
-        this.confirmDialog.confirm({
-          title: 'Error al eliminar',
-          message: err instanceof Error
-            ? err.message
-            : 'Error al eliminar el comercio. Por favor, inténtelo nuevamente.',
-          confirmText: 'Aceptar',
-          type: 'danger',
-          icon: 'error',
-        }).subscribe();
-      }
-    });
+        try {
+          await this.tenantService.deleteTenant(tenant.id);
+
+          this.confirmDialog
+            .confirm({
+              title: 'Eliminación exitosa',
+              message: `El comercio "${tenant.name}" ha sido eliminado correctamente.`,
+              confirmText: 'Aceptar',
+              type: 'info',
+              icon: 'check_circle',
+            })
+            .subscribe();
+
+          await this.loadTenants();
+        } catch (err) {
+          this.confirmDialog
+            .confirm({
+              title: 'Error al eliminar',
+              message:
+                err instanceof Error
+                  ? err.message
+                  : 'Error al eliminar el comercio. Por favor, inténtelo nuevamente.',
+              confirmText: 'Aceptar',
+              type: 'danger',
+              icon: 'error',
+            })
+            .subscribe();
+        }
+      });
   }
 
   // Utilities
@@ -211,5 +218,28 @@ export class TenantsListComponent {
       month: 'short',
       year: 'numeric',
     }).format(date);
+  }
+
+  getStatusClass(status: string): string {
+    return `status-${status.toLowerCase()}`;
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case TenantStatus.PendingActivation:
+        return 'Pendiente de activación';
+      case TenantStatus.Pending:
+        return 'Pendiente';
+      case TenantStatus.Ready:
+        return 'Activo';
+      case TenantStatus.Seeding:
+        return 'Provisionando';
+      case TenantStatus.Suspended:
+        return 'Suspendido';
+      case TenantStatus.Failed:
+        return 'Fallido';
+      default:
+        return status;
+    }
   }
 }

@@ -42,17 +42,15 @@ export const tenantGuard: CanActivateFn = () => {
   const tenantConfig = inject(TenantConfigService);
   const tenantResolution = inject(TenantResolutionService);
   const router = inject(Router);
+  const resolution = tenantResolution.getCurrentResolution();
 
-  // Verificar tenant desde la fuente unica de verdad
-  if (!tenantResolution.hasTenant()) {
-    // Redirigir al login administrativo cuando no hay tenant
+  // Comportamiento minimo explicito para host sin subdominio tenant.
+  if (!resolution.slug) {
     return router.createUrlTree(['/admin']);
   }
 
-  // Verificar si hay tenant cargado
   if (!tenantConfig.config || !tenantConfig.tenantSlug) {
-    // Redirigir al login administrativo cuando no hay tenant
-    return router.createUrlTree(['/admin']);
+    return router.createUrlTree(['/tenant/not-found']);
   }
 
   return true;

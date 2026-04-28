@@ -337,12 +337,14 @@
 }
 
 .status-pending,
+.status-pendingactivation,
 .status-seeding {
   background: #fef3c7;
   color: #92400e;
 }
 
 .status-pending .status-dot,
+.status-pendingactivation .status-dot,
 .status-seeding .status-dot {
   background: #f59e0b;
 }

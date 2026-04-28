@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import {
   Component,
-  OnDestroy,
-  OnInit,
   computed,
   inject,
+  OnDestroy,
+  OnInit,
   signal,
 } from '@angular/core';
 import {
@@ -13,21 +13,19 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { AppEnvService } from '@pwa/core';
+import { AppEnvService, TenantConfigService } from '@pwa/core';
 import {
   ConfirmationDialogService,
   extractApiErrorMessage,
   ToastService,
 } from '@pwa/shared';
-import { Observable, of } from 'rxjs';
-import { catchError, finalize, map, switchMap } from 'rxjs/operators';
+import { finalize } from 'rxjs/operators';
 import {
   TenantBrandingColorSettings,
   TenantBrandingSettings,
   TenantLocaleSettings,
   TenantSettingsDto,
   UpdateTenantBrandingRequest,
-  UpdateTenantSettingsRequest,
 } from '../../../models/tenant-settings.model';
 import { TenantSettingsService } from '../../../services/tenant-settings.service';
 
@@ -43,6 +41,7 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
   private readonly defaultCurrency = 'HNL';
   private readonly fb = inject(FormBuilder);
   private readonly appEnv = inject(AppEnvService);
+  private readonly tenantConfigService = inject(TenantConfigService);
   private readonly tenantSettingsService = inject(TenantSettingsService);
   private readonly confirmDialog = inject(ConfirmationDialogService);
   private readonly toastService = inject(ToastService);
@@ -74,7 +73,7 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
   readonly logoPreviewUrl = signal<string | null>(null);
   readonly faviconPreviewUrl = signal<string | null>(null);
   readonly savingSection = signal<
-    'branding' | 'contact' | 'social' | 'all' | null
+    'branding' | 'contact' | 'social' | 'locale' | 'seo' | null
   >(null);
   readonly maxBrandingImageSizeMb = this.appEnv.categoryImageMaxSizeMb;
   readonly maxBrandingImageSizeBytes =
@@ -214,34 +213,26 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
     });
   }
 
-  saveAll(): void {
-    if (this.settingsForm.invalid) {
-      this.settingsForm.markAllAsTouched();
-      this.toastService.warning('Revisa los campos antes de guardar.');
+  saveLocale(): void {
+    const group = this.settingsForm.get('locale');
+    if (!group || group.invalid) {
+      group?.markAllAsTouched();
+      this.toastService.warning('Revisa los campos de moneda e impuestos.');
       return;
     }
 
-    this.savingSection.set('all');
+    this.savingSection.set('locale');
     this.tenantSettingsService
-      .updateSettings(this.buildSettingsPayload())
-      .pipe(
-        switchMap((settings) => this.savePendingBrandingFiles(settings)),
-        finalize(() => this.savingSection.set(null))
-      )
+      .updateSettings({
+        locale: this.normalizeLocaleSettings(group.getRawValue()),
+      })
+      .pipe(finalize(() => this.savingSection.set(null)))
       .subscribe({
-        next: ({ settings, brandingUploadFailed }) => {
-          this.applySettings(settings, {
-            resetBrandingUploads: !brandingUploadFailed,
-          });
-
-          if (brandingUploadFailed) {
-            this.toastService.warning(
-              'La configuracion general se guardo, pero no se pudieron subir las imagenes de branding.'
-            );
-            return;
-          }
-
-          this.toastService.success('Configuración actualizada correctamente');
+        next: (settings) => {
+          this.applySettings(settings);
+          this.toastService.success(
+            'Moneda e impuestos actualizados correctamente'
+          );
         },
         error: (error) => {
           this.toastService.error(extractApiErrorMessage(error));
@@ -249,7 +240,34 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
       });
   }
 
-  isSaving(section: 'branding' | 'contact' | 'social' | 'all'): boolean {
+  saveSeo(): void {
+    const group = this.settingsForm.get('seo');
+    if (!group || group.invalid) {
+      group?.markAllAsTouched();
+      this.toastService.warning('Revisa los campos de SEO.');
+      return;
+    }
+
+    this.savingSection.set('seo');
+    this.tenantSettingsService
+      .updateSettings({
+        seo: group.getRawValue(),
+      })
+      .pipe(finalize(() => this.savingSection.set(null)))
+      .subscribe({
+        next: (settings) => {
+          this.applySettings(settings);
+          this.toastService.success('SEO actualizado correctamente');
+        },
+        error: (error) => {
+          this.toastService.error(extractApiErrorMessage(error));
+        },
+      });
+  }
+
+  isSaving(
+    section: 'branding' | 'contact' | 'social' | 'locale' | 'seo'
+  ): boolean {
     return this.savingSection() === section;
   }
 
@@ -314,20 +332,11 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
       ?.patchValue(this.extractBrandingColorSettings(branding));
     this.existingLogoUrl.set(branding.logoUrl || null);
     this.existingFaviconUrl.set(branding.faviconUrl || null);
+    this.tenantConfigService.updateRuntimeBranding(branding);
 
     if (resetUploads) {
       this.resetBrandingUploadState();
     }
-  }
-
-  private buildSettingsPayload(): UpdateTenantSettingsRequest {
-    const rawValue =
-      this.settingsForm.getRawValue() as UpdateTenantSettingsRequest;
-
-    return {
-      ...rawValue,
-      locale: this.normalizeLocaleSettings(rawValue.locale),
-    };
   }
 
   private buildBrandingPayload(): UpdateTenantBrandingRequest {
@@ -446,47 +455,6 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
     this.selectedFaviconFile.set(null);
     this.faviconPreviewUrl.set(null);
     this.revokeFaviconObjectUrl();
-  }
-
-  private savePendingBrandingFiles(settings: TenantSettingsDto): Observable<{
-    settings: TenantSettingsDto;
-    brandingUploadFailed: boolean;
-  }> {
-    if (!this.hasPendingBrandingFiles()) {
-      return of({ settings, brandingUploadFailed: false });
-    }
-
-    return this.tenantSettingsService
-      .updateBranding(this.buildBrandingFilesPayload())
-      .pipe(
-        map((branding) => ({
-          settings: this.mergeBrandingIntoSettings(settings, branding),
-          brandingUploadFailed: false,
-        })),
-        catchError(() =>
-          of({
-            settings,
-            brandingUploadFailed: true,
-          })
-        )
-      );
-  }
-
-  private hasPendingBrandingFiles(): boolean {
-    return !!(this.selectedLogoFile() || this.selectedFaviconFile());
-  }
-
-  private mergeBrandingIntoSettings(
-    settings: TenantSettingsDto,
-    branding: TenantBrandingSettings
-  ): TenantSettingsDto {
-    return {
-      ...settings,
-      branding: {
-        ...settings.branding,
-        ...branding,
-      },
-    };
   }
 
   private extractBrandingColorSettings(

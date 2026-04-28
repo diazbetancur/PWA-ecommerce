@@ -222,19 +222,18 @@
 }
 
 .plan-features {
-  list-style: none;
-  padding: 0;
+  display: grid;
+  gap: 0.5rem;
   margin: 0;
   text-align: left;
 }
 
-.plan-features li {
+.plan-feature-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.875rem;
   color: #374151;
-  margin-bottom: 0.5rem;
 }
 
 .plan-features .material-icons {
@@ -242,12 +241,12 @@
   color: #10b981;
 }
 
-.plan-features li.more-features {
+.plan-feature-item.more-features {
   color: #6b7280;
   font-style: italic;
 }
 
-.plan-features li.more-features .material-icons {
+.plan-feature-item.more-features .material-icons {
   color: #6b7280;
 }
 

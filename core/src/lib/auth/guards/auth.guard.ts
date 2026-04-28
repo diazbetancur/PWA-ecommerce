@@ -11,7 +11,7 @@ export const AuthGuard: CanActivateFn = () => {
 
   const tenantSlug = tenantResolution.getTenantSlug();
   if (tenantSlug && !tenantResolution.isAdminContext()) {
-    router.navigateByUrl(`/account/login?tenant=${tenantSlug}`);
+    router.navigateByUrl('/account/login');
   } else {
     router.navigateByUrl('/admin/login');
   }

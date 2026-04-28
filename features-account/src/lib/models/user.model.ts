@@ -41,8 +41,19 @@ export interface AuthResponse {
   expiresIn: number;
 }
 
+export interface AuthActionResponse {
+  success: boolean;
+  message: string;
+}
+
 export interface ForgotPasswordRequest {
   email: string;
+}
+
+export interface ActivateAccountRequest {
+  token: string;
+  password: string;
+  confirmPassword: string;
 }
 
 export interface ResetPasswordRequest {

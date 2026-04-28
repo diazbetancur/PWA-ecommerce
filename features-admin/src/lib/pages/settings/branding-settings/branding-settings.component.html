@@ -52,14 +52,6 @@
     <section class="section-card" formGroupName="branding">
       <div class="section-header">
         <h2>Branding</h2>
-        <button
-          type="button"
-          class="btn btn-primary"
-          (click)="saveBranding()"
-          [disabled]="isSaving('branding')"
-        >
-          @if (isSaving('branding')) { Guardando... } @else { Guardar branding }
-        </button>
       </div>
 
       <div class="grid two">
@@ -179,19 +171,22 @@
           <input type="color" formControlName="backgroundColor" />
         </label>
       </div>
+
+      <div class="section-actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveBranding()"
+          [disabled]="isSaving('branding')"
+        >
+          @if (isSaving('branding')) { Guardando... } @else { Guardar branding }
+        </button>
+      </div>
     </section>
     } @if (activeTab() === 'contact') {
     <section class="section-card" formGroupName="contact">
       <div class="section-header">
         <h2>Contacto</h2>
-        <button
-          type="button"
-          class="btn"
-          (click)="saveContact()"
-          [disabled]="isSaving('contact')"
-        >
-          @if (isSaving('contact')) { Guardando... } @else { Guardar contacto }
-        </button>
       </div>
 
       <div class="grid two">
@@ -212,19 +207,22 @@
           <input type="text" formControlName="address" />
         </label>
       </div>
+
+      <div class="section-actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveContact()"
+          [disabled]="isSaving('contact')"
+        >
+          @if (isSaving('contact')) { Guardando... } @else { Guardar contacto }
+        </button>
+      </div>
     </section>
     } @if (activeTab() === 'social') {
     <section class="section-card" formGroupName="social">
       <div class="section-header">
         <h2>Redes Sociales</h2>
-        <button
-          type="button"
-          class="btn"
-          (click)="saveSocial()"
-          [disabled]="isSaving('social')"
-        >
-          @if (isSaving('social')) { Guardando... } @else { Guardar redes }
-        </button>
       </div>
 
       <div class="grid two">
@@ -244,6 +242,17 @@
           TikTok
           <input type="url" formControlName="tikTok" />
         </label>
+      </div>
+
+      <div class="section-actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveSocial()"
+          [disabled]="isSaving('social')"
+        >
+          @if (isSaving('social')) { Guardando... } @else { Guardar redes }
+        </button>
       </div>
     </section>
     } @if (activeTab() === 'advanced') {
@@ -269,6 +278,18 @@
           <input type="number" step="0.01" formControlName="taxRate" />
         </label>
       </div>
+
+      <div class="section-actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveLocale()"
+          [disabled]="isSaving('locale')"
+        >
+          @if (isSaving('locale')) { Guardando... } @else { Guardar moneda e
+          impuestos }
+        </button>
+      </div>
     </section>
 
     <section class="section-card" formGroupName="seo">
@@ -287,19 +308,19 @@
           <input type="text" formControlName="keywords" />
         </label>
       </div>
+
+      <div class="section-actions">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveSeo()"
+          [disabled]="isSaving('seo')"
+        >
+          @if (isSaving('seo')) { Guardando... } @else { Guardar SEO }
+        </button>
+      </div>
     </section>
     }
-
-    <div class="actions">
-      <button
-        type="button"
-        class="btn btn-primary"
-        (click)="saveAll()"
-        [disabled]="isSaving('all')"
-      >
-        @if (isSaving('all')) { Guardando... } @else { Guardar todo }
-      </button>
-    </div>
   </form>
   }
 </div>

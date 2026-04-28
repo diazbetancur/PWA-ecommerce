@@ -5,7 +5,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogModule,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -32,7 +36,9 @@ interface TenantDetailDialogData {
 })
 export class TenantDetailDialogComponent implements OnInit {
   private readonly tenantService = inject(TenantAdminService);
-  private readonly dialogRef = inject(MatDialogRef<TenantDetailDialogComponent>);
+  private readonly dialogRef = inject(
+    MatDialogRef<TenantDetailDialogComponent>
+  );
   private readonly data = inject<TenantDetailDialogData>(MAT_DIALOG_DATA);
 
   readonly isLoading = signal(false);
@@ -48,7 +54,9 @@ export class TenantDetailDialogComponent implements OnInit {
     this.error.set(null);
 
     try {
-      const details = await this.tenantService.getTenantById(this.data.tenantId);
+      const details = await this.tenantService.getTenantById(
+        this.data.tenantId
+      );
       this.tenant.set(details);
     } catch (err: unknown) {
       this.error.set('Error al cargar los detalles del comercio');
@@ -75,7 +83,7 @@ export class TenantDetailDialogComponent implements OnInit {
   getAllowedOriginsList(): string[] {
     const tenant = this.tenant();
     if (!tenant?.allowedOrigins) return [];
-    return tenant.allowedOrigins.split(',').map(o => o.trim());
+    return tenant.allowedOrigins.split(',').map((o) => o.trim());
   }
 
   formatDate(dateStr: string): string {
@@ -90,6 +98,25 @@ export class TenantDetailDialogComponent implements OnInit {
 
   getStatusClass(status: string): string {
     return `status-${status.toLowerCase()}`;
+  }
+
+  getStatusLabel(status: string): string {
+    switch (status) {
+      case 'PendingActivation':
+        return 'Pendiente de activación';
+      case 'Pending':
+        return 'Pendiente';
+      case 'Ready':
+        return 'Activo';
+      case 'Seeding':
+        return 'Provisionando';
+      case 'Suspended':
+        return 'Suspendido';
+      case 'Failed':
+        return 'Fallido';
+      default:
+        return status;
+    }
   }
 
   getStepStatusIcon(status: string): string {

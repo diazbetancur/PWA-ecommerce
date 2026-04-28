@@ -11,6 +11,9 @@ import { AppEnvService } from '../services/app-env.service';
 import { TenantContextService } from '../services/tenant-context.service';
 
 /**
+ * LEGACY: este interceptor ya no participa en el runtime activo.
+ * El flujo vigente usa authTenantInterceptor como único punto base para headers.
+ *
  * Interceptor que automáticamente añade headers de tenant a todas las requests HTTP
  * que requieran contexto de tenant (excluyendo endpoints públicos)
  *
@@ -44,9 +47,6 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
             'X-Admin-Mode': 'general',
           },
         });
-
-        if (this.isDevelopment()) {
-        }
 
         return next.handle(adminRequest);
       }
@@ -145,9 +145,6 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
     }
 
     // Si hay body, mostrarlo
-    if (req.body) {
-    }
-
     console.groupEnd();
   }
 
@@ -167,9 +164,6 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
       `✅ [TenantHeaderInterceptor] ${req.method} ${relativePath} - ${event.status}`
     );
 
-    if (event.body) {
-    }
-
     console.groupEnd();
   }
 
@@ -188,9 +182,6 @@ export class TenantHeaderInterceptor implements HttpInterceptor {
     console.group(
       `❌ [TenantHeaderInterceptor] ${req.method} ${relativePath} - ERROR`
     );
-
-    if (error.error) {
-    }
 
     console.groupEnd();
   }

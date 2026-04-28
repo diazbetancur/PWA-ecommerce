@@ -1,12 +1,13 @@
 # Tenant Configuration Files
 
-Esta carpeta contiene archivos de configuración JSON para tenants en modo **Mock API**.
+Esta carpeta conserva archivos JSON de tenant solo para pruebas aisladas y debugging manual fuera del flujo principal.
 
 ## ⚠️ Importante
 
 - Los archivos demo (`demo-a.json`, `demo-b.json`) han sido **eliminados**
-- Esta carpeta solo se usa cuando `mockApi: true` en el environment
-- En producción/QA, las configuraciones se cargan desde el backend Azure
+- El flujo normal de local, dev, QA y PDN ya no usa `mockApi`
+- La configuración real de tenant se carga desde el backend por subdominio en todos los ambientes
+- Estos JSON no forman parte del runtime principal ni de la validación oficial del frontend
 
 ## 📝 Cómo Crear un Tenant de Prueba
 
@@ -56,7 +57,7 @@ Crea un archivo con el nombre del tenant slug, por ejemplo: `my-store.json`
 ### 2. Acceder en el navegador
 
 ```
-http://localhost:4200?tenant=my-store
+http://my-store.localhost:4200
 ```
 
 ### 3. Verificar en DevTools
@@ -64,8 +65,8 @@ http://localhost:4200?tenant=my-store
 Abre la consola (F12) y deberías ver:
 
 ```
-🌐 [TenantConfigService] Cargando desde: /config/tenants/my-store.json
-✅ Tenant cargado exitosamente
+GET /api/public/store/tenant/config
+X-Tenant-Slug: my-store
 ```
 
 ## 🚀 Uso en QA/Producción
@@ -84,7 +85,7 @@ Si el tenant no se carga:
 1. **Verifica el nombre del archivo**: Debe ser exactamente `{slug}.json`
 2. **Verifica el JSON**: Usa un validador JSON online
 3. **Revisa la consola**: F12 → Console → busca errores
-4. **Modo Mock**: Verifica que `mockApi: true` en `environment.ts`
+4. **Prueba aislada**: Si decides usar estos JSON en un experimento local, hazlo fuera del flujo normal y sin reintroducir ramas por ambiente
 
 ## 📂 Estructura Mínima Requerida
 
@@ -121,4 +122,4 @@ Si tienes problemas creando tenants de prueba:
 
 ---
 
-**Nota**: Para testing real, es recomendable crear tenants directamente en QA/Azure en lugar de usar mock files.
+**Nota**: Para testing real, crea tenants en backend y valida el acceso por subdominio; no reintroduzcas `mockApi` al flujo oficial.

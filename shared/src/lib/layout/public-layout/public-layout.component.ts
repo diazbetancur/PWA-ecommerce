@@ -13,7 +13,6 @@ import {
   SitePopupData,
   WhatsappButtonComponent,
 } from '../../ui';
-import { ToastContainerComponent } from '../../ui/toast-container/toast-container.component';
 
 @Component({
   selector: 'lib-public-layout',
@@ -25,7 +24,6 @@ import { ToastContainerComponent } from '../../ui/toast-container/toast-containe
     FooterComponent,
     SitePopupComponent,
     WhatsappButtonComponent,
-    ToastContainerComponent,
   ],
   templateUrl: './public-layout.component.html',
   styleUrl: './public-layout.component.scss',
@@ -67,10 +65,9 @@ export class PublicLayoutComponent {
   });
 
   readonly watermarkBackgroundImage = computed(() => {
-    const config = this.tenantContext.getCurrentTenantConfig();
-    const tenantLogo =
-      config?.tenant.branding?.logoUrl || config?.theme?.logoUrl;
-    const logo = this.resolveLogoUrl(tenantLogo, config?.cdnBaseUrl);
+    const logo =
+      this.tenantContext.getResolvedTenantLogoUrl() ||
+      '/assets/images/logoEcommerce.png';
     return `url('${logo}')`;
   });
 
@@ -100,33 +97,5 @@ export class PublicLayoutComponent {
         this.showPopup.set(false);
       },
     });
-  }
-
-  private resolveLogoUrl(logoUrl?: string, cdnBaseUrl?: string): string {
-    if (!logoUrl) {
-      return '/assets/images/logoEcommerce.png';
-    }
-
-    if (
-      logoUrl.startsWith('http://') ||
-      logoUrl.startsWith('https://') ||
-      logoUrl.startsWith('data:') ||
-      logoUrl.startsWith('blob:')
-    ) {
-      return logoUrl;
-    }
-
-    if (logoUrl.startsWith('/')) {
-      return logoUrl;
-    }
-
-    if (cdnBaseUrl) {
-      const normalizedBase = cdnBaseUrl.endsWith('/')
-        ? cdnBaseUrl
-        : `${cdnBaseUrl}/`;
-      return `${normalizedBase}${logoUrl}`;
-    }
-
-    return `/${logoUrl}`;
   }
 }

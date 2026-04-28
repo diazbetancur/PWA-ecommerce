@@ -1,5 +1,6 @@
 export enum TenantStatus {
   Pending = 'Pending',
+  PendingActivation = 'PendingActivation',
   Seeding = 'Seeding',
   Ready = 'Ready',
   Suspended = 'Suspended',
@@ -88,7 +89,7 @@ export interface CreateTenantResponse {
   slug: string;
   status: string;
   adminEmail: string;
-  temporaryPassword: string;
+  activationNotificationAccepted: boolean;
   message: string;
 }
 

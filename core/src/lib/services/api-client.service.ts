@@ -1,5 +1,6 @@
 import {
   HttpClient,
+  HttpContext,
   HttpHeaders,
   HttpParams,
   HttpResponse,
@@ -7,10 +8,12 @@ import {
 import { Injectable, inject } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { mapErrorToAppError } from '../errors/http-error.mapper';
 import { AppEnvService } from './app-env.service';
 
 export interface ApiRequestOptions {
   headers?: HttpHeaders | { [header: string]: string | string[] };
+  context?: HttpContext;
   params?:
     | HttpParams
     | {
@@ -268,7 +271,14 @@ export class ApiClientService {
     startTime: number
   ): Observable<never> {
     const duration = Math.round(performance.now() - startTime);
+    const appError = mapErrorToAppError(error);
     if (this.envService.isConsoleLoggingEnabled) {
+      console.error('[ApiClientService] Request failed', {
+        method,
+        relativePath,
+        duration,
+        appError,
+      });
     }
     return throwError(() => error);
   }
@@ -387,15 +397,15 @@ export class ApiClientService {
 
   getClientInfo(): {
     baseUrl: string;
-    mockApi: boolean;
     loggingEnabled: boolean;
     environment: string;
+    serviceWorkerEnabled: boolean;
   } {
     return {
       baseUrl: this.envService.apiBaseUrl,
-      mockApi: this.envService.useMockApi,
       loggingEnabled: this.envService.isConsoleLoggingEnabled,
-      environment: this.envService.isProduction ? 'production' : 'development',
+      environment: this.envService.environmentName,
+      serviceWorkerEnabled: this.envService.isServiceWorkerEnabled,
     };
   }
 }

@@ -9,7 +9,6 @@ import {
   ApplicationConfig,
   ErrorHandler,
   inject,
-  isDevMode,
   PLATFORM_ID,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
@@ -32,9 +31,11 @@ import { appRoutes } from './app.routes';
 import {
   APP_ENV,
   APP_ENV_INITIALIZER,
+  AppError,
   AuthService,
   authTenantInterceptor,
   GlobalErrorHandler,
+  HTTP_ERROR_NOTIFIER,
   LoggerService,
   ManifestService,
   PushService,
@@ -45,6 +46,7 @@ import {
   TranslocoHttpLoader,
   UserModeService,
 } from '@pwa/core';
+import { ToastService } from '@pwa/shared';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -66,6 +68,13 @@ export const appConfig: ApplicationConfig = {
     }),
     // Inicializador del entorno (debe ir primero)
     APP_ENV_INITIALIZER,
+    {
+      provide: HTTP_ERROR_NOTIFIER,
+      deps: [ToastService],
+      useFactory: (toastService: ToastService) => (appError: AppError) => {
+        toastService.error(appError.userMessage);
+      },
+    },
     {
       provide: APP_INITIALIZER,
       multi: true,
@@ -120,7 +129,7 @@ export const appConfig: ApplicationConfig = {
     },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
     provideServiceWorker('ngsw-worker.js', {
-      enabled: !isDevMode(),
+      enabled: environment.enableServiceWorker,
       registrationStrategy: 'registerWhenStable:30000',
     }),
   ],

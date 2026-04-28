@@ -1,6 +1,7 @@
 // UI Components
 export * from './banner-carousel/banner-carousel.component';
 export * from './footer/footer.component';
+export * from './global-loader/global-loader.component';
 export * from './header/header.component';
 export * from './product-card/product-card.component';
 export * from './site-popup/site-popup.component';

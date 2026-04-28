@@ -256,14 +256,7 @@ export class AuthService {
   async getProfile(): Promise<UserProfile> {
     // Verificar si hay tenant activo
     const hasTenant = !!this.tenantConfig.tenantSlug;
-    let endpoint = hasTenant ? '/auth/me' : '/admin/auth/me';
-
-    // Agregar tenant como query parameter si está disponible
-    if (hasTenant && this.tenantConfig.tenantSlug) {
-      endpoint = `${endpoint}?tenant=${encodeURIComponent(
-        this.tenantConfig.tenantSlug
-      )}`;
-    }
+    const endpoint = hasTenant ? '/auth/me' : '/admin/auth/me';
 
     return await firstValueFrom(this.apiClient.get<UserProfile>(endpoint));
   }

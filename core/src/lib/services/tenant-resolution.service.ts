@@ -1,7 +1,7 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 
-export type TenantResolutionSource = 'subdomain' | 'query' | 'default' | 'none';
+export type TenantResolutionSource = 'subdomain' | 'none';
 
 export type TenantHostContext = 'storefront' | 'admin' | 'reserved' | 'unknown';
 
@@ -32,6 +32,9 @@ export class TenantResolutionService {
     'api',
     'admin',
     'app',
+    'qa',
+    'prod',
+    'pdn',
     'staging',
     'dev',
     'localhost',
@@ -109,22 +112,6 @@ export class TenantResolutionService {
       };
     }
 
-    const queryCandidate = this.extractQueryTenant(url.searchParams);
-    if (queryCandidate && this.isValidTenantSlug(queryCandidate)) {
-      return {
-        slug: queryCandidate,
-        source: 'query',
-        hostname,
-        port,
-        hostContext,
-        isValidCandidate: true,
-        isFallback: true,
-        isStorefrontTenant: hostContext !== 'admin',
-        isAdminHost: hostContext === 'admin',
-        debug: 'resolved_from_query_fallback',
-      };
-    }
-
     return this.buildNoneResult(
       hostname,
       port,
@@ -191,20 +178,6 @@ export class TenantResolutionService {
     if (labels.length >= 3) {
       const candidate = labels[0];
       return this.reservedHostLabels.has(candidate) ? null : candidate;
-    }
-
-    return null;
-  }
-
-  private extractQueryTenant(params: URLSearchParams): string | null {
-    const tenant = (params.get('tenant') || '').trim().toLowerCase();
-    if (tenant) {
-      return tenant;
-    }
-
-    const store = (params.get('store') || '').trim().toLowerCase();
-    if (store) {
-      return store;
     }
 
     return null;

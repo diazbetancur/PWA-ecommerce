@@ -1,7 +1,7 @@
 <div class="login-container">
   <div class="login-card">
     <h1>Iniciar Sesión</h1>
-    <p class="subtitle">Bienvenido a {{ tenantName() }}</p>
+    <p class="subtitle">Accede a {{ tenantName() }} con tus credenciales.</p>
 
     @if (errorMessage()) {
     <div class="alert alert-error">
@@ -11,12 +11,13 @@
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="email">Email</label>
+        <label for="email">Email <span class="required">*</span></label>
         <input
           type="email"
           id="email"
           formControlName="email"
-          placeholder="tu@email.com"
+          placeholder="admin@mitienda.com"
+          autocomplete="username"
           [class.error]="getFieldError('email')"
         />
         @if (getFieldError('email')) {
@@ -25,7 +26,7 @@
       </div>
 
       <div class="form-group">
-        <label for="password">Contraseña</label>
+        <label for="password">Contraseña <span class="required">*</span></label>
         <div class="password-input">
           <input
             [type]="showPassword() ? 'text' : 'password'"
@@ -38,9 +39,11 @@
             type="button"
             class="toggle-password"
             (click)="togglePasswordVisibility()"
-            aria-label="Mostrar contraseña"
+            aria-label="Mostrar u ocultar contraseña"
           >
-            {{ showPassword() ? '🙈' : '👁️' }}
+            <span class="material-icons">
+              {{ showPassword() ? 'visibility_off' : 'visibility' }}
+            </span>
           </button>
         </div>
         @if (getFieldError('password')) {
@@ -65,7 +68,7 @@
       >
         @if (isLoading()) {
         <span class="spinner"></span>
-        Iniciando sesión... } @else { Iniciar Sesión }
+        Iniciando sesión... } @else { Iniciar sesión }
       </button>
     </form>
 

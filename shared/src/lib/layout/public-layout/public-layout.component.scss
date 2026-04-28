@@ -17,8 +17,25 @@
   background-repeat: no-repeat;
   background-position: center;
   background-size: min(76vw, 76vh);
-  opacity: 0.00125;
+  opacity: 0.042;
   mix-blend-mode: multiply;
+  transform-origin: center;
+  will-change: transform;
+  animation: watermark-drift 24s ease-in-out infinite alternate;
+}
+
+@keyframes watermark-drift {
+  0% {
+    transform: translate3d(-0.75rem, -0.5rem, 0) scale(1) rotate(-0.6deg);
+  }
+
+  50% {
+    transform: translate3d(0.5rem, 0.75rem, 0) scale(1.018) rotate(0.4deg);
+  }
+
+  100% {
+    transform: translate3d(-0.35rem, 0.9rem, 0) scale(1.03) rotate(0.75deg);
+  }
 }
 
 .public-layout > * {
@@ -78,13 +95,20 @@ main {
 @media (max-width: 768px) {
   .public-layout::before {
     background-size: min(80vw, 80vh);
-    opacity: 0.065;
+    opacity: 0.055;
   }
 }
 
 @media (min-width: 1440px) {
   .public-layout::before {
     background-size: min(70vw, 70vh);
-    opacity: 0.055;
+    opacity: 0.05;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-layout::before {
+    animation: none;
+    transform: none;
   }
 }

@@ -15,6 +15,7 @@ import {
   CreateTenantResponse,
   Plan,
   TenantPlan,
+  TenantStatus,
 } from '../../models/tenant.model';
 import { TenantAdminService } from '../../services/tenant-admin.service';
 
@@ -181,6 +182,39 @@ export class TenantCreateComponent implements OnInit {
     this.showSuccessModal.set(false);
     this.createdTenant.set(null);
     this.goBack();
+  }
+
+  getFriendlyStatus(status?: string | null): string {
+    switch (status) {
+      case TenantStatus.PendingActivation:
+        return 'Pendiente de activación';
+      case TenantStatus.Pending:
+        return 'Pendiente';
+      case TenantStatus.Ready:
+        return 'Activo';
+      case TenantStatus.Suspended:
+        return 'Suspendido';
+      case TenantStatus.Failed:
+        return 'Fallido';
+      case TenantStatus.Seeding:
+        return 'Provisionando';
+      default:
+        return status || 'Sin estado';
+    }
+  }
+
+  getCreationSummaryMessage(): string {
+    const tenant = this.createdTenant();
+
+    if (!tenant) {
+      return '';
+    }
+
+    if (tenant.activationNotificationAccepted) {
+      return 'Comercio creado correctamente. Se envió un enlace de activación al correo del administrador.';
+    }
+
+    return 'Comercio creado correctamente, pero no se pudo enviar el correo de activación. Intenta reenviarlo más tarde.';
   }
 
   getAccessUrl(): string {
