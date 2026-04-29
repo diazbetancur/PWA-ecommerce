@@ -77,6 +77,13 @@
   margin-bottom: 12px;
 }
 
+.field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+}
+
 .section-actions {
   display: flex;
   justify-content: flex-end;
@@ -104,6 +111,34 @@
   small {
     color: #6b7280;
     font-size: 12px;
+  }
+}
+
+.info-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #64748b;
+  cursor: help;
+  transition: color 0.2s ease, background-color 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--tenant-primary-color, #111827);
+    background: rgba(59, 130, 246, 0.08);
+    outline: none;
+  }
+
+  .mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
   }
 }
 

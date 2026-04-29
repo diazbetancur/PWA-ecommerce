@@ -13,6 +13,8 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AppEnvService, TenantConfigService } from '@pwa/core';
 import {
   ConfirmationDialogService,
@@ -32,7 +34,7 @@ import { TenantSettingsService } from '../../../services/tenant-settings.service
 @Component({
   selector: 'lib-branding-settings',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, MatIconModule, MatTooltipModule],
   templateUrl: './branding-settings.component.html',
   styleUrl: './branding-settings.component.scss',
 })
@@ -60,6 +62,44 @@ export class BrandingSettingsComponent implements OnInit, OnDestroy {
       symbol: '$',
     },
   ] as const;
+  readonly fieldHelpText = {
+    logo: 'Sube el logo principal de tu negocio. Se usa para identificar tu tienda visualmente.',
+    favicon:
+      'Es el icono pequeno que aparece en la pestana del navegador y en favoritos.',
+    primaryColor:
+      'Es el color principal de tu marca. Suele verse en botones y elementos destacados.',
+    secondaryColor:
+      'Es un color de apoyo para combinar tu identidad visual en la tienda.',
+    accentColor:
+      'Sirve para resaltar detalles o puntos de atencion dentro de la interfaz.',
+    backgroundColor:
+      'Define el color base de fondo para mantener una apariencia clara y consistente.',
+    email:
+      'Correo principal para que tus clientes sepan como comunicarse con tu negocio.',
+    phone:
+      'Numero principal de contacto del negocio para llamadas o consultas.',
+    whatsApp:
+      'Numero o enlace de WhatsApp para atencion rapida con tus clientes.',
+    address:
+      'Direccion fisica del negocio, si deseas mostrar un punto de referencia o ubicacion.',
+    facebook: 'Enlace publico a la pagina de Facebook de tu negocio.',
+    instagram:
+      'Enlace publico al perfil de Instagram que quieres mostrar en tu tienda.',
+    twitter: 'Enlace publico a tu perfil de X o Twitter.',
+    tikTok: 'Enlace publico al perfil de TikTok de tu negocio.',
+    currency:
+      'Moneda base en la que se mostraran los precios y montos de tu tienda.',
+    currencySymbol:
+      'Simbolo que acompana los precios. Se completa automaticamente segun la moneda elegida.',
+    taxRate:
+      'Porcentaje de impuesto que usaras como referencia en tus calculos o visualizacion.',
+    seoTitle:
+      'Titulo con el que tu tienda puede aparecer en buscadores y en la pestana del navegador.',
+    seoDescription:
+      'Descripcion corta de tu tienda para buscadores y vistas compartidas.',
+    seoKeywords:
+      'Palabras clave relacionadas con tu negocio para describir mejor su contenido.',
+  } as const;
 
   readonly isLoading = signal(false);
   readonly errorMessage = signal<string | null>(null);

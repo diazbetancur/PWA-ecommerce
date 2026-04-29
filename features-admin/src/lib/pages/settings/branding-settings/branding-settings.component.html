@@ -57,7 +57,19 @@
       <div class="grid two">
         <div class="media-field">
           <div class="media-field-header">
-            <span>Logo</span>
+            <div class="field-label">
+              <span>Logo</span>
+              <button
+                type="button"
+                class="info-trigger"
+                [matTooltip]="fieldHelpText.logo"
+                matTooltipPosition="above"
+                matTooltipClass="branding-help-tooltip"
+                aria-label="Informacion sobre el logo"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            </div>
             <small
               >Adjunta una imagen. Max {{ maxBrandingImageSizeMb }} MB.</small
             >
@@ -105,7 +117,19 @@
 
         <div class="media-field">
           <div class="media-field-header">
-            <span>Favicon</span>
+            <div class="field-label">
+              <span>Favicon</span>
+              <button
+                type="button"
+                class="info-trigger"
+                [matTooltip]="fieldHelpText.favicon"
+                matTooltipPosition="above"
+                matTooltipClass="branding-help-tooltip"
+                aria-label="Informacion sobre el favicon"
+              >
+                <mat-icon>info_outline</mat-icon>
+              </button>
+            </div>
             <small>PNG, SVG o ICO. Max {{ maxBrandingImageSizeMb }} MB.</small>
           </div>
 
@@ -155,19 +179,67 @@
 
       <div class="grid four colors">
         <label>
-          Primary
+          <span class="field-label">
+            <span>Primary</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.primaryColor"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre el color principal"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="color" formControlName="primaryColor" />
         </label>
         <label>
-          Secondary
+          <span class="field-label">
+            <span>Secondary</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.secondaryColor"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre el color secundario"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="color" formControlName="secondaryColor" />
         </label>
         <label>
-          Accent
+          <span class="field-label">
+            <span>Accent</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.accentColor"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre el color de acento"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="color" formControlName="accentColor" />
         </label>
         <label>
-          Background
+          <span class="field-label">
+            <span>Background</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.backgroundColor"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre el color de fondo"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="color" formControlName="backgroundColor" />
         </label>
       </div>
@@ -191,19 +263,67 @@
 
       <div class="grid two">
         <label>
-          Email
+          <span class="field-label">
+            <span>Email</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.email"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre el correo de contacto"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="email" formControlName="email" />
         </label>
         <label>
-          Teléfono
+          <span class="field-label">
+            <span>Teléfono</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.phone"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre el telefono"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="text" formControlName="phone" />
         </label>
         <label>
-          WhatsApp
+          <span class="field-label">
+            <span>WhatsApp</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.whatsApp"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre WhatsApp"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="text" formControlName="whatsApp" />
         </label>
         <label>
-          Dirección
+          <span class="field-label">
+            <span>Dirección</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.address"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre la direccion"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="text" formControlName="address" />
         </label>
       </div>
@@ -227,19 +347,67 @@
 
       <div class="grid two">
         <label>
-          Facebook
+          <span class="field-label">
+            <span>Facebook</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.facebook"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre Facebook"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="url" formControlName="facebook" />
         </label>
         <label>
-          Instagram
+          <span class="field-label">
+            <span>Instagram</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.instagram"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre Instagram"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="url" formControlName="instagram" />
         </label>
         <label>
-          Twitter / X
+          <span class="field-label">
+            <span>Twitter / X</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.twitter"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre Twitter o X"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="url" formControlName="twitter" />
         </label>
         <label>
-          TikTok
+          <span class="field-label">
+            <span>TikTok</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.tikTok"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre TikTok"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="url" formControlName="tikTok" />
         </label>
       </div>
@@ -260,7 +428,19 @@
       <h2>Moneda e impuestos</h2>
       <div class="grid three">
         <label>
-          Moneda
+          <span class="field-label">
+            <span>Moneda</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.currency"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre la moneda"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <select formControlName="currency" (change)="onCurrencyChange()">
             @for (option of currencyOptions; track option.code) {
             <option [value]="option.code">
@@ -270,11 +450,35 @@
           </select>
         </label>
         <label>
-          Simbolo
+          <span class="field-label">
+            <span>Simbolo</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.currencySymbol"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre el simbolo"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="text" formControlName="currencySymbol" readonly />
         </label>
         <label>
-          Impuesto (%)
+          <span class="field-label">
+            <span>Impuesto (%)</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.taxRate"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre el impuesto"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="number" step="0.01" formControlName="taxRate" />
         </label>
       </div>
@@ -296,15 +500,51 @@
       <h2>SEO</h2>
       <div class="grid one">
         <label>
-          Title
+          <span class="field-label">
+            <span>Title</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.seoTitle"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre el titulo SEO"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="text" formControlName="title" />
         </label>
         <label>
-          Description
+          <span class="field-label">
+            <span>Description</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.seoDescription"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre la descripcion SEO"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <textarea rows="3" formControlName="description"></textarea>
         </label>
         <label>
-          Keywords
+          <span class="field-label">
+            <span>Keywords</span>
+            <button
+              type="button"
+              class="info-trigger"
+              [matTooltip]="fieldHelpText.seoKeywords"
+              matTooltipPosition="above"
+              matTooltipClass="branding-help-tooltip"
+              aria-label="Informacion sobre las palabras clave"
+            >
+              <mat-icon>info_outline</mat-icon>
+            </button>
+          </span>
           <input type="text" formControlName="keywords" />
         </label>
       </div>
